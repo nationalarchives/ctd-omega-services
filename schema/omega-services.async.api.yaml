@@ -243,6 +243,7 @@ components:
             people and places). Its purpose is to enable users to judge the
             potential relevance of the record described and whether they want
             to investigate the material further or not.
+
             Note: Called "Scope and Content" in TNA-CS13
         coveringDate:
           type: string
@@ -252,7 +253,7 @@ components:
         formerReferenceDepartment:
           type: string
           description: |
-            Record creating department’s original reference for the record(s)
+            Record creating department's original reference for the record(s)
             being described.
         formerReferencePro:
           type: string
@@ -261,22 +262,34 @@ components:
             material and the description that represents it.
         startDateDay:
           type: string
-          description: Used for querying. Can be derived from Covering Dates or entered manually.
+          description: |
+            Used for querying. Can be derived from Covering Dates or entered
+            manually.
         startDateMonth:
           type: string
-          description: Used for querying. Can be derived from Covering Dates or entered manually.
+          description: |
+            Used for querying. Can be derived from Covering Dates or entered
+            manually.
         startDateYear:
           type: string
-          description: Used for querying. Can be derived from Covering Dates or entered manually.
+          description: |
+            Used for querying. Can be derived from Covering Dates or entered
+            manually.
         endDateDay:
           type: string
-          description: Used for querying. Can be derived from Covering Dates or entered manually.
+          description: |
+            Used for querying. Can be derived from Covering Dates or entered
+            manually.
         endDateMonth:
           type: string
-          description: Used for querying. Can be derived from Covering Dates or entered manually.
+          description: |
+            Used for querying. Can be derived from Covering Dates or entered
+            manually.
         endDateYear:
           type: string
-          description: Used for querying. Can be derived from Covering Dates or entered manually.
+          description: |
+            Used for querying. Can be derived from Covering Dates or entered
+            manually.
         legalStatusID:
           type: string
           description: |
@@ -291,12 +304,13 @@ components:
             rather than a statement regarding the location of the physical
             repository. Records held by The National Archives may be held off
             site. 
-            Note: displays as ‘Held by’ in the live online catalogue.
+
+            Note: displays as 'Held by' in the live online catalogue.
         note:
           type: string
           description: |
             Specialised information that cannot be accommodated elsewhere
-            (Archivist’s note).
+            (Archivist's note).
         background:
           type: string
           description: |
