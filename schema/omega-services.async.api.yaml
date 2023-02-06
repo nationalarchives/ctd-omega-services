@@ -1,0 +1,428 @@
+asyncapi: '2.5.0'
+
+info:
+  title: Project Omega Services API
+  version: '1.0.0'
+  description: |
+    The Project Omega API allows you to perform Query and CRUD operations against assets in The National Archives Catalogue.
+    ### Architecture
+    The API and systemns connected to it are using an asynchronous messaging architecture. This may seem unconventional for those who are used to working with HTTP APIs which typically provide a Request-Response approach, but it has many advantages when integrating systems:
+    * Decoupling of Systems
+    * Quality of Service and Prioritisation
+    * Separation of Response and Error channels
+    * Buffering during individual system outages
+    * Abilility to Backpressure
+    ### Check out our latest features:
+    * Get an Edit Set 🪣
+    * Get a Record 📜
+    * Update a Record ✍️
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  contact:
+    name: Adam Retter
+    email: adam@evolvedbinary.com
+    url: https://www.evolvedbinary.com
+
+servers:
+  mvbpeta:
+    url: service.mvbpeta.catalogue.nationalarchives.gov.uk:61616
+    protocol: jms
+    protocolVersion: '1.1'
+    description: MVP Beta - Message Broker
+    security:
+      - saslScram: []
+    tags:
+      - name: "env:mvpbeta"
+        description: "This environment is for the MVP Beta"
+
+defaultContentType: application/json
+
+channels:
+  request.general:
+    description: The queue on which general priority requests should be published.
+    publish:
+      operationId: request_general
+      description: Request messages
+      message:
+        oneOf:
+          - $ref: '#/components/messages/getEditSet'
+
+### TODO(AR) request/response pattern
+  ### TODO(AR) - where to publish response messages
+  ### TODO(AR) - correlationId for responses (SQS+JMS)
+  ### TODO(AR) - auth on requests
+  ### TODO(AR) - error responses
+
+  ### TODO(AR) - is this language powerful enough to express real constraints and reuse - perhaps need XML Schema that is translated down into this?
+
+components:
+  messages:
+    getEditSet:
+      messageId: OSGEES001
+      name: getEditSet
+      title: Get EditSet
+      summary: Retrieve an EditSet
+      # contentType: application/json
+      traits:
+        - $ref: '#/components/messageTraits/serviceRequestHeaders'
+        # - $ref: "#/components/messageTraits/assetRequestHeaders"
+      payload:
+        $ref: "#/components/schemas/assetRequest"
+    getEditSetSummary:
+      messageId: OSGEES002
+      name: getEditSetSummary
+      title: Get a Summary of an EditSet
+      summary: Retrieve a Summary of an EditSet
+      # contentType: application/json
+      traits:
+        - $ref: '#/components/messageTraits/serviceRequestHeaders'
+        # - $ref: "#/components/messageTraits/assetRequestHeaders"
+      payload:
+        $ref: "#/components/schemas/assetRequest"
+
+    editSet:
+      # messageId: ODEDSE001
+      name: editSet
+      title: EditSet
+      summary: An EditSet from the Omega Catalogue
+      payload:
+        $ref: "#/components/schemas/editSet"
+      correlationId:
+        description: Default Correlation ID
+        location: $message.header#/correlationId
+
+    editSetSummary:
+      # messageId: ODEDSE002
+      name: editSetSummary
+      title: EditSet Summary
+      summary: A Summary of an EditSet in the Omega Catalogue
+      payload:
+        $ref: "#/components/schemas/editSetSummary"
+      correlationId:
+        description: Default Correlation ID
+        location: $message.header#/correlationId
+      
+      # correlationId:
+      # traits:
+
+
+    # turnOnOff:
+    #   name: turnOnOff
+    #   title: Turn on/off
+    #   summary: Command a particular streetlight to turn the lights on or off.
+    #   traits:
+    #     - $ref: '#/components/messageTraits/commonHeaders'
+    #   payload:
+    #     $ref: "#/components/schemas/turnOnOffPayload"
+    # dimLight:
+    #   name: dimLight
+    #   title: Dim light
+    #   summary: Command a particular streetlight to dim the lights.
+    #   traits:
+    #     - $ref: '#/components/messageTraits/commonHeaders'
+    #   payload:
+    #     $ref: "#/components/schemas/dimLightPayload"
+
+  schemas:
+    assetRequest:
+      type: object
+      properties:
+        oci:
+          $ref: "#/components/schemas/omegaCatalogueIdentifier"
+        timestamp:
+          $ref: "#/components/schemas/timestamp"
+    omegaCatalogueIdentifier:
+      type: string
+      # format: date-time
+      description: The Identifier of the asset in the Omega Catalogue.
+    classicCatalogueReference:
+      type: string
+      # format: date-time
+      description: The Classic Catalogue Reference of the asset in the Omega Catalogue.
+    timestamp:
+      type: string
+      format: date-time
+      description: Client timestamp of when the request was sent.
+    editSet:
+      type: object
+      properties:
+        oci:
+          $ref: "#/components/schemas/omegaCatalogueIdentifier"
+        version:
+          $ref: "#/components/schemas/assetVersion"
+        ownerId:
+          $ref: "#/components/schemas/assetOwnerId"
+        title:
+          $ref: "#/components/schemas/assetTitle"
+        description:
+          type: string
+          description: The description of the EditSet
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/omegaCatalogueIdentifier'
+      
+    editSetSummary:
+      type: object
+      properties:
+        oci:
+          $ref: "#/components/schemas/omegaCatalogueIdentifier"
+        version:
+          $ref: "#/components/schemas/assetVersion"
+        ownerId:
+          $ref: "#/components/schemas/assetOwnerId"
+        title:
+          $ref: "#/components/schemas/assetTitle"
+        description:
+          $ref: "#/components/schemas/assetDescription"
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/editSetSummaryMember'
+
+    editSetSummaryMember:
+      type: object
+      description: The Summary of an EditSet member
+      properties:
+        oci:
+          $ref: "#/components/schemas/omegaCatalogueIdentifier"
+        version:
+          $ref: "#/components/schemas/assetVersion"
+        ownerId:
+          $ref: "#/components/schemas/assetOwnerId"
+        ccr:
+          $ref: "#/components/schemas/classicCatalogueReference"
+        title:
+          $ref: "#/components/schemas/assetTitle"
+        description:
+          $ref: "#/components/schemas/assetDescription"
+        coveringDate:
+          type: string
+          description: The covering dates of the EditSet Member
+
+    editSetRecord:
+      type: object
+      description: The properties of a record in an edit set.
+      required:
+        - ccr
+        - oci
+        - description
+        - coveringDate
+        - formerReferenceDepartment
+        - formerReferencePro
+        - startDateDay
+        - startDateMonth
+        - startDateYear
+        - endDateDay
+        - endDateMonth
+        - endDateYear
+        - legalStatusID
+        - placeOfDepositID
+        - note
+        - background
+        - custodialHistory
+        - relatedMaterial
+        - separatedMaterial
+        - creatorIDs
+
+      properties:
+        ccr:
+          description: |
+            CCR stands for "Classic Catalogue Reference"
+            The unique identifier which links the catalogue to the records it
+            represents and allows the user to order and refer to them.
+          $ref: "#/components/schemas/classicCatalogueReference"
+        oci:
+          $ref: "#/components/schemas/omegaCatalogueIdentifier"
+        description:
+          type: string
+          description: |
+            A prose statement giving information about the form and subject
+            matter of the unit of description (often in terms of subjects,
+            people and places). Its purpose is to enable users to judge the
+            potential relevance of the record described and whether they want
+            to investigate the material further or not.
+            Note: Called "Scope and Content" in TNA-CS13
+        coveringDate:
+          type: string
+          description: |
+            Identifies and records the date(s) of creation of the records being
+            described.
+        formerReferenceDepartment:
+          type: string
+          description: |
+            Record creating department’s original reference for the record(s)
+            being described.
+        formerReferencePro:
+          type: string
+          description: |
+            Former PRO/TNA identifier providing the link between the archival
+            material and the description that represents it.
+        startDateDay:
+          type: string
+          description: Used for querying. Can be derived from Covering Dates or entered manually.
+        startDateMonth:
+          type: string
+          description: Used for querying. Can be derived from Covering Dates or entered manually.
+        startDateYear:
+          type: string
+          description: Used for querying. Can be derived from Covering Dates or entered manually.
+        endDateDay:
+          type: string
+          description: Used for querying. Can be derived from Covering Dates or entered manually.
+        endDateMonth:
+          type: string
+          description: Used for querying. Can be derived from Covering Dates or entered manually.
+        endDateYear:
+          type: string
+          description: Used for querying. Can be derived from Covering Dates or entered manually.
+        legalStatusID:
+          type: string
+          description: |
+            A note as to whether the records being described are Public Records
+            or not, as defined by the 1958 Act and its schedules (and other
+            Public Records and FOI Acts).
+        placeOfDepositID:
+          type: string
+          description: |
+            The authority controlled name of the repository holding the records
+            being described. This is a declaration of legal responsibility
+            rather than a statement regarding the location of the physical
+            repository. Records held by The National Archives may be held off
+            site. 
+            Note: displays as ‘Held by’ in the live online catalogue.
+        note:
+          type: string
+          description: |
+            Specialised information that cannot be accommodated elsewhere
+            (Archivist’s note).
+        background:
+          type: string
+          description: |
+            Used to provide an administrative history, biographical details, or
+            other historical statement about the corporate body/bodies or
+            individual(s) responsible for creating and accumulating the records
+            being described; placing the material in context and making it
+            better understood.
+        custodialHistory:
+          type: string
+          description: |
+            Describes where and how records have been held from creation to
+            transfer to PRO/TNA, giving those details of changes of ownership
+            and/or custody that may be significant in terms of authority,
+            integrity and interpretation.
+        relatedMaterial:
+          type: array
+          items:
+            $ref: '#/components/schemas/relatedMaterial'
+        separatedMaterial:
+          type: array
+          items:
+            $ref: '#/components/schemas/separatedMaterial'
+        creatorIDs:
+          description: |
+            Identifies the organisation(s) or individual(s) responsible for
+            creating, accumulating or maintaining the records being described.
+            Incorporates the authority controlled corporate or personal name(s)
+            of the creator(s) of the records.
+          type: array
+          items:
+            type: string
+
+    assetVersion:
+      type: string
+      description: The version of an asset
+
+    assetOwnerId:
+      type: string
+      description: Identifier of the owner of the asset
+    
+    assetTitle:
+      type: string
+      description: The title of an asset
+
+    assetDescription:
+      type: string
+      description: The description of an asset
+
+    relatedMaterial:
+      type: object
+      description: |
+        A note identifying material that has a direct and significant
+        connection to the unit of description. This will usually be in the form
+        of references to material that dealt with similar functions at an
+        earlier, or later, period to the unit of description. References to
+        significant material dealing with similar subjects may also be
+        appropriate. The fact that related material references are always
+        reciprocal should help the judgment of how significant a reference is.
+      properties:
+        linkHref:
+          type: string
+          description: The URL to this related material
+        linkText:
+          type: string
+          description: The text for the link for this related material
+        description:
+          type: string
+          description: The description for this related material
+
+    separatedMaterial:
+      type: object
+      description: |
+        Identifies materials (and their location) that are organically part of
+        the unit of description that have been physically separated or removed.
+      properties:
+        linkHref:
+          type: string
+          description: The URL to this separated material
+        linkText:
+          type: string
+          description: The text for the link for this separated material
+        description:
+          type: string
+          description: The description for this separated material
+
+  securitySchemes:
+    saslScram:
+      type: scramSha256
+      description: Provide your username and password for SASL/SCRAM authentication
+
+  parameters:
+    streetlightId:
+      description: The ID of the streetlight.
+      schema:
+        type: string
+
+  messageTraits:
+    serviceRequestHeaders:
+      headers:
+        required: [osi]
+        type: object
+        properties:
+          sid:
+            name: Omega Service ID
+            description: The Identifier of the Omega Service to place the Request against
+            type: string
+            pattern: OS[A-Z]{4}([1-9][0-9][0-9])(0[1-9][0-9])|(00[1-9])
+    # assetRequestHeaders:
+    #   headers:
+    #     required: [oci]
+    #     type: object
+    #     properties:
+    #       oci:
+    #         name: Omega Catalogue ID
+    #         description: The Identifier of the asset in the Omega Catalogue
+    #         type: string
+
+
+# TODO(AR) what are these for?
+  operationTraits:
+    kafka:
+      bindings:
+        kafka:
+          clientId: my-app-id
+
+tags:
+  - name: "Project Omega"
+    description: "Project Omega"
