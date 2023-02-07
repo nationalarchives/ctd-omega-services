@@ -20,9 +20,9 @@ info:
     name: MIT
     url: https://opensource.org/licenses/MIT
   contact:
-    name: Adam Retter
-    email: adam@evolvedbinary.com
-    url: https://www.evolvedbinary.com
+    name: The National Archives
+    email: webmaster@nationalarchives.gov.uk
+    url: https://www.nationalarchives.gov.uk/
 
 servers:
   mvbpeta:
@@ -197,7 +197,7 @@ components:
           $ref: "#/components/schemas/assetTitle"
         description:
           $ref: "#/components/schemas/assetDescription"
-        coveringDate:
+        coveringDates:
           type: string
           description: The covering dates of the EditSet Member
 
@@ -208,7 +208,7 @@ components:
         - ccr
         - oci
         - description
-        - coveringDate
+        - coveringDates
         - formerReferenceDepartment
         - formerReferencePro
         - startDateDay
@@ -245,7 +245,7 @@ components:
             to investigate the material further or not.
 
             Note: Called "Scope and Content" in TNA-CS13
-        coveringDate:
+        coveringDates:
           type: string
           description: |
             Identifies and records the date(s) of creation of the records being
