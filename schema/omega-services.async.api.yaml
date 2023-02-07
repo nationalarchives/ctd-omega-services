@@ -506,19 +506,11 @@ components:
     updateEditSetRecordHeaders:
       headers:
         type: object
+        required:
+          - oci
         properties:
           oci:
             $ref: "#/components/schemas/omegaCatalogueIdentifier"
-    # assetRequestHeaders:
-    #   headers:
-    #     required: [oci]
-    #     type: object
-    #     properties:
-    #       oci:
-    #         name: Omega Catalogue ID
-    #         description: The Identifier of the asset in the Omega Catalogue
-    #         type: string
-
 
 # TODO(AR) what are these for?
   operationTraits:
