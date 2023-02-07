@@ -203,12 +203,8 @@ components:
         - coveringDates
         - formerReferenceDepartment
         - formerReferencePro
-        - startDateDay
-        - startDateMonth
-        - startDateYear
-        - endDateDay
-        - endDateMonth
-        - endDateYear
+        - startDate
+        - endDate
         - legalStatusID
         - placeOfDepositID
         - note
@@ -231,18 +227,10 @@ components:
           $ref: "#/components/schemas/formerReferenceDepartment"
         formerReferencePro:
           $ref: "#/components/schemas/formerReferencePro"
-        startDateDay:
-          $ref: "#/components/schemas/startDateDay"
-        startDateMonth:
-          $ref: "#/components/schemas/startDateMonth"
-        startDateYear:
-          $ref: "#/components/schemas/startDateYear"
-        endDateDay:
-          $ref: "#/components/schemas/endDateDay"
-        endDateMonth:
-          $ref: "#/components/schemas/endDateMonth"
-        endDateYear:
-          $ref: "#/components/schemas/endDateYear"
+        startDate:
+          $ref: "#/components/schemas/startDate"
+        endDate:
+          $ref: "#/components/schemas/endDate"
         legalStatusID:
           $ref: "#/components/schemas/legalStatusID"
         placeOfDepositID:
@@ -276,18 +264,10 @@ components:
           $ref: "#/components/schemas/formerReferenceDepartment"
         formerReferencePro:
           $ref: "#/components/schemas/formerReferencePro"
-        startDateDay:
-          $ref: "#/components/schemas/startDateDay"
-        startDateMonth:
-          $ref: "#/components/schemas/startDateMonth"
-        startDateYear:
-          $ref: "#/components/schemas/startDateYear"
-        endDateDay:
-          $ref: "#/components/schemas/endDateDay"
-        endDateMonth:
-          $ref: "#/components/schemas/endDateMonth"
-        endDateYear:
-          $ref: "#/components/schemas/endDateYear"
+        startDate:
+          $ref: "#/components/schemas/start"
+        endDate:
+          $ref: "#/components/schemas/endDate"
         legalStatusID:
           $ref: "#/components/schemas/legalStatusID"
         placeOfDepositID:
@@ -360,38 +340,16 @@ components:
         Former PRO/TNA identifier providing the link between the archival
         material and the description that represents it.
 
-    startDateDay:
+    startDate:
       type: string
+      format: date
       description: |
         Used for querying. Can be derived from Covering Dates or entered
         manually.
 
-    startDateMonth:
+    endDate:
       type: string
-      description: |
-        Used for querying. Can be derived from Covering Dates or entered
-        manually.
-
-    startDateYear:
-      type: string
-      description: |
-        Used for querying. Can be derived from Covering Dates or entered
-        manually.
-
-    endDateDay:
-      type: string
-      description: |
-        Used for querying. Can be derived from Covering Dates or entered
-        manually.
-
-    endDateMonth:
-      type: string
-      description: |
-        Used for querying. Can be derived from Covering Dates or entered
-        manually.
-
-    endDateYear:
-      type: string
+      format: date
       description: |
         Used for querying. Can be derived from Covering Dates or entered
         manually.
