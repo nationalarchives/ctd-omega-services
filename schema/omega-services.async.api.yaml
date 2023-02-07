@@ -114,6 +114,15 @@ components:
         description: Default Correlation ID
         location: $message.header#/correlationId
 
+    updateResponseStatus:
+      name: updateResultStatus
+      title: Update Result Status
+      payload:
+        $ref: "#/components/schemas/updateResponseStatus"
+      correlationId:
+        description: Default Correlation ID
+        location: $message.header#/correlationId
+
   schemas:
     assetRequest:
       type: object
@@ -183,51 +192,6 @@ components:
         coveringDates:
           type: string
           description: The covering dates of the EditSet Member
-
-    updateEditSetRecord:
-      type: object
-      description: Properties to update for an edit set record
-      properties:
-        description:
-          $ref: "#/components/schemas/description"
-        coveringDates:
-          $ref: "#/components/schemas/coveringDates"
-        formerReferenceDepartment:
-          $ref: "#/components/schemas/formerReferenceDepartment"
-        formerReferencePro:
-          $ref: "#/components/schemas/formerReferencePro"
-        startDateDay:
-          $ref: "#/components/schemas/startDateDay"
-        startDateMonth:
-          $ref: "#/components/schemas/startDateMonth"
-        startDateYear:
-          $ref: "#/components/schemas/startDateYear"
-        endDateDay:
-          $ref: "#/components/schemas/endDateDay"
-        endDateMonth:
-          $ref: "#/components/schemas/endDateMonth"
-        endDateYear:
-          $ref: "#/components/schemas/endDateYear"
-        legalStatusID:
-          $ref: "#/components/schemas/legalStatusID"
-        placeOfDepositID:
-          $ref: "#/components/schemas/placeOfDepositID"
-        note:
-          $ref: "#/components/schemas/note"
-        background:
-          $ref: "#/components/schemas/background"
-        custodialHistory:
-          $ref: "#/components/schemas/custodialHistory"
-        relatedMaterial:
-          type: array
-          items:
-            $ref: '#/components/schemas/relatedMaterial'
-        separatedMaterial:
-          type: array
-          items:
-            $ref: '#/components/schemas/separatedMaterial'
-        creatorIDs:
-          $ref: "#/components/schemas/creatorIDs"
 
     editSetRecord:
       type: object
@@ -299,6 +263,62 @@ components:
             $ref: '#/components/schemas/separatedMaterial'
         creatorIDs:
           $ref: "#/components/schemas/creatorIDs"
+
+    updateEditSetRecord:
+      type: object
+      description: Properties to update for an edit set record
+      properties:
+        description:
+          $ref: "#/components/schemas/description"
+        coveringDates:
+          $ref: "#/components/schemas/coveringDates"
+        formerReferenceDepartment:
+          $ref: "#/components/schemas/formerReferenceDepartment"
+        formerReferencePro:
+          $ref: "#/components/schemas/formerReferencePro"
+        startDateDay:
+          $ref: "#/components/schemas/startDateDay"
+        startDateMonth:
+          $ref: "#/components/schemas/startDateMonth"
+        startDateYear:
+          $ref: "#/components/schemas/startDateYear"
+        endDateDay:
+          $ref: "#/components/schemas/endDateDay"
+        endDateMonth:
+          $ref: "#/components/schemas/endDateMonth"
+        endDateYear:
+          $ref: "#/components/schemas/endDateYear"
+        legalStatusID:
+          $ref: "#/components/schemas/legalStatusID"
+        placeOfDepositID:
+          $ref: "#/components/schemas/placeOfDepositID"
+        note:
+          $ref: "#/components/schemas/note"
+        background:
+          $ref: "#/components/schemas/background"
+        custodialHistory:
+          $ref: "#/components/schemas/custodialHistory"
+        relatedMaterial:
+          type: array
+          items:
+            $ref: '#/components/schemas/relatedMaterial'
+        separatedMaterial:
+          type: array
+          items:
+            $ref: '#/components/schemas/separatedMaterial'
+        creatorIDs:
+          $ref: "#/components/schemas/creatorIDs"
+
+    updateResponseStatus:
+      type: object
+      description: A respose for update status
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: ["success", "failed"]
+        message:
+          type: string
 
     omegaCatalogueIdentifier:
       type: string
