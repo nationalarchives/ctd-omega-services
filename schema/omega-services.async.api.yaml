@@ -211,12 +211,8 @@ components:
         - coveringDates
         - formerReferenceDepartment
         - formerReferencePro
-        - startDateDay
-        - startDateMonth
-        - startDateYear
-        - endDateDay
-        - endDateMonth
-        - endDateYear
+        - startDate
+        - endDate
         - legalStatusID
         - placeOfDepositID
         - note
@@ -260,33 +256,15 @@ components:
           description: |
             Former PRO/TNA identifier providing the link between the archival
             material and the description that represents it.
-        startDateDay:
+        startDate:
           type: string
+          format: date
           description: |
             Used for querying. Can be derived from Covering Dates or entered
             manually.
-        startDateMonth:
+        endDate:
           type: string
-          description: |
-            Used for querying. Can be derived from Covering Dates or entered
-            manually.
-        startDateYear:
-          type: string
-          description: |
-            Used for querying. Can be derived from Covering Dates or entered
-            manually.
-        endDateDay:
-          type: string
-          description: |
-            Used for querying. Can be derived from Covering Dates or entered
-            manually.
-        endDateMonth:
-          type: string
-          description: |
-            Used for querying. Can be derived from Covering Dates or entered
-            manually.
-        endDateYear:
-          type: string
+          format: date
           description: |
             Used for querying. Can be derived from Covering Dates or entered
             manually.
