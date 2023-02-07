@@ -201,6 +201,12 @@ components:
           type: string
           description: The covering dates of the EditSet Member
 
+    editSetRecordUpdate:
+      type: object
+      properties:
+        allOf:
+          $ref: "#/components/schemas/editSetRecord"
+
     editSetRecord:
       type: object
       description: The properties of a record in an edit set.
