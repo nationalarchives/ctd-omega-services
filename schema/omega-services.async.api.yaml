@@ -102,27 +102,26 @@ components:
       correlationId:
         description: Default Correlation ID
         location: $message.header#/correlationId
-      
-      # correlationId:
-      # traits:
 
+    updateEditSetRecord:
+      name: updateEditSetRecord
+      title: Update Edit Set Record
+      traits:
+        - $ref: '#/components/messageTraits/updateEditSetRecordHeaders'
+      payload:
+        $ref: "#/components/schemas/updateEditSetRecord"
+      correlationId:
+        description: Default Correlation ID
+        location: $message.header#/correlationId
 
-    # turnOnOff:
-    #   name: turnOnOff
-    #   title: Turn on/off
-    #   summary: Command a particular streetlight to turn the lights on or off.
-    #   traits:
-    #     - $ref: '#/components/messageTraits/commonHeaders'
-    #   payload:
-    #     $ref: "#/components/schemas/turnOnOffPayload"
-    # dimLight:
-    #   name: dimLight
-    #   title: Dim light
-    #   summary: Command a particular streetlight to dim the lights.
-    #   traits:
-    #     - $ref: '#/components/messageTraits/commonHeaders'
-    #   payload:
-    #     $ref: "#/components/schemas/dimLightPayload"
+    updateResponseStatus:
+      name: updateResultStatus
+      title: Update Result Status
+      payload:
+        $ref: "#/components/schemas/updateResponseStatus"
+      correlationId:
+        description: Default Correlation ID
+        location: $message.header#/correlationId
 
   schemas:
     assetRequest:
@@ -132,14 +131,7 @@ components:
           $ref: "#/components/schemas/omegaCatalogueIdentifier"
         timestamp:
           $ref: "#/components/schemas/timestamp"
-    omegaCatalogueIdentifier:
-      type: string
-      # format: date-time
-      description: The Identifier of the asset in the Omega Catalogue.
-    classicCatalogueReference:
-      type: string
-      # format: date-time
-      description: The Classic Catalogue Reference of the asset in the Omega Catalogue.
+
     timestamp:
       type: string
       format: date-time
@@ -224,86 +216,31 @@ components:
 
       properties:
         ccr:
-          description: |
-            CCR stands for "Classic Catalogue Reference"
-            The unique identifier which links the catalogue to the records it
-            represents and allows the user to order and refer to them.
           $ref: "#/components/schemas/classicCatalogueReference"
         oci:
           $ref: "#/components/schemas/omegaCatalogueIdentifier"
         description:
-          type: string
-          description: |
-            A prose statement giving information about the form and subject
-            matter of the unit of description (often in terms of subjects,
-            people and places). Its purpose is to enable users to judge the
-            potential relevance of the record described and whether they want
-            to investigate the material further or not.
-
-            Note: Called "Scope and Content" in TNA-CS13
+          $ref: "#/components/schemas/description"
         coveringDates:
-          type: string
-          description: |
-            Identifies and records the date(s) of creation of the records being
-            described.
+          $ref: "#/components/schemas/coveringDates"
         formerReferenceDepartment:
-          type: string
-          description: |
-            Record creating department's original reference for the record(s)
-            being described.
+          $ref: "#/components/schemas/formerReferenceDepartment"
         formerReferencePro:
-          type: string
-          description: |
-            Former PRO/TNA identifier providing the link between the archival
-            material and the description that represents it.
+          $ref: "#/components/schemas/formerReferencePro"
         startDate:
-          type: string
-          format: date
-          description: |
-            Used for querying. Can be derived from Covering Dates or entered
-            manually.
+          $ref: "#/components/schemas/startDate"
         endDate:
-          type: string
-          format: date
-          description: |
-            Used for querying. Can be derived from Covering Dates or entered
-            manually.
+          $ref: "#/components/schemas/endDate"
         legalStatusID:
-          type: string
-          description: |
-            A note as to whether the records being described are Public Records
-            or not, as defined by the 1958 Act and its schedules (and other
-            Public Records and FOI Acts).
+          $ref: "#/components/schemas/legalStatusID"
         placeOfDepositID:
-          type: string
-          description: |
-            The authority controlled name of the repository holding the records
-            being described. This is a declaration of legal responsibility
-            rather than a statement regarding the location of the physical
-            repository. Records held by The National Archives may be held off
-            site. 
-
-            Note: displays as 'Held by' in the live online catalogue.
+          $ref: "#/components/schemas/placeOfDepositID"
         note:
-          type: string
-          description: |
-            Specialised information that cannot be accommodated elsewhere
-            (Archivist's note).
+          $ref: "#/components/schemas/note"
         background:
-          type: string
-          description: |
-            Used to provide an administrative history, biographical details, or
-            other historical statement about the corporate body/bodies or
-            individual(s) responsible for creating and accumulating the records
-            being described; placing the material in context and making it
-            better understood.
+          $ref: "#/components/schemas/background"
         custodialHistory:
-          type: string
-          description: |
-            Describes where and how records have been held from creation to
-            transfer to PRO/TNA, giving those details of changes of ownership
-            and/or custody that may be significant in terms of authority,
-            integrity and interpretation.
+          $ref: "#/components/schemas/custodialHistory"
         relatedMaterial:
           type: array
           items:
@@ -313,30 +250,150 @@ components:
           items:
             $ref: '#/components/schemas/separatedMaterial'
         creatorIDs:
-          description: |
-            Identifies the organisation(s) or individual(s) responsible for
-            creating, accumulating or maintaining the records being described.
-            Incorporates the authority controlled corporate or personal name(s)
-            of the creator(s) of the records.
+          $ref: "#/components/schemas/creatorIDs"
+
+    updateEditSetRecord:
+      type: object
+      description: Properties to update for an edit set record
+      properties:
+        description:
+          $ref: "#/components/schemas/description"
+        coveringDates:
+          $ref: "#/components/schemas/coveringDates"
+        formerReferenceDepartment:
+          $ref: "#/components/schemas/formerReferenceDepartment"
+        formerReferencePro:
+          $ref: "#/components/schemas/formerReferencePro"
+        startDate:
+          $ref: "#/components/schemas/startDate"
+        endDate:
+          $ref: "#/components/schemas/endDate"
+        legalStatusID:
+          $ref: "#/components/schemas/legalStatusID"
+        placeOfDepositID:
+          $ref: "#/components/schemas/placeOfDepositID"
+        note:
+          $ref: "#/components/schemas/note"
+        background:
+          $ref: "#/components/schemas/background"
+        custodialHistory:
+          $ref: "#/components/schemas/custodialHistory"
+        relatedMaterial:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/relatedMaterial'
+        separatedMaterial:
+          type: array
+          items:
+            $ref: '#/components/schemas/separatedMaterial'
+        creatorIDs:
+          $ref: "#/components/schemas/creatorIDs"
 
-    assetVersion:
-      type: string
-      description: The version of an asset
+    updateResponseStatus:
+      type: object
+      description: A respose for update status
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: ["success", "failed"]
+        message:
+          type: string
 
-    assetOwnerId:
+    omegaCatalogueIdentifier:
       type: string
-      description: Identifier of the owner of the asset
-    
-    assetTitle:
-      type: string
-      description: The title of an asset
+      description: The Identifier of the asset in the Omega Catalogue.
 
-    assetDescription:
+    classicCatalogueReference:
       type: string
-      description: The description of an asset
+      description: |
+        CCR stands for "Classic Catalogue Reference"
+        The unique identifier which links the catalogue to the records it
+        represents and allows the user to order and refer to them.
+
+    description:
+      type: string
+      description: |
+        A prose statement giving information about the form and subject
+        matter of the unit of description (often in terms of subjects,
+        people and places). Its purpose is to enable users to judge the
+        potential relevance of the record described and whether they want
+        to investigate the material further or not.
+
+        Note: Called "Scope and Content" in TNA-CS13
+
+    coveringDates:
+      type: string
+      description: |
+        Identifies and records the date(s) of creation of the records being
+        described.
+
+    formerReferenceDepartment:
+      type: string
+      description: |
+        Record creating department's original reference for the record(s)
+        being described.
+
+    formerReferencePro:
+      type: string
+      description: |
+        Former PRO/TNA identifier providing the link between the archival
+        material and the description that represents it.
+
+    startDate:
+      type: string
+      format: date
+      description: |
+        Used for querying. Can be derived from Covering Dates or entered
+        manually.
+
+    endDate:
+      type: string
+      format: date
+      description: |
+        Used for querying. Can be derived from Covering Dates or entered
+        manually.
+
+    legalStatusID:
+      type: string
+      description: |
+        A note as to whether the records being described are Public Records
+        or not, as defined by the 1958 Act and its schedules (and other
+        Public Records and FOI Acts).
+
+    placeOfDepositID:
+      type: string
+      description: |
+        The authority controlled name of the repository holding the records
+        being described. This is a declaration of legal responsibility
+        rather than a statement regarding the location of the physical
+        repository. Records held by The National Archives may be held off
+        site. 
+
+        Note: displays as 'Held by' in the live online catalogue.
+
+    note:
+      type: string
+      description: |
+        Specialised information that cannot be accommodated elsewhere
+        (Archivist's note).
+
+    background:
+      type: string
+      description: |
+        Used to provide an administrative history, biographical details, or
+        other historical statement about the corporate body/bodies or
+        individual(s) responsible for creating and accumulating the records
+        being described; placing the material in context and making it
+        better understood.
+
+    custodialHistory:
+      type: string
+      description: |
+        Describes where and how records have been held from creation to
+        transfer to PRO/TNA, giving those details of changes of ownership
+        and/or custody that may be significant in terms of authority,
+        integrity and interpretation.
 
     relatedMaterial:
       type: object
@@ -375,6 +432,32 @@ components:
           type: string
           description: The description for this separated material
 
+    creatorIDs:
+      description: |
+        Identifies the organisation(s) or individual(s) responsible for
+        creating, accumulating or maintaining the records being described.
+        Incorporates the authority controlled corporate or personal name(s)
+        of the creator(s) of the records.
+      type: array
+      items:
+        type: string
+
+    assetVersion:
+      type: string
+      description: The version of an asset
+
+    assetOwnerId:
+      type: string
+      description: Identifier of the owner of the asset
+    
+    assetTitle:
+      type: string
+      description: The title of an asset
+
+    assetDescription:
+      type: string
+      description: The description of an asset
+
   securitySchemes:
     saslScram:
       type: scramSha256
@@ -397,16 +480,15 @@ components:
             description: The Identifier of the Omega Service to place the Request against
             type: string
             pattern: OS[A-Z]{4}([1-9][0-9][0-9])(0[1-9][0-9])|(00[1-9])
-    # assetRequestHeaders:
-    #   headers:
-    #     required: [oci]
-    #     type: object
-    #     properties:
-    #       oci:
-    #         name: Omega Catalogue ID
-    #         description: The Identifier of the asset in the Omega Catalogue
-    #         type: string
 
+    updateEditSetRecordHeaders:
+      headers:
+        type: object
+        required:
+          - oci
+        properties:
+          oci:
+            $ref: "#/components/schemas/omegaCatalogueIdentifier"
 
 # TODO(AR) what are these for?
   operationTraits:
