@@ -265,7 +265,7 @@ components:
         formerReferencePro:
           $ref: "#/components/schemas/formerReferencePro"
         startDate:
-          $ref: "#/components/schemas/start"
+          $ref: "#/components/schemas/startDate"
         endDate:
           $ref: "#/components/schemas/endDate"
         legalStatusID:
