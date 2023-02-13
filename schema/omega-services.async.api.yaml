@@ -50,7 +50,7 @@ channels:
 
   omega.editorial.web.application.instance.1:
     description: The queue on which response messages will be sent.
-    publish:
+    subscribe:
       operationId: omega_editorial_web_application_instance_1
       description: Response messages
       message:
@@ -58,6 +58,8 @@ channels:
           - $ref: '#/components/messages/editSet'
           - $ref: '#/components/messages/editSetSummary'
           - $ref: '#/components/messages/editSetRecord'
+          - $ref: '#/components/messages/updateEditSetRecord'
+          - $ref: '#/components/messages/updateResponseStatus'
 
 ### TODO(AR) request/response pattern
   ### TODO(AR) - where to publish response messages
@@ -115,8 +117,8 @@ components:
         location: $message.header#/correlationId
 
     editSetRecord:
-      name: editSetSummary
-      title: EditSet Summary
+      name: editSetRecord
+      title: EditSet Record
       summary: An Edit Set Record in the Omega Catalogue
       payload:
         $ref: "#/components/schemas/editSetRecord"
