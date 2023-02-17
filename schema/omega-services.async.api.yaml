@@ -6,7 +6,7 @@ info:
   description: |
     The Project Omega API allows you to perform Query and CRUD operations against assets in The National Archives Catalogue.
     ### Architecture
-    The API and systemns connected to it are using an asynchronous messaging architecture. This may seem unconventional for those who are used to working with HTTP APIs which typically provide a Request-Response approach, but it has many advantages when integrating systems:
+    The API and systems connected to it are using an asynchronous messaging architecture. This may seem unconventional for those who are used to working with HTTP APIs which typically provide a Request-Response approach, but it has many advantages when integrating systems:
     * Decoupling of Systems
     * Quality of Service and Prioritisation
     * Separation of Response and Error channels
@@ -47,6 +47,7 @@ channels:
       message:
         oneOf:
           - $ref: '#/components/messages/getEditSet'
+          - $ref: '#/components/messages/getEditSetRecord'
 
   omega.editorial.web.application.instance.1:
     description: The queue on which response messages will be sent.
@@ -61,7 +62,7 @@ channels:
           - $ref: '#/components/messages/updateEditSetRecord'
           - $ref: '#/components/messages/updateResponseStatus'
 
-### TODO(AR) request/response pattern
+  ### TODO(AR) request/response pattern
   ### TODO(AR) - where to publish response messages
   ### TODO(AR) - correlationId for responses (SQS+JMS)
   ### TODO(AR) - auth on requests
@@ -79,7 +80,6 @@ components:
       # contentType: application/json
       traits:
         - $ref: '#/components/messageTraits/serviceRequestHeaders'
-        # - $ref: "#/components/messageTraits/assetRequestHeaders"
       payload:
         $ref: "#/components/schemas/assetRequest"
     getEditSetSummary:
@@ -90,9 +90,18 @@ components:
       # contentType: application/json
       traits:
         - $ref: '#/components/messageTraits/serviceRequestHeaders'
-        # - $ref: "#/components/messageTraits/assetRequestHeaders"
       payload:
         $ref: "#/components/schemas/assetRequest"
+    getEditSetRecord:
+      messageId: OSGESR001
+      name: getEditSetRecord
+      title: Get EditSet Record
+      summary: Retrieve an EditSet Record
+      # contentType: application/json
+      traits:
+        - $ref: '#/components/messageTraits/serviceRequestHeaders'
+      payload:
+        $ref: "#/components/schemas/assetRecordRequest"
 
     editSet:
       # messageId: ODEDSE001
@@ -154,6 +163,15 @@ components:
           $ref: "#/components/schemas/omegaCatalogueIdentifier"
         timestamp:
           $ref: "#/components/schemas/timestamp"
+    assetRecordRequest:
+      type: object
+      properties:
+        editSetOci:
+          $ref: "#/components/schemas/omegaCatalogueIdentifier"
+        recordOci:
+          $ref: "#/components/schemas/omegaCatalogueIdentifier"
+        timestamp:
+          $ref: "#/components/schemas/timestamp"
 
     timestamp:
       type: string
@@ -177,7 +195,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/omegaCatalogueIdentifier'
-      
+
     editSetSummary:
       type: object
       properties:
@@ -472,7 +490,7 @@ components:
     assetOwnerId:
       type: string
       description: Identifier of the owner of the asset
-    
+
     assetTitle:
       type: string
       description: The title of an asset
@@ -513,7 +531,7 @@ components:
           oci:
             $ref: "#/components/schemas/omegaCatalogueIdentifier"
 
-# TODO(AR) what are these for?
+  # TODO(AR) what are these for?
   operationTraits:
     kafka:
       bindings:
