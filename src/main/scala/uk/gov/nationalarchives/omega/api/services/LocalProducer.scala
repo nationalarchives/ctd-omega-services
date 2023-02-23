@@ -42,7 +42,7 @@ class LocalProducerImpl(val jmsProducer: JmsProducer[IO], val outputQueue: Queue
       jmsProducer.send { mf =>
         val msg = mf.makeTextMessage(replyText)
         msg.map { m =>
-          val _ = m.setJMSCorrelationId(requestMessage.correlationId)
+          m.setJMSCorrelationId(requestMessage.correlationId)
           (m, outputQueue)
         }
       } *> IO.unit

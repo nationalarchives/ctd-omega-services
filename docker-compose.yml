@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   elasticmq-native:
-    container_name: elasticmq-container
+    container_name: ctd-omega-services_elasticmq
     ports:
       - 9324:9324
       - 9325:9325

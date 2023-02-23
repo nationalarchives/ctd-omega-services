@@ -37,7 +37,22 @@ class JmsConnector(serviceConfig: ServiceConfig) {
   implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
-  def createJmsClient()(implicit L: Logger[IO]): Resource[IO, JmsClient[IO]] =
+  /** Binds together a JMS producer and consumer
+    * @param inputQueue
+    *   the JMS queue the consumer listens to
+    * @return
+    */
+  def getJmsProducerAndConsumer(inputQueue: QueueName): Resource[IO, (JmsProducer[IO], JmsAcknowledgerConsumer[IO])] =
+    for {
+      jmsClient <- createJmsClient()
+      jmsProducerAndConsumer <-
+        Resource.both(
+          createJmsProducer(jmsClient)(serviceConfig.maxProducers),
+          createJmsInputQueueConsumer(jmsClient)(inputQueue, serviceConfig.maxConsumers, 100.millis)
+        )
+    } yield jmsProducerAndConsumer
+
+  private def createJmsClient()(implicit L: Logger[IO]): Resource[IO, JmsClient[IO]] =
     simpleQueueService.makeJmsClient[IO](
       Config(
         endpoint = simpleQueueService.Endpoint(Some(DirectAddress(HTTP, "localhost", Some(9324))), "elasticmq"),
@@ -47,24 +62,14 @@ class JmsConnector(serviceConfig: ServiceConfig) {
       )
     )
 
-  def createJmsProducer(client: JmsClient[IO])(concurrencyLevel: Int): Resource[IO, JmsProducer[IO]] =
+  private def createJmsProducer(client: JmsClient[IO])(concurrencyLevel: Int): Resource[IO, JmsProducer[IO]] =
     client.createProducer(concurrencyLevel)
 
-  def createJmsInputQueueConsumer(client: JmsClient[IO])(
+  private def createJmsInputQueueConsumer(client: JmsClient[IO])(
     queueName: QueueName,
     concurrencyLevel: Int,
     pollingInterval: FiniteDuration
   ): Resource[IO, JmsAcknowledgerConsumer[IO]] =
     client.createAcknowledgerConsumer(queueName, concurrencyLevel, pollingInterval)
-
-  def getJmsIo(inputQueue: QueueName): Resource[IO, (JmsProducer[IO], JmsAcknowledgerConsumer[IO])] =
-    for {
-      jmsClient <- createJmsClient()
-      jmsProducerAndConsumer <-
-        Resource.both(
-          createJmsProducer(jmsClient)(serviceConfig.maxProducers),
-          createJmsInputQueueConsumer(jmsClient)(inputQueue, serviceConfig.maxConsumers, 100.millis)
-        )
-    } yield jmsProducerAndConsumer
 
 }

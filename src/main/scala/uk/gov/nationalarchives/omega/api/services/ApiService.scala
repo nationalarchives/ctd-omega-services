@@ -78,7 +78,7 @@ class ApiService(val config: ServiceConfig) {
           switchState(Starting, Stopped)(errorOnInvalidServiceState)
           IO.pure(ExitCode.Error)
         } finally
-          println(e.getMessage)
+          logger.error(e.getMessage)
     }
 
   }
@@ -122,65 +122,65 @@ class ApiService(val config: ServiceConfig) {
 
     val result = for {
       q <- localQueue
-      res <- jmsConnector.getJmsIo(QueueName(config.requestQueue)).use { case (jmsProducer, jmsConsumer) =>
-               process(q, jmsConsumer, jmsProducer)
-             }
+      res <-
+        jmsConnector.getJmsProducerAndConsumer(QueueName(config.requestQueue)).use { case (jmsProducer, jmsConsumer) =>
+          process(q, jmsConsumer, jmsProducer)
+        }
     } yield res
     result.as(ExitCode.Success)
   }
 
-  private def process(q: Queue[IO, LocalMessage], consumer: JmsAcknowledgerConsumer[IO], producer: JmsProducer[IO]) =
+  private def process(queue: Queue[IO, LocalMessage], consumer: JmsAcknowledgerConsumer[IO], producer: JmsProducer[IO]) =
     for {
-      // START
       res <- IO.race(
-               transferMessageToLocalQueue(q)(consumer),
-
-               // single dispatcher
-               //        dispatcher(q).foreverM
-
-               // multiple dispatchers
+               createMessageHandler(queue)(consumer),
                List.range(start = 0, end = config.maxDispatchers).parTraverse_ { i =>
-                 IO.println(s"Starting consumer #${i + 1}") >>
-                   new Dispatcher(new LocalProducerImpl(producer, QueueName(config.replyQueue))).run(i)(q).foreverM
+                 logger.info(s"Starting consumer #${i + 1}") >>
+                   new Dispatcher(new LocalProducerImpl(producer, QueueName(config.replyQueue))).run(i)(queue).foreverM
                }
              )
-      // END
-
     } yield res
 
   private def doStop(): Unit =
     logger.info("Connection closed")
 
   private def acknowledgeMessage(): IO[AckAction[IO]] =
-    //    IO.pure(AckAction.ack)
-    IO {
-      println("Acknowledged message")
-      AckAction.ack
-    }
+    logger.info("Acknowledged message") *> IO(AckAction.ack)
 
+  @throws[IllegalArgumentException]
   private def createLocalMessage(persistentMessageId: PersistentMessageId, jmsMessage: JmsMessage): IO[LocalMessage] =
     for {
-      sid       <- IO.fromOption(jmsMessage.getStringProperty("sid"))(throw new Exception("Missing service ID"))
-      serviceId <- IO.fromOption(ServiceIdentifier.withNameOption(sid))(throw new Exception("SID not recognised"))
-      messageId <- IO.fromOption(jmsMessage.getJMSMessageId)(throw new Exception("Missing message ID"))
+      sid <-
+        IO.fromOption(jmsMessage.getStringProperty("sid"))(throw new IllegalArgumentException("Missing service ID"))
+      serviceId <-
+        IO.fromOption(ServiceIdentifier.withNameOption(sid))(throw new IllegalArgumentException("SID not recognised"))
+      messageId <- IO.fromOption(jmsMessage.getJMSMessageId)(throw new IllegalArgumentException("Missing message ID"))
       text      <- jmsMessage.asTextF[IO]
     } yield LocalMessage(persistentMessageId, serviceId, text, messageId)
 
-  // receives a message, persists it and then adds it to the queue
-  private def transferMessageToLocalQueue(
-    q: Queue[IO, LocalMessage]
+  private def createMessageHandler(
+    queue: Queue[IO, LocalMessage]
   )(jmsAcknowledgerConsumer: JmsAcknowledgerConsumer[IO]): IO[Unit] =
-    jmsAcknowledgerConsumer.handle { (jmsMessage, mf) =>
+    jmsAcknowledgerConsumer.handle { (jmsMessage, _) =>
       for {
         persistentMessageId <- localMessageStore.persistMessage(jmsMessage)
         res                 <- acknowledgeMessage()
-        localMessage        <- createLocalMessage(persistentMessageId, jmsMessage)
-        _                   <- q.offer(localMessage)
-        _ <- IO.delay {
-               println(s"Queued: $persistentMessageId")
-             }
+        _                   <- queueMessage(queue, persistentMessageId, jmsMessage)
       } yield res
     }
+
+  private def queueMessage(
+    queue: Queue[IO, LocalMessage],
+    persistentMessageId: PersistentMessageId,
+    jmsMessage: JmsMessage
+  ): IO[Unit] =
+    for {
+      localMessageResult <- createLocalMessage(persistentMessageId, jmsMessage).attempt
+      _ <- localMessageResult match {
+             case Left(e)  => logger.error(s"Failed to queue message due to ${e.getMessage}")
+             case Right(m) => queue.offer(m) *> logger.info(s"Queued message: $persistentMessageId")
+           }
+    } yield ()
 
 }
 object ApiService {

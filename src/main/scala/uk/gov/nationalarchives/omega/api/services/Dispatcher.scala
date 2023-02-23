@@ -25,6 +25,8 @@ import cats.data.Validated.{ Invalid, Valid }
 import cats.data.{ Validated, ValidatedNec }
 import cats.effect.IO
 import cats.effect.std.Queue
+import org.typelevel.log4cats.slf4j.Slf4jFactory
+import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.business._
 import uk.gov.nationalarchives.omega.api.business.echo.{ EchoRequest, EchoResponse, EchoService }
 import uk.gov.nationalarchives.omega.api.services.ServiceIdentifier.ECHO001
@@ -33,12 +35,13 @@ import java.util.UUID
 
 class Dispatcher(val localProducer: LocalProducer) {
 
+  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
+  implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
+
   def run(dispatcherId: Int)(q: Queue[IO, LocalMessage]): IO[Unit] =
     for {
       requestMessage <- q.take
-      _ <- IO.delay {
-             println(s"Dispatcher # $dispatcherId, processing message id: ${requestMessage.persistentMessageId}")
-           }
+      _ <- logger.info(s"Dispatcher # $dispatcherId, processing message id: ${requestMessage.persistentMessageId}")
       serviceRequest                  <- createServiceRequest(requestMessage)
       businessService                 <- IO.pure(serviceRequest._1)
       businessServiceRequest          <- IO.pure(serviceRequest._2)
@@ -93,15 +96,15 @@ class Dispatcher(val localProducer: LocalProducer) {
           }
 
         case Valid(Left(serviceError)) =>
-          val customerErrorReference = UUID.randomUUID()
-          s"""{status: "SERVICE-ERROR", reference: "$customerErrorReference", code: "${serviceError.code}", message: "${serviceError.message}"}"""
+          s"""{status: "SERVICE-ERROR", reference: "$getCustomerErrorReference", code: "${serviceError.code}", message: "${serviceError.message}"}"""
 
         case Invalid(requestValidationFailures) =>
-          val customerErrorReference = UUID.randomUUID()
-          s"""{status: "INVALID-REQUEST", reference: "$customerErrorReference", message: "$requestValidationFailures"}"""
+          s"""{status: "INVALID-REQUEST", reference: "$getCustomerErrorReference", message: "$requestValidationFailures"}"""
       }
     }
     localProducer.send(replyMessage, requestMessage)
   }
+
+  private def getCustomerErrorReference: UUID = UUID.randomUUID()
 
 }

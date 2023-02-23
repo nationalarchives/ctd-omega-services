@@ -2,8 +2,7 @@ val CatsEffectVersion = "3.4.5"
 val PureConfigVersion = "0.17.2"
 
 ThisBuild / versionScheme := Some("semver-spec")
-ThisBuild / githubOwner := "nationalarchives"
-ThisBuild / githubRepository := "jms4s-request-reply"
+
 ThisBuild / githubTokenSource.withRank(KeyRanks.Invisible) := TokenSource.Or(
   TokenSource.Environment("GITHUB_TOKEN"),
   TokenSource.GitConfig("github.token")

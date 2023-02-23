@@ -23,4 +23,3 @@ package uk.gov.nationalarchives.omega.api.common
 
 sealed trait CommandArgs
 case class ServiceArgs(tempMessageDir: Option[String], configFilePath: Option[String]) extends CommandArgs
-case class DocsArgs(filename: String) extends CommandArgs

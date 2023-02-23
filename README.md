@@ -5,9 +5,9 @@ The PAC API is implemented using Cats Effect, to provide an asynchronous runtime
 
 **Cats Effect Services**
 
-![alt text][logo]
+![alt text][diagram]
 
-[logo]: https://github.com/nationalarchives/ctd-omega-services/images/Cats_Effect_Services.png "Cats Effect Services"
+[diagram]: https://github.com/nationalarchives/ctd-omega-services/images/Cats_Effect_Services.png "Cats Effect Services"
 
 ### Pre-requisites for building and running the project:
 * [Git](https://git-scm.com)
@@ -36,31 +36,15 @@ cd ./ctd-omega-services
 ```
 docker-compose up -d
 ```
-5. Run the `docker` command to verify the docker instance is running for ElasticSearch, Kibana and ElasticMQ as below:
+5. Run the `docker` command to verify the docker instance is running for ElasticMQ as below:
 ```
 docker ps -a
 ```
-6. Clone the ElasticMQ Git repository to a suitable location:  
-```
-git clone https://github.com/softwaremill/elasticmq.git
-```
-7. Switch to the `ui` directory in the ElasticMQ project:
-```
-cd ./elasticmq/ui
-```
-8. Install the Yarn dependencies:
-```
-yarn
-```
-9. Start the ElasticMQ UI:
-```
-yarn start
-```
-10. Go to http://localhost:3000/ in a web browser and you should see the message queues configured in `custom.conf`, e.g. `search-queue`, `search-reply-queue`, `search-error-queue`
+6. Go to http://localhost:9325/ in a web browser and you should see the message queues configured in `custom.conf`, e.g. `request-general` and `omega-editorial-web-application-instance-1`
 
-11. To run the Pan-Archival Catalogue Services locally, it is recommended to first package and stage the application (see [Packaging](#packaging) below) and then navigate to the `stage` directory and follow the instructions given in the [Running](#running) section below. Note that the queue names configured in the `application.conf` file used by application must match those in the `custom.conf` file used by ElasticMQ.
+7. To run the Pan-Archival Catalogue Services locally, it is recommended to first package and stage the application (see [Packaging](#packaging) below) and then navigate to the `stage` directory and follow the instructions given in the [Running](#running) section below. Note that the queue names configured in the `application.conf` file used by application must match those in the `custom.conf` file used by ElasticMQ.
 
-14. Your message service is now running and ready to respond to requests.
+8. Your message service is now running and ready to respond to requests.
 
 ## Packaging
 This project makes use of the [sbt-native-packager](https://www.scala-sbt.org/sbt-native-packager/index.html) plugin to create distribution packages of the application.
