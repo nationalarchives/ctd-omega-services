@@ -48,6 +48,7 @@ channels:
         oneOf:
           - $ref: '#/components/messages/getEditSet'
           - $ref: '#/components/messages/getEditSetRecord'
+          - $ref: '#/components/messages/updateEditSetRecord'
 
   omega.editorial.web.application.instance.1:
     description: The queue on which response messages will be sent.
@@ -59,7 +60,7 @@ channels:
           - $ref: '#/components/messages/editSet'
           - $ref: '#/components/messages/editSetSummary'
           - $ref: '#/components/messages/editSetRecord'
-          - $ref: '#/components/messages/updateEditSetRecord'
+          - $ref: '#/components/messages/editSetRecordUpdate'
           - $ref: '#/components/messages/updateResponseStatus'
 
   ### TODO(AR) request/response pattern
@@ -102,6 +103,16 @@ components:
         - $ref: '#/components/messageTraits/serviceRequestHeaders'
       payload:
         $ref: "#/components/schemas/assetRecordRequest"
+    updateEditSetRecord:
+      messageId: OSUESR001
+      name: updateEditSetRecord
+      title: Update EditSet Record
+      summary: Update an EditSet Record
+      # contentType: application/json
+      traits:
+        - $ref: '#/components/messageTraits/serviceRequestHeaders'
+      payload:
+        $ref: "#/components/schemas/assetRecordUpdateRequest"
 
     editSet:
       # messageId: ODEDSE001
@@ -135,9 +146,9 @@ components:
         description: Default Correlation ID
         location: $message.header#/correlationId
 
-    updateEditSetRecord:
-      name: updateEditSetRecord
-      title: Update Edit Set Record
+    editSetRecordUpdate:
+      name: editSetRecordUpdate
+      title: Edit Set Record Update
       traits:
         - $ref: '#/components/messageTraits/updateEditSetRecordHeaders'
       payload:
@@ -172,6 +183,17 @@ components:
           $ref: "#/components/schemas/omegaCatalogueIdentifier"
         timestamp:
           $ref: "#/components/schemas/timestamp"
+    assetRecordUpdateRequest:
+      type: object
+      properties:
+        editSetOci:
+          $ref: "#/components/schemas/omegaCatalogueIdentifier"
+        recordOci:
+          $ref: "#/components/schemas/omegaCatalogueIdentifier"
+        timestamp:
+          $ref: "#/components/schemas/timestamp"
+        fields:
+          $ref: '#/components/schemas/updateEditSetRecord'
 
     timestamp:
       type: string
