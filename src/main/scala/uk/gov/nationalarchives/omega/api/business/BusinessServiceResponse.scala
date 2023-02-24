@@ -21,4 +21,6 @@
 
 package uk.gov.nationalarchives.omega.api.business
 
-trait BusinessServiceResponse
+trait BusinessServiceResponse {
+  val content: String
+}

@@ -142,10 +142,9 @@ class ApiService(val config: ServiceConfig) {
       }
     )
 
-  private def doStop(): Unit = {
+  private def doStop(): Unit =
     // TODO(RW) this is where we will need to close any connections, for example to SQS or OpenSearch
     logger.info("Connection closed.")
-  }
 
   private def acknowledgeMessage(): IO[AckAction[IO]] =
     logger.info("Acknowledged message") *> IO(AckAction.ack)

@@ -42,18 +42,17 @@ class Dispatcher(val localProducer: LocalProducer) {
     for {
       requestMessage <- q.take
       _ <- logger.info(s"Dispatcher # $dispatcherId, processing message id: ${requestMessage.persistentMessageId}")
-      serviceRequest                  <- createServiceRequest(requestMessage)
-      businessService                 <- IO.pure(serviceRequest._1)
-      businessServiceRequest          <- IO.pure(serviceRequest._2)
-      validatedBusinessServiceRequest <- validateBusinessServiceRequest(businessService, businessServiceRequest)
-      businessResult                  <- execBusinessService(businessService, validatedBusinessServiceRequest)
-      res                             <- sendResultToJmsQueue(businessResult, requestMessage)
+      (businessService, businessServiceRequest) <- createServiceRequest(requestMessage)
+      validatedBusinessServiceRequest <-
+        IO.pure(validateBusinessServiceRequest(businessService, businessServiceRequest))
+      businessResult <- execBusinessService(businessService, validatedBusinessServiceRequest)
+      res            <- sendResultToJmsQueue(businessResult, requestMessage)
     } yield res
 
   private def createServiceRequest(localMessage: LocalMessage): IO[(BusinessService, BusinessServiceRequest)] =
     localMessage.serviceId match {
       case ECHO001 =>
-        IO.delay {
+        IO.pure {
           Tuple2(
             new EchoService(),
             EchoRequest(localMessage.messageText)
@@ -65,33 +64,30 @@ class Dispatcher(val localProducer: LocalProducer) {
   private def validateBusinessServiceRequest(
     businessService: BusinessService,
     businessServiceRequest: BusinessServiceRequest
-  ): IO[ValidatedNec[RequestValidationError, BusinessServiceRequest]] =
-    IO.delay {
-      businessService match {
-        case value: RequestValidation =>
-          value.validateRequest(businessServiceRequest)
-        case _ =>
-          Validated.valid(businessServiceRequest)
-      }
+  ): ValidatedNec[RequestValidationError, BusinessServiceRequest] =
+    businessService match {
+      case value: RequestValidation =>
+        value.validateRequest(businessServiceRequest)
+      case _ =>
+        Validated.valid(businessServiceRequest)
     }
+  // }
 
   private def execBusinessService[T <: BusinessServiceRequest, U <: BusinessServiceResponse, E <: BusinessServiceError](
     businessService: BusinessService,
     validatedBusinessServiceRequest: ValidatedNec[RequestValidationError, T]
   ): IO[ValidatedNec[RequestValidationError, Either[BusinessServiceError, BusinessServiceResponse]]] =
-    IO.delay {
-      validatedBusinessServiceRequest.map(businessService.process)
-    }
+    IO.delay(validatedBusinessServiceRequest.map(businessService.process))
 
   private def sendResultToJmsQueue[U <: BusinessServiceResponse, E <: BusinessServiceError](
     businessResult: ValidatedNec[RequestValidationError, Either[E, U]],
     requestMessage: LocalMessage
   ): IO[Unit] = {
-    val replyMessage: IO[String] = IO.delay {
+    val replyMessage: String =
       businessResult match {
         case Valid(Right(businessResult)) =>
           requestMessage.serviceId match {
-            case ECHO001 => businessResult.asInstanceOf[EchoResponse].text
+            case ECHO001 => businessResult.content
             // add more services here
           }
 
@@ -101,7 +97,6 @@ class Dispatcher(val localProducer: LocalProducer) {
         case Invalid(requestValidationFailures) =>
           s"""{status: "INVALID-REQUEST", reference: "$getCustomerErrorReference", message: "$requestValidationFailures"}"""
       }
-    }
     localProducer.send(replyMessage, requestMessage)
   }
 

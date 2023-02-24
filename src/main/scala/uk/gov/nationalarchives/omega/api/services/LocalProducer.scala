@@ -29,7 +29,7 @@ trait LocalProducer {
 
   var message: String = ""
 
-  def send(replyMessage: IO[String], requestMessage: LocalMessage): IO[Unit]
+  def send(replyMessage: String, requestMessage: LocalMessage): IO[Unit]
 }
 
 /** In JMS terms a producer can have one or many destinations - in this implementation we have one destination, if we
@@ -37,15 +37,18 @@ trait LocalProducer {
   */
 class LocalProducerImpl(val jmsProducer: JmsProducer[IO], val outputQueue: QueueName) extends LocalProducer {
 
-  def send(replyMessage: IO[String], requestMessage: LocalMessage): IO[Unit] =
-    replyMessage.flatMap(replyText =>
-      jmsProducer.send { mf =>
-        val msg = mf.makeTextMessage(replyText)
-        msg.map { m =>
-          m.setJMSCorrelationId(requestMessage.correlationId)
-          (m, outputQueue)
-        }
-      } *> IO.unit
-    )
+  /** Send the given reply message to the output queue
+    * @param replyMessage - the message
+    * @param requestMessage the request message (needed for correlation ID)
+    * @return
+    */
+  def send(replyMessage: String, requestMessage: LocalMessage): IO[Unit] =
+    jmsProducer.send { mf =>
+      val msg = mf.makeTextMessage(replyMessage)
+      msg.map { m =>
+        m.setJMSCorrelationId(requestMessage.correlationId)
+        (m, outputQueue)
+      }
+    } *> IO.unit
 
 }

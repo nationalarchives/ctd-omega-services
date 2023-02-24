@@ -23,4 +23,4 @@ package uk.gov.nationalarchives.omega.api.business.echo
 
 import uk.gov.nationalarchives.omega.api.business.BusinessServiceResponse
 
-case class EchoResponse(text: String) extends BusinessServiceResponse
+case class EchoResponse(override val content: String) extends BusinessServiceResponse
