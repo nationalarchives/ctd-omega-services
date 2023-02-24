@@ -60,7 +60,6 @@ channels:
           - $ref: '#/components/messages/editSet'
           - $ref: '#/components/messages/editSetSummary'
           - $ref: '#/components/messages/editSetRecord'
-          - $ref: '#/components/messages/editSetRecordUpdate'
           - $ref: '#/components/messages/updateResponseStatus'
 
   ### TODO(AR) request/response pattern
@@ -142,17 +141,6 @@ components:
       summary: An Edit Set Record in the Omega Catalogue
       payload:
         $ref: "#/components/schemas/editSetRecord"
-      correlationId:
-        description: Default Correlation ID
-        location: $message.header#/correlationId
-
-    editSetRecordUpdate:
-      name: editSetRecordUpdate
-      title: Edit Set Record Update
-      traits:
-        - $ref: '#/components/messageTraits/updateEditSetRecordHeaders'
-      payload:
-        $ref: "#/components/schemas/updateEditSetRecord"
       correlationId:
         description: Default Correlation ID
         location: $message.header#/correlationId
@@ -543,15 +531,6 @@ components:
             description: The Identifier of the Omega Service to place the Request against
             type: string
             pattern: OS[A-Z]{4}([1-9][0-9][0-9])(0[1-9][0-9])|(00[1-9])
-
-    updateEditSetRecordHeaders:
-      headers:
-        type: object
-        required:
-          - oci
-        properties:
-          oci:
-            $ref: "#/components/schemas/omegaCatalogueIdentifier"
 
   # TODO(AR) what are these for?
   operationTraits:
