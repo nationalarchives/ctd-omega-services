@@ -16,7 +16,6 @@ The PAC API is implemented using Cats Effect, to provide an asynchronous runtime
 * [sbt](https://www.scala-sbt.org/) >= 1.6.2
 * [Scala](https://www.scala-lang.org/) >= 2.13.8
 * [Java JDK](https://adoptopenjdk.net/) >= 1.8
-* [Yarn](https://classic.yarnpkg.com/lang/en/docs/install) >= 1.22.10
 
 ### Steps:
 

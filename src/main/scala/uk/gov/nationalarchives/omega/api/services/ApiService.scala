@@ -55,17 +55,18 @@ class ApiService(val config: ServiceConfig) {
     new LocalMessageStore(messageStoreFolder)
   }
 
-  def start: IO[ExitCode] = {
+  def start: IO[ExitCode] =
     // check if we can start the service
     if (!switchState(Stopped, Starting)(config.errorOnInvalidServiceState)) {
-      return IO.pure(ExitCode.Error)
+      IO.pure(ExitCode.Error)
+    } else {
+      attemptStartUp()
     }
 
+  private def attemptStartUp(): IO[ExitCode] = {
     // copy config option to local state
     this.errorOnInvalidServiceState = config.errorOnInvalidServiceState
-
     try {
-      // attempt startup
       val ec = doStart(config)
       // switch to the started state
       switchState(Starting, Started)(errorOnInvalidServiceState)
@@ -80,19 +81,17 @@ class ApiService(val config: ServiceConfig) {
         } finally
           logger.error(e.getMessage)
     }
-
   }
 
   @throws[IllegalStateException]
   def stop(): Unit = {
     // check if we can stop the service
-    if (!switchState(Started, Stopping)(errorOnInvalidServiceState)) {
-      return
+    if (switchState(Started, Stopping)(errorOnInvalidServiceState)) {
+      logger.info("Closing connection..")
+      if (switchState(Stopping, Stopped)(errorOnInvalidServiceState)) {
+        doStop()
+      }
     }
-
-    // attempt shutdown
-    doStop()
-    switchState(Stopping, Stopped)(errorOnInvalidServiceState)
     () // Explicitly return unit
   }
 
@@ -130,19 +129,23 @@ class ApiService(val config: ServiceConfig) {
     result.as(ExitCode.Success)
   }
 
-  private def process(queue: Queue[IO, LocalMessage], consumer: JmsAcknowledgerConsumer[IO], producer: JmsProducer[IO]) =
-    for {
-      res <- IO.race(
-               createMessageHandler(queue)(consumer),
-               List.range(start = 0, end = config.maxDispatchers).parTraverse_ { i =>
-                 logger.info(s"Starting consumer #${i + 1}") >>
-                   new Dispatcher(new LocalProducerImpl(producer, QueueName(config.replyQueue))).run(i)(queue).foreverM
-               }
-             )
-    } yield res
+  private def process(
+    queue: Queue[IO, LocalMessage],
+    consumer: JmsAcknowledgerConsumer[IO],
+    producer: JmsProducer[IO]
+  ) =
+    IO.race(
+      createMessageHandler(queue)(consumer),
+      List.range(start = 0, end = config.maxDispatchers).parTraverse_ { i =>
+        logger.info(s"Starting consumer #${i + 1}") >>
+          new Dispatcher(new LocalProducerImpl(producer, QueueName(config.replyQueue))).run(i)(queue).foreverM
+      }
+    )
 
-  private def doStop(): Unit =
-    logger.info("Connection closed")
+  private def doStop(): Unit = {
+    // TODO(RW) this is where we will need to close any connections, for example to SQS or OpenSearch
+    logger.info("Connection closed.")
+  }
 
   private def acknowledgeMessage(): IO[AckAction[IO]] =
     logger.info("Acknowledged message") *> IO(AckAction.ack)
