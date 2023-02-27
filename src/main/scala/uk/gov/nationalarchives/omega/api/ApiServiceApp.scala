@@ -21,48 +21,30 @@
 
 package uk.gov.nationalarchives.omega.api
 
-import buildinfo.BuildInfo
 import cats.effect.{ ExitCode, IO, IOApp }
-import uk.gov.nationalarchives.omega.api.OmegaCommand.{ ApiCommand, RunCommand, ShowVersion }
+import org.typelevel.log4cats.slf4j.Slf4jFactory
+import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
+import pureconfig.ConfigSource
+import pureconfig.generic.auto._
+import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.services.ApiService
 
-/** This is the main entry point to the application and is responsible for handling command line input, together with
-  * the uk.gov.nationalarchives.omega.api.OmegaCommand
-  *
-  * N.B. BuildInfo is generated on compile and will be available in the ./target/scala-2.13/src_managed directory
-  */
 object ApiServiceApp extends IOApp {
 
-  // see https://tldp.org/LDP/abs/html/exitcodes.html
-  private val EXIT_SUCCESS = 0
-  private val EXIT_GENERAL_ERROR = 1
+  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
+  implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
-  override def run(args: List[String]): IO[ExitCode] =
-    OmegaCommand.parse(args.toIndexedSeq) match {
-      case Left(help) if help.errors.nonEmpty =>
-        // user needs help due to errors with expected args
-        System.err.println(help)
-        sys.exit(EXIT_GENERAL_ERROR)
+  override def run(args: List[String]): IO[ExitCode] = {
+    val serviceConfig = ConfigSource.default.loadOrThrow[ServiceConfig]
+    val apiService = new ApiService(serviceConfig)
 
-      case Left(help) =>
-        // help was requested by the user, i.e.: `--help`
-        println(help)
-        sys.exit(EXIT_SUCCESS)
-
-      case Right(ApiCommand(RunCommand(apiConfig))) =>
-        val apiService = ApiService(apiConfig)
-
-        // install a shutdown hook on the API Service so that when the App receives SIGTERM it stops gracefully
-        sys.ShutdownHookThread {
-          apiService.stop()
-        }
-
-        // start the API Service
-        apiService.start
-
-      case Right(ShowVersion) =>
-        println(BuildInfo.version)
-        sys.exit(EXIT_SUCCESS)
+    // install a shutdown hook on the API Service so that when the App receives SIGTERM it stops gracefully
+    sys.ShutdownHookThread {
+      apiService.stop()
     }
+
+    // start the API Service
+    apiService.start
+  }
 
 }

@@ -41,7 +41,7 @@ docker ps -a
 ```
 6. Go to http://localhost:9325/ in a web browser and you should see the message queues configured in `custom.conf`, e.g. `request-general` and `omega-editorial-web-application-instance-1`
 
-7. To run the Pan-Archival Catalogue Services locally, it is recommended to first package and stage the application (see [Packaging](#packaging) below) and then navigate to the `stage` directory and follow the instructions given in the [Running](#running) section below. Note that the queue names configured in the `application.conf` file used by application must match those in the `custom.conf` file used by ElasticMQ.
+7. To run the Pan-Archival Catalogue Services locally you can use ` sbt run`. Note that the queue names configured in the `application.conf` file used by application must match those in the `custom.conf` file used by ElasticMQ.
 
 8. Your message service is now running and ready to respond to requests.
 

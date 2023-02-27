@@ -38,8 +38,10 @@ trait LocalProducer {
 class LocalProducerImpl(val jmsProducer: JmsProducer[IO], val outputQueue: QueueName) extends LocalProducer {
 
   /** Send the given reply message to the output queue
-    * @param replyMessage - the message
-    * @param requestMessage the request message (needed for correlation ID)
+    * @param replyMessage
+    *   \- the message
+    * @param requestMessage
+    *   the request message (needed for correlation ID)
     * @return
     */
   def send(replyMessage: String, requestMessage: LocalMessage): IO[Unit] =

@@ -30,9 +30,6 @@ import jms4s.jms.JmsMessage
 import jms4s.{ JmsAcknowledgerConsumer, JmsProducer }
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
-import pureconfig.generic.auto._
-import pureconfig.{ ConfigObjectSource, ConfigSource }
-import uk.gov.nationalarchives.omega.api.common.ServiceArgs
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.connectors.JmsConnector
 import uk.gov.nationalarchives.omega.api.services.LocalMessageStore.PersistentMessageId
@@ -46,7 +43,6 @@ class ApiService(val config: ServiceConfig) {
   implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
-  private var errorOnInvalidServiceState = false
   private val state = new AtomicReference[ServiceState](Stopped)
 
   private val localMessageStore = {
@@ -63,32 +59,29 @@ class ApiService(val config: ServiceConfig) {
       attemptStartUp()
     }
 
-  private def attemptStartUp(): IO[ExitCode] = {
-    // copy config option to local state
-    this.errorOnInvalidServiceState = config.errorOnInvalidServiceState
+  private def attemptStartUp(): IO[ExitCode] =
     try {
       val ec = doStart(config)
       // switch to the started state
-      switchState(Starting, Started)(errorOnInvalidServiceState)
+      switchState(Starting, Started)(config.errorOnInvalidServiceState)
       ec
     } catch {
       case e: Throwable =>
         // we are in some inconsistent state as startup failed, so we must attempt shutdown
         try {
           doStop()
-          switchState(Starting, Stopped)(errorOnInvalidServiceState)
+          switchState(Starting, Stopped)(config.errorOnInvalidServiceState)
           IO.pure(ExitCode.Error)
         } finally
           logger.error(e.getMessage)
     }
-  }
 
   @throws[IllegalStateException]
   def stop(): Unit = {
     // check if we can stop the service
-    if (switchState(Started, Stopping)(errorOnInvalidServiceState)) {
+    if (switchState(Started, Stopping)(config.errorOnInvalidServiceState)) {
       logger.info("Closing connection..")
-      if (switchState(Stopping, Stopped)(errorOnInvalidServiceState)) {
+      if (switchState(Stopping, Stopped)(config.errorOnInvalidServiceState)) {
         doStop()
       }
     }
@@ -143,7 +136,7 @@ class ApiService(val config: ServiceConfig) {
     )
 
   private def doStop(): Unit =
-    // TODO(RW) this is where we will need to close any connections, for example to SQS or OpenSearch
+    // TODO(RW) this is where we will need to close any external connections, for example to OpenSearch
     logger.info("Connection closed.")
 
   private def acknowledgeMessage(): IO[AckAction[IO]] =
@@ -183,39 +176,5 @@ class ApiService(val config: ServiceConfig) {
              case Right(m) => queue.offer(m) *> logger.info(s"Queued message: $persistentMessageId")
            }
     } yield ()
-
-}
-object ApiService {
-
-  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
-  implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
-  def apply(args: ServiceArgs): ApiService = {
-    val serviceConfig = loadConfig(args)
-    new ApiService(serviceConfig)
-  }
-
-  private def loadConfig(serviceArgs: ServiceArgs): ServiceConfig = {
-    val maybeTempMessageDir = serviceArgs.tempMessageDir.flatMap(dir => Some(s"{ temp-message-dir = $dir }"))
-    val defaultConfigSource: ConfigObjectSource = ConfigSource.resources("application.conf")
-    val configFilePath: String = serviceArgs.configFilePath.getOrElse("")
-    logger.info(s"Starting application with diskStorePath=${serviceArgs.tempMessageDir}")
-    if (configFilePath.nonEmpty && Files.exists(Paths.get(configFilePath))) {
-      maybeTempMessageDir match {
-        case Some(tempMessageDir) =>
-          ConfigSource
-            .string(tempMessageDir)
-            .withFallback(ConfigSource.file(configFilePath))
-            .withFallback(defaultConfigSource)
-            .loadOrThrow[ServiceConfig]
-        case None => ConfigSource.file(configFilePath).withFallback(defaultConfigSource).loadOrThrow[ServiceConfig]
-      }
-    } else {
-      maybeTempMessageDir match {
-        case Some(tempMessageDir) =>
-          ConfigSource.string(tempMessageDir).withFallback(defaultConfigSource).loadOrThrow[ServiceConfig]
-        case None => defaultConfigSource.loadOrThrow[ServiceConfig]
-      }
-    }
-  }
 
 }
