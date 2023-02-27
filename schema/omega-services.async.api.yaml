@@ -134,7 +134,7 @@ components:
 
     errorResponse:
       name: errorResponse
-      title: Error response
+      title: Error response message
       payload:
         $ref: "#/components/schemas/errorMessage"
       correlationId:
@@ -311,7 +311,7 @@ components:
 
     updateResponseStatus:
       type: object
-      description: A response for update status
+      description: A respose for update status
       required: [status]
       properties:
         status:
@@ -326,9 +326,11 @@ components:
       properties:
         errorCode:
           type: integer
-          enum: [1001]
+          enum:
+            - 1001
         errorText:
           type: string
+          description:  a description of the error
 
     omegaCatalogueIdentifier:
       type: string
