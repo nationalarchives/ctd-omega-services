@@ -58,7 +58,6 @@ channels:
       message:
         oneOf:
           - $ref: '#/components/messages/editSet'
-          - $ref: '#/components/messages/editSetSummary'
           - $ref: '#/components/messages/editSetRecord'
           - $ref: '#/components/messages/updateResponseStatus'
 
@@ -77,16 +76,6 @@ components:
       name: getEditSet
       title: Get EditSet
       summary: Retrieve an EditSet
-      # contentType: application/json
-      traits:
-        - $ref: '#/components/messageTraits/serviceRequestHeaders'
-      payload:
-        $ref: "#/components/schemas/assetRequest"
-    getEditSetSummary:
-      messageId: OSGEES002
-      name: getEditSetSummary
-      title: Get a Summary of an EditSet
-      summary: Retrieve a Summary of an EditSet
       # contentType: application/json
       traits:
         - $ref: '#/components/messageTraits/serviceRequestHeaders'
@@ -120,17 +109,6 @@ components:
       summary: An EditSet from the Omega Catalogue
       payload:
         $ref: "#/components/schemas/editSet"
-      correlationId:
-        description: Default Correlation ID
-        location: $message.header#/correlationId
-
-    editSetSummary:
-      # messageId: ODEDSE002
-      name: editSetSummary
-      title: EditSet Summary
-      summary: A Summary of an EditSet in the Omega Catalogue
-      payload:
-        $ref: "#/components/schemas/editSetSummary"
       correlationId:
         description: Default Correlation ID
         location: $message.header#/correlationId
@@ -187,26 +165,8 @@ components:
       type: string
       format: date-time
       description: Client timestamp of when the request was sent.
-    editSet:
-      type: object
-      properties:
-        oci:
-          $ref: "#/components/schemas/omegaCatalogueIdentifier"
-        version:
-          $ref: "#/components/schemas/assetVersion"
-        ownerId:
-          $ref: "#/components/schemas/assetOwnerId"
-        title:
-          $ref: "#/components/schemas/assetTitle"
-        description:
-          type: string
-          description: The description of the EditSet
-        members:
-          type: array
-          items:
-            $ref: '#/components/schemas/omegaCatalogueIdentifier'
 
-    editSetSummary:
+    editSet:
       type: object
       properties:
         oci:
@@ -222,9 +182,9 @@ components:
         members:
           type: array
           items:
-            $ref: '#/components/schemas/editSetSummaryMember'
+            $ref: '#/components/schemas/editSetMember'
 
-    editSetSummaryMember:
+    editSetMember:
       type: object
       description: The Summary of an EditSet member
       properties:
