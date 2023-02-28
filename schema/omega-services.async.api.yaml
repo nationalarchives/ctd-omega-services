@@ -9,7 +9,6 @@ info:
     The API and systems connected to it are using an asynchronous messaging architecture. This may seem unconventional for those who are used to working with HTTP APIs which typically provide a Request-Response approach, but it has many advantages when integrating systems:
     * Decoupling of Systems
     * Quality of Service and Prioritisation
-    * Separation of Response and Error channels
     * Buffering during individual system outages
     * Abilility to Backpressure
     ### Check out our latest features:
@@ -60,6 +59,7 @@ channels:
           - $ref: '#/components/messages/editSet'
           - $ref: '#/components/messages/editSetRecord'
           - $ref: '#/components/messages/updateResponseStatus'
+          - $ref: '#/components/messages/errorResponse'
 
   ### TODO(AR) request/response pattern
   ### TODO(AR) - where to publish response messages
@@ -128,6 +128,15 @@ components:
       title: Update Result Status
       payload:
         $ref: "#/components/schemas/updateResponseStatus"
+      correlationId:
+        description: Default Correlation ID
+        location: $message.header#/correlationId
+
+    errorResponse:
+      name: errorResponse
+      title: Error response message
+      payload:
+        $ref: "#/components/schemas/errorMessage"
       correlationId:
         description: Default Correlation ID
         location: $message.header#/correlationId
@@ -310,6 +319,18 @@ components:
           enum: ["success", "failed"]
         message:
           type: string
+
+    errorMessage:
+      type: object
+      description: An error message
+      properties:
+        errorCode:
+          type: integer
+          enum:
+            - 1001
+        errorText:
+          type: string
+          description:  a description of the error
 
     omegaCatalogueIdentifier:
       type: string
