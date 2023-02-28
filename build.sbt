@@ -2,7 +2,6 @@ val CatsEffectVersion = "3.4.5"
 val PureConfigVersion = "0.17.2"
 
 ThisBuild / versionScheme := Some("semver-spec")
-ThisBuild / fork := true
 
 ThisBuild / githubTokenSource.withRank(KeyRanks.Invisible) := TokenSource.Or(
   TokenSource.Environment("GITHUB_TOKEN"),

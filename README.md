@@ -3,13 +3,13 @@ A message-based API for Pan-Archival Catalogue (PAC) services.
 
 The PAC API is implemented using Cats Effect, to provide an asynchronous runtime, and an asynchronous   communications protocol (JMS). The reason for using an asynchronous protocol, rather than a synchronous one, like HTTP, is to ensure strong decoupling between the service and client systems. Strongly decoupled systems are much less likely to experience cascading failures, where the failure of one system causes others to fail, and are much less likely to become overloaded by too many requests.
 
-**Cats Effect Services**
+## Cats Effect services
 
 ![alt text][diagram]
 
 [diagram]: https://github.com/nationalarchives/ctd-omega-services/images/Cats_Effect_Services.png "Cats Effect Services"
 
-### Pre-requisites for building and running the project:
+## Pre-requisites for building and running the project
 * [Git](https://git-scm.com)
 * [Docker](https://docs.docker.com/get-docker/)
 * [ElasticMQ](https://github.com/softwaremill/elasticmq)
@@ -17,7 +17,9 @@ The PAC API is implemented using Cats Effect, to provide an asynchronous runtime
 * [Scala](https://www.scala-lang.org/) >= 2.13.8
 * [Java JDK](https://adoptopenjdk.net/) >= 1.8
 
-### Steps:
+## Building and running locally
+
+Steps:
 
 1. Clone the Git repository:
 ```
@@ -68,7 +70,7 @@ You can verify the existence of the Docker image by running the following from t
 docker image ls
 ```
 It is recommended to [read more about the Docker Plugin](https://www.scala-sbt.org/sbt-native-packager/formats/docker.html) if you wish yo use this feature. 
-## Running
+## Running the packaged application
 When the application has been packaged as described above, the following directory structure will be created in the distribution:
 ```
 │
@@ -81,4 +83,4 @@ uk.gov.nationalarchives.ctd-omega-service.jar
 ```
 The `bin` folder contains the scripts to start the application from the command line and the `lib` folder contains the application jar file and other dependencies.
 
-Running the application from the command line using the `ctd-omega-services` script or `ctd-omega-service.bat` Windows batch file with the `--help` flag will display further instructions for running the application including the required command line arguments.
+Run the application from the command line using the `ctd-omega-services` script or `ctd-omega-service.bat` Windows batch file.
