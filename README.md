@@ -79,6 +79,6 @@ When the application has been packaged as described above, the following directo
 uk.gov.nationalarchives.ctd-omega-service.jar
 ...
 ```
-The `bin` folder contains the scripts to start the application from the command line and the `lib` folder contains the prototype jar file and other dependencies.
+The `bin` folder contains the scripts to start the application from the command line and the `lib` folder contains the application jar file and other dependencies.
 
 Running the application from the command line using the `ctd-omega-services` script or `ctd-omega-service.bat` Windows batch file with the `--help` flag will display further instructions for running the application including the required command line arguments.
