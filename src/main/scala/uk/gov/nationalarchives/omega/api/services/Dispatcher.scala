@@ -95,7 +95,8 @@ class Dispatcher(val localProducer: LocalProducer) {
           s"""{status: "SERVICE-ERROR", reference: "$getCustomerErrorReference", code: "${serviceError.code}", message: "${serviceError.message}"}"""
 
         case Invalid(requestValidationFailures) =>
-          s"""{status: "INVALID-REQUEST", reference: "$getCustomerErrorReference", message: "$requestValidationFailures"}"""
+          val text = requestValidationFailures.reduceLeftTo(_.message)((acc,cur) => acc + cur.message)
+          s"""{status: "INVALID-REQUEST", reference: "$getCustomerErrorReference", message: "$text"}"""
       }
     localProducer.send(replyMessage, requestMessage)
   }
