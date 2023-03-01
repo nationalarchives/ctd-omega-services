@@ -26,9 +26,6 @@ import jms4s.JmsProducer
 import jms4s.config.QueueName
 
 trait LocalProducer {
-
-  var message: String = ""
-
   def send(replyMessage: String, requestMessage: LocalMessage): IO[Unit]
 }
 

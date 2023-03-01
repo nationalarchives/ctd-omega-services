@@ -31,11 +31,7 @@ import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.{ Files, Path, StandardOpenOption }
 import java.util.UUID
 
-object LocalMessageStore {
-  type PersistentMessageId = UUID
-}
-
-class LocalMessageStore(folder: Path) {
+case class LocalMessageStore(folder: Path) {
   private val uuidGenerator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
 
   import LocalMessageStore.PersistentMessageId
@@ -72,4 +68,7 @@ class LocalMessageStore(folder: Path) {
         .flatTap(uuid => IO.delay(s"Persisted message: $uuid"))
     }
   }
+}
+object LocalMessageStore {
+  type PersistentMessageId = UUID
 }

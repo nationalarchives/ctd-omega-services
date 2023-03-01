@@ -26,7 +26,10 @@ import jms4s.config.QueueName
 
 class TestProducerImpl(val queueName: QueueName) extends LocalProducer {
 
-  override def send(replyMessage: IO[String], requestMessage: LocalMessage): IO[Unit] =
-    replyMessage.map(msg => message = msg)
+  var message = ""
 
+  override def send(replyMessage: String, requestMessage: LocalMessage): IO[Unit] = {
+    message = replyMessage
+    IO.unit
+  }
 }

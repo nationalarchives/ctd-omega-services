@@ -30,6 +30,7 @@ import jms4s.jms.JmsMessage
 import jms4s.{ JmsAcknowledgerConsumer, JmsProducer }
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
+import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.connectors.JmsConnector
 import uk.gov.nationalarchives.omega.api.services.LocalMessageStore.PersistentMessageId
@@ -44,12 +45,6 @@ class ApiService(val config: ServiceConfig) {
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
   private val state = new AtomicReference[ServiceState](Stopped)
-
-  private val localMessageStore = {
-    val messageStoreFolder = Paths.get(config.tempMessageDir)
-    Files.createDirectories(messageStoreFolder)
-    new LocalMessageStore(messageStoreFolder)
-  }
 
   def start: IO[ExitCode] =
     // check if we can start the service
@@ -66,7 +61,7 @@ class ApiService(val config: ServiceConfig) {
       switchState(Starting, Started)(config.errorOnInvalidServiceState)
       ec
     } catch {
-      case e: Throwable =>
+      case e: Exception =>
         // we are in some inconsistent state as startup failed, so we must attempt shutdown
         try {
           doStop()
@@ -77,7 +72,7 @@ class ApiService(val config: ServiceConfig) {
     }
 
   @throws[IllegalStateException]
-  def stop(): Unit = {
+  def stop(): IO[Unit] = {
     // check if we can stop the service
     if (switchState(Started, Stopping)(config.errorOnInvalidServiceState)) {
       logger.info("Closing connection..")
@@ -85,7 +80,7 @@ class ApiService(val config: ServiceConfig) {
         doStop()
       }
     }
-    () // Explicitly return unit
+    IO.unit // Explicitly return unit
   }
 
   @throws[IllegalStateException]
@@ -111,12 +106,15 @@ class ApiService(val config: ServiceConfig) {
 
     val localQueue: IO[Queue[IO, LocalMessage]] = Queue.bounded[IO, LocalMessage](config.maxLocalQueueSize)
     val jmsConnector = new JmsConnector(config)
+    val messageStoreFolder = Paths.get(config.tempMessageDir)
+    Files.createDirectories(messageStoreFolder)
+    val localMessageStore = LocalMessageStore(messageStoreFolder)
 
     val result = for {
       q <- localQueue
       res <-
         jmsConnector.getJmsProducerAndConsumer(QueueName(config.requestQueue)).use { case (jmsProducer, jmsConsumer) =>
-          process(q, jmsConsumer, jmsProducer)
+          process(q, jmsConsumer, jmsProducer, localMessageStore)
         }
     } yield res
     result.as(ExitCode.Success)
@@ -125,17 +123,20 @@ class ApiService(val config: ServiceConfig) {
   private def process(
     queue: Queue[IO, LocalMessage],
     consumer: JmsAcknowledgerConsumer[IO],
-    producer: JmsProducer[IO]
+    producer: JmsProducer[IO],
+    localMessageStore: LocalMessageStore
   ) =
     IO.race(
-      createMessageHandler(queue)(consumer),
+      createMessageHandler(queue, localMessageStore)(consumer),
       List.range(start = 0, end = config.maxDispatchers).parTraverse_ { i =>
         logger.info(s"Starting consumer #${i + 1}") >>
-          new Dispatcher(new LocalProducerImpl(producer, QueueName(config.replyQueue))).run(i)(queue).foreverM
+          new Dispatcher(new LocalProducerImpl(producer, QueueName(config.replyQueue)), new EchoService())
+            .run(i)(queue)
+            .foreverM
       }
     )
 
-  private def doStop(): Unit =
+  private def doStop(): IO[Unit] =
     // TODO(RW) this is where we will need to close any external connections, for example to OpenSearch
     logger.info("Connection closed.")
 
@@ -154,7 +155,8 @@ class ApiService(val config: ServiceConfig) {
     } yield LocalMessage(persistentMessageId, serviceId, text, messageId)
 
   private def createMessageHandler(
-    queue: Queue[IO, LocalMessage]
+    queue: Queue[IO, LocalMessage],
+    localMessageStore: LocalMessageStore
   )(jmsAcknowledgerConsumer: JmsAcknowledgerConsumer[IO]): IO[Unit] =
     jmsAcknowledgerConsumer.handle { (jmsMessage, _) =>
       for {
@@ -172,7 +174,9 @@ class ApiService(val config: ServiceConfig) {
     for {
       localMessageResult <- createLocalMessage(persistentMessageId, jmsMessage).attempt
       _ <- localMessageResult match {
-             case Left(e)  => logger.error(s"Failed to queue message due to ${e.getMessage}")
+             case Left(e) =>
+               // TODO(RW) at this point we should send a JMS error message (provided we have a correlation ID)
+               logger.error(s"Failed to queue message due to ${e.getMessage}")
              case Right(m) => queue.offer(m) *> logger.info(s"Queued message: $persistentMessageId")
            }
     } yield ()

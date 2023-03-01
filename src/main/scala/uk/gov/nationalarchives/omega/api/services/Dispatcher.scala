@@ -25,18 +25,21 @@ import cats.data.Validated.{ Invalid, Valid }
 import cats.data.{ Validated, ValidatedNec }
 import cats.effect.IO
 import cats.effect.std.Queue
+import com.fasterxml.uuid.{ EthernetAddress, Generators }
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.business._
-import uk.gov.nationalarchives.omega.api.business.echo.{ EchoRequest, EchoResponse, EchoService }
+import uk.gov.nationalarchives.omega.api.business.echo.{ EchoRequest, EchoService }
 import uk.gov.nationalarchives.omega.api.services.ServiceIdentifier.ECHO001
 
 import java.util.UUID
 
-class Dispatcher(val localProducer: LocalProducer) {
+class Dispatcher(val localProducer: LocalProducer, echoService: EchoService) {
 
   implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
+
+  private val generator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
 
   def run(dispatcherId: Int)(q: Queue[IO, LocalMessage]): IO[Unit] =
     for {
@@ -54,7 +57,7 @@ class Dispatcher(val localProducer: LocalProducer) {
       case ECHO001 =>
         IO.pure {
           Tuple2(
-            new EchoService(),
+            echoService,
             EchoRequest(localMessage.messageText)
           )
         }
@@ -95,12 +98,12 @@ class Dispatcher(val localProducer: LocalProducer) {
           s"""{status: "SERVICE-ERROR", reference: "$getCustomerErrorReference", code: "${serviceError.code}", message: "${serviceError.message}"}"""
 
         case Invalid(requestValidationFailures) =>
-          val text = requestValidationFailures.reduceLeftTo(_.message)((acc,cur) => acc + cur.message)
+          val text = requestValidationFailures.reduceLeftTo(_.message)((acc, cur) => acc + cur.message)
           s"""{status: "INVALID-REQUEST", reference: "$getCustomerErrorReference", message: "$text"}"""
       }
     localProducer.send(replyMessage, requestMessage)
   }
 
-  private def getCustomerErrorReference: UUID = UUID.randomUUID()
+  private def getCustomerErrorReference: UUID = generator.generate()
 
 }

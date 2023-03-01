@@ -21,14 +21,20 @@
 
 package uk.gov.nationalarchives.omega.api.services
 
+import cats.data.Validated.Valid
 import cats.effect.IO
 import cats.effect.std.Queue
 import cats.effect.testing.scalatest.AsyncIOSpec
 import com.fasterxml.uuid.{ EthernetAddress, Generators }
 import jms4s.config.QueueName
+import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
+import uk.gov.nationalarchives.omega.api.business.BusinessServiceRequest
+import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 
 import scala.concurrent.duration.DurationInt
 
@@ -39,7 +45,8 @@ class DispatcherSpec extends AsyncFreeSpec with AsyncIOSpec with Matchers with M
     "for the ECHO001 service it should reply" in {
       val testQueue = QueueName("test-queue")
       val testLocalProducer = new TestProducerImpl(testQueue)
-      val dispatcher = new Dispatcher(testLocalProducer)
+      val echoService = new EchoService()
+      val dispatcher = new Dispatcher(testLocalProducer, echoService)
       val generator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
       Queue.bounded[IO, LocalMessage](1).flatMap { queue =>
         queue.offer(LocalMessage(generator.generate(), ServiceIdentifier.ECHO001, "Hello World!", "1234")) *>

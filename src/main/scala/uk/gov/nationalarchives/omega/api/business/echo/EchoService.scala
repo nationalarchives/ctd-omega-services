@@ -21,12 +21,16 @@
 
 package uk.gov.nationalarchives.omega.api.business.echo
 
-import cats.data.{NonEmptyChain, Validated}
+import cats.data.{ NonEmptyChain, Validated }
 import uk.gov.nationalarchives.omega.api.business._
 class EchoService extends BusinessService with RequestValidation {
 
   override def validateRequest(request: BusinessServiceRequest): ValidationResult =
-    Validated.cond(!request.text.trim.isEmpty, request, NonEmptyChain.one(TextIsNonEmptyCharacters("Echo Text cannot be empty.")))
+    Validated.cond(
+      !request.text.trim.isEmpty,
+      request,
+      NonEmptyChain.one(TextIsNonEmptyCharacters("Echo Text cannot be empty."))
+    )
 
   override def process(request: BusinessServiceRequest): Either[BusinessServiceError, BusinessServiceResponse] =
     if (request.text.contains("ERROR")) {
