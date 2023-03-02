@@ -5,9 +5,7 @@ The PAC API is implemented using Cats Effect, to provide an asynchronous runtime
 
 ## Cats Effect services
 
-![alt text][diagram]
-
-[diagram]: https://github.com/nationalarchives/ctd-omega-services/images/Cats_Effect_Services.png "Cats Effect Services"
+![Cats Effect Services](images/Cats_Effect_Services.png)
 
 ## Pre-requisites for building and running the project
 * [Git](https://git-scm.com)
