@@ -1,4 +1,4 @@
-val CatsEffectVersion = "3.4.5"
+val CatsEffectVersion = "3.4.8"
 val PureConfigVersion = "0.17.2"
 
 ThisBuild / versionScheme := Some("semver-spec")
@@ -63,7 +63,7 @@ lazy val root = Project("ctd-omega-services", file("."))
       "com.fasterxml.uuid"     % "java-uuid-generator"           % "4.1.0",
       "com.monovore"          %% "decline"                       % "2.4.1",
       "com.beachape"          %% "enumeratum"                    % "1.7.2",
-      "org.slf4j"              % "slf4j-simple"                  % "2.0.5",
+      "org.slf4j"              % "slf4j-simple"                  % "2.0.6",
       "com.github.pureconfig" %% "pureconfig"                    % "0.17.2",
       "org.scalatest"         %% "scalatest"                     % "3.2.15"  % Test,
       "org.typelevel"         %% "cats-effect-testing-scalatest" % "1.5.0"   % Test,
