@@ -34,15 +34,13 @@ import java.util.UUID
 case class LocalMessageStore(folder: Path) {
   private val uuidGenerator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
 
-  import LocalMessageStore.PersistentMessageId
-
-  def persistMessage(message: JmsMessage): IO[PersistentMessageId] = {
-    def newMessageFileId(): IO[PersistentMessageId] =
+  def persistMessage(message: JmsMessage): IO[UUID] = {
+    def newMessageFileId(): IO[UUID] =
       IO.delay {
         uuidGenerator.generate()
       }
 
-    def openNewMessageFile(messageId: PersistentMessageId): IO[ByteChannel] =
+    def openNewMessageFile(messageId: UUID): IO[ByteChannel] =
       IO.blocking {
         val path = folder.resolve(s"$messageId.msg")
         Files.newByteChannel(path, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE, StandardOpenOption.DSYNC)
@@ -68,7 +66,4 @@ case class LocalMessageStore(folder: Path) {
         .flatTap(uuid => IO.delay(s"Persisted message: $uuid"))
     }
   }
-}
-object LocalMessageStore {
-  type PersistentMessageId = UUID
 }

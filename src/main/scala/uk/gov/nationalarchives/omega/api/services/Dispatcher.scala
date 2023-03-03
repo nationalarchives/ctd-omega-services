@@ -58,7 +58,7 @@ class Dispatcher(val localProducer: LocalProducer, echoService: EchoService) {
         IO.pure {
           Tuple2(
             echoService,
-            EchoRequest(localMessage.messageText)
+            EchoRequest(localMessage.messageText) // deserialize messageText to EchoRequest
           )
         }
       // add more service IDs here
@@ -91,7 +91,7 @@ class Dispatcher(val localProducer: LocalProducer, echoService: EchoService) {
         case Valid(Right(businessResult)) =>
           requestMessage.serviceId match {
             case ECHO001 => businessResult.content
-            // add more services here
+            // TODO(RW) add more services here
           }
 
         case Valid(Left(serviceError)) =>
@@ -102,7 +102,7 @@ class Dispatcher(val localProducer: LocalProducer, echoService: EchoService) {
           s"""{status: "INVALID-REQUEST", reference: "$getCustomerErrorReference", message: "$text"}"""
       }
     localProducer.send(replyMessage, requestMessage)
-  }
+  } // TODO(RW) add recoverWith here to handle unexpected exceptions and send a message back to the client
 
   private def getCustomerErrorReference: UUID = generator.generate()
 

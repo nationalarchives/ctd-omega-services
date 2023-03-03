@@ -21,11 +21,48 @@
 
 package uk.gov.nationalarchives.omega.api.services
 
-import uk.gov.nationalarchives.omega.api.services.LocalMessageStore.PersistentMessageId
+import cats.effect.IO
+import cats.implicits.catsSyntaxEitherId
+import jms4s.jms.JmsMessage
+
+import java.util.UUID
 
 case class LocalMessage(
-  persistentMessageId: PersistentMessageId,
+  persistentMessageId: UUID,
   serviceId: ServiceIdentifier,
   messageText: String,
   correlationId: String
 )
+object LocalMessage {
+
+  private def getServiceId(jmsMessage: JmsMessage): Either[ServiceError, ServiceIdentifier] =
+    jmsMessage.getStringProperty("sid") match {
+      case Some(sid) =>
+        ServiceIdentifier.withNameOption(sid) match {
+          case Some(serviceId) => Right(serviceId)
+          case None            => Left(ServiceIdentifierError("SID not recognised"))
+        }
+      case None => Left(ServiceIdentifierError("Missing service ID"))
+    }
+
+  private def getMessageId(jmsMessage: JmsMessage): Either[ServiceError, String] =
+    jmsMessage.getJMSMessageId match {
+      case Some(messageId) => Right(messageId)
+      case None            => Left(MessageIdentifierError(""))
+    }
+
+  def createLocalMessage(
+    persistentMessageId: UUID,
+    jmsMessage: JmsMessage
+  ): IO[Either[ServiceError, LocalMessage]] =
+    jmsMessage.asTextF[IO].attempt.flatMap {
+      case Left(e) => IO.pure(MessageReadError("Unable to read message", Some(e)).asLeft[LocalMessage])
+      case Right(text) =>
+        val res = for {
+          serviceId     <- getServiceId(jmsMessage)
+          correlationId <- getMessageId(jmsMessage)
+        } yield LocalMessage(persistentMessageId, serviceId, text, correlationId)
+        IO(res)
+    }
+
+}

@@ -33,10 +33,11 @@ import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.connectors.JmsConnector
-import uk.gov.nationalarchives.omega.api.services.LocalMessageStore.PersistentMessageId
+import uk.gov.nationalarchives.omega.api.services.LocalMessage.createLocalMessage
 import uk.gov.nationalarchives.omega.api.services.ServiceState.{ Started, Starting, Stopped, Stopping }
 
 import java.nio.file.{ Files, Paths }
+import java.util.UUID
 import java.util.concurrent.atomic.AtomicReference
 
 class ApiService(val config: ServiceConfig) {
@@ -143,17 +144,6 @@ class ApiService(val config: ServiceConfig) {
   private def acknowledgeMessage(): IO[AckAction[IO]] =
     logger.info("Acknowledged message") *> IO(AckAction.ack)
 
-  @throws[IllegalArgumentException]
-  private def createLocalMessage(persistentMessageId: PersistentMessageId, jmsMessage: JmsMessage): IO[LocalMessage] =
-    for {
-      sid <-
-        IO.fromOption(jmsMessage.getStringProperty("sid"))(throw new IllegalArgumentException("Missing service ID"))
-      serviceId <-
-        IO.fromOption(ServiceIdentifier.withNameOption(sid))(throw new IllegalArgumentException("SID not recognised"))
-      messageId <- IO.fromOption(jmsMessage.getJMSMessageId)(throw new IllegalArgumentException("Missing message ID"))
-      text      <- jmsMessage.asTextF[IO]
-    } yield LocalMessage(persistentMessageId, serviceId, text, messageId)
-
   private def createMessageHandler(
     queue: Queue[IO, LocalMessage],
     localMessageStore: LocalMessageStore
@@ -168,15 +158,15 @@ class ApiService(val config: ServiceConfig) {
 
   private def queueMessage(
     queue: Queue[IO, LocalMessage],
-    persistentMessageId: PersistentMessageId,
+    persistentMessageId: UUID,
     jmsMessage: JmsMessage
   ): IO[Unit] =
     for {
-      localMessageResult <- createLocalMessage(persistentMessageId, jmsMessage).attempt
+      localMessageResult <- createLocalMessage(persistentMessageId, jmsMessage)
       _ <- localMessageResult match {
              case Left(e) =>
                // TODO(RW) at this point we should send a JMS error message (provided we have a correlation ID)
-               logger.error(s"Failed to queue message due to ${e.getMessage}")
+               logger.error(s"Failed to queue message due to ${e.message}")
              case Right(m) => queue.offer(m) *> logger.info(s"Queued message: $persistentMessageId")
            }
     } yield ()
