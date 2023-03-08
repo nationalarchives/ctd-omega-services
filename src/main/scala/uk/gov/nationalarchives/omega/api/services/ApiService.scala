@@ -109,7 +109,7 @@ class ApiService(val config: ServiceConfig) {
     val jmsConnector = new JmsConnector(config)
     val messageStoreFolder = Paths.get(config.tempMessageDir)
     Files.createDirectories(messageStoreFolder)
-    val localMessageStore = LocalMessageStore(messageStoreFolder)
+    val localMessageStore = new LocalMessageStore(messageStoreFolder)
 
     val result = for {
       q <- localQueue

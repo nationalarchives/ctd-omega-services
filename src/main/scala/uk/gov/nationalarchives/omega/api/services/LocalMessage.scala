@@ -48,21 +48,20 @@ object LocalMessage {
   private def getMessageId(jmsMessage: JmsMessage): Either[ServiceError, String] =
     jmsMessage.getJMSMessageId match {
       case Some(messageId) => Right(messageId)
-      case None            => Left(MessageIdentifierError(""))
+      case None            => Left(MessageIdentifierError("Missing message ID"))
     }
 
   def createLocalMessage(
     persistentMessageId: UUID,
     jmsMessage: JmsMessage
   ): IO[Either[ServiceError, LocalMessage]] =
-    jmsMessage.asTextF[IO].attempt.flatMap {
-      case Left(e) => IO.pure(MessageReadError("Unable to read message", Some(e)).asLeft[LocalMessage])
+    jmsMessage.asTextF[IO].attempt.map {
+      case Left(e) => MessageReadError("Unable to read message", Some(e)).asLeft[LocalMessage]
       case Right(text) =>
-        val res = for {
+        for {
           serviceId     <- getServiceId(jmsMessage)
           correlationId <- getMessageId(jmsMessage)
         } yield LocalMessage(persistentMessageId, serviceId, text, correlationId)
-        IO(res)
     }
 
 }

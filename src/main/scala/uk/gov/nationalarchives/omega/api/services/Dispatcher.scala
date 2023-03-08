@@ -45,22 +45,20 @@ class Dispatcher(val localProducer: LocalProducer, echoService: EchoService) {
     for {
       requestMessage <- q.take
       _ <- logger.info(s"Dispatcher # $dispatcherId, processing message id: ${requestMessage.persistentMessageId}")
-      (businessService, businessServiceRequest) <- createServiceRequest(requestMessage)
+      (businessService, businessServiceRequest) <- IO.pure(createServiceRequest(requestMessage))
       validatedBusinessServiceRequest <-
         IO.pure(validateBusinessServiceRequest(businessService, businessServiceRequest))
       businessResult <- execBusinessService(businessService, validatedBusinessServiceRequest)
       res            <- sendResultToJmsQueue(businessResult, requestMessage)
     } yield res
 
-  private def createServiceRequest(localMessage: LocalMessage): IO[(BusinessService, BusinessServiceRequest)] =
+  private def createServiceRequest(localMessage: LocalMessage): (BusinessService, BusinessServiceRequest) =
     localMessage.serviceId match {
       case ECHO001 =>
-        IO.pure {
-          Tuple2(
-            echoService,
-            EchoRequest(localMessage.messageText) // deserialize messageText to EchoRequest
-          )
-        }
+        Tuple2(
+          echoService,
+          EchoRequest(localMessage.messageText) // deserialize messageText to EchoRequest
+        )
       // add more service IDs here
     }
 

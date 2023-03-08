@@ -31,7 +31,7 @@ import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.{ Files, Path, StandardOpenOption }
 import java.util.UUID
 
-case class LocalMessageStore(folder: Path) {
+class LocalMessageStore(folder: Path) {
   private val uuidGenerator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
 
   def persistMessage(message: JmsMessage): IO[UUID] = {
