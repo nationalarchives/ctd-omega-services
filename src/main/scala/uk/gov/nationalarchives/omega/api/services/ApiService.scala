@@ -28,8 +28,6 @@ import jms4s.JmsAcknowledgerConsumer.AckAction
 import jms4s.config.QueueName
 import jms4s.jms.JmsMessage
 import jms4s.{ JmsAcknowledgerConsumer, JmsProducer }
-import org.typelevel.log4cats.slf4j.Slf4jFactory
-import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.connectors.JmsConnector
@@ -38,7 +36,6 @@ import uk.gov.nationalarchives.omega.api.services.ServiceState.{ Started, Starti
 
 import java.nio.file.{ Files, Paths }
 import java.util.UUID
-import java.util.concurrent.atomic.AtomicReference
 
 class ApiService(val config: ServiceConfig) extends Stateful {
 
@@ -50,7 +47,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     // switch to the started state
     switchState(Starting, Started)
       .ifM(
-        doStart(config),
+        doStart(),
         IO.pure(ExitCode(invalidState))
       )
       .handleErrorWith(error =>
@@ -66,30 +63,35 @@ class ApiService(val config: ServiceConfig) extends Stateful {
       IO.pure(ExitCode(invalidState))
     )
 
-  private def doStart(config: ServiceConfig): IO[ExitCode] = {
+  private def doStart(): IO[ExitCode] = {
 
     // TODO(AR) - one client, how to ack a consumer message after local persistence and then process it, and then produce a response
     // TODO(AR) how to wire up queues and services using a config file or DSL?
-
     // TODO(AR) request queue will typically be 1 (plus maybe a few more for expedited ops), response queues will be per external application
-
-    throw new IllegalStateException("Some error")
-
     val localQueue: IO[Queue[IO, LocalMessage]] = Queue.bounded[IO, LocalMessage](config.maxLocalQueueSize)
     val jmsConnector = new JmsConnector(config)
+    getLocalMessageStore.flatMap {
+      case Right(localMessageStore) =>
+        val result = for {
+          q <- localQueue
+          res <-
+            jmsConnector.getJmsProducerAndConsumer(QueueName(config.requestQueue)).use {
+              case (jmsProducer, jmsConsumer) =>
+                process(q, jmsConsumer, jmsProducer, localMessageStore)
+            }
+        } yield res
+        result.as(ExitCode.Success)
+      case Left(exitCode) => IO.pure(exitCode)
+    }
+  }
+
+  private def getLocalMessageStore: IO[Either[ExitCode, LocalMessageStore]] = IO {
     val messageStoreFolder = Paths.get(config.tempMessageDir)
     Files.createDirectories(messageStoreFolder)
-    val localMessageStore = new LocalMessageStore(messageStoreFolder)
-
-    val result = for {
-      q <- localQueue
-      res <-
-        jmsConnector.getJmsProducerAndConsumer(QueueName(config.requestQueue)).use { case (jmsProducer, jmsConsumer) =>
-          process(q, jmsConsumer, jmsProducer, localMessageStore)
-        }
-    } yield res
-    result.as(ExitCode.Success)
-  }
+    Right(new LocalMessageStore(messageStoreFolder))
+  }.handleErrorWith(ex =>
+    logger.error(s"Failed to created local message store due to ${ex.getMessage}") *> IO.pure(Left(ExitCode.Error))
+  )
 
   private def process(
     queue: Queue[IO, LocalMessage],
