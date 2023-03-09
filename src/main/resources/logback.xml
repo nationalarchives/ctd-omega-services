@@ -9,7 +9,7 @@
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>logs/ctd-omega-services.log</file>
-        <encoder>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <customFields>{"application":"omega-api-services"}</customFields>
         </encoder>
     </appender>

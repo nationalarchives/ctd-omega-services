@@ -10,3 +10,4 @@ services:
         source: ./custom.conf
         target: /opt/elasticmq.conf
     image: softwaremill/elasticmq-native
+    privileged: true

@@ -4,7 +4,7 @@ val PureConfigVersion = "0.17.2"
 val Jms4SVersion = "0.0.1-53518bb-SNAPSHOT"
 
 ThisBuild / versionScheme := Some("semver-spec")
-
+ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation")
 ThisBuild / githubTokenSource.withRank(KeyRanks.Invisible) := TokenSource.Or(
   TokenSource.Environment("GITHUB_TOKEN"),
   TokenSource.GitConfig("github.token")
@@ -53,13 +53,13 @@ lazy val root = Project("ctd-omega-services", file("."))
     libraryDependencies ++= Seq(
       // "core" module - IO, IOApp, schedulers
       // This pulls in the kernel and std modules automatically.
-      "org.typelevel" %% "cats-core" % "2.9.0",
+      "org.typelevel" %% "cats-core"   % "2.9.0",
       "org.typelevel" %% "cats-effect" % CatsEffectVersion,
       // concurrency abstractions and primitives (Concurrent, Sync, Async etc.)
       "org.typelevel" %% "cats-effect-kernel" % CatsEffectVersion,
       // standard "effect" library (Queues, Console, Random etc.)
       "org.typelevel"         %% "cats-effect-std"               % CatsEffectVersion,
-      "dev.fpinbo"            %% "jms4s"    % Jms4SVersion,
+      "dev.fpinbo"            %% "jms4s"                         % Jms4SVersion,
       "dev.fpinbo"            %% "jms4s-simple-queue-service"    % Jms4SVersion,
       "com.github.pureconfig" %% "pureconfig-core"               % PureConfigVersion,
       "com.github.pureconfig" %% "pureconfig-generic"            % PureConfigVersion,
@@ -68,7 +68,8 @@ lazy val root = Project("ctd-omega-services", file("."))
       "com.beachape"          %% "enumeratum"                    % "1.7.2",
       "org.typelevel"         %% "log4cats-core"                 % Log4CatsVersion,
       "org.typelevel"         %% "log4cats-slf4j"                % Log4CatsVersion,
-      "ch.qos.logback"         % "logback-classic"               % "1.4.5" % Runtime,
+      "ch.qos.logback"         % "logback-classic"               % "1.4.5"   % Runtime,
+      "net.logstash.logback"   % "logstash-logback-encoder"      % "7.3" % Runtime,
       "org.scalatest"         %% "scalatest"                     % "3.2.15"  % Test,
       "org.typelevel"         %% "cats-effect-testing-scalatest" % "1.5.0"   % Test,
       "org.mockito"           %% "mockito-scala-scalatest"       % "1.17.12" % Test,

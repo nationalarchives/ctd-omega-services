@@ -40,63 +40,31 @@ import java.nio.file.{ Files, Paths }
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicReference
 
-class ApiService(val config: ServiceConfig) {
-
-  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
-  implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
-
-  private val state = new AtomicReference[ServiceState](Stopped)
+class ApiService(val config: ServiceConfig) extends Stateful {
 
   def start: IO[ExitCode] =
     // check if we can start the service
-    if (!switchState(Stopped, Starting)(config.errorOnInvalidServiceState)) {
-      IO.pure(ExitCode.Error)
-    } else {
-      attemptStartUp()
-    }
+    switchState(Stopped, Starting).ifM(attemptStartUp(), IO.pure(ExitCode(invalidState)))
 
   private def attemptStartUp(): IO[ExitCode] =
-    try {
-      val ec = doStart(config)
-      // switch to the started state
-      switchState(Starting, Started)(config.errorOnInvalidServiceState)
-      ec
-    } catch {
-      case e: Exception =>
-        // we are in some inconsistent state as startup failed, so we must attempt shutdown
-        try {
-          doStop()
-          switchState(Starting, Stopped)(config.errorOnInvalidServiceState)
-          IO.pure(ExitCode.Error)
-        } finally
-          logger.error(e.getMessage)
-    }
+    // switch to the started state
+    switchState(Starting, Started)
+      .ifM(
+        doStart(config),
+        IO.pure(ExitCode(invalidState))
+      )
+      .handleErrorWith(error =>
+        logger.error(s"Shutting down due to ${error.getMessage}") *>
+          doStop() *> switchState(Starting, Stopped) *> IO.pure(ExitCode.Error)
+      )
 
-  @throws[IllegalStateException]
-  def stop(): IO[Unit] = {
+  def stop(): IO[ExitCode] =
     // check if we can stop the service
-    if (switchState(Started, Stopping)(config.errorOnInvalidServiceState)) {
-      logger.info("Closing connection..")
-      if (switchState(Stopping, Stopped)(config.errorOnInvalidServiceState)) {
-        doStop()
-      }
-    }
-    IO.unit // Explicitly return unit
-  }
-
-  @throws[IllegalStateException]
-  private def switchState(from: ServiceState, to: ServiceState)(errorOnInvalidServiceState: Boolean): Boolean = {
-    val switched = state.compareAndSet(from, to)
-    if (!switched) {
-      val msg = s"Unable to switch ApiService state from: $from, to: $to."
-      if (errorOnInvalidServiceState) {
-        throw new IllegalStateException(msg)
-      } else {
-        logger.warn(msg)
-      }
-    }
-    switched
-  }
+    switchState(Started, Stopping).ifM(
+      logger.info("Closing connection..") *>
+        switchState(Stopping, Stopped).ifM(doStop(), IO.pure(ExitCode(invalidState))),
+      IO.pure(ExitCode(invalidState))
+    )
 
   private def doStart(config: ServiceConfig): IO[ExitCode] = {
 
@@ -104,6 +72,8 @@ class ApiService(val config: ServiceConfig) {
     // TODO(AR) how to wire up queues and services using a config file or DSL?
 
     // TODO(AR) request queue will typically be 1 (plus maybe a few more for expedited ops), response queues will be per external application
+
+    throw new IllegalStateException("Some error")
 
     val localQueue: IO[Queue[IO, LocalMessage]] = Queue.bounded[IO, LocalMessage](config.maxLocalQueueSize)
     val jmsConnector = new JmsConnector(config)
@@ -137,9 +107,9 @@ class ApiService(val config: ServiceConfig) {
       }
     )
 
-  private def doStop(): IO[Unit] =
+  private def doStop(): IO[ExitCode] =
     // TODO(RW) this is where we will need to close any external connections, for example to OpenSearch
-    logger.info("Connection closed.")
+    logger.info("Connection closed.") *> IO.pure(ExitCode.Success)
 
   private def acknowledgeMessage(): IO[AckAction[IO]] =
     logger.info("Acknowledged message") *> IO(AckAction.ack)
