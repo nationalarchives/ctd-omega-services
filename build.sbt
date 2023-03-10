@@ -68,7 +68,7 @@ lazy val root = Project("ctd-omega-services", file("."))
       "com.beachape"          %% "enumeratum"                    % "1.7.2",
       "org.typelevel"         %% "log4cats-core"                 % Log4CatsVersion,
       "org.typelevel"         %% "log4cats-slf4j"                % Log4CatsVersion,
-      "ch.qos.logback"         % "logback-classic"               % "1.4.5"   % Runtime,
+      "ch.qos.logback"         % "logback-classic"               % "1.3.5"   % Runtime,
       "net.logstash.logback"   % "logstash-logback-encoder"      % "7.3"     % Runtime,
       "org.scalatest"         %% "scalatest"                     % "3.2.15"  % Test,
       "org.typelevel"         %% "cats-effect-testing-scalatest" % "1.5.0"   % Test,
