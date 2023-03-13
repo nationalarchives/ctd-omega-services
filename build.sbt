@@ -68,12 +68,12 @@ lazy val root = Project("ctd-omega-services", file("."))
       "com.beachape"          %% "enumeratum"                    % "1.7.2",
       "org.typelevel"         %% "log4cats-core"                 % Log4CatsVersion,
       "org.typelevel"         %% "log4cats-slf4j"                % Log4CatsVersion,
-      "ch.qos.logback"         % "logback-classic"               % "1.3.5"   % Runtime,
+      "ch.qos.logback"         % "logback-classic"               % "1.3.5"   % Runtime, // Java 8 compatible
       "net.logstash.logback"   % "logstash-logback-encoder"      % "7.3"     % Runtime,
       "org.scalatest"         %% "scalatest"                     % "3.2.15"  % Test,
       "org.typelevel"         %% "cats-effect-testing-scalatest" % "1.5.0"   % Test,
       "org.mockito"           %% "mockito-scala-scalatest"       % "1.17.12" % Test,
-      "com.vladsch.flexmark"   % "flexmark-profile-pegdown"      % "0.64.0"  % Test,
+      "com.vladsch.flexmark"   % "flexmark-profile-pegdown"      % "0.62.2"  % Test, // Java 8 compatible
       // better monadic for compiler plugin as suggested by documentation
       compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
     ),
