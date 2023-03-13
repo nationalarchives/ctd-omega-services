@@ -40,7 +40,7 @@ trait Stateful {
   def switchState(from: ServiceState, to: ServiceState): IO[Boolean] = IO {
     val switched = state.compareAndSet(from, to)
     if (!switched) {
-      logger.error(s"Unable to switch ApiService state from: $from, to: $to.")
+      logger.error(s"Unable to switch ${this.getClass.getSimpleName} state from: $from, to: $to.")
     }
     switched
   }

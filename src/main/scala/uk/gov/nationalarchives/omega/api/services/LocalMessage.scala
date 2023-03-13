@@ -38,7 +38,7 @@ object LocalMessage {
   private def getServiceId(jmsMessage: JmsMessage): Either[ServiceError, ServiceIdentifier] =
     jmsMessage.getStringProperty("sid") match {
       case Some(sid) =>
-        ServiceIdentifier.withNameOption(sid) match {
+        ServiceIdentifier.withNameOption(sid.toUpperCase) match {
           case Some(serviceId) => Right(serviceId)
           case None            => Left(ServiceIdentifierError("SID not recognised"))
         }

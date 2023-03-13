@@ -21,12 +21,10 @@
 
 package uk.gov.nationalarchives.omega.api.services
 
-import cats.effect.{ IO, Resource }
+import cats.effect.IO
 import com.fasterxml.uuid.{ EthernetAddress, Generators }
 import jms4s.jms.JmsMessage
 
-import java.nio.ByteBuffer
-import java.nio.channels.ByteChannel
 import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.{ Files, Path, StandardOpenOption }
 import java.util.UUID
@@ -40,30 +38,20 @@ class LocalMessageStore(folder: Path) {
         uuidGenerator.generate()
       }
 
-    def openNewMessageFile(messageId: UUID): IO[ByteChannel] =
-      IO.blocking {
-        val path = folder.resolve(s"$messageId.msg")
-        Files.newByteChannel(path, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE, StandardOpenOption.DSYNC)
+    newMessageFileId().flatMap { persistMessageId: UUID =>
+      message.asTextF[IO].flatMap { messageText: String =>
+        val path = folder.resolve(s"$persistMessageId.msg")
+        IO.blocking(
+          Files.write(
+            path,
+            messageText.getBytes(UTF_8),
+            StandardOpenOption.CREATE_NEW,
+            StandardOpenOption.WRITE,
+            StandardOpenOption.DSYNC
+          )
+        ) *> IO.pure(persistMessageId)
       }
-
-    def closeMessageFile(byteChannel: ByteChannel): IO[Unit] =
-      IO.blocking {
-        byteChannel.close()
-      }
-
-    newMessageFileId().flatMap { persistentMessageId: UUID =>
-      message
-        .asTextF[IO]
-        .flatMap { messageText: String =>
-          Resource.make(openNewMessageFile(persistentMessageId))(closeMessageFile).use { messageFile =>
-            IO.blocking {
-              val buffer = ByteBuffer.wrap(messageText.getBytes(UTF_8))
-              messageFile.write(buffer)
-              persistentMessageId
-            }
-          }
-        }
-        .flatTap(uuid => IO.delay(s"Persisted message: $uuid"))
     }
   }
+
 }

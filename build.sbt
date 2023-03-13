@@ -73,8 +73,10 @@ lazy val root = Project("ctd-omega-services", file("."))
       "org.scalatest"         %% "scalatest"                     % "3.2.15"  % Test,
       "org.typelevel"         %% "cats-effect-testing-scalatest" % "1.5.0"   % Test,
       "org.mockito"           %% "mockito-scala-scalatest"       % "1.17.12" % Test,
+      "com.vladsch.flexmark"   % "flexmark-profile-pegdown"      % "0.64.0"  % Test,
       // better monadic for compiler plugin as suggested by documentation
       compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
     ),
     resolvers += Resolver.githubPackages("rwalpole")
   )
+Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/test-reports")
