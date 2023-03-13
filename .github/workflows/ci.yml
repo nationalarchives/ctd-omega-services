@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    name: Build and Test (JDK ${{ matrix.jdk }} / ${{ matrix.os }})
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        jdk: [8, 11]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK ${{ matrix.jdk }}
+        with:
+          java-version: ${{ matrix.jdk }}
+        uses: actions/setup-java@v1
+      - name: Coursier cache
+        uses: coursier/cache-action@v6
+      - name: Check Scala format
+        run: sbt scalafmtCheck test:scalafmtCheck scalafmtSbtCheck
+      - name: Run unit tests
+        run: sbt test

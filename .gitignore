@@ -1,0 +1,5 @@
+**/target
+.idea/
+.bsp/
+temp-messages/
+logs/

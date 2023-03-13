@@ -1,0 +1,13 @@
+version: "3.7"
+services:
+  elasticmq-native:
+    container_name: ctd-omega-services_elasticmq
+    ports:
+      - 9324:9324
+      - 9325:9325
+    volumes:
+      - type: bind
+        source: ./custom.conf
+        target: /opt/elasticmq.conf
+    image: softwaremill/elasticmq-native
+    privileged: true
