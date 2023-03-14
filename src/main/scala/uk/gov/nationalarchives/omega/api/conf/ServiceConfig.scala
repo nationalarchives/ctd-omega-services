@@ -29,5 +29,4 @@ case class ServiceConfig(
   maxLocalQueueSize: Int,
   requestQueue: String,
   replyQueue: String,
-  errorOnInvalidServiceState: Boolean = false
 )

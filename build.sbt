@@ -2,6 +2,8 @@ val CatsEffectVersion = "3.4.8"
 val Log4CatsVersion = "2.5.0"
 val PureConfigVersion = "0.17.2"
 val Jms4SVersion = "0.0.1-53518bb-SNAPSHOT"
+val AwsJavaSdkVersion = "1.12.196"
+val CirceVersion = "0.14.1"
 
 ThisBuild / versionScheme := Some("semver-spec")
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation")
@@ -14,7 +16,9 @@ lazy val root = Project("ctd-omega-services", file("."))
   .enablePlugins(AutomateHeaderPlugin)
   .enablePlugins(BuildInfoPlugin)
   .enablePlugins(JavaAppPackaging)
+  .configs(IntegrationTest)
   .settings(
+    Defaults.itSettings,
     organization := "uk.gov.nationalarchives",
     name := "ctd-omega-services",
     Compile / mainClass := Some("uk.gov.nationalarchives.omega.api.ApiServiceApp"),
@@ -68,12 +72,19 @@ lazy val root = Project("ctd-omega-services", file("."))
       "com.beachape"          %% "enumeratum"                    % "1.7.2",
       "org.typelevel"         %% "log4cats-core"                 % Log4CatsVersion,
       "org.typelevel"         %% "log4cats-slf4j"                % Log4CatsVersion,
-      "ch.qos.logback"         % "logback-classic"               % "1.3.5"   % Runtime, // Java 8 compatible
-      "net.logstash.logback"   % "logstash-logback-encoder"      % "7.3"     % Runtime,
-      "org.scalatest"         %% "scalatest"                     % "3.2.15"  % Test,
-      "org.typelevel"         %% "cats-effect-testing-scalatest" % "1.5.0"   % Test,
-      "org.mockito"           %% "mockito-scala-scalatest"       % "1.17.12" % Test,
-      "com.vladsch.flexmark"   % "flexmark-profile-pegdown"      % "0.62.2"  % Test, // Java 8 compatible
+      "ch.qos.logback"         % "logback-classic"               % "1.3.5"           % Runtime, // Java 8 compatible
+      "net.logstash.logback"   % "logstash-logback-encoder"      % "7.3"             % Runtime,
+      "io.circe"              %% "circe-core"                    % CirceVersion %  "it,test",
+      "io.circe"              %% "circe-generic"                 % CirceVersion % "it,test",
+      "io.circe"              %% "circe-parser"                  % CirceVersion % "it,test",
+      "org.scalatest"         %% "scalatest"                     % "3.2.15"          % "it,test",
+      "org.typelevel"         %% "cats-effect-testing-scalatest" % "1.5.0"           % Test,
+      "org.mockito"           %% "mockito-scala-scalatest"       % "1.17.12"         % Test,
+      "com.vladsch.flexmark"   % "flexmark-profile-pegdown"      % "0.62.2"          % Test, // Java 8 compatible
+//      "com.amazonaws"          % "aws-java-sdk-core"             % AwsJavaSdkVersion % Test,
+//      "com.amazonaws"          % "aws-java-sdk-sqs"              % AwsJavaSdkVersion % Test,
+//      "com.amazonaws"          % "amazon-sqs-java-messaging-lib" % "1.0.8"           % Test,
+
       // better monadic for compiler plugin as suggested by documentation
       compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
     ),
