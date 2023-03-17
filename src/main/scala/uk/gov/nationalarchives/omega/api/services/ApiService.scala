@@ -77,7 +77,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
           res <-
             jmsConnector.getJmsProducerAndConsumer(QueueName(config.requestQueue)).use {
               case (jmsProducer, jmsConsumer) =>
-                process(q, jmsConsumer, jmsProducer, localMessageStore)
+                startHandlerAndDispatchers(q, jmsConsumer, jmsProducer, localMessageStore)
             }
         } yield res
         result.as(ExitCode.Success)
@@ -93,7 +93,13 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     logger.error(s"Failed to created local message store due to ${ex.getMessage}") *> IO.pure(Left(ExitCode.Error))
   )
 
-  private def process(
+  /* This method uses IO.race() to run the message handler and dispatcher in parallel. The common component between the
+   * message handler and the dispatcher is the queue. The handler puts messages onto queue and the dispatcher takes
+   * them off. Both of these tasks need to run forever unless the application is shutdown or the an unrecoverable
+   * error is encountered in one task, in which case it would terminate in error and this would cause the other to be
+   * cancelled.
+   */
+  private def startHandlerAndDispatchers(
     queue: Queue[IO, LocalMessage],
     consumer: JmsAcknowledgerConsumer[IO],
     producer: JmsProducer[IO],
@@ -136,10 +142,10 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     for {
       localMessageResult <- createLocalMessage(persistentMessageId, jmsMessage)
       _ <- localMessageResult match {
-             case Left(e) =>
+             case Right(m) => queue.offer(m) *> logger.info(s"Queued message: $persistentMessageId")
+             case Left(e)  =>
                // TODO(RW) at this point we should send a JMS error message (provided we have a correlation ID)
                logger.error(s"Failed to queue message due to ${e.message}")
-             case Right(m) => queue.offer(m) *> logger.info(s"Queued message: $persistentMessageId")
            }
     } yield ()
 
