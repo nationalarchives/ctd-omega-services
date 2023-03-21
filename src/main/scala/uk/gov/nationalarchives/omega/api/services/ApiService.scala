@@ -22,19 +22,21 @@
 package uk.gov.nationalarchives.omega.api.services
 
 import cats.effect.std.Queue
-import cats.effect.{ ExitCode, IO }
+import cats.effect.{ExitCode, IO}
 import cats.implicits.catsSyntaxParallelTraverse_
 import jms4s.JmsAcknowledgerConsumer.AckAction
 import jms4s.config.QueueName
 import jms4s.jms.JmsMessage
-import jms4s.{ JmsAcknowledgerConsumer, JmsProducer }
+import jms4s.{JmsAcknowledgerConsumer, JmsProducer}
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
+import uk.gov.nationalarchives.omega.api.common.ErrorHandling
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.connectors.JmsConnector
-import uk.gov.nationalarchives.omega.api.services.LocalMessage.createLocalMessage
-import uk.gov.nationalarchives.omega.api.services.ServiceState.{ Started, Starting, Stopped, Stopping }
+import uk.gov.nationalarchives.omega.api.messages.{LocalMessage, LocalMessageStore}
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage.createLocalMessage
+import uk.gov.nationalarchives.omega.api.services.ServiceState.{Started, Starting, Stopped, Stopping}
 
-import java.nio.file.{ Files, Paths }
+import java.nio.file.{Files, Paths}
 import java.util.UUID
 
 class ApiService(val config: ServiceConfig) extends Stateful {
@@ -141,12 +143,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
   ): IO[Unit] =
     for {
       localMessageResult <- createLocalMessage(persistentMessageId, jmsMessage)
-      _ <- localMessageResult match {
-             case Right(m) => queue.offer(m) *> logger.info(s"Queued message: $persistentMessageId")
-             case Left(e)  =>
-               // TODO(RW) at this point we should send a JMS error message (provided we have a correlation ID)
-               logger.error(s"Failed to queue message due to ${e.message}")
-           }
+      _ <- queue.offer(localMessageResult) *> logger.info(s"Queued message: $persistentMessageId")
     } yield ()
 
 }

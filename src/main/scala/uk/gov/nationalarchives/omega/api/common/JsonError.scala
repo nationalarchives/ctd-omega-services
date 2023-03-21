@@ -19,39 +19,24 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.services
+package uk.gov.nationalarchives.omega.api.common
 
-import cats.effect.IO
-import com.fasterxml.uuid.{ EthernetAddress, Generators }
-import jms4s.jms.JmsMessage
+import io.circe.syntax._
+import io.circe.{Encoder, Json}
+import sttp.tapir.Schema
+import sttp.tapir.generic.auto._
 
-import java.nio.charset.StandardCharsets.UTF_8
-import java.nio.file.{ Files, Path, StandardOpenOption }
-import java.util.UUID
+final case class JsonError(
+  errorCode: ErrorCode,
+  errorText: String
+)
+object JsonError {
+  implicit val encodeJsonError: Encoder[JsonError] = (jsonError: JsonError) =>
+    Json.obj(
+      ("errorCode", jsonError.errorCode.asJson),
+      ("errorText", jsonError.errorText.asJson)
+    )
 
-class LocalMessageStore(folder: Path) {
-  private val uuidGenerator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
-
-  def persistMessage(message: JmsMessage): IO[UUID] = {
-    def newMessageFileId(): IO[UUID] =
-      IO.delay {
-        uuidGenerator.generate()
-      }
-
-    newMessageFileId().flatMap { persistMessageId: UUID =>
-      message.asTextF[IO].flatMap { messageText: String =>
-        val path = folder.resolve(s"$persistMessageId.msg")
-        IO.blocking(
-          Files.write(
-            path,
-            messageText.getBytes(UTF_8),
-            StandardOpenOption.CREATE_NEW,
-            StandardOpenOption.WRITE,
-            StandardOpenOption.DSYNC
-          )
-        ) *> IO.pure(persistMessageId)
-      }
-    }
-  }
+  implicit val schema = implicitly[Schema[JsonError]]
 
 }

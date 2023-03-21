@@ -19,8 +19,39 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.business
+package uk.gov.nationalarchives.omega.api.messages
 
-trait BusinessService {
-  def process(request: BusinessServiceRequest): Either[ServiceError, BusinessServiceResponse]
+import cats.effect.IO
+import com.fasterxml.uuid.{EthernetAddress, Generators}
+import jms4s.jms.JmsMessage
+
+import java.nio.charset.StandardCharsets.UTF_8
+import java.nio.file.{Files, Path, StandardOpenOption}
+import java.util.UUID
+
+class LocalMessageStore(folder: Path) {
+  private val uuidGenerator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
+
+  def persistMessage(message: JmsMessage): IO[UUID] = {
+    def newMessageFileId(): IO[UUID] =
+      IO.delay {
+        uuidGenerator.generate()
+      }
+
+    newMessageFileId().flatMap { persistMessageId: UUID =>
+      message.asTextF[IO].flatMap { messageText: String =>
+        val path = folder.resolve(s"$persistMessageId.msg")
+        IO.blocking(
+          Files.write(
+            path,
+            messageText.getBytes(UTF_8),
+            StandardOpenOption.CREATE_NEW,
+            StandardOpenOption.WRITE,
+            StandardOpenOption.DSYNC
+          )
+        ) *> IO.pure(persistMessageId)
+      }
+    }
+  }
+
 }

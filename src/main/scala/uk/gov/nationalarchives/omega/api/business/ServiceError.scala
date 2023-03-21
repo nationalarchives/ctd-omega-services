@@ -19,12 +19,10 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.services
+package uk.gov.nationalarchives.omega.api.business
 
-sealed class ServiceError(val message: String, val cause: Option[Throwable] = None)
-final case class ServiceIdentifierError(override val message: String, override val cause: Option[Throwable] = None)
-    extends ServiceError(message, cause)
-final case class MessageIdentifierError(override val message: String, override val cause: Option[Throwable] = None)
-    extends ServiceError(message, cause)
-final case class MessageReadError(override val message: String, override val cause: Option[Throwable] = None)
-    extends ServiceError(message, cause)
+trait ServiceError {
+  //  def reference: String // TODO(AR) this comes later and is used for the user to contact the helpdesk
+  def code: String
+  def message: String
+}

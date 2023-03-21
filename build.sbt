@@ -2,6 +2,8 @@ val CatsEffectVersion = "3.4.8"
 val Log4CatsVersion = "2.5.0"
 val PureConfigVersion = "0.17.2"
 val Jms4SVersion = "0.0.1-53518bb-SNAPSHOT"
+val TapirVersion = "1.2.10"
+val EnumeratumVersion = "1.7.2"
 
 ThisBuild / versionScheme := Some("semver-spec")
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation")
@@ -58,22 +60,25 @@ lazy val root = Project("ctd-omega-services", file("."))
       // concurrency abstractions and primitives (Concurrent, Sync, Async etc.)
       "org.typelevel" %% "cats-effect-kernel" % CatsEffectVersion,
       // standard "effect" library (Queues, Console, Random etc.)
-      "org.typelevel"         %% "cats-effect-std"               % CatsEffectVersion,
-      "dev.fpinbo"            %% "jms4s"                         % Jms4SVersion,
-      "dev.fpinbo"            %% "jms4s-simple-queue-service"    % Jms4SVersion,
-      "com.github.pureconfig" %% "pureconfig-core"               % PureConfigVersion,
-      "com.github.pureconfig" %% "pureconfig-generic"            % PureConfigVersion,
-      "com.github.pureconfig" %% "pureconfig-generic-base"       % PureConfigVersion,
-      "com.fasterxml.uuid"     % "java-uuid-generator"           % "4.1.0",
-      "com.beachape"          %% "enumeratum"                    % "1.7.2",
-      "org.typelevel"         %% "log4cats-core"                 % Log4CatsVersion,
-      "org.typelevel"         %% "log4cats-slf4j"                % Log4CatsVersion,
-      "ch.qos.logback"         % "logback-classic"               % "1.3.5"   % Runtime, // Java 8 compatible
-      "net.logstash.logback"   % "logstash-logback-encoder"      % "7.3"     % Runtime,
-      "org.scalatest"         %% "scalatest"                     % "3.2.15"  % Test,
-      "org.typelevel"         %% "cats-effect-testing-scalatest" % "1.5.0"   % Test,
-      "org.mockito"           %% "mockito-scala-scalatest"       % "1.17.12" % Test,
-      "com.vladsch.flexmark"   % "flexmark-profile-pegdown"      % "0.62.2"  % Test, // Java 8 compatible
+      "org.typelevel"               %% "cats-effect-std"               % CatsEffectVersion,
+      "dev.fpinbo"                  %% "jms4s"                         % Jms4SVersion,
+      "dev.fpinbo"                  %% "jms4s-simple-queue-service"    % Jms4SVersion,
+      "com.github.pureconfig"       %% "pureconfig-core"               % PureConfigVersion,
+      "com.github.pureconfig"       %% "pureconfig-generic"            % PureConfigVersion,
+      "com.github.pureconfig"       %% "pureconfig-generic-base"       % PureConfigVersion,
+      "com.fasterxml.uuid"           % "java-uuid-generator"           % "4.1.0",
+      "com.beachape"                %% "enumeratum"                    % EnumeratumVersion,
+      "com.beachape"                %% "enumeratum-circe"              % EnumeratumVersion,
+      "org.typelevel"               %% "log4cats-core"                 % Log4CatsVersion,
+      "org.typelevel"               %% "log4cats-slf4j"                % Log4CatsVersion,
+      "com.softwaremill.sttp.tapir" %% "tapir-core"                    % TapirVersion,
+      "com.softwaremill.sttp.tapir" %% "tapir-enumeratum"              % TapirVersion,
+      "ch.qos.logback"               % "logback-classic"               % "1.3.5"   % Runtime, // Java 8 compatible
+      "net.logstash.logback"         % "logstash-logback-encoder"      % "7.3"     % Runtime,
+      "org.scalatest"               %% "scalatest"                     % "3.2.15"  % Test,
+      "org.typelevel"               %% "cats-effect-testing-scalatest" % "1.5.0"   % Test,
+      "org.mockito"                 %% "mockito-scala-scalatest"       % "1.17.12" % Test,
+      "com.vladsch.flexmark"         % "flexmark-profile-pegdown"      % "0.62.2"  % Test, // Java 8 compatible
       // better monadic for compiler plugin as suggested by documentation
       compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
     ),

@@ -22,11 +22,32 @@
 package uk.gov.nationalarchives.omega.api.services
 
 import cats.effect.IO
+import io.circe.Json
 import jms4s.JmsProducer
 import jms4s.config.QueueName
+import uk.gov.nationalarchives.omega.api.messages.ValidatedLocalMessage
 
 trait LocalProducer {
-  def send(replyMessage: String, requestMessage: LocalMessage): IO[Unit]
+
+  /** Send the given reply message to the output queue
+    *
+    * @param replyMessage
+    *   \- the message
+    * @param requestMessage
+    *   the request message (needed for correlation ID)
+    * @return
+    */
+  def send(replyMessage: String, requestMessage: ValidatedLocalMessage): IO[Unit]
+
+  /** Send a JSON error message to the output queue
+    *
+    * @param errorMessage
+    *   \- the error message
+    * @param correlationId
+    *   \- the correlation ID (if available)
+    * @return
+    */
+  def sendErrorMessage(errorMessage: Json, correlationId: Option[String]): IO[Unit]
 }
 
 /** In JMS terms a producer can have one or many destinations - in this implementation we have one destination, if we
@@ -34,19 +55,25 @@ trait LocalProducer {
   */
 class LocalProducerImpl(val jmsProducer: JmsProducer[IO], val outputQueue: QueueName) extends LocalProducer {
 
-  /** Send the given reply message to the output queue
-    * @param replyMessage
-    *   \- the message
-    * @param requestMessage
-    *   the request message (needed for correlation ID)
-    * @return
-    */
-  def send(replyMessage: String, requestMessage: LocalMessage): IO[Unit] =
+  def send(replyMessage: String, requestMessage: ValidatedLocalMessage): IO[Unit] =
     jmsProducer.send { mf =>
       val msg = mf.makeTextMessage(replyMessage)
       msg.map { m =>
         m.setJMSCorrelationId(requestMessage.correlationId)
         (m, outputQueue)
+      }
+    } *> IO.unit
+
+  override def sendErrorMessage(errorMessage: Json, correlationId: Option[String]): IO[Unit] =
+    jmsProducer.send { mf =>
+      val msg = mf.makeTextMessage(errorMessage.toString)
+      msg.map { m =>
+        correlationId match {
+          case Some(id) =>
+            m.setJMSCorrelationId(id)
+            (m, outputQueue)
+          case None => (m, outputQueue)
+        }
       }
     } *> IO.unit
 

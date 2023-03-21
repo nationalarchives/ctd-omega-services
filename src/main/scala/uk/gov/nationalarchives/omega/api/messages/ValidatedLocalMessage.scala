@@ -19,8 +19,15 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.business
+package uk.gov.nationalarchives.omega.api.messages
 
-trait BusinessService {
-  def process(request: BusinessServiceRequest): Either[ServiceError, BusinessServiceResponse]
-}
+import uk.gov.nationalarchives.omega.api.services.ServiceIdentifier
+
+import java.util.UUID
+
+case class ValidatedLocalMessage(
+  persistentMessageId: UUID,
+  serviceId: ServiceIdentifier,
+  messageText: String,
+  correlationId: String
+)

@@ -21,6 +21,6 @@
 
 package uk.gov.nationalarchives.omega.api.business
 
-sealed class RequestValidationError(val message: String, val cause: Option[Throwable] = None)
-final case class TextIsNonEmptyCharacters(override val message: String, override val cause: Option[Throwable] = None)
-    extends RequestValidationError(message, cause)
+//sealed class ValidationError(val message: String, val cause: Option[Throwable] = None)
+//final case class TextIsNonEmptyCharacters(override val message: String, override val cause: Option[Throwable] = None)
+//    extends RequestValidationError(message, cause)

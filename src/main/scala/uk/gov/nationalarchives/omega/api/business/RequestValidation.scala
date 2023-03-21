@@ -22,10 +22,18 @@
 package uk.gov.nationalarchives.omega.api.business
 
 import cats.data.ValidatedNec
+import uk.gov.nationalarchives.omega.api.business.RequestValidation.RequestValidationResult
+import uk.gov.nationalarchives.omega.api.common.ValidationError
 
 trait RequestValidation {
 
-  type ValidationResult = ValidatedNec[RequestValidationError, BusinessServiceRequest]
+  //type ValidationResult = ValidatedNec[ValidationError, BusinessServiceRequest]
 
-  def validateRequest(request: BusinessServiceRequest): ValidationResult
+
+
+  def validateRequest(request: BusinessServiceRequest): RequestValidationResult[BusinessServiceRequest]
+}
+object RequestValidation {
+  type RequestValidationResult[A] = ValidatedNec[ValidationError,A]
+
 }

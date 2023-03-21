@@ -21,18 +21,21 @@
 
 package uk.gov.nationalarchives.omega.api.business.echo
 
-import cats.data.{ NonEmptyChain, Validated }
+import cats.implicits.catsSyntaxValidatedIdBinCompat0
+import uk.gov.nationalarchives.omega.api.business.RequestValidation.RequestValidationResult
 import uk.gov.nationalarchives.omega.api.business._
+import uk.gov.nationalarchives.omega.api.common.{ErrorCode, ValidationError}
 class EchoService extends BusinessService with RequestValidation {
 
-  override def validateRequest(request: BusinessServiceRequest): ValidationResult =
-    Validated.cond(
-      !request.text.trim.isEmpty,
-      request,
-      NonEmptyChain.one(TextIsNonEmptyCharacters("Echo Text cannot be empty."))
-    )
+  override def validateRequest(request: BusinessServiceRequest): RequestValidationResult[BusinessServiceRequest] =
+  if (request.text.trim.nonEmpty) {
+    request.validNec
+  } else {
+    // TODO(RW) we will need the correlation ID to be able to send an error message
+    ValidationError(ErrorCode.EmptyMessageError, "Echo Text cannot be empty.", None).invalidNec
+  }
 
-  override def process(request: BusinessServiceRequest): Either[BusinessServiceError, BusinessServiceResponse] =
+  override def process(request: BusinessServiceRequest): Either[ServiceError, BusinessServiceResponse] =
     if (request.text.contains("ERROR")) {
       Left(EchoExplicitError(s"Explicit error: ${request.text}"))
     } else {

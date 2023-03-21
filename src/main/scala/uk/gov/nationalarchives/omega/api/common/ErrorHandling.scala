@@ -19,8 +19,21 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.business
+package uk.gov.nationalarchives.omega.api.common
 
-trait BusinessService {
-  def process(request: BusinessServiceRequest): Either[ServiceError, BusinessServiceResponse]
+import cats.effect.{ IO, Resource }
+import io.circe.syntax.EncoderOps
+import jms4s.JmsProducer
+import uk.gov.nationalarchives.omega.api.services.LocalProducer
+
+trait ErrorHandling {
+
+  val localProducer: LocalProducer
+  def handleError(error: ServiceError): IO[Unit] = {
+    // logger.error(s"Error code: ${error.errorCode.value}, error message: ${error.message}", error.cause.orNull)
+    val jsonError = JsonError(error.errorCode, error.message).asJson
+    //errorProducer.sendErrorMessage(jsonError, error.correlationId)
+    IO.unit
+  }
+
 }

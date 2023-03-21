@@ -19,10 +19,6 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.business
+package uk.gov.nationalarchives.omega.api.common
 
-trait BusinessServiceError {
-  //  def reference: String // TODO(AR) this comes later and is used for the user to contact the helpdesk
-  def code: String
-  def message: String
-}
+case class ValidationError(errorCode: ErrorCode, errorMessage: String, correlationId: Option[String])

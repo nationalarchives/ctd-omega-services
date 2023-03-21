@@ -23,6 +23,7 @@ package uk.gov.nationalarchives.omega.api.services
 
 import cats.effect.IO
 import jms4s.config.QueueName
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage
 
 class TestProducerImpl(val queueName: QueueName) extends LocalProducer {
 

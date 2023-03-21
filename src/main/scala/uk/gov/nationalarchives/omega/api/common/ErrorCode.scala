@@ -19,8 +19,21 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.business
+package uk.gov.nationalarchives.omega.api.common
 
-trait BusinessService {
-  def process(request: BusinessServiceRequest): Either[ServiceError, BusinessServiceResponse]
+import enumeratum.values.{ IntCirceEnum, IntEnum, IntEnumEntry }
+import sttp.tapir.codec.enumeratum.TapirCodecEnumeratum
+
+sealed abstract class ErrorCode(val value: Int) extends IntEnumEntry with TapirCodecEnumeratum
+
+case object ErrorCode extends IntEnum[ErrorCode] with IntCirceEnum[ErrorCode] {
+
+  override def values: IndexedSeq[ErrorCode] = findValues
+
+  case object ServiceIdentifierError extends ErrorCode(1001)
+
+  case object MessageIdentifierError extends ErrorCode(1002)
+
+  case object EmptyMessageError extends ErrorCode(1003)
+
 }

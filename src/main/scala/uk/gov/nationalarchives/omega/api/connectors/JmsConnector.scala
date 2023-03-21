@@ -52,6 +52,12 @@ class JmsConnector(serviceConfig: ServiceConfig) {
         )
     } yield jmsProducerAndConsumer
 
+  def getJmsProducer(concurrencyLevel: Int): Resource[IO, JmsProducer[IO]] =
+    for {
+      jmsClient <- createJmsClient()
+      producer  <- jmsClient.createProducer(concurrencyLevel)
+    } yield producer
+
   private def createJmsClient()(implicit L: Logger[IO]): Resource[IO, JmsClient[IO]] =
     simpleQueueService.makeJmsClient[IO](
       Config(
