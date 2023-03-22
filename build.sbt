@@ -5,10 +5,6 @@ val Jms4SVersion = "0.0.1-53518bb-SNAPSHOT"
 
 ThisBuild / versionScheme := Some("semver-spec")
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation")
-ThisBuild / githubTokenSource.withRank(KeyRanks.Invisible) := TokenSource.Or(
-  TokenSource.Environment("GITHUB_TOKEN"),
-  TokenSource.GitConfig("github.token")
-)
 
 lazy val root = Project("ctd-omega-services", file("."))
   .enablePlugins(AutomateHeaderPlugin)
@@ -29,6 +25,12 @@ lazy val root = Project("ctd-omega-services", file("."))
     organizationName := "The National Archives",
     organizationHomepage := Some(url("http://nationalarchives.gov.uk")),
     maintainer := "webmaster@nationalarchives.gov.uk",
+    githubOwner := "nationalarchives",
+    githubRepository := "ctd-omega-services",
+    githubTokenSource := TokenSource.Or(
+      TokenSource.Environment("GITHUB_TOKEN"),
+      TokenSource.GitConfig("github.token")
+    ),
     scmInfo := Some(
       ScmInfo(
         url("https://github.com/nationalarchives/ctd-omega-services"),

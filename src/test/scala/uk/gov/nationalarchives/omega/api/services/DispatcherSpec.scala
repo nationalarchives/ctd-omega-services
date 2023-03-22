@@ -37,7 +37,7 @@ class DispatcherSpec extends AsyncFreeSpec with AsyncIOSpec with Matchers with M
 
   "When the dispatcher receives a message" - {
 
-    "for the ECHO001 service it should reply" in {
+    "for the ECHO001 service it should reply with an echo message" in {
       val testQueue = QueueName("test-queue")
       val testLocalProducer = new TestProducerImpl(testQueue)
       val echoService = new EchoService()
@@ -48,7 +48,45 @@ class DispatcherSpec extends AsyncFreeSpec with AsyncIOSpec with Matchers with M
           dispatcher.run(1)(queue).andWait(5.seconds) *>
           IO(testLocalProducer.message).asserting(_ mustBe "The Echo Service says: Hello World!")
       }
+    }
 
+    "for an unknown service it should reply with an error message" in {
+      val testQueue = QueueName("test-queue")
+      val testLocalProducer = new TestProducerImpl(testQueue)
+      val echoService = new EchoService()
+      val dispatcher = new Dispatcher(testLocalProducer, echoService)
+      val generator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
+      Queue.bounded[IO, LocalMessage](1).flatMap { queue =>
+        queue.offer(LocalMessage(generator.generate(), "Hello World!", None, Some("1234"))) *>
+          dispatcher.run(1)(queue).andWait(5.seconds) *>
+          IO(testLocalProducer.message).asserting(_ mustBe "Unknown service identifier")
+      }
+    }
+
+    "without a message ID it should reply with an error message" in {
+      val testQueue = QueueName("test-queue")
+      val testLocalProducer = new TestProducerImpl(testQueue)
+      val echoService = new EchoService()
+      val dispatcher = new Dispatcher(testLocalProducer, echoService)
+      val generator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
+      Queue.bounded[IO, LocalMessage](1).flatMap { queue =>
+        queue.offer(LocalMessage(generator.generate(), "Hello World!", Some(ServiceIdentifier.ECHO001), None)) *>
+          dispatcher.run(1)(queue).andWait(5.seconds) *>
+          IO(testLocalProducer.message).asserting(_ mustBe "Missing message ID")
+      }
+    }
+
+    "without any text it should reply with an error message" in {
+      val testQueue = QueueName("test-queue")
+      val testLocalProducer = new TestProducerImpl(testQueue)
+      val echoService = new EchoService()
+      val dispatcher = new Dispatcher(testLocalProducer, echoService)
+      val generator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
+      Queue.bounded[IO, LocalMessage](1).flatMap { queue =>
+        queue.offer(LocalMessage(generator.generate(), "", Some(ServiceIdentifier.ECHO001), Some("1234"))) *>
+          dispatcher.run(1)(queue).andWait(5.seconds) *>
+          IO(testLocalProducer.message).asserting(_ mustBe "Empty message received")
+      }
     }
   }
 
