@@ -26,7 +26,7 @@ import jms4s.JmsProducer
 import jms4s.config.QueueName
 
 trait LocalProducer {
-  def send(replyMessage: String, requestMessage: LocalMessage): IO[Unit]
+  def send(replyMessage: String, requestMessage: ValidatedLocalMessage): IO[Unit]
 }
 
 /** In JMS terms a producer can have one or many destinations - in this implementation we have one destination, if we
@@ -41,7 +41,7 @@ class LocalProducerImpl(val jmsProducer: JmsProducer[IO], val outputQueue: Queue
     *   the request message (needed for correlation ID)
     * @return
     */
-  def send(replyMessage: String, requestMessage: LocalMessage): IO[Unit] =
+  def send(replyMessage: String, requestMessage: ValidatedLocalMessage): IO[Unit] =
     jmsProducer.send { mf =>
       val msg = mf.makeTextMessage(replyMessage)
       msg.map { m =>

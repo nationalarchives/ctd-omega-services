@@ -44,7 +44,7 @@ class DispatcherSpec extends AsyncFreeSpec with AsyncIOSpec with Matchers with M
       val dispatcher = new Dispatcher(testLocalProducer, echoService)
       val generator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
       Queue.bounded[IO, LocalMessage](1).flatMap { queue =>
-        queue.offer(LocalMessage(generator.generate(), ServiceIdentifier.ECHO001, "Hello World!", "1234")) *>
+        queue.offer(LocalMessage(generator.generate(), "Hello World!", Some(ServiceIdentifier.ECHO001), Some("1234"))) *>
           dispatcher.run(1)(queue).andWait(5.seconds) *>
           IO(testLocalProducer.message).asserting(_ mustBe "The Echo Service says: Hello World!")
       }

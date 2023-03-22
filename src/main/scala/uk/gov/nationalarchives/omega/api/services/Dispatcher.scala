@@ -43,16 +43,17 @@ class Dispatcher(val localProducer: LocalProducer, echoService: EchoService) {
 
   def run(dispatcherId: Int)(q: Queue[IO, LocalMessage]): IO[Unit] =
     for {
-      requestMessage <- q.take
+      requestMessage          <- q.take
+      validatedRequestMessage <- IO.pure(validateLocalMessage(requestMessage))
       _ <- logger.info(s"Dispatcher # $dispatcherId, processing message id: ${requestMessage.persistentMessageId}")
-      (businessService, businessServiceRequest) <- IO.pure(createServiceRequest(requestMessage))
+      (businessService, businessServiceRequest) <- IO.pure(createServiceRequest(validatedRequestMessage))
       validatedBusinessServiceRequest <-
         IO.pure(validateBusinessServiceRequest(businessService, businessServiceRequest))
       businessResult <- execBusinessService(businessService, validatedBusinessServiceRequest)
-      res            <- sendResultToJmsQueue(businessResult, requestMessage)
+      res            <- sendResultToJmsQueue(businessResult, validatedRequestMessage)
     } yield res
 
-  private def createServiceRequest(localMessage: LocalMessage): (BusinessService, BusinessServiceRequest) =
+  private def createServiceRequest(localMessage: ValidatedLocalMessage): (BusinessService, BusinessServiceRequest) =
     localMessage.serviceId match {
       case ECHO001 =>
         Tuple2(
@@ -61,6 +62,8 @@ class Dispatcher(val localProducer: LocalProducer, echoService: EchoService) {
         )
       // add more service IDs here
     }
+
+  private def validateLocalMessage(localMessage: LocalMessage): ValidatedLocalMessage = localMessage.validate
 
   private def validateBusinessServiceRequest(
     businessService: BusinessService,
@@ -82,7 +85,7 @@ class Dispatcher(val localProducer: LocalProducer, echoService: EchoService) {
 
   private def sendResultToJmsQueue[U <: BusinessServiceResponse, E <: BusinessServiceError](
     businessResult: ValidatedNec[RequestValidationError, Either[E, U]],
-    requestMessage: LocalMessage
+    requestMessage: ValidatedLocalMessage
   ): IO[Unit] = {
     val replyMessage: String =
       businessResult match {

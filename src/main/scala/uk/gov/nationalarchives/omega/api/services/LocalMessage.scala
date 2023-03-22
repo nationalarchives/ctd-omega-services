@@ -22,46 +22,47 @@
 package uk.gov.nationalarchives.omega.api.services
 
 import cats.effect.IO
-import cats.implicits.catsSyntaxEitherId
 import jms4s.jms.JmsMessage
+import org.typelevel.log4cats.slf4j.Slf4jFactory
+import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 
 import java.util.UUID
 
-case class LocalMessage(
+final case class LocalMessage(
   persistentMessageId: UUID,
-  serviceId: ServiceIdentifier,
   messageText: String,
-  correlationId: String
-)
+  serviceId: Option[ServiceIdentifier],
+  correlationId: Option[String]
+) {
+  def validate: ValidatedLocalMessage =
+    // TODO(RW) this method will need to validated instance of the message - currently we are just adding some default values
+    ValidatedLocalMessage(
+      persistentMessageId,
+      serviceId.getOrElse(ServiceIdentifier.ECHO001),
+      messageText,
+      correlationId.getOrElse("1234")
+    )
+}
 object LocalMessage {
 
-  private def getServiceId(jmsMessage: JmsMessage): Either[ServiceError, ServiceIdentifier] =
-    jmsMessage.getStringProperty("sid") match {
-      case Some(sid) =>
-        ServiceIdentifier.withNameOption(sid.toUpperCase) match {
-          case Some(serviceId) => Right(serviceId)
-          case None            => Left(ServiceIdentifierError("SID not recognised"))
-        }
-      case None => Left(ServiceIdentifierError("Missing service ID"))
-    }
+  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
+  implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
-  private def getMessageId(jmsMessage: JmsMessage): Either[ServiceError, String] =
-    jmsMessage.getJMSMessageId match {
-      case Some(messageId) => Right(messageId)
-      case None            => Left(MessageIdentifierError("Missing message ID"))
-    }
+  private def getServiceId(jmsMessage: JmsMessage): Option[ServiceIdentifier] =
+    for {
+      sid       <- jmsMessage.getStringProperty("sid")
+      serviceId <- ServiceIdentifier.withNameOption(sid.toUpperCase)
+    } yield serviceId
 
   def createLocalMessage(
     persistentMessageId: UUID,
     jmsMessage: JmsMessage
-  ): IO[Either[ServiceError, LocalMessage]] =
+  ): IO[LocalMessage] =
     jmsMessage.asTextF[IO].attempt.map {
-      case Left(e) => MessageReadError("Unable to read message", Some(e)).asLeft[LocalMessage]
-      case Right(text) =>
-        for {
-          serviceId     <- getServiceId(jmsMessage)
-          correlationId <- getMessageId(jmsMessage)
-        } yield LocalMessage(persistentMessageId, serviceId, text, correlationId)
+      case Right(text) => LocalMessage(persistentMessageId, text, getServiceId(jmsMessage), jmsMessage.getJMSMessageId)
+      case Left(e) =>
+        logger.error(s"Failed to retrieve message content due to ${e.getMessage}")
+        LocalMessage(persistentMessageId, "", getServiceId(jmsMessage), jmsMessage.getJMSMessageId)
     }
 
 }

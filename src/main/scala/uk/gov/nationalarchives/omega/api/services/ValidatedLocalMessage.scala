@@ -21,15 +21,11 @@
 
 package uk.gov.nationalarchives.omega.api.services
 
-import cats.effect.IO
-import jms4s.config.QueueName
+import java.util.UUID
 
-class TestProducerImpl(val queueName: QueueName) extends LocalProducer {
-
-  var message = ""
-
-  override def send(replyMessage: String, requestMessage: ValidatedLocalMessage): IO[Unit] = {
-    message = replyMessage
-    IO.unit
-  }
-}
+final case class ValidatedLocalMessage(
+  persistentMessageId: UUID,
+  serviceId: ServiceIdentifier,
+  messageText: String,
+  correlationId: String
+)

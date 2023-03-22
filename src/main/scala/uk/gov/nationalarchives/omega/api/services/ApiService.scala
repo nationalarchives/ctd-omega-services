@@ -141,12 +141,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
   ): IO[Unit] =
     for {
       localMessageResult <- createLocalMessage(persistentMessageId, jmsMessage)
-      _ <- localMessageResult match {
-             case Right(m) => queue.offer(m) *> logger.info(s"Queued message: $persistentMessageId")
-             case Left(e)  =>
-               // TODO(RW) at this point we should send a JMS error message (provided we have a correlation ID)
-               logger.error(s"Failed to queue message due to ${e.message}")
-           }
+      _                  <- queue.offer(localMessageResult) *> logger.info(s"Queued message: $persistentMessageId")
     } yield ()
 
 }
