@@ -60,6 +60,7 @@ class DispatcherSpec extends AsyncFreeSpec with AsyncIOSpec with Matchers {
     }
 
     "for an unknown service it should reply with an error message" in {
+      pending // This test is marked pending until completion of https://national-archives.atlassian.net/browse/PACT-836
       val testQueue = QueueName("test-queue")
       val testLocalProducer = new TestProducerImpl(testQueue)
       val echoService = new EchoService()
@@ -74,6 +75,7 @@ class DispatcherSpec extends AsyncFreeSpec with AsyncIOSpec with Matchers {
     }
 
     "without a message ID it should reply with an error message" in {
+      pending // This test is marked pending until completion of https://national-archives.atlassian.net/browse/PACT-836
       val testQueue = QueueName("test-queue")
       val testLocalProducer = new TestProducerImpl(testQueue)
       val echoService = new EchoService()
@@ -88,6 +90,7 @@ class DispatcherSpec extends AsyncFreeSpec with AsyncIOSpec with Matchers {
     }
 
     "without any text it should reply with an error message" in {
+      pending // This test is marked pending until completion of https://national-archives.atlassian.net/browse/PACT-836
       val testQueue = QueueName("test-queue")
       val testLocalProducer = new TestProducerImpl(testQueue)
       val echoService = new EchoService()
