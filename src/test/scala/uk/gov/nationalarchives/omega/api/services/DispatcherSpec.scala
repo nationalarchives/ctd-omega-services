@@ -26,14 +26,13 @@ import cats.effect.std.Queue
 import cats.effect.testing.scalatest.AsyncIOSpec
 import com.fasterxml.uuid.{ EthernetAddress, Generators }
 import jms4s.config.QueueName
-import org.mockito.MockitoSugar
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 
 import scala.concurrent.duration.DurationInt
 
-class DispatcherSpec extends AsyncFreeSpec with AsyncIOSpec with Matchers with MockitoSugar {
+class DispatcherSpec extends AsyncFreeSpec with AsyncIOSpec with Matchers {
 
   "When the dispatcher receives a message" - {
 
