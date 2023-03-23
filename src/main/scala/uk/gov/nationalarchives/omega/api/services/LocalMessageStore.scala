@@ -34,7 +34,7 @@ class LocalMessageStore(folder: Path) {
 
   def persistMessage(message: JmsMessage): IO[UUID] = {
     def newMessageFileId(): IO[UUID] =
-      IO.delay {
+      IO.pure {
         uuidGenerator.generate()
       }
 
