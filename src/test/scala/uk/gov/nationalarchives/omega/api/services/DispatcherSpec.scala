@@ -30,6 +30,7 @@ import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 
+import java.util.UUID
 import scala.concurrent.duration.DurationInt
 
 class DispatcherSpec extends AsyncFreeSpec with AsyncIOSpec with Matchers {
@@ -44,9 +45,17 @@ class DispatcherSpec extends AsyncFreeSpec with AsyncIOSpec with Matchers {
       val generator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
       Queue.bounded[IO, LocalMessage](1).flatMap { queue =>
         queue
-          .offer(LocalMessage(generator.generate(), "Hello World!", Some(ServiceIdentifier.ECHO001), Some("1234"))) *>
+          .offer(
+            LocalMessage(
+              generator.generate(),
+              "Hello World!",
+              Some(ServiceIdentifier.ECHO001),
+              Some(s"ID:${UUID.randomUUID()}")
+            )
+          ) *>
           dispatcher.run(1)(queue).andWait(5.seconds) *>
-          IO(testLocalProducer.message).asserting(_ mustBe "The Echo Service says: Hello World!")
+          IO(testLocalProducer.message).asserting(_ mustBe "The Echo Service says: Hello World!") *>
+          queue.size.asserting(_ mustBe 0)
       }
     }
 
@@ -57,9 +66,10 @@ class DispatcherSpec extends AsyncFreeSpec with AsyncIOSpec with Matchers {
       val dispatcher = new Dispatcher(testLocalProducer, echoService)
       val generator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
       Queue.bounded[IO, LocalMessage](1).flatMap { queue =>
-        queue.offer(LocalMessage(generator.generate(), "Hello World!", None, Some("1234"))) *>
+        queue.offer(LocalMessage(generator.generate(), "Hello World!", None, Some(s"ID:${UUID.randomUUID()}"))) *>
           dispatcher.run(1)(queue).andWait(5.seconds) *>
-          IO(testLocalProducer.message).asserting(_ mustBe "Unknown service identifier")
+          IO(testLocalProducer.message).asserting(_ mustBe "Unknown service identifier") *>
+          queue.size.asserting(_ mustBe 0)
       }
     }
 
@@ -72,7 +82,8 @@ class DispatcherSpec extends AsyncFreeSpec with AsyncIOSpec with Matchers {
       Queue.bounded[IO, LocalMessage](1).flatMap { queue =>
         queue.offer(LocalMessage(generator.generate(), "Hello World!", Some(ServiceIdentifier.ECHO001), None)) *>
           dispatcher.run(1)(queue).andWait(5.seconds) *>
-          IO(testLocalProducer.message).asserting(_ mustBe "Missing message ID")
+          IO(testLocalProducer.message).asserting(_ mustBe "Missing message ID") *>
+          queue.size.asserting(_ mustBe 0)
       }
     }
 
@@ -83,9 +94,12 @@ class DispatcherSpec extends AsyncFreeSpec with AsyncIOSpec with Matchers {
       val dispatcher = new Dispatcher(testLocalProducer, echoService)
       val generator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
       Queue.bounded[IO, LocalMessage](1).flatMap { queue =>
-        queue.offer(LocalMessage(generator.generate(), "", Some(ServiceIdentifier.ECHO001), Some("1234"))) *>
+        queue.offer(
+          LocalMessage(generator.generate(), "", Some(ServiceIdentifier.ECHO001), Some(s"ID:${UUID.randomUUID()}"))
+        ) *>
           dispatcher.run(1)(queue).andWait(5.seconds) *>
-          IO(testLocalProducer.message).asserting(_ mustBe "Empty message received")
+          IO(testLocalProducer.message).asserting(_ mustBe "Empty message received") *>
+          queue.size.asserting(_ mustBe 0)
       }
     }
   }
