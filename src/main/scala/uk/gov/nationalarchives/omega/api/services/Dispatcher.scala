@@ -56,10 +56,7 @@ class Dispatcher(val localProducer: LocalProducer, echoService: EchoService) {
   private def createServiceRequest(localMessage: ValidatedLocalMessage): (BusinessService, BusinessServiceRequest) =
     localMessage.serviceId match {
       case ECHO001 =>
-        Tuple2(
-          echoService,
-          EchoRequest(localMessage.messageText) // deserialize messageText to EchoRequest
-        )
+        (echoService, EchoRequest(localMessage.messageText))
       // add more service IDs here
     }
 
