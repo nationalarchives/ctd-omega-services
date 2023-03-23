@@ -40,11 +40,9 @@ import java.util.UUID
 class ApiService(val config: ServiceConfig) extends Stateful {
 
   def start: IO[ExitCode] =
-    // check if we can start the service
     switchState(Stopped, Starting).ifM(attemptStartUp(), IO.pure(ExitCode(invalidState)))
 
   private def attemptStartUp(): IO[ExitCode] =
-    // switch to the started state
     switchState(Starting, Started)
       .ifM(
         doStart(),
@@ -56,7 +54,6 @@ class ApiService(val config: ServiceConfig) extends Stateful {
       )
 
   def stop(): IO[ExitCode] =
-    // check if we can stop the service
     switchState(Started, Stopping).ifM(
       logger.info("Closing connection..") *>
         switchState(Stopping, Stopped).ifM(doStop(), IO.pure(ExitCode(invalidState))),
