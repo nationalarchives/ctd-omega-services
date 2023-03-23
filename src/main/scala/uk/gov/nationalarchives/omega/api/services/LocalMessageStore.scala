@@ -24,12 +24,19 @@ package uk.gov.nationalarchives.omega.api.services
 import cats.effect.IO
 import com.fasterxml.uuid.{ EthernetAddress, Generators }
 import jms4s.jms.JmsMessage
+import org.typelevel.log4cats.slf4j.Slf4jFactory
+import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 
 import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.{ Files, Path, StandardOpenOption }
 import java.util.UUID
+import scala.util.{ Failure, Success, Try }
 
 class LocalMessageStore(folder: Path) {
+
+  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
+  implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
+
   private val uuidGenerator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
 
   def persistMessage(message: JmsMessage): IO[UUID] = {
@@ -41,17 +48,25 @@ class LocalMessageStore(folder: Path) {
     newMessageFileId().flatMap { persistMessageId: UUID =>
       message.asTextF[IO].flatMap { messageText: String =>
         val path = folder.resolve(s"$persistMessageId.msg")
-        IO.blocking(
-          Files.write(
-            path,
-            messageText.getBytes(UTF_8),
-            StandardOpenOption.CREATE_NEW,
-            StandardOpenOption.WRITE,
-            StandardOpenOption.DSYNC
-          )
-        ) *> IO.pure(persistMessageId)
+        writeFile(path, messageText) *> IO.pure(persistMessageId)
       }
     }
   }
+
+  private def writeFile(path: Path, messageText: String): IO[Unit] =
+    IO.blocking(
+      Try(
+        Files.write(
+          path,
+          messageText.getBytes(UTF_8),
+          StandardOpenOption.CREATE_NEW,
+          StandardOpenOption.WRITE,
+          StandardOpenOption.DSYNC
+        )
+      ) match {
+        case Success(_) => ()
+        case Failure(e) => logger.error(s"Failed to write message file due to ${e.getMessage}")
+      }
+    )
 
 }
