@@ -27,7 +27,7 @@ class EchoService extends BusinessService with RequestValidation {
 
   override def validateRequest(request: BusinessServiceRequest): ValidationResult =
     Validated.cond(
-      !request.text.trim.isEmpty,
+      request.text.trim.nonEmpty,
       request,
       NonEmptyChain.one(TextIsNonEmptyCharacters("Echo Text cannot be empty."))
     )
