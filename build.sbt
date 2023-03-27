@@ -82,3 +82,5 @@ lazy val root = Project("ctd-omega-services", file("."))
     resolvers += Resolver.githubPackages("rwalpole")
   )
 Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/test-reports")
+
+coverageEnabled := true
