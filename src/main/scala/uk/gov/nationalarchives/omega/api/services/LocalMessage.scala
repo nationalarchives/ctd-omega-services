@@ -25,11 +25,10 @@ import cats.effect.IO
 import jms4s.jms.JmsMessage
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
-
-import java.util.UUID
+import uk.gov.nationalarchives.omega.api.common.Version1UUID
 
 final case class LocalMessage(
-  persistentMessageId: UUID,
+  persistentMessageId: Version1UUID,
   messageText: String,
   serviceId: Option[ServiceIdentifier],
   correlationId: Option[String]
@@ -55,7 +54,7 @@ object LocalMessage {
     } yield serviceId
 
   def createLocalMessage(
-    persistentMessageId: UUID,
+    persistentMessageId: Version1UUID,
     jmsMessage: JmsMessage
   ): IO[LocalMessage] =
     jmsMessage.asTextF[IO].attempt.map {

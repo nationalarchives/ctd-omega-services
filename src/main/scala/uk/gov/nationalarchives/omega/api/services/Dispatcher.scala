@@ -25,21 +25,19 @@ import cats.data.Validated.{ Invalid, Valid }
 import cats.data.{ Validated, ValidatedNec }
 import cats.effect.IO
 import cats.effect.std.Queue
-import com.fasterxml.uuid.{ EthernetAddress, Generators }
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.business._
 import uk.gov.nationalarchives.omega.api.business.echo.{ EchoRequest, EchoService }
+import uk.gov.nationalarchives.omega.api.common.Version1UUID
 import uk.gov.nationalarchives.omega.api.services.ServiceIdentifier.ECHO001
 
-import java.util.UUID
+import scala.util.Try
 
-class Dispatcher(val localProducer: LocalProducer, echoService: EchoService) {
+class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessageStore, echoService: EchoService) {
 
   implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
-
-  private val generator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
 
   def run(dispatcherId: Int)(q: Queue[IO, LocalMessage]): IO[Unit] =
     for {
@@ -51,6 +49,7 @@ class Dispatcher(val localProducer: LocalProducer, echoService: EchoService) {
         IO.pure(validateBusinessServiceRequest(businessService, businessServiceRequest))
       businessResult <- execBusinessService(businessService, validatedBusinessServiceRequest)
       res            <- sendResultToJmsQueue(businessResult, validatedRequestMessage)
+      _              <- remove(requestMessage)
     } yield res
 
   private def createServiceRequest(localMessage: ValidatedLocalMessage): (BusinessService, BusinessServiceRequest) =
@@ -102,6 +101,9 @@ class Dispatcher(val localProducer: LocalProducer, echoService: EchoService) {
     localProducer.send(replyMessage, requestMessage)
   } // TODO(RW) add recoverWith here to handle unexpected exceptions and send a message back to the client
 
-  private def getCustomerErrorReference: UUID = generator.generate()
+  private def getCustomerErrorReference: Version1UUID = Version1UUID.generate()
+
+  private def remove(localMessage: LocalMessage): IO[Try[Unit]] =
+    localMessageStore.removeMessage(localMessage.persistentMessageId)
 
 }

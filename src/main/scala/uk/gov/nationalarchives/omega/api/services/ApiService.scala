@@ -29,13 +29,14 @@ import jms4s.config.QueueName
 import jms4s.jms.JmsMessage
 import jms4s.{ JmsAcknowledgerConsumer, JmsProducer }
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
+import uk.gov.nationalarchives.omega.api.common.Version1UUID
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.connectors.JmsConnector
 import uk.gov.nationalarchives.omega.api.services.LocalMessage.createLocalMessage
 import uk.gov.nationalarchives.omega.api.services.ServiceState.{ Started, Starting, Stopped, Stopping }
 
 import java.nio.file.{ Files, Paths }
-import java.util.UUID
+import scala.util.{ Failure, Success }
 
 class ApiService(val config: ServiceConfig) extends Stateful {
 
@@ -101,15 +102,22 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     consumer: JmsAcknowledgerConsumer[IO],
     producer: JmsProducer[IO],
     localMessageStore: LocalMessageStore
-  ) =
+  ): IO[Either[Unit, Unit]] =
     IO.race(
       createMessageHandler(queue, localMessageStore)(consumer),
       List.range(start = 0, end = config.maxDispatchers).parTraverse_ { i =>
         logger.info(s"Starting consumer #${i + 1}") >>
-          new Dispatcher(new LocalProducerImpl(producer, QueueName(config.replyQueue)), new EchoService())
+          generateDispatcher(producer, localMessageStore)
             .run(i)(queue)
             .foreverM
       }
+    )
+
+  private def generateDispatcher(jmsProducer: JmsProducer[IO], localMessageStore: LocalMessageStore) =
+    new Dispatcher(
+      new LocalProducerImpl(jmsProducer, QueueName(config.replyQueue)),
+      localMessageStore,
+      new EchoService()
     )
 
   private def doStop(): IO[ExitCode] =
@@ -124,16 +132,21 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     localMessageStore: LocalMessageStore
   )(jmsAcknowledgerConsumer: JmsAcknowledgerConsumer[IO]): IO[Unit] =
     jmsAcknowledgerConsumer.handle { (jmsMessage, _) =>
-      for {
-        persistentMessageId <- localMessageStore.persistMessage(jmsMessage)
-        res                 <- acknowledgeMessage()
-        _                   <- queueMessage(queue, persistentMessageId, jmsMessage)
-      } yield res
+      localMessageStore.persistMessage(jmsMessage).flatMap {
+        case Success(messageId) =>
+          for {
+            res <- acknowledgeMessage()
+            _   <- queueMessage(queue, messageId, jmsMessage)
+          } yield res
+        case Failure(e) =>
+          logger.error(s"Failed to create message handler as unable to persist message: [$e]")
+          IO(AckAction.noAck)
+      }
     }
 
   private def queueMessage(
     queue: Queue[IO, LocalMessage],
-    persistentMessageId: UUID,
+    persistentMessageId: Version1UUID,
     jmsMessage: JmsMessage
   ): IO[Unit] =
     for {

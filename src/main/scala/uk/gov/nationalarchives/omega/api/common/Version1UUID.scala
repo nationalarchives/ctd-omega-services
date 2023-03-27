@@ -19,13 +19,29 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.services
+package uk.gov.nationalarchives.omega.api.common
 
-import uk.gov.nationalarchives.omega.api.common.Version1UUID
+import com.fasterxml.uuid.{ EthernetAddress, Generators }
 
-final case class ValidatedLocalMessage(
-  persistentMessageId: Version1UUID,
-  serviceId: ServiceIdentifier,
-  messageText: String,
-  correlationId: String
-)
+import java.util.UUID
+
+sealed trait Version1UUID {
+  val value: UUID
+}
+
+object Version1UUID {
+
+  private val generator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
+
+  private class Version1UUIDImpl(override val value: UUID) extends Version1UUID {
+    override def toString: String = this.value.toString
+  }
+
+  def apply(value: UUID): Version1UUID =
+    if (value.version() == 1) new Version1UUIDImpl(value)
+    else
+      throw new IllegalArgumentException(s"Provided UUID must be version 1; this one is version [${value.version()}]")
+
+  def generate(): Version1UUID = new Version1UUIDImpl(generator.generate())
+
+}
