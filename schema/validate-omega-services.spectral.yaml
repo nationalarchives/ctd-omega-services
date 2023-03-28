@@ -1,0 +1,40 @@
+{
+  "extends": "spectral:asyncapi",
+  "formats": ["aas2"],
+    "rules":
+    {
+     "important-fields":
+       {
+        "description": "Mmust have a message id",
+            "message": "Missing the {{property}}",
+           "severity": "warn",
+              "given": "$.components.messages.*",
+               "then":
+                [
+                        {
+                          field: "messageId",
+                          function: "truthy"
+                        },
+                        {
+                          field: "description",
+                          function: "truthy"
+                        }
+
+                ]
+      },
+     "id" :
+      {
+       "description": "Must have an id",
+           "message": "Missing the {{property}}",
+          "severity": "info",
+             "given": "$",
+              "then":
+              [
+                     {
+                       field: "id",
+                       function: "truthy"
+                     }
+              ]
+      }
+    }
+}
