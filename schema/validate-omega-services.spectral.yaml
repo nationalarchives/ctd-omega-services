@@ -5,7 +5,7 @@
     {
      "important-fields":
        {
-        "description": "Mmust have a message id",
+        "description": "Must have a message id",
             "message": "Missing the {{property}}",
            "severity": "warn",
               "given": "$.components.messages.*",
