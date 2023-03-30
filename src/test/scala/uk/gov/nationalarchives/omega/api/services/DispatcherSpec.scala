@@ -24,87 +24,87 @@ package uk.gov.nationalarchives.omega.api.services
 import cats.effect.IO
 import cats.effect.std.Queue
 import cats.effect.testing.scalatest.AsyncIOSpec
-import com.fasterxml.uuid.{ EthernetAddress, Generators }
 import jms4s.config.QueueName
+import org.scalatest.BeforeAndAfterAll
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
+import uk.gov.nationalarchives.omega.api.LocalMessageSupport
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
+import uk.gov.nationalarchives.omega.api.common.Version1UUID
 
+import java.nio.charset.StandardCharsets.UTF_8
+import java.nio.file.{ FileSystems, Files, StandardOpenOption }
 import java.util.UUID
 import scala.concurrent.duration.DurationInt
+import scala.util.{ Failure, Success, Try }
 
-class DispatcherSpec extends AsyncFreeSpec with AsyncIOSpec with Matchers {
+class DispatcherSpec
+    extends AsyncFreeSpec with BeforeAndAfterAll with AsyncIOSpec with Matchers with LocalMessageSupport {
+
+  private val testQueue = QueueName("test-queue")
+  private val testLocalProducer = new TestProducerImpl(testQueue)
+  private val echoService = new EchoService()
+  private lazy val dispatcher = new Dispatcher(testLocalProducer, localMessageStore, echoService)
+
+  override protected def afterAll(): Unit = {
+    super.afterAll()
+    deleteTempDirectory()
+  }
 
   "When the dispatcher receives a message" - {
 
     "for the ECHO001 service it should reply with an echo message" in {
-      val testQueue = QueueName("test-queue")
-      val testLocalProducer = new TestProducerImpl(testQueue)
-      val echoService = new EchoService()
-      val dispatcher = new Dispatcher(testLocalProducer, echoService)
-      val generator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
       Queue.bounded[IO, LocalMessage](1).flatMap { queue =>
+        val messageId = Version1UUID.generate()
+        val contents = "Hello World!"
+        writeMessageFile(messageId, contents)
         queue
           .offer(
             LocalMessage(
-              generator.generate(),
-              "Hello World!",
+              messageId,
+              contents,
               Some(ServiceIdentifier.ECHO001),
               Some(s"ID:${UUID.randomUUID()}")
             )
           ) *>
           dispatcher.run(1)(queue).andWait(5.seconds) *>
           IO(testLocalProducer.message).asserting(_ mustBe "The Echo Service says: Hello World!") *>
-          queue.size.asserting(_ mustBe 0)
+          queue.size.asserting(_ mustBe 0) *>
+          IO.pure(messageId).asserting(_ must not(haveACorrespondingFile()))
       }
     }
 
     "for an unknown service it should reply with an error message" in {
-      pending // This test is marked pending until completion of https://national-archives.atlassian.net/browse/PACT-836
-      val testQueue = QueueName("test-queue")
-      val testLocalProducer = new TestProducerImpl(testQueue)
-      val echoService = new EchoService()
-      val dispatcher = new Dispatcher(testLocalProducer, echoService)
-      val generator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
-      Queue.bounded[IO, LocalMessage](1).flatMap { queue =>
-        queue.offer(LocalMessage(generator.generate(), "Hello World!", None, Some(s"ID:${UUID.randomUUID()}"))) *>
-          dispatcher.run(1)(queue).andWait(5.seconds) *>
-          IO(testLocalProducer.message).asserting(_ mustBe "Unknown service identifier") *>
-          queue.size.asserting(_ mustBe 0)
-      }
+      pending // Until completion of https://national-archives.atlassian.net/browse/PACT-836
     }
 
     "without a message ID it should reply with an error message" in {
-      pending // This test is marked pending until completion of https://national-archives.atlassian.net/browse/PACT-836
-      val testQueue = QueueName("test-queue")
-      val testLocalProducer = new TestProducerImpl(testQueue)
-      val echoService = new EchoService()
-      val dispatcher = new Dispatcher(testLocalProducer, echoService)
-      val generator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
-      Queue.bounded[IO, LocalMessage](1).flatMap { queue =>
-        queue.offer(LocalMessage(generator.generate(), "Hello World!", Some(ServiceIdentifier.ECHO001), None)) *>
-          dispatcher.run(1)(queue).andWait(5.seconds) *>
-          IO(testLocalProducer.message).asserting(_ mustBe "Missing message ID") *>
-          queue.size.asserting(_ mustBe 0)
-      }
+      pending // Until completion of https://national-archives.atlassian.net/browse/PACT-836
     }
 
     "without any text it should reply with an error message" in {
-      pending // This test is marked pending until completion of https://national-archives.atlassian.net/browse/PACT-836
-      val testQueue = QueueName("test-queue")
-      val testLocalProducer = new TestProducerImpl(testQueue)
-      val echoService = new EchoService()
-      val dispatcher = new Dispatcher(testLocalProducer, echoService)
-      val generator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
-      Queue.bounded[IO, LocalMessage](1).flatMap { queue =>
-        queue.offer(
-          LocalMessage(generator.generate(), "", Some(ServiceIdentifier.ECHO001), Some(s"ID:${UUID.randomUUID()}"))
-        ) *>
-          dispatcher.run(1)(queue).andWait(5.seconds) *>
-          IO(testLocalProducer.message).asserting(_ mustBe "Empty message received") *>
-          queue.size.asserting(_ mustBe 0)
-      }
+      pending // Until completion of https://national-archives.atlassian.net/browse/PACT-836
     }
   }
+
+  /** It is the APIService which is responsible for writing the local message file.
+    *
+    * However, it is the Dispatcher which is responsible for removing it, once the message has been handled.
+    *
+    * As such, we need to simulate this.
+    */
+  private def writeMessageFile(messageId: Version1UUID, messageText: String): Unit =
+    Try(
+      Files.write(
+        FileSystems.getDefault.getPath(generateExpectedFilepath(messageId)),
+        messageText.getBytes(UTF_8),
+        StandardOpenOption.CREATE_NEW,
+        StandardOpenOption.WRITE,
+        StandardOpenOption.DSYNC
+      )
+    ) match {
+      case Success(_) => ()
+      case Failure(e) => fail(s"Unable to write the message file for message [$messageId]: [$e]")
+    }
 
 }
