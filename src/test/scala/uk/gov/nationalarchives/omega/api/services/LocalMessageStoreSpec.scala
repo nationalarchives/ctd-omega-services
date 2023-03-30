@@ -82,15 +82,6 @@ class LocalMessageStoreSpec
     }
     "removing a message when" - {
       "the provided ID" - {
-        "is null" in {
-
-          val thrownException = intercept[IllegalArgumentException] {
-            removeMessage(null)
-          }
-
-          thrownException.getMessage mustBe "A message ID must be provided"
-
-        }
         "doesn't have a corresponding file" in {
 
           val messageId = Version1UUID.generate()

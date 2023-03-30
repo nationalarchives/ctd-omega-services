@@ -33,7 +33,7 @@ object Version1UUID {
 
   private val generator = Generators.timeBasedGenerator(EthernetAddress.fromInterface)
 
-  private class Version1UUIDImpl(override val value: UUID) extends Version1UUID {
+  private case class Version1UUIDImpl(override val value: UUID) extends Version1UUID {
     override def toString: String = this.value.toString
   }
 

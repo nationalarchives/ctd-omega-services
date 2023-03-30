@@ -50,8 +50,7 @@ class LocalMessageStore(directoryPath: Path) {
     }
 
   def removeMessage(messageId: Version1UUID): IO[Try[Unit]] =
-    if (messageId != null) removeFile(generateFilePath(messageId))
-    else IO.pure(Failure(new IllegalArgumentException("A message ID must be provided")))
+    removeFile(generateFilePath(messageId))
 
   private def generateFilePath(messageId: Version1UUID): Path =
     directoryPath.resolve(messageId.toString + ".msg")
