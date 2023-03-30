@@ -54,7 +54,15 @@ docker ps -a
 8. To run the Pan-Archival Catalogue Services locally you can use ` sbt run`. Note that the queue names configured in the `application.conf` file used by application must match those in the `custom.conf` file used by ElasticMQ.
 
 9. Your message service is now running and ready to respond to requests.
+## Testing
+Unit tests can be run from sbt using `sbt test`
 
+Integration tests can be run from sbt using `sbt it:test`.
+
+Note that before running the integration tests you need to start the Docker container for ElasticMQ. This can be started by running the following command from the project root directory:
+```
+docker-compose up -d
+```
 ## Packaging
 This project makes use of the [sbt-native-packager](https://www.scala-sbt.org/sbt-native-packager/index.html) plugin to create distribution packages of the application.
 
