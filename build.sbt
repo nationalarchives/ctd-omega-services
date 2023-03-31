@@ -2,6 +2,7 @@ val CatsEffectVersion = "3.4.8"
 val Log4CatsVersion = "2.5.0"
 val PureConfigVersion = "0.17.2"
 val Jms4SVersion = "0.0.1-53518bb-SNAPSHOT"
+val AwsJavaSdkVersion = "2.18.1"
 
 ThisBuild / versionScheme := Some("semver-spec")
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation")
@@ -10,7 +11,9 @@ lazy val root = Project("ctd-omega-services", file("."))
   .enablePlugins(AutomateHeaderPlugin)
   .enablePlugins(BuildInfoPlugin)
   .enablePlugins(JavaAppPackaging)
+  .configs(IntegrationTest)
   .settings(
+    Defaults.itSettings,
     organization := "uk.gov.nationalarchives",
     name := "ctd-omega-services",
     Compile / mainClass := Some("uk.gov.nationalarchives.omega.api.ApiServiceApp"),
@@ -70,17 +73,24 @@ lazy val root = Project("ctd-omega-services", file("."))
       "com.beachape"          %% "enumeratum"                    % "1.7.2",
       "org.typelevel"         %% "log4cats-core"                 % Log4CatsVersion,
       "org.typelevel"         %% "log4cats-slf4j"                % Log4CatsVersion,
+      "com.chuusai"           %% "shapeless"                     % "2.3.10",
       "ch.qos.logback"         % "logback-classic"               % "1.3.5"   % Runtime, // Java 8 compatible
       "net.logstash.logback"   % "logstash-logback-encoder"      % "7.3"     % Runtime,
-      "org.scalatest"         %% "scalatest"                     % "3.2.15"  % Test,
-      "org.typelevel"         %% "cats-effect-testing-scalatest" % "1.5.0"   % Test,
+      "org.scalatest"         %% "scalatest"                     % "3.2.15"  % "it,test",
+      "org.typelevel"         %% "cats-effect-testing-scalatest" % "1.5.0"   % "it,test",
       "org.mockito"           %% "mockito-scala-scalatest"       % "1.17.12" % Test,
       "com.vladsch.flexmark"   % "flexmark-profile-pegdown"      % "0.62.2"  % Test, // Java 8 compatible
+      "software.amazon.awssdk" % "auth"                          % "2.18.1"  % "it",
+      "software.amazon.awssdk" % "regions"                       % "2.18.1"  % "it",
+      "software.amazon.awssdk" % "sqs"                           % "2.18.1"  % "it",
+      "com.amazonaws"          % "amazon-sqs-java-messaging-lib" % "2.0.2"   % "it",
+
       // better monadic for compiler plugin as suggested by documentation
       compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
     ),
     resolvers += Resolver.githubPackages("rwalpole")
   )
-Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/test-reports")
+Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oD", "-h", "target/test-reports")
+IntegrationTest / fork := true
 
 coverageEnabled := true
