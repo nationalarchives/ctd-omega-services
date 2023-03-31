@@ -96,7 +96,7 @@ class ApiServiceISpec
     jmsMessage.asTextF[IO].attempt.map {
       case Right(text) =>
         replyMessageText = Some(text)
-      case Left(e) => fail(s"Unable to read message file due to ${e.getMessage}")
+      case Left(e) => fail(s"Unable to read message contents due to ${e.getMessage}")
     }
   }
 
