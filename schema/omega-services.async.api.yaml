@@ -240,14 +240,16 @@ components:
             description: >-
               A unique identifier for the message. We suggest using a short
               application instance specific prefix followed by a unique
-              identifier. In the extreme case a UUID may be used.
+              identifier. In the extreme case a UUID may be used. Depending on
+              your JMS provider, this may be set on your behalf.
             type: string
           JMSTimestamp:
             name: JMSTimestamp
             description: >-
               The time the message was sent. The value of the timestamp is the
               amount of time, measured in milliseconds, that has elapsed since
-              midnight, January 1, 1970, UTC.
+              midnight, January 1, 1970, UTC. Depending on your JMS provider,
+              this may be set on your behalf.
             type: number
     JMSResponse:
       name: JMS Response Message
