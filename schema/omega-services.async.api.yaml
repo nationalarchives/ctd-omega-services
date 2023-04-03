@@ -34,16 +34,22 @@ info:
     name: Adam Retter
     email: adam@evolvedbinary.com
     url: https://www.evolvedbinary.com
+
+
 servers:
   mvp-beta:
     url: service.mvbpeta.catalogue.nationalarchives.gov.uk:61616
     protocol: jms
     protocolVersion: '1.1'
     description: MVP Beta - Message Broker
+    # security:
+      # - saslScram: []
     tags:
       - name: env:mvp-beta
         description: This environment is for the MVP Beta
 defaultContentType: application/json
+
+
 channels:
   request.general:
     description: The queue on which general priority requests should be published
@@ -54,6 +60,7 @@ channels:
         oneOf:
           - $ref: '#/components/messages/ListAssetLegalStatusSummary'
           - $ref: '#/components/messages/ListAssetLegalStatusFull'
+
   catalogue.editorial.web.application.instance.1:
     description: >-
       The queue on which response messages will be sent to instance 1 of the
@@ -67,8 +74,28 @@ channels:
         oneOf:
           - $ref: '#/components/messages/AssetLegalStatusSummaryList'
           - $ref: '#/components/messages/AssetLegalStatusFullList'
+
+
 components:
+
+
+  # TODO(AR) the `securitySchemes` mechanism of AsyncAPI does not seem compatible with the idea of sending the Auth token in the `OMGToken` header. I need Investigate this to see if there is a better way of bringing these two things together, then we can add the security to the `publish` or `subscribe` operation in each channel rather than directly in the messages
+  # securitySchemes:
+  #   bearerAuthentication:
+  #     type: apiKey
+  #     in: user
+  #     description: Bearer Authentication Token should be provided in the OMGToken header.
+
+  # TODO(AR) TTL - some messages from some applications (e.g. ctd-omega-editorial-frontend) will be time sensitive, and if the TTL has expired by time we come to process the message we could just discard it. We should record these stats somewhere so that we can understand the SLA of processed vs. disacrded messages
+
+
   messages:
+
+    # NOTE: The `messageID` format is [(OS=Omega Service|OD=Omega Data|OE=Omega Error),(LI=List|GE=Get|UP=Update|CR=Create|RE=Remove),(S=Summary|F=Full)(3 letter mnemonic indicating resource)(3 digit increasing number)]
+
+
+  ## Service Request Messages
+
     ListAssetLegalStatusSummary:
       messageId: OSLISALS001
       name: ListAssetLegalStatusSummary
@@ -79,6 +106,7 @@ components:
         - $ref: '#/components/messageTraits/OMGMessage'
         - $ref: '#/components/messageTraits/OMGRequest'
         - $ref: '#/components/messageTraits/OMGAuthentication'
+
     ListAssetLegalStatusFull:
       messageId: OSLIFALS001
       name: ListAssetLegalStatusFull
@@ -89,6 +117,9 @@ components:
         - $ref: '#/components/messageTraits/OMGMessage'
         - $ref: '#/components/messageTraits/OMGRequest'
         - $ref: '#/components/messageTraits/OMGAuthentication'
+
+  ## Data Messages (may also be used as Service Response Messages)
+
     AssetLegalStatusSummaryList:
       messageId: ODLISALS001
       name: AssetLegalStatusSummaryList
@@ -104,6 +135,7 @@ components:
         type: array
         items:
           - $ref: '#/components/schemas/LegalStatusSummary'
+
     AssetLegalStatusFullList:
       messageId: ODLIFALS001
       name: AssetLegalStatusFullList
@@ -117,6 +149,8 @@ components:
         type: array
         items:
           $ref: '#/components/schemas/LegalStatusFull'
+
+  ## Error Messages
     GeneralError:
       messageId: OELIFERR001
       name: GeneralError
@@ -132,6 +166,7 @@ components:
         type: array
         items:
           $ref: '#/components/schemas/ErrorMessage'
+
     InvalidMessageFormatError:
       messageId: OELIFERR002
       name: InvalidMessageFormatError
@@ -150,6 +185,7 @@ components:
         type: array
         items:
           $ref: '#/components/schemas/ErrorMessage'
+
     InvalidApplicationError:
       messageId: OELIFERR003
       name: InvalidApplicationError
@@ -165,6 +201,7 @@ components:
         type: array
         items:
           $ref: '#/components/schemas/ErrorMessage'
+
     AuthenticationError:
       messageId: OELIFERR004
       name: AuthenticationError
@@ -180,6 +217,7 @@ components:
         type: array
         items:
           $ref: '#/components/schemas/ErrorMessage'
+
     UnrecognisedMessageTypeError:
       messageId: OELIFERR005
       name: UnrecognisedMessageTypeError
@@ -195,6 +233,7 @@ components:
         type: array
         items:
           $ref: '#/components/schemas/ErrorMessage'
+
     InvalidMessageError:
       messageId: OELIFERR006
       name: InvalidMessageError
@@ -211,6 +250,7 @@ components:
         type: array
         items:
           $ref: '#/components/schemas/ErrorMessage'
+
     ProcessingError:
       messageId: OELIFERR007
       name: ProcessingError
@@ -226,7 +266,10 @@ components:
         type: array
         items:
           $ref: '#/components/schemas/ErrorMessage'
+
+
   messageTraits:
+
     JMSMessage:
       name: JMS Message
       description: Headers that are mostly common to all JMS Messages
@@ -251,10 +294,12 @@ components:
               midnight, January 1, 1970, UTC. Depending on your JMS provider,
               this may be set on your behalf.
             type: number
+
     JMSResponse:
       name: JMS Response Message
       description: JMS Message sent in response to another JMS Message
       headers:
+        # required: [JMSCorrelationID]  # NOTE(AR) this is intentionally left optional as it makes it possible to use data messages for both synchronous request-reply, and non-request-reply  asynchronous purposes.
         properties:
           JMSCorrelationID:
             name: JMSCorrelationID
@@ -268,6 +313,7 @@ components:
           The value is the JMSMessageId of the previous message to which this
           message is to be correlated.
         location: $message.header#/JMSCorrelationID
+
     OMGMessage:
       name: Omega Message
       description: Headers that are common to all Omega Messages
@@ -291,14 +337,15 @@ components:
               The Identifier of the Omega Message Type. In AsyncAPI Schema this
               is the `messageId` property of a message defined in the schema.
             type: string
-            pattern: >-
-              (OS|OD|OE)(LI|GE|UP|CR|RE)(S|F)[A-Z]{3}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])
+            # NOTE: The `messageID` format is [(OS=Omega Service|OD=Omega Data|OE=Omega Error),(LI=List|GE=Get|UP=Update|CR=Create|RE=Remove),(S=Summary|F=Full)(3 letter mnemonic indicating resource)(3 digit increasing number)]
+            pattern: "(OS|OD|OE)(LI|GE|UP|CR|RE)(S|F)[A-Z]{3}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])"
           OMGMessageFormat:
             name: OMGMessageFormat
             description: The Internet Media-Type indicating the format of the message body.
             type: string
             enum:
               - application/json
+
     OMGAuthentication:
       name: Omega Authentication
       description: Headers that are required for Authentication
@@ -313,6 +360,7 @@ components:
               An Authentication Token that is valid for the OMGApplicationID and
               request.
             type: string
+
     OMGRequest:
       name: Omega Request Message
       description: Headers that are common to all Omega Request Messages
@@ -331,6 +379,7 @@ components:
             type: string
             pattern: '[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])(\.[A-Za-z0-9])+'
   schemas:
+
     LegalStatusSummary:
       type: object
       required:
@@ -341,11 +390,13 @@ components:
           $ref: '#/components/schemas/GeneralIdentifier'
         label:
           $ref: '#/components/schemas/GeneralLabel'
+
     LegalStatusFull:
       type: object
       allOf:
         - $ref: '#/components/schemas/LegalStatusSummary'
         - $ref: '#/components/schemas/DescriptionOfConcept'
+
     DescriptionOfConcept:
       type: object
       required:
@@ -359,18 +410,22 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GeneralDatedDescription'
+
     GeneralIdentifier:
       type: string
       name: Identifier
       description: An identifier for any general Object, this is typically a URI
+
     GeneralLabel:
       type: string
       name: Label
       description: A label for any general Object
+
     GeneralDescription:
       type: string
       name: Description
       description: A description for any general Object
+
     GeneralDatedDescription:
       type: object
       name: Dated Description
@@ -380,11 +435,13 @@ components:
           $ref: '#/components/schemas/GeneralDescription'
         date:
           $ref: '#/components/schemas/ISODate'
+
     ISODate:
       type: string
       format: date
       name: ISO date
       description: A date string formatted according to ISO 8601
+
     ErrorMessage:
       type: object
       name: Error Message
@@ -394,6 +451,7 @@ components:
           $ref: '#/components/schemas/ErrorCode'
         description:
           $ref: '#/components/schemas/ErrorDescription'
+
     ErrorCode:
       type: string
       format: '[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])'
@@ -401,10 +459,15 @@ components:
       description: >-
         A code related to an error. These should be from a controlled list that
         is published as user documentation.
+
     ErrorDescription:
       type: string
       name: Error Description
       description: The description of an error
+
+
+
+
 tags:
   - name: Project Omega
     description: The new Pan-Archival Catalogue Systems for The National Archives
