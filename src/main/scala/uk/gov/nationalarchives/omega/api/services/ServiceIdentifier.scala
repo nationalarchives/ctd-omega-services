@@ -26,9 +26,12 @@ import enumeratum._
 sealed trait ServiceIdentifier extends EnumEntry
 object ServiceIdentifier extends Enum[ServiceIdentifier] {
 
-  val values = findValues
+  val values: IndexedSeq[ServiceIdentifier] = findValues
 
-  case object ECHO001 extends ServiceIdentifier
+  case object ECHO001 extends ServiceIdentifier {
+    // This happens to follow the regex; otherwise, it's arbitrary.
+    override val entryName = "OSGESZZZ100"
+  }
 
   // add more service identifiers here
 

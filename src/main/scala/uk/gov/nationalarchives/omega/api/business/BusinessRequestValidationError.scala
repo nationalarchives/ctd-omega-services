@@ -21,11 +21,6 @@
 
 package uk.gov.nationalarchives.omega.api.business
 
-import cats.data.ValidatedNec
-
-trait RequestValidation {
-
-  type ValidationResult = ValidatedNec[RequestValidationError, BusinessServiceRequest]
-
-  def validateRequest(request: BusinessServiceRequest): ValidationResult
-}
+sealed class BusinessRequestValidationError(val message: String, val cause: Option[Throwable] = None)
+final case class TextIsNonEmptyCharacters(override val message: String, override val cause: Option[Throwable] = None)
+    extends BusinessRequestValidationError(message, cause)
