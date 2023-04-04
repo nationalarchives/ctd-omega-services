@@ -23,11 +23,11 @@ package uk.gov.nationalarchives.omega.api.services
 
 import cats.effect.IO
 import jms4s.jms.JmsMessage
+import org.apache.commons.lang3.SerializationUtils
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
 
-import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.{ Files, Path, StandardOpenOption }
 import scala.util.{ Failure, Success, Try }
 
@@ -36,18 +36,18 @@ class LocalMessageStore(directoryPath: Path) {
   implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
-  def persistMessage(message: JmsMessage): IO[Try[Version1UUID]] =
-    message.asTextF[IO].flatMap { messageText =>
-      val messageId = Version1UUID.generate()
-      writeFile(generateFilePath(messageId), messageText).map {
-        case Success(_) =>
-          logger.info(s"Successfully persisted the message for ID [$messageId]")
-          Success(messageId)
-        case Failure(e) =>
-          logger.error(s"Failed to persist the message for ID [$messageId]")
-          Failure[Version1UUID](e)
-      }
+  def persistMessage(jmsMessage: JmsMessage): IO[Try[Version1UUID]] = {
+    val messageId = Version1UUID.generate()
+    val localMessage = LocalMessage.createLocalMessage(messageId, jmsMessage)
+    writeFile(generateFilePath(messageId), localMessage).map {
+      case Success(_) =>
+        logger.info(s"Successfully persisted the message for ID [$messageId]")
+        Success(messageId)
+      case Failure(e) =>
+        logger.error(s"Failed to persist the message for ID [$messageId]")
+        Failure[Version1UUID](e)
     }
+  }
 
   def removeMessage(messageId: Version1UUID): IO[Try[Unit]] =
     removeFile(generateFilePath(messageId))
@@ -55,18 +55,18 @@ class LocalMessageStore(directoryPath: Path) {
   private def generateFilePath(messageId: Version1UUID): Path =
     directoryPath.resolve(messageId.toString + ".msg")
 
-  private def writeFile(path: Path, messageText: String): IO[Try[Unit]] =
-    IO.blocking(
+  private def writeFile(path: Path, localMessage: IO[LocalMessage]): IO[Try[Unit]] =
+    localMessage.map { m =>
       Try(
         Files.write(
           path,
-          messageText.getBytes(UTF_8),
+          SerializationUtils.serialize(m),
           StandardOpenOption.CREATE_NEW,
           StandardOpenOption.WRITE,
           StandardOpenOption.DSYNC
         )
       )
-    )
+    }
 
   private def removeFile(path: Path): IO[Try[Unit]] =
     IO.blocking {

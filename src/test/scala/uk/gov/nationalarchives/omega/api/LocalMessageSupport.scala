@@ -21,14 +21,14 @@
 
 package uk.gov.nationalarchives.omega.api
 
+import org.apache.commons.lang3.SerializationUtils
 import org.scalatest.matchers.{ MatchResult, Matcher }
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
-import uk.gov.nationalarchives.omega.api.services.LocalMessageStore
+import uk.gov.nationalarchives.omega.api.services.{ LocalMessage, LocalMessageStore }
 
-import java.nio.file.{ FileSystems, Files, Path }
-import scala.io.Source
+import java.nio.file.{ FileSystems, Files, Path, Paths }
 import scala.reflect.io.Directory
-import scala.util.Using
+import scala.util.{ Failure, Success, Try }
 
 trait LocalMessageSupport {
 
@@ -38,7 +38,7 @@ trait LocalMessageSupport {
   def generateExpectedFilepath(messageId: Version1UUID): String =
     tempDirectoryPath.toAbsolutePath.toString + "/" + messageId + ".msg"
 
-  def haveACorrespondingFile(): Matcher[Version1UUID] = (messageId: Version1UUID) =>
+  def haveACorrespondingFile: Matcher[Version1UUID] = (messageId: Version1UUID) =>
     MatchResult(
       Files.exists(FileSystems.getDefault.getPath(generateExpectedFilepath(messageId))),
       s"We expected that a file would exist for message ID [$messageId], but there wasn't one.",
@@ -47,17 +47,22 @@ trait LocalMessageSupport {
 
   def haveFileContents(expectedContents: String): Matcher[Version1UUID] = (messageId: Version1UUID) => {
 
-    def getFileContents(messageId: Version1UUID): Option[String] =
-      Using(Source.fromFile(generateExpectedFilepath(messageId))) { fileSource =>
-        fileSource.getLines().mkString
-      }.toOption
+    def getFileContents(messageId: Version1UUID): Try[LocalMessage] =
+      for (
+        path    <- Try(Paths.get(generateExpectedFilepath(messageId)));
+        bytes   <- Try(Files.readAllBytes(path));
+        message <- Try(SerializationUtils.deserialize[LocalMessage](bytes))
+      ) yield message
 
-    val actualFileContents = getFileContents(messageId)
-    MatchResult(
-      actualFileContents.contains(expectedContents),
-      s"We expected the file contents for message [$messageId] to be [$expectedContents], but it was [$actualFileContents].",
-      s"We didn't expect the file contents for message [$messageId] to be [$expectedContents], but it was."
-    )
+    getFileContents(messageId) match {
+      case Success(message) =>
+        MatchResult(
+          message.messageText.contains(expectedContents),
+          s"We expected the file contents for message [$messageId] to be [$expectedContents], but it was [${message.messageText}].",
+          s"We didn't expect the file contents for message [$messageId] to be [$expectedContents], but it was."
+        )
+      case Failure(e) => MatchResult(matches = false, s"Failed to retrieve message contents due to ${e.getMessage}", "")
+    }
 
   }
 

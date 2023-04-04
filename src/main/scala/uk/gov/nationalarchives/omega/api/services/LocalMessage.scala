@@ -27,12 +27,13 @@ import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
 
+@SerialVersionUID(1L)
 final case class LocalMessage(
   persistentMessageId: Version1UUID,
   messageText: String,
   serviceId: Option[ServiceIdentifier],
   correlationId: Option[String]
-) {
+) extends Serializable {
   def validate: ValidatedLocalMessage =
     // TODO(RW) this method will need to validated instance of the message - currently we are just adding some default values
     ValidatedLocalMessage(
