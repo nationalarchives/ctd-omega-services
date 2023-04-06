@@ -70,7 +70,7 @@ class DispatcherSpec
           dispatcher.run(1)(queue).andWait(5.seconds) *>
           IO(testLocalProducer.message).asserting(_ mustBe "The Echo Service says: Hello World!") *>
           queue.size.asserting(_ mustBe 0) *>
-          IO.pure(messageId).asserting(_ must not(haveACorrespondingFile()))
+          IO.pure(messageId).asserting(_ must not(haveACorrespondingFile))
       }
     }
 

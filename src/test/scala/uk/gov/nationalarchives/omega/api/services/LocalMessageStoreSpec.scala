@@ -24,6 +24,7 @@ package uk.gov.nationalarchives.omega.api.services
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import jms4s.jms.JmsMessage
+import org.mockito.ArgumentMatchersSugar.eqTo
 import org.mockito.MockitoSugar
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -85,7 +86,7 @@ class LocalMessageStoreSpec
         "doesn't have a corresponding file" in {
 
           val messageId = Version1UUID.generate()
-          messageId must not(haveACorrespondingFile())
+          messageId must not(haveACorrespondingFile)
 
           assertThrows[NoSuchFileException] {
             removeMessage(messageId)
@@ -98,7 +99,7 @@ class LocalMessageStoreSpec
 
           removeMessage(messageId)
 
-          messageId must not(haveACorrespondingFile())
+          messageId must not(haveACorrespondingFile)
 
         }
       }
@@ -112,7 +113,7 @@ class LocalMessageStoreSpec
           removeMessage(messageId)
         }
 
-        messageId must haveACorrespondingFile()
+        messageId must haveACorrespondingFile
 
       }
     }
@@ -146,9 +147,15 @@ class LocalMessageStoreSpec
   private def await[T](io: IO[T]): T =
     Await.result(io.unsafeToFuture(), 1.second)
 
-  private def generateMockJmsMessage(text: String): JmsMessage = {
+  private def generateMockJmsMessage(
+    text: String,
+    maybeSid: Option[String] = None,
+    maybeMessageId: Option[String] = None
+  ): JmsMessage = {
     val mockJmsMessage = mock[JmsMessage]
     when(mockJmsMessage.asTextF[IO]).thenReturn(IO.pure(text))
+    when(mockJmsMessage.getStringProperty(eqTo("sid"))).thenReturn(maybeSid)
+    when(mockJmsMessage.getJMSMessageId).thenReturn(maybeMessageId)
     mockJmsMessage
   }
 

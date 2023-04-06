@@ -74,6 +74,7 @@ lazy val root = Project("ctd-omega-services", file("."))
       "org.typelevel"         %% "log4cats-core"                 % Log4CatsVersion,
       "org.typelevel"         %% "log4cats-slf4j"                % Log4CatsVersion,
       "com.chuusai"           %% "shapeless"                     % "2.3.10",
+      "org.apache.commons"     % "commons-lang3"                 % "3.12.0",
       "ch.qos.logback"         % "logback-classic"               % "1.3.5"   % Runtime, // Java 8 compatible
       "net.logstash.logback"   % "logstash-logback-encoder"      % "7.3"     % Runtime,
       "org.scalatest"         %% "scalatest"                     % "3.2.15"  % "it,test",
