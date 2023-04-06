@@ -22,6 +22,7 @@
 package uk.gov.nationalarchives.omega.api.services
 
 import cats.effect.IO
+import cats.syntax.all._
 import jms4s.jms.JmsMessage
 import org.apache.commons.lang3.SerializationUtils
 import org.typelevel.log4cats.slf4j.Slf4jFactory
@@ -50,16 +51,26 @@ class LocalMessageStore(directoryPath: Path) {
   }
 
   def readMessage(messageId: Version1UUID): IO[Try[LocalMessage]] =
-    IO.blocking {
-      Try {
-        val path = generateFilePath(messageId)
-        val bytes = Files.readAllBytes(path)
-        SerializationUtils.deserialize[LocalMessage](bytes)
-      }
-    }
+    deserializeFile(
+      generateFilePath(messageId)
+    )
+
+  def readAllFilesInDirectory(): IO[List[LocalMessage]] =
+    directoryPath.toFile().listFiles().toList.traverse { path =>
+      deserializeFile(path.toPath()).map(_.toOption)
+    }.map(_.flatten)
 
   def removeMessage(messageId: Version1UUID): IO[Try[Unit]] =
     removeFile(generateFilePath(messageId))
+
+  private def deserializeFile(path: Path): IO[Try[LocalMessage]] =
+    IO.blocking {
+      Try {
+        SerializationUtils.deserialize[LocalMessage](
+          Files.readAllBytes(path)
+        )
+      }
+    }
 
   private def generateFilePath(messageId: Version1UUID): Path =
     directoryPath.resolve(messageId.toString + ".msg")
@@ -83,5 +94,15 @@ class LocalMessageStore(directoryPath: Path) {
         Files.delete(path)
       }
     }
+
+}
+
+object LocalMessageStore {
+
+  def checkDirectoryExists(path: Path): Boolean =
+    Files.exists(path) && Files.isDirectory(path)
+
+  def checkDirectoryNonEmpty(path: Path): Boolean =
+    checkDirectoryExists(path) && Files.list(path).findAny().isPresent()
 
 }

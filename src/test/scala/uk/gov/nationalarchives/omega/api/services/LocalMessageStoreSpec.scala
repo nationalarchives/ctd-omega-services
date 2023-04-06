@@ -92,6 +92,18 @@ class LocalMessageStoreSpec
           writtenMessage.messageText mustEqual "Hello, world"
         }
       }
+      "when multiple messages have been written" - {
+        "they can be read" in {
+          val mockJmsMessage1 = generateMockJmsMessage("Hello, world")
+          val mockJmsMessage2 = generateMockJmsMessage("Hello, world, again")
+
+          persistMessage(mockJmsMessage1)
+          persistMessage(mockJmsMessage2)
+
+          // TODO: Messages are not being cleaned up before this test.
+          readAllMessages().map(_.messageText).toSet mustEqual Set("Hello, world", "Hello, world, again")
+        }
+      }
     }
     "removing a message when" - {
       "the provided ID" - {
@@ -128,6 +140,25 @@ class LocalMessageStoreSpec
         messageId must haveACorrespondingFile
 
       }
+      "check if a directory is empty" - {
+        "when is is not empty" in {
+          val mockJmsMessage = generateMockJmsMessage("")
+          val messageId = persistMessage(mockJmsMessage)
+
+          LocalMessageStore.checkDirectoryExists(tempDirectoryPath) mustBe true
+          LocalMessageStore.checkDirectoryNonEmpty(tempDirectoryPath) mustBe true
+        }
+      }
+      "check if a directory exists" - {
+        "when it has been created" in {
+          LocalMessageStore.checkDirectoryExists(tempDirectoryPath) mustBe true
+        }
+
+        "when it does not exist" in {
+          deleteTempDirectory()
+          LocalMessageStore.checkDirectoryExists(tempDirectoryPath) mustBe false
+        }
+      }
     }
   }
 
@@ -156,6 +187,9 @@ class LocalMessageStoreSpec
       case Failure(e)       => throw e
     }
 
+  private def readAllMessages(): List[LocalMessage] =
+    await(localMessageStore.readAllFilesInDirectory())
+  
   private def removeMessage(messageId: Version1UUID): Unit =
     await(localMessageStore.removeMessage(messageId)) match {
       case Success(_) =>

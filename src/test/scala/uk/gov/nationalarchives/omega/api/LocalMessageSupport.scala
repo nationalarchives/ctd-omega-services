@@ -32,7 +32,7 @@ import scala.util.{ Failure, Success, Try }
 
 trait LocalMessageSupport {
 
-  private val tempDirectoryPath: Path = Files.createTempDirectory("ApiServicesTesting")
+  protected val tempDirectoryPath: Path = Files.createTempDirectory("ApiServicesTesting")
   lazy val localMessageStore = new LocalMessageStore(tempDirectoryPath)
 
   def generateExpectedFilepath(messageId: Version1UUID): String =
