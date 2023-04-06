@@ -81,6 +81,18 @@ class LocalMessageStoreSpec
 
       }
     }
+    "reading a message" - {
+      "when a message has been written" - {
+        "it can be read" in {
+          val mockJmsMessage = generateMockJmsMessage("Hello, world")
+
+          val messageId = persistMessage(mockJmsMessage)
+          val writtenMessage = readMessage(messageId)
+
+          writtenMessage.messageText mustEqual "Hello, world"
+        }
+      }
+    }
     "removing a message when" - {
       "the provided ID" - {
         "doesn't have a corresponding file" in {
@@ -136,6 +148,12 @@ class LocalMessageStoreSpec
     await(localMessageStore.persistMessage(mockJmsMessage)) match {
       case Success(messageId) => messageId
       case Failure(e)         => throw e
+    }
+
+  private def readMessage(messageId: Version1UUID): LocalMessage =
+    await(localMessageStore.readMessage(messageId)) match {
+      case Success(message) => message
+      case Failure(e)       => throw e
     }
 
   private def removeMessage(messageId: Version1UUID): Unit =

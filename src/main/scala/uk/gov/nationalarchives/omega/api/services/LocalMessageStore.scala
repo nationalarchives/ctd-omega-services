@@ -49,6 +49,15 @@ class LocalMessageStore(directoryPath: Path) {
     }
   }
 
+  def readMessage(messageId: Version1UUID): IO[Try[LocalMessage]] =
+    IO.blocking {
+      Try {
+        val path = generateFilePath(messageId)
+        val bytes = Files.readAllBytes(path)
+        SerializationUtils.deserialize[LocalMessage](bytes)
+      }
+    }
+
   def removeMessage(messageId: Version1UUID): IO[Try[Unit]] =
     removeFile(generateFilePath(messageId))
 
