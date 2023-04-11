@@ -23,7 +23,7 @@ package uk.gov.nationalarchives.omega.api.business.echo
 
 import cats.data.{ NonEmptyChain, Validated }
 import uk.gov.nationalarchives.omega.api.business._
-class EchoService extends BusinessService with RequestValidation {
+class EchoService extends BusinessService with BusinessRequestValidation {
 
   override def validateRequest(request: BusinessServiceRequest): ValidationResult =
     Validated.cond(

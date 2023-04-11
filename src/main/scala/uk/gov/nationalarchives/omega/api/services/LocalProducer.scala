@@ -21,12 +21,65 @@
 
 package uk.gov.nationalarchives.omega.api.services
 
+import cats.data.NonEmptyChain
 import cats.effect.IO
 import jms4s.JmsProducer
 import jms4s.config.QueueName
+import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidationError, TextIsNonEmptyCharacters }
+import uk.gov.nationalarchives.omega.api.services.LocalMessage._
 
 trait LocalProducer {
   def send(replyMessage: String, requestMessage: ValidatedLocalMessage): IO[Unit]
+
+  def sendWhenGenericRequestIsInvalid(
+    localMessage: LocalMessage,
+    errors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
+  ): IO[Unit]
+
+  def sendWhenBusinessRequestIsInvalid(
+    localMessage: LocalMessage,
+    errors: NonEmptyChain[BusinessRequestValidationError]
+  ): IO[Unit]
+
+  def localMessageValidationErrorsToReplyMessage(
+    localMessageValidationErrors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
+  ): String = localMessageValidationErrors
+    .map(localMessageValidationError => toErrorMessage(localMessageValidationError))
+    .filter(_.isDefined)
+    .map(_.get)
+    .toList
+    .mkString(";")
+
+  def businessRequestValidationErrorToReplyMessage(
+    errors: NonEmptyChain[BusinessRequestValidationError]
+  ): String = errors
+    .map(error => toErrorMessage(error))
+    .filter(_.isDefined)
+    .map(_.get)
+    .toList
+    .mkString(";")
+
+  private def toErrorMessage(genericRequestValidationError: LocalMessageValidationError): Option[String] =
+    genericRequestValidationError match {
+      case MissingJMSMessageID    => Some("Missing JMSMessageID")
+      case InvalidJMSMessageID    => Some("Invalid JMSMessageID")
+      case MissingServiceID       => Some("Missing OMGMessageTypeID")
+      case InvalidServiceID       => Some("Invalid OMGMessageTypeID")
+      case MissingApplicationID   => Some("Missing OMGApplicationID")
+      case InvalidApplicationID   => Some("Invalid OMGApplicationID")
+      case MissingJMSTimestamp    => Some("Missing JMSTimestamp")
+      case MissingMessageFormat   => Some("Missing OMGMessageFormat")
+      case InvalidMessageFormat   => Some("Invalid OMGMessageFormat")
+      case MissingAuthToken       => Some("Missing OMGToken")
+      case InvalidAuthToken       => Some("Invalid OMGToken")
+      case MissingResponseAddress => Some("Missing OMGResponseAddress")
+      case InvalidResponseAddress => Some("Invalid OMGResponseAddress")
+    }
+
+  private def toErrorMessage(businessRequestValidationError: BusinessRequestValidationError): Option[String] =
+    businessRequestValidationError match {
+      case TextIsNonEmptyCharacters(message, _) => Some(s"Message text is blank: $message")
+    }
 }
 
 /** In JMS terms a producer can have one or many destinations - in this implementation we have one destination, if we
@@ -50,4 +103,37 @@ class LocalProducerImpl(val jmsProducer: JmsProducer[IO], val outputQueue: Queue
       }
     } *> IO.unit
 
+  override def sendWhenGenericRequestIsInvalid(
+    localMessage: LocalMessage,
+    errors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
+  ): IO[Unit] =
+    localMessage.correlationId
+      .filter(_.trim.nonEmpty)
+      .map { correlationId =>
+        jmsProducer.send { mf =>
+          val msg = mf.makeTextMessage(localMessageValidationErrorsToReplyMessage(errors))
+          msg.map { m =>
+            m.setJMSCorrelationId(correlationId)
+            (m, outputQueue)
+          }
+        } *> IO.unit
+      }
+      .getOrElse(IO.pure {})
+
+  override def sendWhenBusinessRequestIsInvalid(
+    localMessage: LocalMessage,
+    businessRequestValidationErrors: NonEmptyChain[BusinessRequestValidationError]
+  ): IO[Unit] =
+    localMessage.correlationId
+      .filter(_.trim.nonEmpty)
+      .map { correlationId =>
+        jmsProducer.send { mf =>
+          val msg = mf.makeTextMessage(businessRequestValidationErrorToReplyMessage(businessRequestValidationErrors))
+          msg.map { m =>
+            m.setJMSCorrelationId(correlationId)
+            (m, outputQueue)
+          }
+        } *> IO.unit
+      }
+      .getOrElse(IO.pure {})
 }
