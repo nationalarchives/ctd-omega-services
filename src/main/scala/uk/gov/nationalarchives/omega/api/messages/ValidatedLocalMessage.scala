@@ -19,12 +19,20 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.services
+package uk.gov.nationalarchives.omega.api.messages
 
-sealed class ServiceError(val message: String, val cause: Option[Throwable] = None)
-final case class ServiceIdentifierError(override val message: String, override val cause: Option[Throwable] = None)
-    extends ServiceError(message, cause)
-final case class MessageIdentifierError(override val message: String, override val cause: Option[Throwable] = None)
-    extends ServiceError(message, cause)
-final case class MessageReadError(override val message: String, override val cause: Option[Throwable] = None)
-    extends ServiceError(message, cause)
+import uk.gov.nationalarchives.omega.api.common.Version1UUID
+
+import java.time.LocalDateTime
+
+final case class ValidatedLocalMessage(
+  persistentMessageId: Version1UUID,
+  omgMessageTypeId: String,
+  messageText: String,
+  jmsMessageId: String,
+  omgApplicationId: String,
+  jmsLocalDateTime: LocalDateTime,
+  omgMessageFormat: String,
+  authToken: String,
+  omgResponseAddress: String
+)

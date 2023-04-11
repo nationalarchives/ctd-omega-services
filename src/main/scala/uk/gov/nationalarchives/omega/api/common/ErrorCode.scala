@@ -19,34 +19,29 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api
+package uk.gov.nationalarchives.omega.api.common
 
-import cats.effect.{ ExitCode, IO, IOApp }
-import org.typelevel.log4cats.slf4j.Slf4jFactory
-import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
-import pureconfig.ConfigSource
-import pureconfig.generic.auto._
-import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
-import uk.gov.nationalarchives.omega.api.services.ApiService
+import enumeratum.{ CirceEnum, Enum, EnumEntry }
 
-object ApiServiceApp extends IOApp {
+sealed trait ErrorCode extends EnumEntry
+object ErrorCode extends Enum[ErrorCode] with CirceEnum[ErrorCode] {
 
-  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
-  implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
+  val values: IndexedSeq[ErrorCode] = findValues
 
-  val applicationId = "PACS001"
-
-  override def run(args: List[String]): IO[ExitCode] = {
-    val serviceConfig = ConfigSource.default.loadOrThrow[ServiceConfig]
-    val apiService = new ApiService(serviceConfig)
-
-    // install a shutdown hook on the API Service so that when the App receives SIGTERM it stops gracefully
-    sys.ShutdownHookThread {
-      apiService.stop()
-    }
-
-    // start the API Service
-    apiService.start
-  }
+  case object PROC001 extends ErrorCode
+  case object MISS001 extends ErrorCode
+  case object MISS002 extends ErrorCode
+  case object MISS003 extends ErrorCode
+  case object MISS004 extends ErrorCode
+  case object MISS005 extends ErrorCode
+  case object MISS006 extends ErrorCode
+  case object MISS007 extends ErrorCode
+  case object INVA001 extends ErrorCode
+  case object INVA002 extends ErrorCode
+  case object INVA003 extends ErrorCode
+  case object INVA005 extends ErrorCode
+  case object INVA006 extends ErrorCode
+  case object INVA007 extends ErrorCode
+  case object BLAN001 extends ErrorCode
 
 }

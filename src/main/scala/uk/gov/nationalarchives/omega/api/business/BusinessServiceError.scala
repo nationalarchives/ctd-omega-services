@@ -21,8 +21,10 @@
 
 package uk.gov.nationalarchives.omega.api.business
 
+import uk.gov.nationalarchives.omega.api.common.ErrorCode
+
 trait BusinessServiceError {
   //  def reference: String // TODO(AR) this comes later and is used for the user to contact the helpdesk
-  def code: String
-  def message: String
+  def code: ErrorCode
+  def description: String
 }

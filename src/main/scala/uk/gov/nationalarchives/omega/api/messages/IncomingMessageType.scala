@@ -19,34 +19,20 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api
+package uk.gov.nationalarchives.omega.api.messages
 
-import cats.effect.{ ExitCode, IO, IOApp }
-import org.typelevel.log4cats.slf4j.Slf4jFactory
-import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
-import pureconfig.ConfigSource
-import pureconfig.generic.auto._
-import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
-import uk.gov.nationalarchives.omega.api.services.ApiService
+import enumeratum._
 
-object ApiServiceApp extends IOApp {
+sealed trait IncomingMessageType extends EnumEntry
+object IncomingMessageType extends Enum[IncomingMessageType] {
 
-  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
-  implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
+  val values: IndexedSeq[IncomingMessageType] = findValues
 
-  val applicationId = "PACS001"
-
-  override def run(args: List[String]): IO[ExitCode] = {
-    val serviceConfig = ConfigSource.default.loadOrThrow[ServiceConfig]
-    val apiService = new ApiService(serviceConfig)
-
-    // install a shutdown hook on the API Service so that when the App receives SIGTERM it stops gracefully
-    sys.ShutdownHookThread {
-      apiService.stop()
-    }
-
-    // start the API Service
-    apiService.start
+  case object ECHO001 extends IncomingMessageType {
+    // This happens to follow the regex; otherwise, it's arbitrary.
+    override val entryName = "OSGESZZZ100"
   }
+
+  // add more service identifiers here
 
 }

@@ -3,6 +3,8 @@ val Log4CatsVersion = "2.5.0"
 val PureConfigVersion = "0.17.2"
 val Jms4SVersion = "0.0.1-53518bb-SNAPSHOT"
 val AwsJavaSdkVersion = "2.18.1"
+val CirceVersion = "0.14.5"
+val EnumeratumVersion = "1.7.2"
 
 ThisBuild / versionScheme := Some("semver-spec")
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation")
@@ -70,17 +72,21 @@ lazy val root = Project("ctd-omega-services", file("."))
       "com.github.pureconfig" %% "pureconfig-generic"            % PureConfigVersion,
       "com.github.pureconfig" %% "pureconfig-generic-base"       % PureConfigVersion,
       "com.fasterxml.uuid"     % "java-uuid-generator"           % "4.1.0",
-      "com.beachape"          %% "enumeratum"                    % "1.7.2",
+      "com.beachape"          %% "enumeratum"                    % EnumeratumVersion,
+      "com.beachape"          %% "enumeratum-circe"              % EnumeratumVersion,
       "org.typelevel"         %% "log4cats-core"                 % Log4CatsVersion,
       "org.typelevel"         %% "log4cats-slf4j"                % Log4CatsVersion,
       "com.chuusai"           %% "shapeless"                     % "2.3.10",
       "org.apache.commons"     % "commons-lang3"                 % "3.12.0",
+      "io.circe"              %% "circe-core"                    % CirceVersion,
+      "io.circe"              %% "circe-generic"                 % CirceVersion,
+      "io.circe"              %% "circe-parser"                  % CirceVersion,
       "ch.qos.logback"         % "logback-classic"               % "1.3.5"   % Runtime, // Java 8 compatible
       "net.logstash.logback"   % "logstash-logback-encoder"      % "7.3"     % Runtime,
       "org.scalatest"         %% "scalatest"                     % "3.2.15"  % "it,test",
       "org.typelevel"         %% "cats-effect-testing-scalatest" % "1.5.0"   % "it,test",
+      "com.vladsch.flexmark"   % "flexmark-profile-pegdown"      % "0.62.2"  % "it,test", // Java 8 compatible
       "org.mockito"           %% "mockito-scala-scalatest"       % "1.17.12" % Test,
-      "com.vladsch.flexmark"   % "flexmark-profile-pegdown"      % "0.62.2"  % Test, // Java 8 compatible
       "software.amazon.awssdk" % "auth"                          % "2.18.1"  % "it",
       "software.amazon.awssdk" % "regions"                       % "2.18.1"  % "it",
       "software.amazon.awssdk" % "sqs"                           % "2.18.1"  % "it",
@@ -92,6 +98,7 @@ lazy val root = Project("ctd-omega-services", file("."))
     resolvers += Resolver.githubPackages("rwalpole")
   )
 Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oD", "-h", "target/test-reports")
+IntegrationTest / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/it-reports")
 IntegrationTest / fork := true
 
 coverageEnabled := true

@@ -19,20 +19,14 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.services
+package uk.gov.nationalarchives.omega.api.messages
 
-import uk.gov.nationalarchives.omega.api.common.Version1UUID
+object MessageProperties {
 
-import java.time.LocalDateTime
+  val OMGApplicationID = "OMGApplicationID"
+  val OMGMessageTypeID = "OMGMessageTypeID"
+  val OMGMessageFormat = "OMGMessageFormat"
+  val OMGToken = "OMGToken"
+  val OMGReplyAddress = "OMGReplyAddress"
 
-final case class ValidatedLocalMessage(
-  persistentMessageId: Version1UUID,
-  serviceId: ServiceIdentifier,
-  messageText: String,
-  correlationId: String,
-  applicationId: String,
-  time: LocalDateTime,
-  messageFormat: String,
-  authToken: String,
-  responseAddress: String
-)
+}
