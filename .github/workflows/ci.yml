@@ -30,3 +30,8 @@ jobs:
         run: sbt scalafmtCheck test:scalafmtCheck scalafmtSbtCheck
       - name: Run unit tests
         run: sbt test
+      - name: Run Spectral
+        uses: stoplightio/spectral-action@latest
+        with:
+          file_glob: './schema/omega-services.async.api.yaml'
+          spectral_ruleset: './schema/validate-omega-services.spectral.yaml'
