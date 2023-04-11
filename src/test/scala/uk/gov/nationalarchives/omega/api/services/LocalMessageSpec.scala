@@ -27,7 +27,8 @@ import org.mockito.scalatest.MockitoSugar
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
-import uk.gov.nationalarchives.omega.api.services.LocalMessage.{ InvalidApplicationID, InvalidAuthToken, InvalidJMSMessageID, InvalidMessageFormat, InvalidResponseAddress, InvalidServiceID, MissingApplicationID, MissingAuthToken, MissingJMSMessageID, MissingJMSTimestamp, MissingMessageFormat, MissingResponseAddress, MissingServiceID }
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{ InvalidApplicationID, InvalidAuthToken, InvalidJMSMessageID, InvalidMessageFormat, InvalidMessageTypeID, InvalidReplyAddress, MissingApplicationID, MissingAuthToken, MissingJMSMessageID, MissingJMSTimestamp, MissingMessageFormat, MissingMessageTypeID, MissingReplyAddress }
+import uk.gov.nationalarchives.omega.api.messages.{ IncomingMessageType, LocalMessage, ValidatedLocalMessage }
 
 import java.time.{ Instant, LocalDateTime, ZoneOffset }
 import java.util.UUID
@@ -38,6 +39,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
   private val validCorrelationId = UUID.randomUUID().toString
   private val validMessageText = "At vero eos et accusamus et iusto odio dignissimos"
   private val validApplicationId = "ABCD002"
+  private val validMessageTypeId = "OSGESZZZ100"
   private val validEpochTimeInMilliseconds = System.currentTimeMillis()
   private val validMessageFormat = "application/json"
   private val validAuthToken = "AbCdEf123456"
@@ -47,13 +49,13 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
     LocalMessage(
       persistentMessageId = validPersistentMessageId,
       messageText = validMessageText,
-      serviceId = Some(validServiceId),
-      correlationId = Some(validCorrelationId),
-      applicationId = Some(validApplicationId),
-      epochTimeInMilliseconds = Some(validEpochTimeInMilliseconds),
-      messageFormat = Some(validMessageFormat),
-      authToken = Some(validAuthToken),
-      responseAddress = Some(validResponseAddress)
+      omgMessageTypeId = Some(validServiceId),
+      jmsMessageId = Some(validCorrelationId),
+      omgApplicationId = Some(validApplicationId),
+      jmsTimestamp = Some(validEpochTimeInMilliseconds),
+      omgMessageFormat = Some(validMessageFormat),
+      omgToken = Some(validAuthToken),
+      omgReplyAddress = Some(validResponseAddress)
     )
 
   "A LocalMessage when" - {
@@ -62,19 +64,21 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
 
         val localMessage = validLocalMessage
 
-        val validationResult = localMessage.validate()
+        val applicationId = localMessage.validateOmgApplicationId
+        val validationResult = localMessage.validateOtherHeaders(applicationId)
 
         validationResult mustBe Validated.Valid(
           ValidatedLocalMessage(
-            correlationId = validCorrelationId,
+            jmsMessageId = validCorrelationId,
             messageText = validMessageText,
             persistentMessageId = validPersistentMessageId,
-            serviceId = ServiceIdentifier.ECHO001,
-            applicationId = validApplicationId,
-            time = LocalDateTime.ofInstant(Instant.ofEpochMilli(validEpochTimeInMilliseconds), ZoneOffset.UTC),
-            messageFormat = validMessageFormat,
+            omgMessageTypeId = validMessageTypeId,
+            omgApplicationId = validApplicationId,
+            jmsLocalDateTime =
+              LocalDateTime.ofInstant(Instant.ofEpochMilli(validEpochTimeInMilliseconds), ZoneOffset.UTC),
+            omgMessageFormat = validMessageFormat,
             authToken = validAuthToken,
-            responseAddress = validResponseAddress
+            omgResponseAddress = validResponseAddress
           )
         )
 
@@ -83,27 +87,30 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
         "the correlation ID" - {
           "is missing" in {
 
-            val localMessage = validLocalMessage.copy(correlationId = None)
+            val localMessage = validLocalMessage.copy(jmsMessageId = None)
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
             validationResult mustBe Invalid(Chain(MissingJMSMessageID))
 
           }
           "is empty, without padding" in {
 
-            val localMessage = validLocalMessage.copy(correlationId = Some(""))
+            val localMessage = validLocalMessage.copy(jmsMessageId = Some(""))
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
             validationResult mustBe Invalid(Chain(InvalidJMSMessageID))
 
           }
           "is empty, with padding" in {
 
-            val localMessage = validLocalMessage.copy(correlationId = Some("        "))
+            val localMessage = validLocalMessage.copy(jmsMessageId = Some("        "))
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
             validationResult mustBe Invalid(Chain(InvalidJMSMessageID))
 
@@ -112,67 +119,89 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
         "the service ID" - {
           "is missing" in {
 
-            val localMessage = validLocalMessage.copy(serviceId = None)
+            val localMessage = validLocalMessage.copy(omgMessageTypeId = None)
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
-            validationResult mustBe Invalid(Chain(MissingServiceID))
+            validationResult mustBe Invalid(Chain(MissingMessageTypeID))
 
           }
           "is blank" in {
 
-            val localMessage = validLocalMessage.copy(serviceId = Some(""))
+            val localMessage = validLocalMessage.copy(omgMessageTypeId = Some(""))
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
-            validationResult mustBe Invalid(Chain(InvalidServiceID))
+            validationResult mustBe Invalid(Chain(InvalidMessageTypeID))
 
           }
           "isn't compliant with the expected pattern" in {
 
-            val localMessage = validLocalMessage.copy(serviceId = Some("ECHO001"))
+            val localMessage = validLocalMessage.copy(omgMessageTypeId = Some("ECHO001"))
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
-            validationResult mustBe Invalid(Chain(InvalidServiceID))
+            validationResult mustBe Invalid(Chain(InvalidMessageTypeID))
 
           }
           "is compliant with the expected pattern, but is not recognised." in {
 
-            val localMessage = validLocalMessage.copy(serviceId = Some("OSGESXXX100"))
+            val unknownMessageTypeId = "OSGESXXX100"
 
-            val validationResult = localMessage.validate()
+            val localMessage = validLocalMessage.copy(omgMessageTypeId = Some(unknownMessageTypeId))
 
-            validationResult mustBe Invalid(Chain(InvalidServiceID))
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
+
+            validationResult mustBe Validated.Valid(
+              ValidatedLocalMessage(
+                jmsMessageId = validCorrelationId,
+                messageText = validMessageText,
+                persistentMessageId = validPersistentMessageId,
+                omgMessageTypeId = unknownMessageTypeId,
+                omgApplicationId = validApplicationId,
+                jmsLocalDateTime =
+                  LocalDateTime.ofInstant(Instant.ofEpochMilli(validEpochTimeInMilliseconds), ZoneOffset.UTC),
+                omgMessageFormat = "application/json",
+                authToken = validAuthToken,
+                omgResponseAddress = validResponseAddress
+              )
+            )
 
           }
         }
         "the application ID" - {
           "is missing" in {
 
-            val localMessage = validLocalMessage.copy(applicationId = None)
+            val localMessage = validLocalMessage.copy(omgApplicationId = None)
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
-            validationResult mustBe Invalid(Chain(MissingApplicationID, InvalidResponseAddress))
+            validationResult mustBe Invalid(Chain(MissingApplicationID, InvalidReplyAddress))
 
           }
           "is invalid" in {
 
-            val localMessage = validLocalMessage.copy(applicationId = Some("ABC123"))
+            val localMessage = validLocalMessage.copy(omgApplicationId = Some("ABC123"))
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
-            validationResult mustBe Invalid(Chain(InvalidApplicationID, InvalidResponseAddress))
+            validationResult mustBe Invalid(Chain(InvalidApplicationID, InvalidReplyAddress))
 
           }
         }
         "the timestamp" - {
           "is missing" in {
 
-            val localMessage = validLocalMessage.copy(epochTimeInMilliseconds = None)
+            val localMessage = validLocalMessage.copy(jmsTimestamp = None)
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
             validationResult mustBe Invalid(Chain(MissingJMSTimestamp))
 
@@ -181,60 +210,66 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
         "the message format" - {
           "is missing" in {
 
-            val localMessage = validLocalMessage.copy(messageFormat = None)
+            val localMessage = validLocalMessage.copy(omgMessageFormat = None)
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
             validationResult mustBe Invalid(Chain(MissingMessageFormat))
 
           }
           "is invalid" in {
 
-            val localMessage = validLocalMessage.copy(messageFormat = Some("text/plain"))
+            val localMessage = validLocalMessage.copy(omgMessageFormat = Some("text/plain"))
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
             validationResult mustBe Invalid(Chain(InvalidMessageFormat))
 
           }
           "is valid (but with padding)" in {
 
-            val localMessage = validLocalMessage.copy(messageFormat = Some("  application/json  "))
+            val localMessage = validLocalMessage.copy(omgMessageFormat = Some("  application/json  "))
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
             validationResult mustBe Validated.Valid(
               ValidatedLocalMessage(
-                correlationId = validCorrelationId,
+                jmsMessageId = validCorrelationId,
                 messageText = validMessageText,
                 persistentMessageId = validPersistentMessageId,
-                serviceId = ServiceIdentifier.ECHO001,
-                applicationId = validApplicationId,
-                time = LocalDateTime.ofInstant(Instant.ofEpochMilli(validEpochTimeInMilliseconds), ZoneOffset.UTC),
-                messageFormat = "application/json",
+                omgMessageTypeId = validMessageTypeId,
+                omgApplicationId = validApplicationId,
+                jmsLocalDateTime =
+                  LocalDateTime.ofInstant(Instant.ofEpochMilli(validEpochTimeInMilliseconds), ZoneOffset.UTC),
+                omgMessageFormat = "application/json",
                 authToken = validAuthToken,
-                responseAddress = validResponseAddress
+                omgResponseAddress = validResponseAddress
               )
             )
 
           }
           "is valid (but with the wrong casing)" in {
 
-            val localMessage = validLocalMessage.copy(messageFormat = Some("APPLICATION/JSON"))
+            val localMessage = validLocalMessage.copy(omgMessageFormat = Some("APPLICATION/JSON"))
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
             validationResult mustBe Validated.Valid(
               ValidatedLocalMessage(
-                correlationId = validCorrelationId,
+                jmsMessageId = validCorrelationId,
                 messageText = validMessageText,
                 persistentMessageId = validPersistentMessageId,
-                serviceId = ServiceIdentifier.ECHO001,
-                applicationId = validApplicationId,
-                time = LocalDateTime.ofInstant(Instant.ofEpochMilli(validEpochTimeInMilliseconds), ZoneOffset.UTC),
-                messageFormat = "application/json",
+                omgMessageTypeId = validMessageTypeId,
+                omgApplicationId = validApplicationId,
+                jmsLocalDateTime =
+                  LocalDateTime.ofInstant(Instant.ofEpochMilli(validEpochTimeInMilliseconds), ZoneOffset.UTC),
+                omgMessageFormat = "application/json",
                 authToken = validAuthToken,
-                responseAddress = validResponseAddress
+                omgResponseAddress = validResponseAddress
               )
             )
 
@@ -243,99 +278,109 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
         "the auth token" - {
           "is missing" in {
 
-            val localMessage = validLocalMessage.copy(authToken = None)
+            val localMessage = validLocalMessage.copy(omgToken = None)
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
             validationResult mustBe Invalid(Chain(MissingAuthToken))
 
           }
           "is blank" in {
 
-            val localMessage = validLocalMessage.copy(authToken = Some(""))
+            val localMessage = validLocalMessage.copy(omgToken = Some(""))
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
             validationResult mustBe Invalid(Chain(InvalidAuthToken))
 
           }
           "is blank (but with padding)" in {
 
-            val localMessage = validLocalMessage.copy(authToken = Some("   "))
+            val localMessage = validLocalMessage.copy(omgToken = Some("   "))
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
             validationResult mustBe Invalid(Chain(InvalidAuthToken))
 
           }
           "is valid (but with the wrong casing)" in {
 
-            val localMessage = validLocalMessage.copy(messageFormat = Some("APPLICATION/JSON"))
+            val localMessage = validLocalMessage.copy(omgMessageFormat = Some("APPLICATION/JSON"))
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
             validationResult mustBe Validated.Valid(
               ValidatedLocalMessage(
-                correlationId = validCorrelationId,
+                jmsMessageId = validCorrelationId,
                 messageText = validMessageText,
                 persistentMessageId = validPersistentMessageId,
-                serviceId = ServiceIdentifier.ECHO001,
-                applicationId = validApplicationId,
-                time = LocalDateTime.ofInstant(Instant.ofEpochMilli(validEpochTimeInMilliseconds), ZoneOffset.UTC),
-                messageFormat = "application/json",
+                omgMessageTypeId = validMessageTypeId,
+                omgApplicationId = validApplicationId,
+                jmsLocalDateTime =
+                  LocalDateTime.ofInstant(Instant.ofEpochMilli(validEpochTimeInMilliseconds), ZoneOffset.UTC),
+                omgMessageFormat = "application/json",
                 authToken = validAuthToken,
-                responseAddress = validResponseAddress
+                omgResponseAddress = validResponseAddress
               )
             )
 
           }
         }
-        "the response address" - {
+        "the reply address" - {
           "is missing" in {
 
-            val localMessage = validLocalMessage.copy(responseAddress = None)
+            val localMessage = validLocalMessage.copy(omgReplyAddress = None)
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
-            validationResult mustBe Invalid(Chain(MissingResponseAddress))
+            validationResult mustBe Invalid(Chain(MissingReplyAddress))
 
           }
           "is blank" in {
 
-            val localMessage = validLocalMessage.copy(responseAddress = Some(""))
+            val localMessage = validLocalMessage.copy(omgReplyAddress = Some(""))
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
-            validationResult mustBe Invalid(Chain(InvalidResponseAddress))
+            validationResult mustBe Invalid(Chain(InvalidReplyAddress))
 
           }
           "is invalid but contains the application ID" in {
 
-            val localMessage = validLocalMessage.copy(responseAddress = Some("ABCD002."))
+            val localMessage = validLocalMessage.copy(omgReplyAddress = Some("ABCD002."))
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
-            validationResult mustBe Invalid(Chain(InvalidResponseAddress))
+            validationResult mustBe Invalid(Chain(InvalidReplyAddress))
 
           }
           "is valid (pattern-wise) but doesn't contain the application ID" in {
 
-            val localMessage = validLocalMessage.copy(responseAddress = Some("XXXX002.a"))
+            val localMessage = validLocalMessage.copy(omgReplyAddress = Some("XXXX002.a"))
 
-            val validationResult = localMessage.validate()
+            val applicationId = localMessage.validateOmgApplicationId
+            val validationResult = localMessage.validateOtherHeaders(applicationId)
 
-            validationResult mustBe Invalid(Chain(InvalidResponseAddress))
+            validationResult mustBe Invalid(Chain(InvalidReplyAddress))
 
           }
         }
       }
       "multiple fields are missing or invalid" in {
 
-        val localMessage = validLocalMessage.copy(correlationId = Some(""), serviceId = None)
+        val localMessage = validLocalMessage.copy(jmsMessageId = Some(""), omgMessageTypeId = None)
 
-        val validationResult = localMessage.validate()
+        val applicationId = localMessage.validateOmgApplicationId
+        val validationResult = localMessage.validateOtherHeaders(applicationId)
 
-        validationResult mustBe Invalid(Chain(InvalidJMSMessageID, MissingServiceID))
+        validationResult mustBe Invalid(Chain(InvalidJMSMessageID, MissingMessageTypeID))
 
       }
     }

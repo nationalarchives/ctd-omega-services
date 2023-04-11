@@ -19,12 +19,29 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.business
+package uk.gov.nationalarchives.omega.api.common
 
-import uk.gov.nationalarchives.omega.api.common.ErrorCode
+import enumeratum.{ CirceEnum, Enum, EnumEntry }
 
-trait BusinessServiceError {
-  //  def reference: String // TODO(AR) this comes later and is used for the user to contact the helpdesk
-  def code: ErrorCode
-  def description: String
+sealed trait ErrorCode extends EnumEntry
+object ErrorCode extends Enum[ErrorCode] with CirceEnum[ErrorCode] {
+
+  val values: IndexedSeq[ErrorCode] = findValues
+
+  case object PROC001 extends ErrorCode
+  case object MISS001 extends ErrorCode
+  case object MISS002 extends ErrorCode
+  case object MISS003 extends ErrorCode
+  case object MISS004 extends ErrorCode
+  case object MISS005 extends ErrorCode
+  case object MISS006 extends ErrorCode
+  case object MISS007 extends ErrorCode
+  case object INVA001 extends ErrorCode
+  case object INVA002 extends ErrorCode
+  case object INVA003 extends ErrorCode
+  case object INVA005 extends ErrorCode
+  case object INVA006 extends ErrorCode
+  case object INVA007 extends ErrorCode
+  case object BLAN001 extends ErrorCode
+
 }

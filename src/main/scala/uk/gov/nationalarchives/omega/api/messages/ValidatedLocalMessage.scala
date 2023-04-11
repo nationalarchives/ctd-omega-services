@@ -19,7 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.services
+package uk.gov.nationalarchives.omega.api.messages
 
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
 
@@ -27,12 +27,12 @@ import java.time.LocalDateTime
 
 final case class ValidatedLocalMessage(
   persistentMessageId: Version1UUID,
-  serviceId: ServiceIdentifier,
+  omgMessageTypeId: String,
   messageText: String,
-  correlationId: String,
-  applicationId: String,
-  time: LocalDateTime,
-  messageFormat: String,
+  jmsMessageId: String,
+  omgApplicationId: String,
+  jmsLocalDateTime: LocalDateTime,
+  omgMessageFormat: String,
   authToken: String,
-  responseAddress: String
+  omgResponseAddress: String
 )

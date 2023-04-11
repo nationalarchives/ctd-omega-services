@@ -32,7 +32,8 @@ import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.connectors.JmsConnector
-import uk.gov.nationalarchives.omega.api.services.LocalMessage.createLocalMessage
+import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, LocalMessageStore }
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage.createLocalMessage
 import uk.gov.nationalarchives.omega.api.services.ServiceState.{ Started, Starting, Stopped, Stopping }
 
 import java.nio.file.{ Files, Paths }
@@ -63,9 +64,9 @@ class ApiService(val config: ServiceConfig) extends Stateful {
 
   private def doStart(): IO[ExitCode] = {
 
-    // TODO(AR) - one client, how to ack a consumer message after local persistence and then process it, and then produce a response
+    // TODO(AR) - one client, how to ack a consumer message after local persistence and then process it, and then produce a reply
     // TODO(AR) how to wire up queues and services using a config file or DSL?
-    // TODO(AR) request queue will typically be 1 (plus maybe a few more for expedited ops), response queues will be per external application
+    // TODO(AR) request queue will typically be 1 (plus maybe a few more for expedited ops), reply queues will be per external application
     val localQueue: IO[Queue[IO, LocalMessage]] = Queue.bounded[IO, LocalMessage](config.maxLocalQueueSize)
     val jmsConnector = new JmsConnector(config)
     getLocalMessageStore.flatMap {

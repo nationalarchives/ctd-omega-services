@@ -19,7 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.services
+package uk.gov.nationalarchives.omega.api.messages
 
 import cats.effect.IO
 import jms4s.jms.JmsMessage

@@ -22,8 +22,12 @@
 package uk.gov.nationalarchives.omega.api.business.echo
 
 import uk.gov.nationalarchives.omega.api.business.BusinessServiceError
+import uk.gov.nationalarchives.omega.api.common.ErrorCode
 
 sealed trait EchoServiceError extends BusinessServiceError
 case class EchoExplicitError(message: String) extends EchoServiceError {
-  override val code = "ERR-ECHO-001"
+
+  override val code = ErrorCode.PROC001
+
+  override def description: String = "There was an error"
 }

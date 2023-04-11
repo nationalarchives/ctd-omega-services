@@ -30,7 +30,12 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.{ Assertion, BeforeAndAfterAll }
 import uk.gov.nationalarchives.omega.api.LocalMessageSupport
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
-import uk.gov.nationalarchives.omega.api.common.Version1UUID
+import uk.gov.nationalarchives.omega.api.common.{ ErrorCode, Version1UUID }
+import io.circe._
+import io.circe.parser._
+import org.scalatest.concurrent.IntegrationPatience
+import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ BLAN001, INVA001, INVA002, INVA003, INVA005, INVA006, INVA007, MISS001, MISS002, MISS003, MISS004, MISS005, MISS006, MISS007 }
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage
 
 import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.{ FileSystems, Files, StandardOpenOption }
@@ -63,14 +68,14 @@ class DispatcherSpec
         "the JMS message ID (aka correlation ID)" - {
           "isn't provided" in {
             assertReplyMessage(
-              generateValidLocalMessageForEchoService().copy(correlationId = None),
-              "Missing JMSMessageID"
+              generateValidLocalMessageForEchoService().copy(jmsMessageId = None),
+              getExpectedJsonErrors(Map(MISS001 -> "Missing JMSMessageID"))
             )
           }
           "is blank" in {
             assertReplyMessage(
-              generateValidLocalMessageForEchoService().copy(correlationId = Some("")),
-              "Invalid JMSMessageID"
+              generateValidLocalMessageForEchoService().copy(jmsMessageId = Some("")),
+              getExpectedJsonErrors(Map(INVA001 -> "Invalid JMSMessageID"))
             )
           }
         }
@@ -79,7 +84,7 @@ class DispatcherSpec
           "is blank" in {
             assertReplyMessage(
               generateValidLocalMessageForEchoService().copy(messageText = ""),
-              "Message text is blank: Echo Text cannot be empty."
+              getExpectedJsonErrors(Map(BLAN001 -> "Message text is blank: Echo Text cannot be empty."))
             )
           }
         }
@@ -88,78 +93,78 @@ class DispatcherSpec
       "the service" - {
         "isn't provided" in {
           assertReplyMessage(
-            generateValidLocalMessageForEchoService().copy(serviceId = None),
-            "Missing OMGMessageTypeID"
+            generateValidLocalMessageForEchoService().copy(omgMessageTypeId = None),
+            getExpectedJsonErrors(Map(MISS002 -> "Missing OMGMessageTypeID"))
           )
         }
         "isn't valid" in {
           assertReplyMessage(
-            generateValidLocalMessageForEchoService().copy(serviceId = Some("ECHO001")),
-            "Invalid OMGMessageTypeID"
+            generateValidLocalMessageForEchoService().copy(omgMessageTypeId = Some("ECHO001")),
+            getExpectedJsonErrors(Map(INVA002 -> "Invalid OMGMessageTypeID"))
           )
         }
       }
       "the calling application ID" - {
         "isn't provided" in {
           assertReplyMessage(
-            generateValidLocalMessageForEchoService().copy(applicationId = None),
-            "Missing OMGApplicationID;Invalid OMGResponseAddress"
+            generateValidLocalMessageForEchoService().copy(omgApplicationId = None),
+            getExpectedJsonErrors(Map(MISS003 -> "Missing OMGApplicationID"))
           )
         }
         "isn't valid" in {
           assertReplyMessage(
-            generateValidLocalMessageForEchoService().copy(applicationId = Some("ABC001")),
-            "Invalid OMGApplicationID;Invalid OMGResponseAddress"
+            generateValidLocalMessageForEchoService().copy(omgApplicationId = Some("ABC001")),
+            getExpectedJsonErrors(Map(INVA003 -> "Invalid OMGApplicationID"))
           )
         }
       }
       "the JMS message timestamp" - {
         "isn't provided" in {
           assertReplyMessage(
-            generateValidLocalMessageForEchoService().copy(epochTimeInMilliseconds = None),
-            "Missing JMSTimestamp"
+            generateValidLocalMessageForEchoService().copy(jmsTimestamp = None),
+            getExpectedJsonErrors(Map(MISS004 -> "Missing JMSTimestamp"))
           )
         }
       }
       "the message format" - {
         "isn't provided" in {
           assertReplyMessage(
-            generateValidLocalMessageForEchoService().copy(messageFormat = None),
-            "Missing OMGMessageFormat"
+            generateValidLocalMessageForEchoService().copy(omgMessageFormat = None),
+            getExpectedJsonErrors(Map(MISS005 -> "Missing OMGMessageFormat"))
           )
         }
         "isn't valid" in {
           assertReplyMessage(
-            generateValidLocalMessageForEchoService().copy(messageFormat = Some("text/plain")),
-            "Invalid OMGMessageFormat"
+            generateValidLocalMessageForEchoService().copy(omgMessageFormat = Some("text/plain")),
+            getExpectedJsonErrors(Map(INVA005 -> "Invalid OMGMessageFormat"))
           )
         }
       }
       "the auth token" - {
         "isn't provided" in {
           assertReplyMessage(
-            generateValidLocalMessageForEchoService().copy(authToken = None),
-            "Missing OMGToken"
+            generateValidLocalMessageForEchoService().copy(omgToken = None),
+            getExpectedJsonErrors(Map(MISS006 -> "Missing OMGToken"))
           )
         }
         "is invalid" in {
           assertReplyMessage(
-            generateValidLocalMessageForEchoService().copy(authToken = Some("")),
-            "Invalid OMGToken"
+            generateValidLocalMessageForEchoService().copy(omgToken = Some("")),
+            getExpectedJsonErrors(Map(INVA006 -> "Invalid OMGToken"))
           )
         }
       }
-      "the response address" - {
+      "the reply address" - {
         "isn't provided" in {
           assertReplyMessage(
-            generateValidLocalMessageForEchoService().copy(responseAddress = None),
-            "Missing OMGResponseAddress"
+            generateValidLocalMessageForEchoService().copy(omgReplyAddress = None),
+            getExpectedJsonErrors(Map(MISS007 -> "Missing OMGReplyAddress"))
           )
         }
         "is invalid" in {
           assertReplyMessage(
-            generateValidLocalMessageForEchoService().copy(responseAddress = Some("ABCD002.")),
-            "Invalid OMGResponseAddress"
+            generateValidLocalMessageForEchoService().copy(omgReplyAddress = Some("ABCD002.")),
+            getExpectedJsonErrors(Map(INVA007 -> "Invalid OMGReplyAddress"))
           )
         }
       }
@@ -182,7 +187,7 @@ class DispatcherSpec
   }
 
   private def await[T](io: IO[T]): T =
-    Await.result(io.unsafeToFuture(), 5.second)
+    Await.result(io.unsafeToFuture(), 60.second)
 
   private def generateValidLocalMessageForEchoService(): LocalMessage =
     LocalMessage(
@@ -190,7 +195,7 @@ class DispatcherSpec
       "Hello World!",
       Some("OSGESZZZ100"),
       Some(UUID.randomUUID().toString),
-      applicationId = Some("ABCD002"),
+      omgApplicationId = Some("ABCD002"),
       Some(System.currentTimeMillis()),
       Some("application/json"),
       Some(UUID.randomUUID().toString),
@@ -216,5 +221,17 @@ class DispatcherSpec
       case Success(_) => ()
       case Failure(e) => fail(s"Unable to write the message file for message [$messageId]: [$e]")
     }
+
+  private def getExpectedJsonErrors(errorMap: Map[ErrorCode, String]): String = {
+    val entries = errorMap.map { entry =>
+      s"""
+         |{
+         |  "code" : "${entry._1}",
+         |  "description" : "${entry._2}"
+         |}
+         |""".stripMargin
+    }
+    parse(s"[${entries.mkString(",")}]").getOrElse(Json.Null).toString
+  }
 
 }

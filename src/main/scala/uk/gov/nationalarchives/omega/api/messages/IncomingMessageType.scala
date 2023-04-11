@@ -19,12 +19,20 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.business
+package uk.gov.nationalarchives.omega.api.messages
 
-import uk.gov.nationalarchives.omega.api.common.ErrorCode
+import enumeratum._
 
-trait BusinessServiceError {
-  //  def reference: String // TODO(AR) this comes later and is used for the user to contact the helpdesk
-  def code: ErrorCode
-  def description: String
+sealed trait IncomingMessageType extends EnumEntry
+object IncomingMessageType extends Enum[IncomingMessageType] {
+
+  val values: IndexedSeq[IncomingMessageType] = findValues
+
+  case object ECHO001 extends IncomingMessageType {
+    // This happens to follow the regex; otherwise, it's arbitrary.
+    override val entryName = "OSGESZZZ100"
+  }
+
+  // add more service identifiers here
+
 }

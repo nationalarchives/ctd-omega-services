@@ -24,7 +24,7 @@ package uk.gov.nationalarchives.omega.api
 import org.apache.commons.lang3.SerializationUtils
 import org.scalatest.matchers.{ MatchResult, Matcher }
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
-import uk.gov.nationalarchives.omega.api.services.{ LocalMessage, LocalMessageStore }
+import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, LocalMessageStore }
 
 import java.nio.file.{ FileSystems, Files, Path, Paths }
 import scala.reflect.io.Directory

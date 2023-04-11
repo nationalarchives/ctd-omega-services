@@ -158,7 +158,7 @@ class LocalMessageStoreSpec
     when(mockJmsMessage.getStringProperty(eqTo("OMGApplicationID"))).thenReturn(Some("ABCD002"))
     when(mockJmsMessage.getStringProperty(eqTo("OMGMessageFormat"))).thenReturn(Some("application/json"))
     when(mockJmsMessage.getStringProperty(eqTo("OMGToken"))).thenReturn(Some("application"))
-    when(mockJmsMessage.getStringProperty(eqTo("OMGResponseAddress"))).thenReturn(Some("ABCD002.a"))
+    when(mockJmsMessage.getStringProperty(eqTo("OMGReplyAddress"))).thenReturn(Some("ABCD002.a"))
     mockJmsMessage
   }
 

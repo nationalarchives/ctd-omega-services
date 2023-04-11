@@ -19,20 +19,16 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.services
+package uk.gov.nationalarchives.omega.api.common
 
-import enumeratum._
+import io.circe.{ Encoder, Json }
+import io.circe.syntax._
 
-sealed trait ServiceIdentifier extends EnumEntry
-object ServiceIdentifier extends Enum[ServiceIdentifier] {
-
-  val values: IndexedSeq[ServiceIdentifier] = findValues
-
-  case object ECHO001 extends ServiceIdentifier {
-    // This happens to follow the regex; otherwise, it's arbitrary.
-    override val entryName = "OSGESZZZ100"
-  }
-
-  // add more service identifiers here
-
+final case class JsonError(code: ErrorCode, description: String)
+object JsonError {
+  implicit val encodeJsonError: Encoder[JsonError] = (jsonError: JsonError) =>
+    Json.obj(
+      ("code", jsonError.code.asJson),
+      ("description", jsonError.description.asJson)
+    )
 }

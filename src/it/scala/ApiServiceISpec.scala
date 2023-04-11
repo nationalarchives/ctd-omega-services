@@ -15,6 +15,10 @@ import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.services.ApiService
+import io.circe._
+import io.circe.parser._
+import uk.gov.nationalarchives.omega.api.common.ErrorCode
+import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ BLAN001, INVA002, INVA003, INVA005, INVA006, INVA007, MISS002, MISS003, MISS005, MISS006, MISS007 }
 
 import javax.jms.{ Connection, MessageProducer, Session, TextMessage }
 import scala.concurrent.duration.DurationInt
@@ -118,17 +122,19 @@ class ApiServiceISpec
 
           sendMessage(f.session, f.producer, textMessageConfig)
 
-          assertReplyMessage("Missing OMGMessageTypeID")
+          assertReplyMessage(getExpectedJsonErrors(Map(MISS002 -> "Missing OMGMessageTypeID")))
 
         }
+
         "is unrecognised" in { f =>
           val textMessageConfig = generateValidMessageConfig().copy(messageTypeId = Some("OSGESXXX100"))
 
           sendMessage(f.session, f.producer, textMessageConfig)
 
-          assertReplyMessage("Invalid OMGMessageTypeID")
+          assertReplyMessage(getExpectedJsonErrors(Map(INVA002 -> "Invalid OMGMessageTypeID")))
 
         }
+
       }
       "the OMGApplicationID" - {
         "isn't provided" in { f =>
@@ -136,84 +142,89 @@ class ApiServiceISpec
 
           sendMessage(f.session, f.producer, textMessageConfig)
 
-          assertReplyMessage("Missing OMGApplicationID;Invalid OMGResponseAddress")
+          assertReplyMessage(
+            getExpectedJsonErrors(Map(MISS003 -> "Missing OMGApplicationID"))
+          )
 
         }
+
         "isn't valid" in { f =>
           val textMessageConfig = generateValidMessageConfig().copy(applicationId = Some("ABC001"))
 
           sendMessage(f.session, f.producer, textMessageConfig)
 
-          assertReplyMessage("Invalid OMGApplicationID;Invalid OMGResponseAddress")
-
+          assertReplyMessage(
+            getExpectedJsonErrors(Map(INVA003 -> "Invalid OMGApplicationID"))
+          )
         }
+
       }
-      "the OMGMessageFormat" - {
-        "isn't provided" in { f =>
-          val textMessageConfig = generateValidMessageConfig().copy(messageFormat = None)
+    }
+    "the OMGMessageFormat" - {
+      "isn't provided" in { f =>
+        val textMessageConfig = generateValidMessageConfig().copy(messageFormat = None)
 
-          sendMessage(f.session, f.producer, textMessageConfig)
+        sendMessage(f.session, f.producer, textMessageConfig)
 
-          assertReplyMessage("Missing OMGMessageFormat")
+        assertReplyMessage(getExpectedJsonErrors(Map(MISS005 -> "Missing OMGMessageFormat")))
 
-        }
-        "isn't valid" in { f =>
-          val textMessageConfig = generateValidMessageConfig().copy(messageFormat = Some("text/plain"))
-
-          sendMessage(f.session, f.producer, textMessageConfig)
-
-          assertReplyMessage("Invalid OMGMessageFormat")
-
-        }
       }
-      "the OMGToken" - {
-        "isn't provided" in { f =>
-          val textMessageConfig = generateValidMessageConfig().copy(token = None)
+      "isn't valid" in { f =>
+        val textMessageConfig = generateValidMessageConfig().copy(messageFormat = Some("text/plain"))
 
-          sendMessage(f.session, f.producer, textMessageConfig)
+        sendMessage(f.session, f.producer, textMessageConfig)
 
-          assertReplyMessage("Missing OMGToken")
+        assertReplyMessage(getExpectedJsonErrors(Map(INVA005 -> "Invalid OMGMessageFormat")))
 
-        }
-        "isn't valid" in { f =>
-          val textMessageConfig = generateValidMessageConfig().copy(token = Some(" "))
-
-          sendMessage(f.session, f.producer, textMessageConfig)
-
-          assertReplyMessage("Invalid OMGToken")
-
-        }
       }
-      "the OMGResponseAddress" - {
-        "isn't provided" in { f =>
-          val textMessageConfig = generateValidMessageConfig().copy(responseAddress = None)
+    }
+    "the OMGToken" - {
+      "isn't provided" in { f =>
+        val textMessageConfig = generateValidMessageConfig().copy(token = None)
 
-          sendMessage(f.session, f.producer, textMessageConfig)
+        sendMessage(f.session, f.producer, textMessageConfig)
 
-          assertReplyMessage("Missing OMGResponseAddress")
+        assertReplyMessage(getExpectedJsonErrors(Map(MISS006 -> "Missing OMGToken")))
 
-        }
-        "isn't valid" in { f =>
-          val textMessageConfig = generateValidMessageConfig().copy(responseAddress = Some("ABCD002."))
-
-          sendMessage(f.session, f.producer, textMessageConfig)
-
-          assertReplyMessage("Invalid OMGResponseAddress")
-
-        }
       }
-      "the message body is" - {
-        "empty (with padding)" in { f =>
-          val textMessageConfig = generateValidMessageConfig().copy(contents = " ")
+      "isn't valid" in { f =>
+        val textMessageConfig = generateValidMessageConfig().copy(token = Some(" "))
 
-          sendMessage(f.session, f.producer, textMessageConfig)
+        sendMessage(f.session, f.producer, textMessageConfig)
 
-          assertReplyMessage("Message text is blank: Echo Text cannot be empty.")
+        assertReplyMessage(getExpectedJsonErrors(Map(INVA006 -> "Invalid OMGToken")))
 
-        }
       }
     }
 
+    "the OMGReplyAddress" - {
+      "isn't provided" in { f =>
+        val textMessageConfig = generateValidMessageConfig().copy(replyAddress = None)
+
+        sendMessage(f.session, f.producer, textMessageConfig)
+
+        assertReplyMessage(getExpectedJsonErrors(Map(MISS007 -> "Missing OMGReplyAddress")))
+
+      }
+      "isn't valid" in { f =>
+        val textMessageConfig = generateValidMessageConfig().copy(replyAddress = Some("ABCD002."))
+
+        sendMessage(f.session, f.producer, textMessageConfig)
+
+        assertReplyMessage(getExpectedJsonErrors(Map(INVA007 -> "Invalid OMGReplyAddress")))
+
+      }
+    }
+    "the message body is" - {
+      "empty (with padding)" in { f =>
+        val textMessageConfig = generateValidMessageConfig().copy(contents = " ")
+
+        sendMessage(f.session, f.producer, textMessageConfig)
+
+        assertReplyMessage(getExpectedJsonErrors(Map(BLAN001 -> "Message text is blank: Echo Text cannot be empty.")))
+
+      }
+    }
   }
 
   private def generateValidMessageConfig(): TextMessageConfig =
@@ -223,7 +234,7 @@ class ApiServiceISpec
       applicationId = Some("ABCD002"),
       messageFormat = Some("application/json"),
       token = Some("AbCdEf123456"),
-      responseAddress = Some("ABCD002.a")
+      replyAddress = Some("ABCD002.a")
     )
 
   private def asTextMessage(session: Session, messageConfig: TextMessageConfig): TextMessage = {
@@ -240,8 +251,8 @@ class ApiServiceISpec
     messageConfig.token.foreach { token =>
       textMessage.setStringProperty("OMGToken", token)
     }
-    messageConfig.responseAddress.foreach { responseAddress =>
-      textMessage.setStringProperty("OMGResponseAddress", responseAddress)
+    messageConfig.replyAddress.foreach { replyAddress =>
+      textMessage.setStringProperty("OMGReplyAddress", replyAddress)
     }
     textMessage
   }
@@ -253,6 +264,18 @@ class ApiServiceISpec
         replyMessageText = Some(text)
       case Left(e) => fail(s"Unable to read message contents due to ${e.getMessage}")
     }
+  }
+
+  private def getExpectedJsonErrors(errorMap: Map[ErrorCode, String]): String = {
+    val entries = errorMap.map { entry =>
+      s"""
+         |{
+         |  "code" : "${entry._1}",
+         |  "description" : "${entry._2}"
+         |}
+         |""".stripMargin
+    }
+    parse(s"[${entries.mkString(",")}]").getOrElse(Json.Null).toString
   }
 
   private def assertReplyMessage(expectedContents: String): IO[Assertion] =
@@ -271,5 +294,5 @@ case class TextMessageConfig(
   applicationId: Option[String],
   messageFormat: Option[String],
   token: Option[String],
-  responseAddress: Option[String]
+  replyAddress: Option[String]
 )

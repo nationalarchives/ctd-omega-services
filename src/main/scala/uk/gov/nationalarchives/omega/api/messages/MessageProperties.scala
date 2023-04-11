@@ -19,12 +19,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.business
+package uk.gov.nationalarchives.omega.api.messages
 
-import uk.gov.nationalarchives.omega.api.common.ErrorCode
+object MessageProperties {
 
-trait BusinessServiceError {
-  //  def reference: String // TODO(AR) this comes later and is used for the user to contact the helpdesk
-  def code: ErrorCode
-  def description: String
+  val OMGApplicationID = "OMGApplicationID"
+  val OMGMessageTypeID = "OMGMessageTypeID"
+  val OMGMessageFormat = "OMGMessageFormat"
+
 }

@@ -21,15 +21,18 @@
 
 package uk.gov.nationalarchives.omega.api.services
 
+import cats.data.Validated.{ Invalid, Valid }
 import cats.data.{ Validated, ValidatedNec }
 import cats.effect.IO
 import cats.effect.std.Queue
+import cats.implicits.catsSyntaxValidatedIdBinCompat0
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.business._
 import uk.gov.nationalarchives.omega.api.business.echo.{ EchoRequest, EchoService }
-import uk.gov.nationalarchives.omega.api.common.Version1UUID
-import uk.gov.nationalarchives.omega.api.services.ServiceIdentifier.ECHO001
+import uk.gov.nationalarchives.omega.api.messages.IncomingMessageType.ECHO001
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage.ValidationResult
+import uk.gov.nationalarchives.omega.api.messages.{ IncomingMessageType, LocalMessage, LocalMessageStore, ValidatedLocalMessage }
 
 import scala.util.Try
 
@@ -42,37 +45,49 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
     for {
       localMessage <- q.take
       _ <- logger.info(s"Dispatcher # $dispatcherId, processing message id: ${localMessage.persistentMessageId}")
-      _ <- process(localMessage)
+      _ <- checkAndReply(localMessage)
       _ <- remove(localMessage)
     } yield ()
 
-  private def process(localMessage: LocalMessage): IO[Unit] =
-    localMessage.validate() match {
-      case Validated.Valid(validatedLocalMessage: ValidatedLocalMessage) =>
+  private def checkAndReply(localMessage: LocalMessage): IO[Unit] =
+    localMessage.validateOmgApplicationId match {
+      case Valid(applicationId) => checkOtherHeaders(applicationId.validNec, localMessage)
+      case Invalid(errors)      => localProducer.sendInvalidApplicationError(localMessage, errors)
+    }
+
+  private def checkOtherHeaders(applicationId: ValidationResult[String], localMessage: LocalMessage): IO[Unit] =
+    localMessage.validateOtherHeaders(applicationId) match {
+      case Valid(validatedLocalMessage) =>
         createAndValidateServiceRequest(validatedLocalMessage, localMessage)
-      case Validated.Invalid(errors) => localProducer.sendWhenGenericRequestIsInvalid(localMessage, errors)
+      case Invalid(errors) =>
+        localProducer.sendInvalidMessageFormatError(localMessage, errors)
     }
 
   private def createAndValidateServiceRequest(
     validatedLocalMessage: ValidatedLocalMessage,
     originalLocalMessage: LocalMessage
-  ): IO[Unit] = {
-    val (businessService: BusinessService, businessServiceRequest: BusinessServiceRequest) =
-      createServiceRequest(validatedLocalMessage)
-    validateBusinessServiceRequest(businessService, businessServiceRequest) match {
-      case Validated.Valid(validatedBusinessServiceRequest) =>
-        sendResultToJmsQueue(
-          execBusinessService(businessService, validatedBusinessServiceRequest),
-          validatedLocalMessage
-        )
-      case Validated.Invalid(errors) => localProducer.sendWhenBusinessRequestIsInvalid(originalLocalMessage, errors)
+  ): IO[Unit] =
+    IncomingMessageType.withNameOption(validatedLocalMessage.omgMessageTypeId) match {
+      case Some(messageType) =>
+        val (businessService: BusinessService, businessServiceRequest: BusinessServiceRequest) =
+          createServiceRequest(validatedLocalMessage, messageType)
+        validateBusinessServiceRequest(businessService, businessServiceRequest) match {
+          case Validated.Valid(validatedBusinessServiceRequest) =>
+            sendResultToJmsQueue(
+              execBusinessService(businessService, validatedBusinessServiceRequest),
+              validatedLocalMessage
+            )
+          case Validated.Invalid(errors) => localProducer.sendWhenBusinessRequestIsInvalid(originalLocalMessage, errors)
+        }
+      case None => localProducer.sendUnrecognisedMessageTypeError(originalLocalMessage)
     }
-  }
 
-  private def createServiceRequest(localMessage: ValidatedLocalMessage): (BusinessService, BusinessServiceRequest) =
-    localMessage.serviceId match {
-      case ECHO001 =>
-        (echoService, EchoRequest(localMessage.messageText))
+  private def createServiceRequest(
+    localMessage: ValidatedLocalMessage,
+    messageType: IncomingMessageType
+  ): (BusinessService, BusinessServiceRequest) =
+    messageType match {
+      case ECHO001 => (echoService, EchoRequest(localMessage.messageText))
       // add more service IDs here
     }
 
@@ -87,7 +102,6 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
       case _ =>
         Validated.valid(businessServiceRequest)
     }
-  // }
 
   private def execBusinessService[T <: BusinessServiceRequest, U <: BusinessServiceResponse, E <: BusinessServiceError](
     businessService: BusinessService,
@@ -98,22 +112,17 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
   private def sendResultToJmsQueue[U <: BusinessServiceResponse, E <: BusinessServiceError](
     businessResult: Either[E, U],
     requestMessage: ValidatedLocalMessage
-  ): IO[Unit] = {
-    val replyMessage: String =
-      businessResult match {
-        case Right(businessResult) =>
-          requestMessage.serviceId match {
-            case ECHO001 => businessResult.content
-            // TODO(RW) add more services here
-          }
-        case Left(serviceError) =>
-          s"""{status: "SERVICE-ERROR", reference: "$getCustomerErrorReference", code: "${serviceError.code}", message: "${serviceError.message}"}"""
+  ): IO[Unit] =
+    businessResult match {
+      case Right(businessResult) =>
+        localProducer.send(businessResult.content, requestMessage)
+      case Left(serviceError) =>
+        localProducer.sendProcessingError(serviceError, requestMessage)
 
-      }
-    localProducer.send(replyMessage, requestMessage)
-  } // TODO(RW) add recoverWith here to handle unexpected exceptions and send a message back to the client
+    }
+  // TODO(RW) add recoverWith here to handle unexpected exceptions and send a message back to the client
 
-  private def getCustomerErrorReference: Version1UUID = Version1UUID.generate()
+  // private def getCustomerErrorReference: Version1UUID = Version1UUID.generate()
 
   private def remove(localMessage: LocalMessage): IO[Try[Unit]] =
     localMessageStore.removeMessage(localMessage.persistentMessageId)
