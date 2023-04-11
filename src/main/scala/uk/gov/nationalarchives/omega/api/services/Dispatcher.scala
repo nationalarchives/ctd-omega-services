@@ -21,8 +21,7 @@
 
 package uk.gov.nationalarchives.omega.api.services
 
-import cats.data.Validated.{ Invalid, Valid }
-import cats.data.{ NonEmptyChain, Validated, ValidatedNec }
+import cats.data.{ Validated, ValidatedNec }
 import cats.effect.IO
 import cats.effect.std.Queue
 import org.typelevel.log4cats.slf4j.Slf4jFactory
@@ -32,7 +31,7 @@ import uk.gov.nationalarchives.omega.api.business.echo.{ EchoRequest, EchoServic
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
 import uk.gov.nationalarchives.omega.api.services.ServiceIdentifier.ECHO001
 
-import scala.util.{ Failure, Success, Try }
+import scala.util.Try
 
 class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessageStore, echoService: EchoService) {
 
@@ -50,18 +49,25 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
   private def process(localMessage: LocalMessage): IO[Unit] =
     localMessage.validate() match {
       case Validated.Valid(validatedLocalMessage: ValidatedLocalMessage) =>
-        val (businessService: BusinessService, businessServiceRequest: BusinessServiceRequest) =
-          createServiceRequest(validatedLocalMessage)
-        validateBusinessServiceRequest(businessService, businessServiceRequest) match {
-          case Validated.Valid(validatedBusinessServiceRequest) =>
-            sendResultToJmsQueue(
-              execBusinessService(businessService, validatedBusinessServiceRequest),
-              validatedLocalMessage
-            )
-          case Validated.Invalid(errors) => localProducer.sendWhenBusinessRequestIsInvalid(localMessage, errors)
-        }
+        createAndValidateServiceRequest(validatedLocalMessage, localMessage)
       case Validated.Invalid(errors) => localProducer.sendWhenGenericRequestIsInvalid(localMessage, errors)
     }
+
+  private def createAndValidateServiceRequest(
+    validatedLocalMessage: ValidatedLocalMessage,
+    originalLocalMessage: LocalMessage
+  ): IO[Unit] = {
+    val (businessService: BusinessService, businessServiceRequest: BusinessServiceRequest) =
+      createServiceRequest(validatedLocalMessage)
+    validateBusinessServiceRequest(businessService, businessServiceRequest) match {
+      case Validated.Valid(validatedBusinessServiceRequest) =>
+        sendResultToJmsQueue(
+          execBusinessService(businessService, validatedBusinessServiceRequest),
+          validatedLocalMessage
+        )
+      case Validated.Invalid(errors) => localProducer.sendWhenBusinessRequestIsInvalid(originalLocalMessage, errors)
+    }
+  }
 
   private def createServiceRequest(localMessage: ValidatedLocalMessage): (BusinessService, BusinessServiceRequest) =
     localMessage.serviceId match {
