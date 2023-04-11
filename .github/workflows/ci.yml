@@ -28,6 +28,12 @@ jobs:
         uses: coursier/cache-action@v6
       - name: Check Scala format
         run: sbt scalafmtCheck test:scalafmtCheck scalafmtSbtCheck
+      - uses: isbang/compose-action@v1.4.1
+        name: Start docker compose
+        with:
+          compose-file: "./docker-compose.yml"
+      - name: Run integration tests
+        run: sbt -v IntegrationTest/test
       - name: Run unit tests
         run: sbt test
       - name: Run Spectral
