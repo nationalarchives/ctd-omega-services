@@ -57,6 +57,8 @@ class LocalMessageStoreSpec
 
           messageId must haveFileContents("")
 
+          removeMessage(messageId)
+
         }
         "not empty" in {
 
@@ -65,6 +67,8 @@ class LocalMessageStoreSpec
           val messageId = persistMessage(mockJmsMessage)
 
           messageId must haveFileContents("Hello, world")
+
+          removeMessage(messageId)
 
         }
 
@@ -89,6 +93,7 @@ class LocalMessageStoreSpec
           val messageId = persistMessage(mockJmsMessage)
           val writtenMessage = readMessage(messageId)
 
+          removeMessage(messageId)
           writtenMessage.messageText mustEqual "Hello, world"
         }
       }
@@ -102,6 +107,7 @@ class LocalMessageStoreSpec
 
           // TODO: Messages are not being cleaned up before this test.
           readAllMessages().map(_.messageText).toSet mustEqual Set("Hello, world", "Hello, world, again")
+
         }
       }
     }
@@ -189,7 +195,7 @@ class LocalMessageStoreSpec
 
   private def readAllMessages(): List[LocalMessage] =
     await(localMessageStore.readAllFilesInDirectory())
-  
+
   private def removeMessage(messageId: Version1UUID): Unit =
     await(localMessageStore.removeMessage(messageId)) match {
       case Success(_) =>
