@@ -68,8 +68,20 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     // TODO(AR) request queue will typically be 1 (plus maybe a few more for expedited ops), response queues will be per external application
     val localQueue: IO[Queue[IO, LocalMessage]] = Queue.bounded[IO, LocalMessage](config.maxLocalQueueSize)
     val jmsConnector = new JmsConnector(config)
+    val tmpQueue: IO[Queue[IO, LocalMessage]] = Queue.bounded[IO, LocalMessage](config.maxLocalQueueSize)
     getLocalMessageStore.flatMap {
       case Right(localMessageStore) =>
+        // block to handle the existing messages
+        // create dispatcher instance
+        // use unsafe run sync to complete future
+        localMessageStore.readAllFilesInDirectory().map(_ => tmpQueue)
+        for {
+          jmsClient <- jmsConnector.createJmsClient()
+          producer  <- jmsConnector.createJmsProducer(jmsClient)(config.maxProducers)
+        } yield producer match {
+          case producer => startDispatcher(tmpQueue, producer, localMessageStore)
+        }
+
         val result = for {
           q <- localQueue
           res <-
@@ -112,6 +124,18 @@ class ApiService(val config: ServiceConfig) extends Stateful {
             .foreverM
       }
     )
+
+  private def startDispatcher(
+    queue: Queue[IO, LocalMessage],
+    producer: JmsProducer[IO],
+    localMessageStore: LocalMessageStore
+  ): IO[Unit] =
+    List.range(start = 0, end = config.maxDispatchers).parTraverse_ { i =>
+      logger.info(s"Starting dispatcher #${i + 1}") >>
+        generateDispatcher(producer, localMessageStore)
+          .run(i)(queue)
+          .foreverM
+    }
 
   private def generateDispatcher(jmsProducer: JmsProducer[IO], localMessageStore: LocalMessageStore) =
     new Dispatcher(

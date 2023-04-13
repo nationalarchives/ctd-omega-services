@@ -56,9 +56,14 @@ class LocalMessageStore(directoryPath: Path) {
     )
 
   def readAllFilesInDirectory(): IO[List[LocalMessage]] =
-    directoryPath.toFile().listFiles().toList.traverse { path =>
-      deserializeFile(path.toPath()).map(_.toOption)
-    }.map(_.flatten)
+    directoryPath
+      .toFile()
+      .listFiles()
+      .toList
+      .traverse { path =>
+        deserializeFile(path.toPath()).map(_.toOption)
+      }
+      .map(_.flatten)
 
   def removeMessage(messageId: Version1UUID): IO[Try[Unit]] =
     removeFile(generateFilePath(messageId))
