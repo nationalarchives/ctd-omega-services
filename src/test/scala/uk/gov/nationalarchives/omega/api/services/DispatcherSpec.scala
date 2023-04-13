@@ -33,7 +33,7 @@ import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
 
 import java.nio.charset.StandardCharsets.UTF_8
-import java.nio.file.{ FileSystems, Files, StandardOpenOption }
+import java.nio.file.{ FileSystems, Files, NoSuchFileException, StandardOpenOption }
 import java.util.UUID
 import scala.concurrent.duration.DurationInt
 import scala.util.{ Failure, Success, Try }
@@ -72,6 +72,26 @@ class DispatcherSpec
           queue.size.asserting(_ mustBe 0) *>
           IO.pure(messageId).asserting(_ must not(haveACorrespondingFile))
       }
+    }
+
+    "for message recovery then it should run recovery and delete all the local messages" in {
+      val mockJmsMessage1 = "Hello, world"
+      val messageId1 = Version1UUID.generate()
+      val mockJmsMessage2 = "Hello, world, again"
+      val messageId2 = Version1UUID.generate()
+
+      writeMessageFile(messageId1, mockJmsMessage1)
+      writeMessageFile(messageId2, mockJmsMessage2)
+
+      val localMessages = localMessageStore.readAllFilesInDirectory().unsafeRunSync()
+      dispatcher.runRecovery(0)(localMessages)
+      assertThrows[NoSuchFileException] {
+        localMessageStore.readMessage(messageId1)
+      }
+      assertThrows[NoSuchFileException] {
+        localMessageStore.readMessage(messageId2)
+      }
+
     }
 
     "for an unknown service it should reply with an error message" in {
