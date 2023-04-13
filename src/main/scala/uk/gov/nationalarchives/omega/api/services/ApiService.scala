@@ -23,21 +23,21 @@ package uk.gov.nationalarchives.omega.api.services
 
 import cats.effect.std.Queue
 import cats.effect.unsafe.implicits.global
-import cats.effect.{ExitCode, IO}
+import cats.effect.{ ExitCode, IO }
 import cats.implicits.catsSyntaxParallelTraverse_
 import jms4s.JmsAcknowledgerConsumer.AckAction
 import jms4s.config.QueueName
 import jms4s.jms.JmsMessage
-import jms4s.{JmsAcknowledgerConsumer, JmsProducer}
+import jms4s.{ JmsAcknowledgerConsumer, JmsProducer }
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.connectors.JmsConnector
 import uk.gov.nationalarchives.omega.api.services.LocalMessage.createLocalMessage
-import uk.gov.nationalarchives.omega.api.services.ServiceState.{Started, Starting, Stopped, Stopping}
+import uk.gov.nationalarchives.omega.api.services.ServiceState.{ Started, Starting, Stopped, Stopping }
 
-import java.nio.file.{Files, Paths}
-import scala.util.{Failure, Success}
+import java.nio.file.{ Files, Paths }
+import scala.util.{ Failure, Success }
 
 class ApiService(val config: ServiceConfig) extends Stateful {
 
@@ -74,7 +74,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
         // block to handle the existing messages
         // create dispatcher instance
         // use unsafe run sync to complete future
-        runRecovery(localMessageStore,jmsConnector).unsafeRunSync()
+        runRecovery(localMessageStore, jmsConnector).unsafeRunSync()
         val result = for {
           q <- localQueue
           res <-
@@ -92,10 +92,10 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     val savedFiles = localMessageStore.readAllFilesInDirectory().unsafeRunSync()
     for {
       jmsClient <- jmsConnector.createJmsClient()
-      producer <- jmsConnector.createJmsProducer(jmsClient)(config.maxProducers)
+      producer  <- jmsConnector.createJmsProducer(jmsClient)(config.maxProducers)
     } yield producer match {
       case producer =>
-        val dispatcher = generateDispatcher(producer,localMessageStore)
+        val dispatcher = generateDispatcher(producer, localMessageStore)
         dispatcher.runRecovery(0)(savedFiles)
     }
   }.useEval
