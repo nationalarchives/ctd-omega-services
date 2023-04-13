@@ -39,18 +39,33 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
   implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
+  import cats.syntax.all._
+
+  def runRecovery(dispatcherId: Int)(recoveredMessages: List[LocalMessage]): IO[Unit] =
+      IO {
+        recoveredMessages.foreach { recoveredMessage =>
+          processMessage(recoveredMessage, dispatcherId)
+        }
+      }
+
   def run(dispatcherId: Int)(q: Queue[IO, LocalMessage]): IO[Unit] =
     for {
       requestMessage          <- q.take
+      res <- processMessage(requestMessage,dispatcherId)
+    } yield res
+
+  private def processMessage(requestMessage: LocalMessage, dispatcherId: Int): IO[Unit] = {
+    for {
       validatedRequestMessage <- IO.pure(validateLocalMessage(requestMessage))
       _ <- logger.info(s"Dispatcher # $dispatcherId, processing message id: ${requestMessage.persistentMessageId}")
       (businessService, businessServiceRequest) <- IO.pure(createServiceRequest(validatedRequestMessage))
       validatedBusinessServiceRequest <-
         IO.pure(validateBusinessServiceRequest(businessService, businessServiceRequest))
       businessResult <- execBusinessService(businessService, validatedBusinessServiceRequest)
-      res            <- sendResultToJmsQueue(businessResult, validatedRequestMessage)
-      _              <- remove(requestMessage)
+      res <- sendResultToJmsQueue(businessResult, validatedRequestMessage)
+      _ <- remove(requestMessage)
     } yield res
+  }
 
   private def createServiceRequest(localMessage: ValidatedLocalMessage): (BusinessService, BusinessServiceRequest) =
     localMessage.serviceId match {
