@@ -25,6 +25,7 @@ import cats.data.Validated.{ Invalid, Valid }
 import cats.data.{ Validated, ValidatedNec }
 import cats.effect.IO
 import cats.effect.std.Queue
+import cats.effect.unsafe.implicits.global
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.business._
@@ -44,7 +45,7 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
   def runRecovery(dispatcherId: Int)(recoveredMessages: List[LocalMessage]): IO[Unit] =
     IO {
       recoveredMessages.foreach { recoveredMessage =>
-        processMessage(recoveredMessage, dispatcherId)
+        processMessage(recoveredMessage, dispatcherId).unsafeRunSync()
       }
     }
 

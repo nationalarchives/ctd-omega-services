@@ -25,21 +25,22 @@ import cats.effect.IO
 import cats.effect.std.Queue
 import cats.effect.testing.scalatest.AsyncIOSpec
 import jms4s.config.QueueName
-import org.scalatest.BeforeAndAfterAll
+import org.apache.commons.lang3.SerializationUtils
+import org.scalatest.{ BeforeAndAfterAll, TryValues }
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import uk.gov.nationalarchives.omega.api.LocalMessageSupport
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
 
-import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.{ FileSystems, Files, NoSuchFileException, StandardOpenOption }
 import java.util.UUID
 import scala.concurrent.duration.DurationInt
 import scala.util.{ Failure, Success, Try }
 
 class DispatcherSpec
-    extends AsyncFreeSpec with BeforeAndAfterAll with AsyncIOSpec with Matchers with LocalMessageSupport {
+    extends AsyncFreeSpec with BeforeAndAfterAll with AsyncIOSpec with Matchers with TryValues
+    with LocalMessageSupport {
 
   private val testQueue = QueueName("test-queue")
   private val testLocalProducer = new TestProducerImpl(testQueue)
@@ -57,7 +58,7 @@ class DispatcherSpec
       Queue.bounded[IO, LocalMessage](1).flatMap { queue =>
         val messageId = Version1UUID.generate()
         val contents = "Hello World!"
-        writeMessageFile(messageId, contents)
+        writeMessageFile(LocalMessage(messageId, contents, None, None))
         queue
           .offer(
             LocalMessage(
@@ -80,18 +81,14 @@ class DispatcherSpec
       val mockJmsMessage2 = "Hello, world, again"
       val messageId2 = Version1UUID.generate()
 
-      writeMessageFile(messageId1, mockJmsMessage1)
-      writeMessageFile(messageId2, mockJmsMessage2)
+      writeMessageFile(LocalMessage(messageId1, mockJmsMessage1, None, None))
+      writeMessageFile(LocalMessage(messageId2, mockJmsMessage2, None, None))
 
       val localMessages = localMessageStore.readAllFilesInDirectory().unsafeRunSync()
-      dispatcher.runRecovery(0)(localMessages)
-      assertThrows[NoSuchFileException] {
-        localMessageStore.readMessage(messageId1)
-      }
-      assertThrows[NoSuchFileException] {
-        localMessageStore.readMessage(messageId2)
-      }
 
+      dispatcher.runRecovery(0)(localMessages) *>
+        localMessageStore.readMessage(messageId1).asserting(_.failure.exception mustBe a[NoSuchFileException]) *>
+        localMessageStore.readMessage(messageId2).asserting(_.failure.exception mustBe a[NoSuchFileException])
     }
 
     "for an unknown service it should reply with an error message" in {
@@ -113,18 +110,18 @@ class DispatcherSpec
     *
     * As such, we need to simulate this.
     */
-  private def writeMessageFile(messageId: Version1UUID, messageText: String): Unit =
+  private def writeMessageFile(message: LocalMessage): Unit =
     Try(
       Files.write(
-        FileSystems.getDefault.getPath(generateExpectedFilepath(messageId)),
-        messageText.getBytes(UTF_8),
+        FileSystems.getDefault.getPath(generateExpectedFilepath(message.persistentMessageId)),
+        SerializationUtils.serialize(message),
         StandardOpenOption.CREATE_NEW,
         StandardOpenOption.WRITE,
         StandardOpenOption.DSYNC
       )
     ) match {
       case Success(_) => ()
-      case Failure(e) => fail(s"Unable to write the message file for message [$messageId]: [$e]")
+      case Failure(e) => fail(s"Unable to write the message file for message [${message.persistentMessageId}]: [$e]")
     }
 
 }
