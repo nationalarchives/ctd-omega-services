@@ -254,7 +254,7 @@ components:
     ProcessingError:
       messageId: OELIFERR007
       name: ProcessingError
-      title: ProcessingError
+      title: Processing Error
       description: >-
         The received message was valid, but the system was unable complete the
         processing of a message.
