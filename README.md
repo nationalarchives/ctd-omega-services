@@ -103,7 +103,7 @@ Run the application from the command line using the `ctd-omega-services` script 
 
 ## Installing and Running Spectral Linter
 
-Spectral is an API linting tool used for validating the Async API schema document against custom validation rules. It comes with built-in rulesets for asyncapi. 
+Spectral is an API linting tool used for validating the [Async API](https://www.asyncapi.com/docs) schema document against custom validation rules. It comes with built-in rulesets for asyncapi. 
 
 To install Spectral CLI run the following command:
 ```
