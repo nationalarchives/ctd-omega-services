@@ -1,525 +1,480 @@
-asyncapi: '2.5.0'
-
+asyncapi: 2.6.0
+id: http://service.catalogue.nationalarchives.gov.uk
 info:
   title: Project Omega Services API
-  version: '1.0.0'
-  description: |
-    The Project Omega API allows you to perform Query and CRUD operations against assets in The National Archives Catalogue.
+  version: 0.1.0
+  description: >
+    The Project Omega API allows you to perform Query and CRUD operations
+    against assets in The National Archives Catalogue.
+
     ### Architecture
-    The API and systems connected to it are using an asynchronous messaging architecture. This may seem unconventional for those who are used to working with HTTP APIs which typically provide a Request-Response approach, but it has many advantages when integrating systems:
+
+    This API and the systems connected to it are using an asynchronous messaging
+    architecture. This may seem unconventional for those who are used to working
+    with HTTP APIs which typically provide a synchronous Request-Reply
+    approach, but it has many advantages when integrating systems:
+
     * Decoupling of Systems
+
     * Quality of Service and Prioritisation
+
+    * Potential Separation of Reply and Error channels
+
     * Buffering during individual system outages
-    * Abilility to Backpressure
+
+    * Abilility to Backpressure and easily introduce "Circuit Breakers"
+
     ### Check out our latest features:
-    * Get an Edit Set 🪣
-    * Get a Record 📜
-    * Update a Record ✍️
+
+    * Get Legal Statuses (for an Asset) ⚖
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
   contact:
-    name: The National Archives
-    email: webmaster@nationalarchives.gov.uk
-    url: https://www.nationalarchives.gov.uk/
+    name: Adam Retter
+    email: adam@evolvedbinary.com
+    url: https://www.evolvedbinary.com
+
 
 servers:
-  mvbpeta:
+  mvp-beta:
     url: service.mvbpeta.catalogue.nationalarchives.gov.uk:61616
     protocol: jms
     protocolVersion: '1.1'
     description: MVP Beta - Message Broker
-    security:
-      - saslScram: []
+    # security:
+      # - saslScram: []
     tags:
-      - name: "env:mvpbeta"
-        description: "This environment is for the MVP Beta"
-
+      - name: env:mvp-beta
+        description: This environment is for the MVP Beta
 defaultContentType: application/json
+
 
 channels:
   request.general:
-    description: The queue on which general priority requests should be published.
+    description: The queue on which general priority requests should be published
     publish:
       operationId: request_general
-      description: Request messages
+      description: Request general channel publish operations
       message:
         oneOf:
-          - $ref: '#/components/messages/getEditSet'
-          - $ref: '#/components/messages/getEditSetRecord'
-          - $ref: '#/components/messages/updateEditSetRecord'
+          - $ref: '#/components/messages/ListAssetLegalStatusSummary'
+          - $ref: '#/components/messages/ListAssetLegalStatusFull'
 
-  omega.editorial.web.application.instance.1:
-    description: The queue on which response messages will be sent.
+  catalogue.editorial.web.application.instance.1:
+    description: >-
+      The queue on which reply messages will be sent to instance 1 of the
+      Catalogue Editorial Web Application
     subscribe:
-      operationId: omega_editorial_web_application_instance_1
-      description: Response messages
+      operationId: catalogue_editorial_web_application_instance_1
+      description: >-
+        Reply channel operations for instance 1 of the Catalogue Editorial Web
+        Application
       message:
         oneOf:
-          - $ref: '#/components/messages/editSet'
-          - $ref: '#/components/messages/editSetRecord'
-          - $ref: '#/components/messages/updateResponseStatus'
-          - $ref: '#/components/messages/errorResponse'
+          - $ref: '#/components/messages/AssetLegalStatusSummaryList'
+          - $ref: '#/components/messages/AssetLegalStatusFullList'
 
-  ### TODO(AR) request/response pattern
-  ### TODO(AR) - where to publish response messages
-  ### TODO(AR) - correlationId for responses (SQS+JMS)
-  ### TODO(AR) - auth on requests
-  ### TODO(AR) - error responses
-
-  ### TODO(AR) - is this language powerful enough to express real constraints and reuse - perhaps need XML Schema that is translated down into this?
 
 components:
+
+
+  # TODO(AR) the `securitySchemes` mechanism of AsyncAPI does not seem compatible with the idea of sending the Auth token in the `OMGToken` header. I need Investigate this to see if there is a better way of bringing these two things together, then we can add the security to the `publish` or `subscribe` operation in each channel rather than directly in the messages
+  # securitySchemes:
+  #   bearerAuthentication:
+  #     type: apiKey
+  #     in: user
+  #     description: Bearer Authentication Token should be provided in the OMGToken header.
+
+  # TODO(AR) TTL - some messages from some applications (e.g. ctd-omega-editorial-frontend) will be time sensitive, and if the TTL has expired by time we come to process the message we could just discard it. We should record these stats somewhere so that we can understand the SLA of processed vs. disacrded messages
+
+
   messages:
-    getEditSet:
-      messageId: OSGEES001
-      name: getEditSet
-      title: Get EditSet
-      summary: Retrieve an EditSet
-      # contentType: application/json
+
+    # NOTE: The `messageID` format is [(OS=Omega Service|OD=Omega Data|OE=Omega Error),(LI=List|GE=Get|UP=Update|CR=Create|RE=Remove),(S=Summary|F=Full)(3 letter mnemonic indicating resource)(3 digit increasing number)]
+
+
+  ## Service Request Messages
+
+    ListAssetLegalStatusSummary:
+      messageId: OSLISALS001
+      name: ListAssetLegalStatusSummary
+      title: List Asset Legal Status Summaries
+      description: List a summary description of each Legal Status applicable to any Asset
       traits:
-        - $ref: '#/components/messageTraits/serviceRequestHeaders'
-      payload:
-        $ref: "#/components/schemas/assetRequest"
-    getEditSetRecord:
-      messageId: OSGESR001
-      name: getEditSetRecord
-      title: Get EditSet Record
-      summary: Retrieve an EditSet Record
-      # contentType: application/json
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/OMGMessage'
+        - $ref: '#/components/messageTraits/OMGRequest'
+        - $ref: '#/components/messageTraits/OMGAuthentication'
+
+    ListAssetLegalStatusFull:
+      messageId: OSLIFALS001
+      name: ListAssetLegalStatusFull
+      title: List Asset Legal Status
+      description: List a full description of each Legal Status applicable to any Asset
       traits:
-        - $ref: '#/components/messageTraits/serviceRequestHeaders'
-      payload:
-        $ref: "#/components/schemas/assetRecordRequest"
-    updateEditSetRecord:
-      messageId: OSUESR001
-      name: updateEditSetRecord
-      title: Update EditSet Record
-      summary: Update an EditSet Record
-      # contentType: application/json
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/OMGMessage'
+        - $ref: '#/components/messageTraits/OMGRequest'
+        - $ref: '#/components/messageTraits/OMGAuthentication'
+
+  ## Data Messages (may also be used as Service Reply Messages)
+
+    AssetLegalStatusSummaryList:
+      messageId: ODLISALS001
+      name: AssetLegalStatusSummaryList
+      title: Asset Legal Status Summary List
+      description: >-
+        List of summary descriptions of each Legal Status applicable to any
+        Asset
       traits:
-        - $ref: '#/components/messageTraits/serviceRequestHeaders'
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/JMSReply'
+        - $ref: '#/components/messageTraits/OMGMessage'
       payload:
-        $ref: "#/components/schemas/assetRecordUpdateRequest"
+        type: array
+        items:
+          - $ref: '#/components/schemas/LegalStatusSummary'
 
-    editSet:
-      # messageId: ODEDSE001
-      name: editSet
-      title: EditSet
-      summary: An EditSet from the Omega Catalogue
+    AssetLegalStatusFullList:
+      messageId: ODLIFALS001
+      name: AssetLegalStatusFullList
+      title: Asset Legal Status Full List
+      description: List of full descriptions of each Legal Status applicable to any Asset
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/JMSReply'
+        - $ref: '#/components/messageTraits/OMGMessage'
       payload:
-        $ref: "#/components/schemas/editSet"
-      correlationId:
-        description: Default Correlation ID
-        location: $message.header#/correlationId
+        type: array
+        items:
+          $ref: '#/components/schemas/LegalStatusFull'
 
-    editSetRecord:
-      name: editSetRecord
-      title: EditSet Record
-      summary: An Edit Set Record in the Omega Catalogue
+  ## Error Messages
+    GeneralError:
+      messageId: OELIFERR001
+      name: GeneralError
+      title: General Error
+      description: >-
+        The lowest common denominator of error where it is unclear what went
+        wrong
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/JMSReply'
+        - $ref: '#/components/messageTraits/OMGMessage'
       payload:
-        $ref: "#/components/schemas/editSetRecord"
-      correlationId:
-        description: Default Correlation ID
-        location: $message.header#/correlationId
+        type: array
+        items:
+          $ref: '#/components/schemas/ErrorMessage'
 
-    updateResponseStatus:
-      name: updateResultStatus
-      title: Update Result Status
+    InvalidMessageFormatError:
+      messageId: OELIFERR002
+      name: InvalidMessageFormatError
+      title: Invalid Message Format Error
+      description: >-
+        An error occured during early stage parsing/recognition of the message.
+        This includes extracting and validating the presence of required message
+        headers and that they meet their excpected data types, extracting the
+        body as text and validating that its format (NOT content) is correct
+        (i.e. that it is valid JSON/XML/RDF/Binary etc.)
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/JMSReply'
+        - $ref: '#/components/messageTraits/OMGMessage'
       payload:
-        $ref: "#/components/schemas/updateResponseStatus"
-      correlationId:
-        description: Default Correlation ID
-        location: $message.header#/correlationId
+        type: array
+        items:
+          $ref: '#/components/schemas/ErrorMessage'
 
-    errorResponse:
-      name: errorResponse
-      title: Error response message
+    InvalidApplicationError:
+      messageId: OELIFERR003
+      name: InvalidApplicationError
+      title: Invalid Application Error
+      description: >-
+        The client application as identified by the `OMGApplicationID` header is
+        either invalid, not-recognised, or prohibited.
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/JMSReply'
+        - $ref: '#/components/messageTraits/OMGMessage'
       payload:
-        $ref: "#/components/schemas/errorMessage"
-      correlationId:
-        description: Default Correlation ID
-        location: $message.header#/correlationId
+        type: array
+        items:
+          $ref: '#/components/schemas/ErrorMessage'
 
-  schemas:
-    assetRequest:
-      type: object
-      properties:
-        oci:
-          $ref: "#/components/schemas/omegaCatalogueIdentifier"
-        timestamp:
-          $ref: "#/components/schemas/timestamp"
-    assetRecordRequest:
-      type: object
-      properties:
-        editSetOci:
-          $ref: "#/components/schemas/omegaCatalogueIdentifier"
-        recordOci:
-          $ref: "#/components/schemas/omegaCatalogueIdentifier"
-        timestamp:
-          $ref: "#/components/schemas/timestamp"
-    assetRecordUpdateRequest:
-      type: object
-      properties:
-        editSetOci:
-          $ref: "#/components/schemas/omegaCatalogueIdentifier"
-        recordOci:
-          $ref: "#/components/schemas/omegaCatalogueIdentifier"
-        timestamp:
-          $ref: "#/components/schemas/timestamp"
-        fields:
-          $ref: '#/components/schemas/updateEditSetRecord'
+    AuthenticationError:
+      messageId: OELIFERR004
+      name: AuthenticationError
+      title: Authentication Error
+      description: >-
+        Authentication failed, likely due to an invalid token being present in
+        the `OMGToken` header.
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/JMSReply'
+        - $ref: '#/components/messageTraits/OMGMessage'
+      payload:
+        type: array
+        items:
+          $ref: '#/components/schemas/ErrorMessage'
 
-    timestamp:
-      type: string
-      format: date-time
-      description: Client timestamp of when the request was sent.
+    UnrecognisedMessageTypeError:
+      messageId: OELIFERR005
+      name: UnrecognisedMessageTypeError
+      title: Unrecognised Message Type Error
+      description: >-
+        The value of `OMGMessageTypeID` header was not recognised and so the
+        message cannot be further dispatched for processing.
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/JMSReply'
+        - $ref: '#/components/messageTraits/OMGMessage'
+      payload:
+        type: array
+        items:
+          $ref: '#/components/schemas/ErrorMessage'
 
-    editSet:
-      type: object
-      properties:
-        oci:
-          $ref: "#/components/schemas/omegaCatalogueIdentifier"
-        version:
-          $ref: "#/components/schemas/assetVersion"
-        ownerId:
-          $ref: "#/components/schemas/assetOwnerId"
-        title:
-          $ref: "#/components/schemas/assetTitle"
-        description:
-          $ref: "#/components/schemas/assetDescription"
-        members:
-          type: array
-          items:
-            $ref: '#/components/schemas/editSetMember'
+    InvalidMessageError:
+      messageId: OELIFERR006
+      name: InvalidMessageError
+      title: Invalid Message Error
+      description: >-
+        The content of the body of the message has failed validation, e.g. a
+        parsed JSON message may be missing some required properties, or those
+        properties may have invalid values.
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/JMSReply'
+        - $ref: '#/components/messageTraits/OMGMessage'
+      payload:
+        type: array
+        items:
+          $ref: '#/components/schemas/ErrorMessage'
 
-    editSetMember:
-      type: object
-      description: The Summary of an EditSet member
-      properties:
-        oci:
-          $ref: "#/components/schemas/omegaCatalogueIdentifier"
-        version:
-          $ref: "#/components/schemas/assetVersion"
-        ownerId:
-          $ref: "#/components/schemas/assetOwnerId"
-        ccr:
-          $ref: "#/components/schemas/classicCatalogueReference"
-        title:
-          $ref: "#/components/schemas/assetTitle"
-        description:
-          $ref: "#/components/schemas/assetDescription"
-        coveringDates:
-          type: string
-          description: The covering dates of the EditSet Member
+    ProcessingError:
+      messageId: OELIFERR007
+      name: ProcessingError
+      title: Processing Error
+      description: >-
+        The received message was valid, but the system was unable complete the
+        processing of a message.
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/JMSReply'
+        - $ref: '#/components/messageTraits/OMGMessage'
+      payload:
+        type: array
+        items:
+          $ref: '#/components/schemas/ErrorMessage'
 
-    editSetRecord:
-      type: object
-      description: The properties of a record in an edit set.
-      required:
-        - ccr
-        - oci
-        - description
-        - coveringDates
-        - formerReferenceDepartment
-        - formerReferencePro
-        - startDate
-        - endDate
-        - legalStatusID
-        - placeOfDepositID
-        - note
-        - background
-        - custodialHistory
-        - relatedMaterial
-        - separatedMaterial
-        - creatorIDs
-
-      properties:
-        ccr:
-          $ref: "#/components/schemas/classicCatalogueReference"
-        oci:
-          $ref: "#/components/schemas/omegaCatalogueIdentifier"
-        description:
-          $ref: "#/components/schemas/description"
-        coveringDates:
-          $ref: "#/components/schemas/coveringDates"
-        formerReferenceDepartment:
-          $ref: "#/components/schemas/formerReferenceDepartment"
-        formerReferencePro:
-          $ref: "#/components/schemas/formerReferencePro"
-        startDate:
-          $ref: "#/components/schemas/startDate"
-        endDate:
-          $ref: "#/components/schemas/endDate"
-        legalStatusID:
-          $ref: "#/components/schemas/legalStatusID"
-        placeOfDepositID:
-          $ref: "#/components/schemas/placeOfDepositID"
-        note:
-          $ref: "#/components/schemas/note"
-        background:
-          $ref: "#/components/schemas/background"
-        custodialHistory:
-          $ref: "#/components/schemas/custodialHistory"
-        relatedMaterial:
-          type: array
-          items:
-            $ref: '#/components/schemas/relatedMaterial'
-        separatedMaterial:
-          type: array
-          items:
-            $ref: '#/components/schemas/separatedMaterial'
-        creatorIDs:
-          $ref: "#/components/schemas/creatorIDs"
-
-    updateEditSetRecord:
-      type: object
-      description: Properties to update for an edit set record
-      properties:
-        description:
-          $ref: "#/components/schemas/description"
-        coveringDates:
-          $ref: "#/components/schemas/coveringDates"
-        formerReferenceDepartment:
-          $ref: "#/components/schemas/formerReferenceDepartment"
-        formerReferencePro:
-          $ref: "#/components/schemas/formerReferencePro"
-        startDate:
-          $ref: "#/components/schemas/startDate"
-        endDate:
-          $ref: "#/components/schemas/endDate"
-        legalStatusID:
-          $ref: "#/components/schemas/legalStatusID"
-        placeOfDepositID:
-          $ref: "#/components/schemas/placeOfDepositID"
-        note:
-          $ref: "#/components/schemas/note"
-        background:
-          $ref: "#/components/schemas/background"
-        custodialHistory:
-          $ref: "#/components/schemas/custodialHistory"
-        relatedMaterial:
-          type: array
-          items:
-            $ref: '#/components/schemas/relatedMaterial'
-        separatedMaterial:
-          type: array
-          items:
-            $ref: '#/components/schemas/separatedMaterial'
-        creatorIDs:
-          $ref: "#/components/schemas/creatorIDs"
-
-    updateResponseStatus:
-      type: object
-      description: A respose for update status
-      required: [status]
-      properties:
-        status:
-          type: string
-          enum: ["success", "failed"]
-        message:
-          type: string
-
-    errorMessage:
-      type: object
-      description: An error message
-      properties:
-        errorCode:
-          type: integer
-          enum:
-            - 1001
-        errorText:
-          type: string
-          description:  a description of the error
-
-    omegaCatalogueIdentifier:
-      type: string
-      description: The Identifier of the asset in the Omega Catalogue.
-
-    classicCatalogueReference:
-      type: string
-      description: |
-        CCR stands for "Classic Catalogue Reference"
-        The unique identifier which links the catalogue to the records it
-        represents and allows the user to order and refer to them.
-
-    description:
-      type: string
-      description: |
-        A prose statement giving information about the form and subject
-        matter of the unit of description (often in terms of subjects,
-        people and places). Its purpose is to enable users to judge the
-        potential relevance of the record described and whether they want
-        to investigate the material further or not.
-
-        Note: Called "Scope and Content" in TNA-CS13
-
-    coveringDates:
-      type: string
-      description: |
-        Identifies and records the date(s) of creation of the records being
-        described.
-
-    formerReferenceDepartment:
-      type: string
-      description: |
-        Record creating department's original reference for the record(s)
-        being described.
-
-    formerReferencePro:
-      type: string
-      description: |
-        Former PRO/TNA identifier providing the link between the archival
-        material and the description that represents it.
-
-    startDate:
-      type: string
-      format: date
-      description: |
-        Used for querying. Can be derived from Covering Dates or entered
-        manually.
-
-    endDate:
-      type: string
-      format: date
-      description: |
-        Used for querying. Can be derived from Covering Dates or entered
-        manually.
-
-    legalStatusID:
-      type: string
-      description: |
-        A note as to whether the records being described are Public Records
-        or not, as defined by the 1958 Act and its schedules (and other
-        Public Records and FOI Acts).
-
-    placeOfDepositID:
-      type: string
-      description: |
-        The authority controlled name of the repository holding the records
-        being described. This is a declaration of legal responsibility
-        rather than a statement regarding the location of the physical
-        repository. Records held by The National Archives may be held off
-        site. 
-
-        Note: displays as 'Held by' in the live online catalogue.
-
-    note:
-      type: string
-      description: |
-        Specialised information that cannot be accommodated elsewhere
-        (Archivist's note).
-
-    background:
-      type: string
-      description: |
-        Used to provide an administrative history, biographical details, or
-        other historical statement about the corporate body/bodies or
-        individual(s) responsible for creating and accumulating the records
-        being described; placing the material in context and making it
-        better understood.
-
-    custodialHistory:
-      type: string
-      description: |
-        Describes where and how records have been held from creation to
-        transfer to PRO/TNA, giving those details of changes of ownership
-        and/or custody that may be significant in terms of authority,
-        integrity and interpretation.
-
-    relatedMaterial:
-      type: object
-      description: |
-        A note identifying material that has a direct and significant
-        connection to the unit of description. This will usually be in the form
-        of references to material that dealt with similar functions at an
-        earlier, or later, period to the unit of description. References to
-        significant material dealing with similar subjects may also be
-        appropriate. The fact that related material references are always
-        reciprocal should help the judgment of how significant a reference is.
-      properties:
-        linkHref:
-          type: string
-          description: The URL to this related material
-        linkText:
-          type: string
-          description: The text for the link for this related material
-        description:
-          type: string
-          description: The description for this related material
-
-    separatedMaterial:
-      type: object
-      description: |
-        Identifies materials (and their location) that are organically part of
-        the unit of description that have been physically separated or removed.
-      properties:
-        linkHref:
-          type: string
-          description: The URL to this separated material
-        linkText:
-          type: string
-          description: The text for the link for this separated material
-        description:
-          type: string
-          description: The description for this separated material
-
-    creatorIDs:
-      description: |
-        Identifies the organisation(s) or individual(s) responsible for
-        creating, accumulating or maintaining the records being described.
-        Incorporates the authority controlled corporate or personal name(s)
-        of the creator(s) of the records.
-      type: array
-      items:
-        type: string
-
-    assetVersion:
-      type: string
-      description: The version of an asset
-
-    assetOwnerId:
-      type: string
-      description: Identifier of the owner of the asset
-
-    assetTitle:
-      type: string
-      description: The title of an asset
-
-    assetDescription:
-      type: string
-      description: The description of an asset
-
-  securitySchemes:
-    saslScram:
-      type: scramSha256
-      description: Provide your username and password for SASL/SCRAM authentication
-
-  parameters:
-    streetlightId:
-      description: The ID of the streetlight.
-      schema:
-        type: string
 
   messageTraits:
-    serviceRequestHeaders:
+
+    JMSMessage:
+      name: JMS Message
+      description: Headers that are mostly common to all JMS Messages
       headers:
-        required: [osi]
+        required:
+          - JMSMessageID
+          - JMSTimestamp
+        properties:
+          JMSMessageID:
+            name: JMSMessageID
+            description: >-
+              A unique identifier for the message. We suggest using a short
+              application instance specific prefix followed by a unique
+              identifier. In the extreme case a UUID may be used. Depending on
+              your JMS provider, this may be set on your behalf.
+            type: string
+          JMSTimestamp:
+            name: JMSTimestamp
+            description: >-
+              The time the message was sent. The value of the timestamp is the
+              amount of time, measured in milliseconds, that has elapsed since
+              midnight, January 1, 1970, UTC. Depending on your JMS provider,
+              this may be set on your behalf.
+            type: number
+
+    JMSReply:
+      name: JMS Reply Message
+      description: JMS Message sent in reply to another JMS Message
+      headers:
+        # required: [JMSCorrelationID]  # NOTE(AR) this is intentionally left optional as it makes it possible to use data messages for both synchronous request-reply, and non-request-reply  asynchronous purposes.
+        properties:
+          JMSCorrelationID:
+            name: JMSCorrelationID
+            description: >-
+              An identifier that is used to associate this message as a reply to
+              a previous message. The value is the JMSMessageId of the previous
+              message.
+            type: string
+      correlationId:
+        description: >-
+          The value is the JMSMessageId of the previous message to which this
+          message is to be correlated.
+        location: $message.header#/JMSCorrelationID
+
+    OMGMessage:
+      name: Omega Message
+      description: Headers that are common to all Omega Messages
+      headers:
+        required:
+          - OMGApplicationID
+          - OMGMessageTypeID
+          - OMGMessageFormat
         type: object
         properties:
-          sid:
-            name: Omega Service ID
-            description: The Identifier of the Omega Service to place the Request against
+          OMGApplicationID:
+            name: OMGApplicationID
+            description: >-
+              Identifier of the application that is publishing the message to
+              Omega.
             type: string
-            pattern: OS[A-Z]{4}([1-9][0-9][0-9])(0[1-9][0-9])|(00[1-9])
+            pattern: '[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])'
+          OMGMessageTypeID:
+            name: OMGMessageTypeID
+            description: >-
+              The Identifier of the Omega Message Type. In AsyncAPI Schema this
+              is the `messageId` property of a message defined in the schema.
+            type: string
+            # NOTE: The `messageID` format is [(OS=Omega Service|OD=Omega Data|OE=Omega Error),(LI=List|GE=Get|UP=Update|CR=Create|RE=Remove),(S=Summary|F=Full)(3 letter mnemonic indicating resource)(3 digit increasing number)]
+            pattern: "(OS|OD|OE)(LI|GE|UP|CR|RE)(S|F)[A-Z]{3}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])"
+          OMGMessageFormat:
+            name: OMGMessageFormat
+            description: The Internet Media-Type indicating the format of the message body.
+            type: string
+            enum:
+              - application/json
 
-  # TODO(AR) what are these for?
-  operationTraits:
-    kafka:
-      bindings:
-        kafka:
-          clientId: my-app-id
+    OMGAuthentication:
+      name: Omega Authentication
+      description: Headers that are required for Authentication
+      headers:
+        required:
+          - OMGToken
+        type: object
+        properties:
+          OMGToken:
+            name: OMGToken
+            description: >-
+              An Authentication Token that is valid for the OMGApplicationID and
+              request.
+            type: string
+
+    OMGRequest:
+      name: Omega Request Message
+      description: Headers that are common to all Omega Request Messages
+      headers:
+        required:
+          - OMGReplyAddress
+        type: object
+        properties:
+          OMGReplyAddress:
+            name: OMGReplyAddress
+            description: >-
+              The address that the reply to this message should be sent to.
+              Typically this is the name of a Queue setup for a specific
+              application and must be prefixed with the OMGApplicationID of the
+              application that is making the request.
+            type: string
+            pattern: '[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])(\.[A-Za-z0-9])+'
+  schemas:
+
+    LegalStatusSummary:
+      type: object
+      required:
+        - identifier
+        - label
+      properties:
+        identifier:
+          $ref: '#/components/schemas/GeneralIdentifier'
+        label:
+          $ref: '#/components/schemas/GeneralLabel'
+
+    LegalStatusFull:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/LegalStatusSummary'
+        - $ref: '#/components/schemas/DescriptionOfConcept'
+
+    DescriptionOfConcept:
+      type: object
+      required:
+        - defintion
+      properties:
+        definition:
+          $ref: '#/components/schemas/GeneralDescription'
+        scope-note:
+          $ref: '#/components/schemas/GeneralDescription'
+        editorial-note:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeneralDatedDescription'
+
+    GeneralIdentifier:
+      type: string
+      name: Identifier
+      description: An identifier for any general Object, this is typically a URI
+
+    GeneralLabel:
+      type: string
+      name: Label
+      description: A label for any general Object
+
+    GeneralDescription:
+      type: string
+      name: Description
+      description: A description for any general Object
+
+    GeneralDatedDescription:
+      type: object
+      name: Dated Description
+      description: A dated description for any general Object
+      properties:
+        description:
+          $ref: '#/components/schemas/GeneralDescription'
+        date:
+          $ref: '#/components/schemas/ISODate'
+
+    ISODate:
+      type: string
+      format: date
+      name: ISO date
+      description: A date string formatted according to ISO 8601
+
+    ErrorMessage:
+      type: object
+      name: Error Message
+      description: An error message consisting of a code and a description.
+      properties:
+        code:
+          $ref: '#/components/schemas/ErrorCode'
+        description:
+          $ref: '#/components/schemas/ErrorDescription'
+
+    ErrorCode:
+      type: string
+      format: '[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])'
+      name: Error Code
+      description: >-
+        A code related to an error. These should be from a controlled list that
+        is published as user documentation.
+
+    ErrorDescription:
+      type: string
+      name: Error Description
+      description: The description of an error
+
+
+
 
 tags:
-  - name: "Project Omega"
-    description: "Project Omega"
+  - name: Project Omega
+    description: The new Pan-Archival Catalogue Systems for The National Archives
+    externalDocs:
+      url: >-
+        https://www.nationalarchives.gov.uk/about/our-role/plans-policies-performance-and-projects/our-plans/our-digital-cataloguing-practices/project-omega/
+  - name: The National Archives
+    description: The National Archives
+    externalDocs:
+      url: https://www.nationalarchives.gov.uk
