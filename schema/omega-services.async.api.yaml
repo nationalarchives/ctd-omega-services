@@ -11,14 +11,14 @@ info:
 
     This API and the systems connected to it are using an asynchronous messaging
     architecture. This may seem unconventional for those who are used to working
-    with HTTP APIs which typically provide a synchronous Request-Response
+    with HTTP APIs which typically provide a synchronous Request-Reply
     approach, but it has many advantages when integrating systems:
 
     * Decoupling of Systems
 
     * Quality of Service and Prioritisation
 
-    * Potential Separation of Response and Error channels
+    * Potential Separation of Reply and Error channels
 
     * Buffering during individual system outages
 
@@ -55,7 +55,7 @@ channels:
     description: The queue on which general priority requests should be published
     publish:
       operationId: request_general
-      description: Request messages channel
+      description: Request general channel publish operations
       message:
         oneOf:
           - $ref: '#/components/messages/ListAssetLegalStatusSummary'
@@ -63,12 +63,12 @@ channels:
 
   catalogue.editorial.web.application.instance.1:
     description: >-
-      The queue on which response messages will be sent to instance 1 of the
+      The queue on which reply messages will be sent to instance 1 of the
       Catalogue Editorial Web Application
     subscribe:
       operationId: catalogue_editorial_web_application_instance_1
       description: >-
-        Response messages channel for instance 1 of the Catalogue Editorial Web
+        Reply channel operations for instance 1 of the Catalogue Editorial Web
         Application
       message:
         oneOf:
@@ -118,7 +118,7 @@ components:
         - $ref: '#/components/messageTraits/OMGRequest'
         - $ref: '#/components/messageTraits/OMGAuthentication'
 
-  ## Data Messages (may also be used as Service Response Messages)
+  ## Data Messages (may also be used as Service Reply Messages)
 
     AssetLegalStatusSummaryList:
       messageId: ODLISALS001
@@ -129,7 +129,7 @@ components:
         Asset
       traits:
         - $ref: '#/components/messageTraits/JMSMessage'
-        - $ref: '#/components/messageTraits/JMSResponse'
+        - $ref: '#/components/messageTraits/JMSReply'
         - $ref: '#/components/messageTraits/OMGMessage'
       payload:
         type: array
@@ -143,7 +143,7 @@ components:
       description: List of full descriptions of each Legal Status applicable to any Asset
       traits:
         - $ref: '#/components/messageTraits/JMSMessage'
-        - $ref: '#/components/messageTraits/JMSResponse'
+        - $ref: '#/components/messageTraits/JMSReply'
         - $ref: '#/components/messageTraits/OMGMessage'
       payload:
         type: array
@@ -160,7 +160,7 @@ components:
         wrong
       traits:
         - $ref: '#/components/messageTraits/JMSMessage'
-        - $ref: '#/components/messageTraits/JMSResponse'
+        - $ref: '#/components/messageTraits/JMSReply'
         - $ref: '#/components/messageTraits/OMGMessage'
       payload:
         type: array
@@ -179,7 +179,7 @@ components:
         (i.e. that it is valid JSON/XML/RDF/Binary etc.)
       traits:
         - $ref: '#/components/messageTraits/JMSMessage'
-        - $ref: '#/components/messageTraits/JMSResponse'
+        - $ref: '#/components/messageTraits/JMSReply'
         - $ref: '#/components/messageTraits/OMGMessage'
       payload:
         type: array
@@ -195,7 +195,7 @@ components:
         either invalid, not-recognised, or prohibited.
       traits:
         - $ref: '#/components/messageTraits/JMSMessage'
-        - $ref: '#/components/messageTraits/JMSResponse'
+        - $ref: '#/components/messageTraits/JMSReply'
         - $ref: '#/components/messageTraits/OMGMessage'
       payload:
         type: array
@@ -211,7 +211,7 @@ components:
         the `OMGToken` header.
       traits:
         - $ref: '#/components/messageTraits/JMSMessage'
-        - $ref: '#/components/messageTraits/JMSResponse'
+        - $ref: '#/components/messageTraits/JMSReply'
         - $ref: '#/components/messageTraits/OMGMessage'
       payload:
         type: array
@@ -227,7 +227,7 @@ components:
         message cannot be further dispatched for processing.
       traits:
         - $ref: '#/components/messageTraits/JMSMessage'
-        - $ref: '#/components/messageTraits/JMSResponse'
+        - $ref: '#/components/messageTraits/JMSReply'
         - $ref: '#/components/messageTraits/OMGMessage'
       payload:
         type: array
@@ -244,7 +244,7 @@ components:
         properties may have invalid values.
       traits:
         - $ref: '#/components/messageTraits/JMSMessage'
-        - $ref: '#/components/messageTraits/JMSResponse'
+        - $ref: '#/components/messageTraits/JMSReply'
         - $ref: '#/components/messageTraits/OMGMessage'
       payload:
         type: array
@@ -260,7 +260,7 @@ components:
         processing of a message.
       traits:
         - $ref: '#/components/messageTraits/JMSMessage'
-        - $ref: '#/components/messageTraits/JMSResponse'
+        - $ref: '#/components/messageTraits/JMSReply'
         - $ref: '#/components/messageTraits/OMGMessage'
       payload:
         type: array
@@ -295,9 +295,9 @@ components:
               this may be set on your behalf.
             type: number
 
-    JMSResponse:
-      name: JMS Response Message
-      description: JMS Message sent in response to another JMS Message
+    JMSReply:
+      name: JMS Reply Message
+      description: JMS Message sent in reply to another JMS Message
       headers:
         # required: [JMSCorrelationID]  # NOTE(AR) this is intentionally left optional as it makes it possible to use data messages for both synchronous request-reply, and non-request-reply  asynchronous purposes.
         properties:
@@ -366,13 +366,13 @@ components:
       description: Headers that are common to all Omega Request Messages
       headers:
         required:
-          - OMGResponseAddress
+          - OMGReplyAddress
         type: object
         properties:
-          OMGResponseAddress:
-            name: OMGResponseAddress
+          OMGReplyAddress:
+            name: OMGReplyAddress
             description: >-
-              The address that the response to this message should be sent to.
+              The address that the reply to this message should be sent to.
               Typically this is the name of a Queue setup for a specific
               application and must be prefixed with the OMGApplicationID of the
               application that is making the request.
