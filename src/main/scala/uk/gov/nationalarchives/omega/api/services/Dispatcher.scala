@@ -57,6 +57,7 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
 
   private def processMessage(requestMessage: LocalMessage, dispatcherId: Int): IO[Unit] =
     for {
+      _                       <- logger.info(s"processing message: ${requestMessage.messageText}")
       validatedRequestMessage <- IO.pure(validateLocalMessage(requestMessage))
       _ <- logger.info(s"Dispatcher # $dispatcherId, processing message id: ${requestMessage.persistentMessageId}")
       (businessService, businessServiceRequest) <- IO.pure(createServiceRequest(validatedRequestMessage))
@@ -86,7 +87,6 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
       case _ =>
         Validated.valid(businessServiceRequest)
     }
-  // }
 
   private def execBusinessService[T <: BusinessServiceRequest, U <: BusinessServiceResponse, E <: BusinessServiceError](
     businessService: BusinessService,
