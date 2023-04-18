@@ -49,7 +49,7 @@ class LocalMessageStore(directoryPath: Path) {
         Failure[Version1UUID](e)
     }
   }
-  
+
   def readMessage(messageId: Version1UUID): IO[Try[LocalMessage]] =
     deserializeFile(
       generateFilePath(messageId)
