@@ -103,9 +103,9 @@ class MessageRecoveryISpec
     "runs the recovery service and removes the message from the message store" in {
       val messageStoreFolder = Paths.get(apiService.get.config.tempMessageDir)
       val localMessageStore = new LocalMessageStore(messageStoreFolder)
-      localMessageStore.readMessage(messageId).asserting(_.failure.exception mustBe a[NoSuchFileException])
       eventually {
-        IO.pure(replyMessageText).asserting(_ mustBe Some("The Echo Service says: Test World!"))
+        localMessageStore.readMessage(messageId).asserting(_.failure.exception mustBe a[NoSuchFileException]) *>
+          IO.pure(replyMessageText).asserting(_ mustBe Some("The Echo Service says: Test World!"))
       }
     }
 
