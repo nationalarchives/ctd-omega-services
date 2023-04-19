@@ -89,7 +89,9 @@ class ApiService(val config: ServiceConfig) extends Stateful {
   }
 
   private def runRecovery(localMessageStore: LocalMessageStore, jmsConnector: JmsConnector): IO[Unit] = {
+    println(s"Checking for files in ${localMessageStore.directoryPath}")
     val savedFiles = localMessageStore.readAllFilesInDirectory().unsafeRunSync()
+    println(s"Found ${savedFiles.length} for recovery")
     for {
       jmsClient <- jmsConnector.createJmsClient()
       producer  <- jmsConnector.createJmsProducer(jmsClient)(config.maxProducers)
@@ -98,7 +100,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
         val dispatcher = generateDispatcher(producer, localMessageStore)
         dispatcher.runRecovery(0)(savedFiles)
     }
-  }.useEval
+  } //.useEval
 
   private def getLocalMessageStore: IO[Either[ExitCode, LocalMessageStore]] = IO {
     val messageStoreFolder = Paths.get(config.tempMessageDir)
@@ -130,12 +132,14 @@ class ApiService(val config: ServiceConfig) extends Stateful {
       }
     )
 
-  private def generateDispatcher(jmsProducer: JmsProducer[IO], localMessageStore: LocalMessageStore) =
+  private def generateDispatcher(jmsProducer: JmsProducer[IO], localMessageStore: LocalMessageStore) = {
+    println("Creating dispatcher..")
     new Dispatcher(
       new LocalProducerImpl(jmsProducer, QueueName(config.replyQueue)),
       localMessageStore,
       new EchoService()
     )
+  }
 
   private def doStop(): IO[ExitCode] =
     // TODO(RW) this is where we will need to close any external connections, for example to OpenSearch

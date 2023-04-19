@@ -41,12 +41,14 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
 
   import cats.syntax.all._
 
-  def runRecovery(dispatcherId: Int)(recoveredMessages: List[LocalMessage]): IO[Unit] =
+  def runRecovery(dispatcherId: Int)(recoveredMessages: List[LocalMessage]): IO[Unit] = {
+    println("Starting recovery...")
     IO {
       recoveredMessages.foreach { recoveredMessage =>
         processMessage(recoveredMessage, dispatcherId).unsafeRunSync()
       }
     }
+  }
 
   def run(dispatcherId: Int)(q: Queue[IO, LocalMessage]): IO[Unit] =
     for {
@@ -54,13 +56,15 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
       res            <- processMessage(requestMessage, dispatcherId)
     } yield ()
 
-  private def processMessage(localMessage: LocalMessage, dispatcherId: Int): IO[Unit] =
+  private def processMessage(localMessage: LocalMessage, dispatcherId: Int): IO[Unit] = {
+    println(s"Processing message ${localMessage.persistentMessageId}")
     for {
       _ <- logger.info(s"processing message: ${localMessage.messageText}")
       _ <- logger.info(s"Dispatcher # $dispatcherId, processing message id: ${localMessage.persistentMessageId}")
       _ <- process(localMessage)
       _ <- remove(localMessage)
     } yield ()
+  }
 
   private def process(localMessage: LocalMessage): IO[Unit] =
     localMessage.validate() match {

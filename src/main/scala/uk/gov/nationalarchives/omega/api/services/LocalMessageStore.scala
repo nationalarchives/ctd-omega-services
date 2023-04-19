@@ -32,7 +32,7 @@ import uk.gov.nationalarchives.omega.api.common.Version1UUID
 import java.nio.file.{ Files, Path, StandardOpenOption }
 import scala.util.{ Failure, Success, Try }
 
-class LocalMessageStore(directoryPath: Path) {
+class LocalMessageStore(val directoryPath: Path) {
 
   implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
