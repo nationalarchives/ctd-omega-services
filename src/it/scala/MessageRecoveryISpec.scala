@@ -65,7 +65,7 @@ class MessageRecoveryISpec
 
   override protected def beforeAll(): Unit = {
     // load messages to disk
-    val path = writeMessageFile(new LocalMessage(messageId, "Test World!", None, None))
+    val path = writeMessageFile(new LocalMessage(messageId, "Test World!", None, None, None, None, None, None, None))
     tempMsgDir = Some(path.getParent.toString)
     apiService = Some(
       new ApiService(
