@@ -56,12 +56,11 @@ class LocalMessageStore(directoryPath: Path) {
     )
 
   def readAllFilesInDirectory(): IO[List[LocalMessage]] =
-    directoryPath
-      .toFile()
+    directoryPath.toFile
       .listFiles()
       .toList
       .traverse { path =>
-        deserializeFile(path.toPath()).map(_.toOption)
+        deserializeFile(path.toPath).map(_.toOption)
       }
       .map(_.flatten)
 
@@ -108,6 +107,6 @@ object LocalMessageStore {
     Files.exists(path) && Files.isDirectory(path)
 
   def checkDirectoryNonEmpty(path: Path): Boolean =
-    checkDirectoryExists(path) && Files.list(path).findAny().isPresent()
+    checkDirectoryExists(path) && Files.list(path).findAny().isPresent
 
 }
