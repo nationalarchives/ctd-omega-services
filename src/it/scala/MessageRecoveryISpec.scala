@@ -43,7 +43,6 @@ class MessageRecoveryISpec
   private var messageId: Option[Version1UUID] = None
 
   var replyMessageText: Option[String] = None
-  var replyMessageId: Option[String] = None
   var tempMsgDir: Option[String] = None
   var apiService: Option[ApiService] = None
 
@@ -56,14 +55,12 @@ class MessageRecoveryISpec
     )
   )
 
-  private def readTextMessage(jmsMessage: JmsMessage): IO[Unit] = {
-    replyMessageId = jmsMessage.getJMSCorrelationId
+  private def readTextMessage(jmsMessage: JmsMessage): IO[Unit] =
     jmsMessage.asTextF[IO].attempt.map {
       case Right(text) =>
         replyMessageText = Some(text)
       case Left(e) => fail(s"Unable to read message contents due to ${e.getMessage}")
     }
-  }
 
   override protected def beforeAll(): Unit = {
     // load messages to disk
@@ -107,7 +104,7 @@ class MessageRecoveryISpec
   "The Message Recovery API" - {
 
     "runs the recovery service and removes the message from the message store" in {
-      val messageStoreFolder = Paths.get(apiService.get.config.tempMessageDir)
+      val messageStoreFolder = Paths.get(tempMsgDir.get)
       val localMessageStore = new LocalMessageStore(messageStoreFolder)
       eventually {
         localMessageStore.readMessage(messageId.get).asserting(_.failure.exception mustBe a[NoSuchFileException]) *>
