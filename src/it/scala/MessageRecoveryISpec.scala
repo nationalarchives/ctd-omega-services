@@ -20,6 +20,7 @@ import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.services.{ ApiService, LocalMessage, LocalMessageStore }
 
 import java.nio.file.{ FileSystems, Files, NoSuchFileException, Path, Paths, StandardOpenOption }
+import java.util.UUID
 import scala.concurrent.duration.DurationInt
 import scala.util.{ Failure, Success, Try }
 
@@ -37,8 +38,9 @@ class MessageRecoveryISpec
   private val replyQueueName = "omega-editorial-web-application-instance-1"
   private val sqsHostName = "localhost"
   private val sqsPort = 9324
+  private val testMessage = "Testing message recovery!"
 
-  private val messageId = Version1UUID.generate()
+  private var messageId: Option[Version1UUID] = None
 
   var replyMessageText: Option[String] = None
   var replyMessageId: Option[String] = None
@@ -65,7 +67,11 @@ class MessageRecoveryISpec
 
   override protected def beforeAll(): Unit = {
     // load messages to disk
-    val path = writeMessageFile(new LocalMessage(messageId, "Test World!", None, None, None, None, None, None, None))
+    // create a valid message
+    val tmpMessage = generateValidLocalMessageForEchoService().copy(messageText = testMessage)
+    // write the message to file in the temporary message store
+    val path = writeMessageFile(tmpMessage)
+    messageId = Some(tmpMessage.persistentMessageId)
     tempMsgDir = Some(path.getParent.toString)
     apiService = Some(
       new ApiService(
@@ -104,8 +110,8 @@ class MessageRecoveryISpec
       val messageStoreFolder = Paths.get(apiService.get.config.tempMessageDir)
       val localMessageStore = new LocalMessageStore(messageStoreFolder)
       eventually {
-        localMessageStore.readMessage(messageId).asserting(_.failure.exception mustBe a[NoSuchFileException]) *>
-          IO.pure(replyMessageText).asserting(_ mustBe Some("The Echo Service says: Test World!"))
+        localMessageStore.readMessage(messageId.get).asserting(_.failure.exception mustBe a[NoSuchFileException]) *>
+          IO.pure(replyMessageText).asserting(_ mustBe Some(s"The Echo Service says: $testMessage"))
       }
     }
 
@@ -127,5 +133,18 @@ class MessageRecoveryISpec
 
   def generateExpectedFilepath(messageId: Version1UUID): String =
     Files.createTempDirectory("temp").toAbsolutePath.toString + "/" + messageId + ".msg"
+
+  private def generateValidLocalMessageForEchoService(): LocalMessage =
+    LocalMessage(
+      Version1UUID.generate(),
+      "Hello World!",
+      Some("OSGESZZZ100"),
+      Some(UUID.randomUUID().toString),
+      applicationId = Some("ABCD002"),
+      Some(System.currentTimeMillis()),
+      Some("application/json"),
+      Some(UUID.randomUUID().toString),
+      Some("ABCD002.a")
+    )
 
 }
