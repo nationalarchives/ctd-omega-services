@@ -21,7 +21,6 @@
 
 package uk.gov.nationalarchives.omega.api.services
 
-import cats.data.Validated.{ Invalid, Valid }
 import cats.data.{ Validated, ValidatedNec }
 import cats.effect.IO
 import cats.effect.std.Queue
@@ -53,20 +52,38 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
     for {
       requestMessage <- q.take
       res            <- processMessage(requestMessage, dispatcherId)
-    } yield res
+    } yield ()
 
-  private def processMessage(requestMessage: LocalMessage, dispatcherId: Int): IO[Unit] =
+  private def processMessage(localMessage: LocalMessage, dispatcherId: Int): IO[Unit] =
     for {
-      _                       <- logger.info(s"processing message: ${requestMessage.messageText}")
-      validatedRequestMessage <- IO.pure(validateLocalMessage(requestMessage))
-      _ <- logger.info(s"Dispatcher # $dispatcherId, processing message id: ${requestMessage.persistentMessageId}")
-      (businessService, businessServiceRequest) <- IO.pure(createServiceRequest(validatedRequestMessage))
-      validatedBusinessServiceRequest <-
-        IO.pure(validateBusinessServiceRequest(businessService, businessServiceRequest))
-      businessResult <- execBusinessService(businessService, validatedBusinessServiceRequest)
-      res            <- sendResultToJmsQueue(businessResult, validatedRequestMessage)
-      _              <- remove(requestMessage)
-    } yield res
+      _                       <- logger.info(s"processing message: ${localMessage.messageText}")
+      _ <- logger.info(s"Dispatcher # $dispatcherId, processing message id: ${localMessage.persistentMessageId}")
+      _ <- process(localMessage)
+      _ <- remove(localMessage)
+    } yield ()
+
+  private def process(localMessage: LocalMessage): IO[Unit] =
+    localMessage.validate() match {
+      case Validated.Valid(validatedLocalMessage: ValidatedLocalMessage) =>
+        createAndValidateServiceRequest(validatedLocalMessage, localMessage)
+      case Validated.Invalid(errors) => localProducer.sendWhenGenericRequestIsInvalid(localMessage, errors)
+    }
+
+  private def createAndValidateServiceRequest(
+    validatedLocalMessage: ValidatedLocalMessage,
+    originalLocalMessage: LocalMessage
+  ): IO[Unit] = {
+    val (businessService: BusinessService, businessServiceRequest: BusinessServiceRequest) =
+      createServiceRequest(validatedLocalMessage)
+    validateBusinessServiceRequest(businessService, businessServiceRequest) match {
+      case Validated.Valid(validatedBusinessServiceRequest) =>
+        sendResultToJmsQueue(
+          execBusinessService(businessService, validatedBusinessServiceRequest),
+          validatedLocalMessage
+        )
+      case Validated.Invalid(errors) => localProducer.sendWhenBusinessRequestIsInvalid(originalLocalMessage, errors)
+    }
+  }
 
   private def createServiceRequest(localMessage: ValidatedLocalMessage): (BusinessService, BusinessServiceRequest) =
     localMessage.serviceId match {
@@ -75,14 +92,13 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
       // add more service IDs here
     }
 
-  private def validateLocalMessage(localMessage: LocalMessage): ValidatedLocalMessage = localMessage.validate
-
+  // TODO: This is where we do the second and final stage of validation.
   private def validateBusinessServiceRequest(
     businessService: BusinessService,
     businessServiceRequest: BusinessServiceRequest
-  ): ValidatedNec[RequestValidationError, BusinessServiceRequest] =
+  ): ValidatedNec[BusinessRequestValidationError, BusinessServiceRequest] =
     businessService match {
-      case value: RequestValidation =>
+      case value: BusinessRequestValidation =>
         value.validateRequest(businessServiceRequest)
       case _ =>
         Validated.valid(businessServiceRequest)
@@ -90,28 +106,24 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
 
   private def execBusinessService[T <: BusinessServiceRequest, U <: BusinessServiceResponse, E <: BusinessServiceError](
     businessService: BusinessService,
-    validatedBusinessServiceRequest: ValidatedNec[RequestValidationError, T]
-  ): IO[ValidatedNec[RequestValidationError, Either[BusinessServiceError, BusinessServiceResponse]]] =
-    IO.delay(validatedBusinessServiceRequest.map(businessService.process))
+    validatedBusinessServiceRequest: T
+  ): Either[BusinessServiceError, BusinessServiceResponse] =
+    businessService.process(validatedBusinessServiceRequest)
 
   private def sendResultToJmsQueue[U <: BusinessServiceResponse, E <: BusinessServiceError](
-    businessResult: ValidatedNec[RequestValidationError, Either[E, U]],
+    businessResult: Either[E, U],
     requestMessage: ValidatedLocalMessage
   ): IO[Unit] = {
     val replyMessage: String =
       businessResult match {
-        case Valid(Right(businessResult)) =>
+        case Right(businessResult) =>
           requestMessage.serviceId match {
             case ECHO001 => businessResult.content
             // TODO(RW) add more services here
           }
-
-        case Valid(Left(serviceError)) =>
+        case Left(serviceError) =>
           s"""{status: "SERVICE-ERROR", reference: "$getCustomerErrorReference", code: "${serviceError.code}", message: "${serviceError.message}"}"""
 
-        case Invalid(requestValidationFailures) =>
-          val text = requestValidationFailures.reduceLeftTo(_.message)((acc, cur) => acc + cur.message)
-          s"""{status: "INVALID-REQUEST", reference: "$getCustomerErrorReference", message: "$text"}"""
       }
     localProducer.send(replyMessage, requestMessage)
   } // TODO(RW) add recoverWith here to handle unexpected exceptions and send a message back to the client

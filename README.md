@@ -100,3 +100,17 @@ uk.gov.nationalarchives.ctd-omega-service.jar
 The `bin` folder contains the scripts to start the application from the command line and the `lib` folder contains the application jar file and other dependencies.
 
 Run the application from the command line using the `ctd-omega-services` script or `ctd-omega-service.bat` Windows batch file.
+
+## Installing and Running Spectral Linter
+
+Spectral is an API linting tool used for validating the [Async API](https://www.asyncapi.com/docs) schema document against custom validation rules. It comes with built-in rulesets for asyncapi. 
+
+To install Spectral CLI run the following command:
+```
+npm install -g @stoplight/spectral-cli
+```
+ 
+Using the ruleset defined in `.spectral.yaml`, run Spectral via the command line as below:
+```
+spectral lint ./schema/omega-services.async.api.yaml -r ./schema/validate-omega-services.spectral.yaml --verbose
+```

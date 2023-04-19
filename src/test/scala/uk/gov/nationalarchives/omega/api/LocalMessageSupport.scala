@@ -38,12 +38,14 @@ trait LocalMessageSupport {
   def generateExpectedFilepath(messageId: Version1UUID): String =
     tempDirectoryPath.toAbsolutePath.toString + "/" + messageId + ".msg"
 
-  def haveACorrespondingFile: Matcher[Version1UUID] = (messageId: Version1UUID) =>
+  def haveACorrespondingFile: Matcher[Version1UUID] = (messageId: Version1UUID) => {
+    val filePath = FileSystems.getDefault.getPath(generateExpectedFilepath(messageId))
     MatchResult(
-      Files.exists(FileSystems.getDefault.getPath(generateExpectedFilepath(messageId))),
-      s"We expected that a file would exist for message ID [$messageId], but there wasn't one.",
-      s"We expected that no file would exist for message ID [$messageId], but it did."
+      Files.exists(filePath),
+      s"We expected that a file would exist for message ID [$messageId], path [$filePath], but there wasn't one.",
+      s"We expected that no file would exist for message ID [$messageId], path [$filePath] but it did."
     )
+  }
 
   def haveFileContents(expectedContents: String): Matcher[Version1UUID] = (messageId: Version1UUID) => {
 

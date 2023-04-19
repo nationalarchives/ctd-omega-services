@@ -9,25 +9,34 @@ import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP }
 import org.scalatest.concurrent.{ Eventually, IntegrationPatience }
 import org.scalatest.freespec.FixtureAsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.time.{ Millis, Seconds, Span }
-import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach, FutureOutcome }
+import org.scalatest.time.{ Seconds, Span }
+import org.scalatest.{ Assertion, BeforeAndAfterAll, BeforeAndAfterEach, FutureOutcome }
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.services.ApiService
 
-import javax.jms.{ Connection, MessageProducer, Session }
+import javax.jms.{ Connection, MessageProducer, Session, TextMessage }
 import scala.concurrent.duration.DurationInt
 
 class ApiServiceISpec
     extends FixtureAsyncFreeSpec with AsyncIOSpec with Matchers with Eventually with IntegrationPatience
     with BeforeAndAfterEach with BeforeAndAfterAll {
 
+  /** Note: Now that we have multiple scenarios, we see that we cannot run more than one at a time, likely because there
+    * is contention with the JMS consumer.
+    *
+    * As such, the only way for the scenarios to pass (currently) is to run them individuals - and even then you'll
+    * regularly see a failure.
+    *
+    * I think the whole approach to the reply message assertion needs to be improved.
+    */
+
   implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
   implicit override val patienceConfig: PatienceConfig =
-    PatienceConfig(timeout = scaled(Span(60, Seconds)), interval = scaled(Span(5, Millis)))
+    PatienceConfig(timeout = scaled(Span(30, Seconds)), interval = scaled(Span(1, Seconds)))
 
   private val requestQueueName = "request-general"
   private val replyQueueName = "omega-editorial-web-application-instance-1"
@@ -91,6 +100,152 @@ class ApiServiceISpec
 
   override def afterEach(): Unit = replyMessageText = None
 
+  "The Message API" - {
+
+    "returns an echo message when all fields are valid" in { f =>
+      val textMessageConfig = generateValidMessageConfig().copy(contents = "Hello World!")
+
+      sendMessage(f.session, f.producer, textMessageConfig)
+
+      assertReplyMessage("The Echo Service says: Hello World!")
+
+    }
+
+    "returns an error message when" - {
+      "the OMGMessageTypeID (aka SID)" - {
+        "isn't provided" in { f =>
+          val textMessageConfig = generateValidMessageConfig().copy(messageTypeId = None)
+
+          sendMessage(f.session, f.producer, textMessageConfig)
+
+          assertReplyMessage("Missing OMGMessageTypeID")
+
+        }
+        "is unrecognised" in { f =>
+          val textMessageConfig = generateValidMessageConfig().copy(messageTypeId = Some("OSGESXXX100"))
+
+          sendMessage(f.session, f.producer, textMessageConfig)
+
+          assertReplyMessage("Invalid OMGMessageTypeID")
+
+        }
+      }
+      "the OMGApplicationID" - {
+        "isn't provided" in { f =>
+          val textMessageConfig = generateValidMessageConfig().copy(applicationId = None)
+
+          sendMessage(f.session, f.producer, textMessageConfig)
+
+          assertReplyMessage("Missing OMGApplicationID;Invalid OMGResponseAddress")
+
+        }
+        "isn't valid" in { f =>
+          val textMessageConfig = generateValidMessageConfig().copy(applicationId = Some("ABC001"))
+
+          sendMessage(f.session, f.producer, textMessageConfig)
+
+          assertReplyMessage("Invalid OMGApplicationID;Invalid OMGResponseAddress")
+
+        }
+      }
+      "the OMGMessageFormat" - {
+        "isn't provided" in { f =>
+          val textMessageConfig = generateValidMessageConfig().copy(messageFormat = None)
+
+          sendMessage(f.session, f.producer, textMessageConfig)
+
+          assertReplyMessage("Missing OMGMessageFormat")
+
+        }
+        "isn't valid" in { f =>
+          val textMessageConfig = generateValidMessageConfig().copy(messageFormat = Some("text/plain"))
+
+          sendMessage(f.session, f.producer, textMessageConfig)
+
+          assertReplyMessage("Invalid OMGMessageFormat")
+
+        }
+      }
+      "the OMGToken" - {
+        "isn't provided" in { f =>
+          val textMessageConfig = generateValidMessageConfig().copy(token = None)
+
+          sendMessage(f.session, f.producer, textMessageConfig)
+
+          assertReplyMessage("Missing OMGToken")
+
+        }
+        "isn't valid" in { f =>
+          val textMessageConfig = generateValidMessageConfig().copy(token = Some(" "))
+
+          sendMessage(f.session, f.producer, textMessageConfig)
+
+          assertReplyMessage("Invalid OMGToken")
+
+        }
+      }
+      "the OMGResponseAddress" - {
+        "isn't provided" in { f =>
+          val textMessageConfig = generateValidMessageConfig().copy(responseAddress = None)
+
+          sendMessage(f.session, f.producer, textMessageConfig)
+
+          assertReplyMessage("Missing OMGResponseAddress")
+
+        }
+        "isn't valid" in { f =>
+          val textMessageConfig = generateValidMessageConfig().copy(responseAddress = Some("ABCD002."))
+
+          sendMessage(f.session, f.producer, textMessageConfig)
+
+          assertReplyMessage("Invalid OMGResponseAddress")
+
+        }
+      }
+      "the message body is" - {
+        "empty (with padding)" in { f =>
+          val textMessageConfig = generateValidMessageConfig().copy(contents = " ")
+
+          sendMessage(f.session, f.producer, textMessageConfig)
+
+          assertReplyMessage("Message text is blank: Echo Text cannot be empty.")
+
+        }
+      }
+    }
+
+  }
+
+  private def generateValidMessageConfig(): TextMessageConfig =
+    TextMessageConfig(
+      contents = "Hello, World",
+      messageTypeId = Some("OSGESZZZ100"),
+      applicationId = Some("ABCD002"),
+      messageFormat = Some("application/json"),
+      token = Some("AbCdEf123456"),
+      responseAddress = Some("ABCD002.a")
+    )
+
+  private def asTextMessage(session: Session, messageConfig: TextMessageConfig): TextMessage = {
+    val textMessage: TextMessage = session.createTextMessage(messageConfig.contents)
+    messageConfig.messageTypeId.foreach { messageTypeId =>
+      textMessage.setStringProperty("OMGMessageTypeID", messageTypeId)
+    }
+    messageConfig.applicationId.foreach { applicationId =>
+      textMessage.setStringProperty("OMGApplicationID", applicationId)
+    }
+    messageConfig.messageFormat.foreach { messageFormat =>
+      textMessage.setStringProperty("OMGMessageFormat", messageFormat)
+    }
+    messageConfig.token.foreach { token =>
+      textMessage.setStringProperty("OMGToken", token)
+    }
+    messageConfig.responseAddress.foreach { responseAddress =>
+      textMessage.setStringProperty("OMGResponseAddress", responseAddress)
+    }
+    textMessage
+  }
+
   private def readTextMessage(jmsMessage: JmsMessage): IO[Unit] = {
     replyMessageId = jmsMessage.getJMSCorrelationId
     jmsMessage.asTextF[IO].attempt.map {
@@ -100,24 +255,21 @@ class ApiServiceISpec
     }
   }
 
-  "The Message API" - {
-
-    "returns an echo message when a text message is sent with a SID of ECHO001" in { f =>
-      val textMessage = f.session.createTextMessage("Hello World!")
-      textMessage.setStringProperty("sid", "ECHO001")
-      f.producer.send(textMessage)
-      eventually {
-        IO.pure(replyMessageText).asserting(_ mustBe Some("The Echo Service says: Hello World!"))
-      }
+  private def assertReplyMessage(expectedContents: String): IO[Assertion] =
+    eventually {
+      IO.pure(replyMessageText).asserting(_ mustBe Some(expectedContents))
     }
 
-    "returns an error message when the SID is not recognised" in { _ =>
-      pending // This test is marked pending until completion of https://national-archives.atlassian.net/browse/PACT-836
-    }
-
-    "returns an error message when the message body is empty" in { _ =>
-      pending // This test is marked pending until completion of https://national-archives.atlassian.net/browse/PACT-836
-    }
-  }
+  private def sendMessage(session: Session, producer: MessageProducer, textMessageConfig: TextMessageConfig): Unit =
+    producer.send(asTextMessage(session, textMessageConfig))
 
 }
+
+case class TextMessageConfig(
+  contents: String,
+  messageTypeId: Option[String],
+  applicationId: Option[String],
+  messageFormat: Option[String],
+  token: Option[String],
+  responseAddress: Option[String]
+)

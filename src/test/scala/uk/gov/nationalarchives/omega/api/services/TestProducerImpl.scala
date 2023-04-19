@@ -21,8 +21,10 @@
 
 package uk.gov.nationalarchives.omega.api.services
 
+import cats.data.NonEmptyChain
 import cats.effect.IO
 import jms4s.config.QueueName
+import uk.gov.nationalarchives.omega.api.business.BusinessRequestValidationError
 
 class TestProducerImpl(val queueName: QueueName) extends LocalProducer {
 
@@ -30,6 +32,22 @@ class TestProducerImpl(val queueName: QueueName) extends LocalProducer {
 
   override def send(replyMessage: String, requestMessage: ValidatedLocalMessage): IO[Unit] = {
     message = replyMessage
+    IO.unit
+  }
+
+  override def sendWhenGenericRequestIsInvalid(
+    localMessage: LocalMessage,
+    errors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
+  ): IO[Unit] = {
+    message = localMessageValidationErrorsToReplyMessage(errors)
+    IO.unit
+  }
+
+  override def sendWhenBusinessRequestIsInvalid(
+    localMessage: LocalMessage,
+    errors: NonEmptyChain[BusinessRequestValidationError]
+  ): IO[Unit] = {
+    message = businessRequestValidationErrorToReplyMessage(errors)
     IO.unit
   }
 }

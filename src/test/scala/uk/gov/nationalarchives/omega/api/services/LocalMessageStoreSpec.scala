@@ -33,6 +33,8 @@ import uk.gov.nationalarchives.omega.api.LocalMessageSupport
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
 
 import java.nio.file.{ AccessDeniedException, NoSuchFileException }
+import java.time.{ LocalDate, LocalDateTime, ZoneOffset }
+import java.util.UUID
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import scala.util.{ Failure, Success }
@@ -205,15 +207,16 @@ class LocalMessageStoreSpec
   private def await[T](io: IO[T]): T =
     Await.result(io.unsafeToFuture(), 1.second)
 
-  private def generateMockJmsMessage(
-    text: String,
-    maybeSid: Option[String] = None,
-    maybeMessageId: Option[String] = None
-  ): JmsMessage = {
+  private def generateMockJmsMessage(text: String): JmsMessage = {
     val mockJmsMessage = mock[JmsMessage]
     when(mockJmsMessage.asTextF[IO]).thenReturn(IO.pure(text))
-    when(mockJmsMessage.getStringProperty(eqTo("sid"))).thenReturn(maybeSid)
-    when(mockJmsMessage.getJMSMessageId).thenReturn(maybeMessageId)
+    when(mockJmsMessage.getJMSMessageId).thenReturn(Some(UUID.randomUUID().toString))
+    when(mockJmsMessage.getJMSTimestamp).thenReturn(Some(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)))
+    when(mockJmsMessage.getStringProperty(eqTo("OMGMessageTypeID"))).thenReturn(Some("OSGESZZZ100"))
+    when(mockJmsMessage.getStringProperty(eqTo("OMGApplicationID"))).thenReturn(Some("ABCD002"))
+    when(mockJmsMessage.getStringProperty(eqTo("OMGMessageFormat"))).thenReturn(Some("application/json"))
+    when(mockJmsMessage.getStringProperty(eqTo("OMGToken"))).thenReturn(Some("application"))
+    when(mockJmsMessage.getStringProperty(eqTo("OMGResponseAddress"))).thenReturn(Some("ABCD002.a"))
     mockJmsMessage
   }
 

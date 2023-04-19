@@ -23,9 +23,16 @@ package uk.gov.nationalarchives.omega.api.services
 
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
 
+import java.time.LocalDateTime
+
 final case class ValidatedLocalMessage(
   persistentMessageId: Version1UUID,
   serviceId: ServiceIdentifier,
   messageText: String,
-  correlationId: String
+  correlationId: String,
+  applicationId: String,
+  time: LocalDateTime,
+  messageFormat: String,
+  authToken: String,
+  responseAddress: String
 )

@@ -26,15 +26,17 @@ import cats.effect.std.Queue
 import cats.effect.testing.scalatest.AsyncIOSpec
 import jms4s.config.QueueName
 import org.apache.commons.lang3.SerializationUtils
-import org.scalatest.{ BeforeAndAfterAll, TryValues }
+import org.scalatest.TryValues
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.{ Assertion, BeforeAndAfterAll }
 import uk.gov.nationalarchives.omega.api.LocalMessageSupport
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
 
 import java.nio.file.{ FileSystems, Files, NoSuchFileException, StandardOpenOption }
 import java.util.UUID
+import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import scala.util.{ Failure, Success, Try }
 
@@ -52,28 +54,119 @@ class DispatcherSpec
     deleteTempDirectory()
   }
 
-  "When the dispatcher receives a message" - {
+  "When the dispatcher receives a message when" - {
 
-    "for the ECHO001 service it should reply with an echo message" in {
-      Queue.bounded[IO, LocalMessage](1).flatMap { queue =>
-        val messageId = Version1UUID.generate()
-        val contents = "Hello World!"
-        writeMessageFile(LocalMessage(messageId, contents, None, None))
-        queue
-          .offer(
-            LocalMessage(
-              messageId,
-              contents,
-              Some(ServiceIdentifier.ECHO001),
-              Some(s"ID:${UUID.randomUUID()}")
+    "it's for the ECHO001 service" - {
+
+      "and all fields are provided and valid" in {
+        assertReplyMessage(generateValidLocalMessageForEchoService(), "The Echo Service says: Hello World!")
+      }
+      "a single field is either absent or invalid, namely" - {
+        "the JMS message ID (aka correlation ID)" - {
+          "isn't provided" in {
+            assertReplyMessage(
+              generateValidLocalMessageForEchoService().copy(correlationId = None),
+              "Missing JMSMessageID"
             )
-          ) *>
-          dispatcher.run(1)(queue).andWait(5.seconds) *>
-          IO(testLocalProducer.message).asserting(_ mustBe "The Echo Service says: Hello World!") *>
-          queue.size.asserting(_ mustBe 0) *>
-          IO.pure(messageId).asserting(_ must not(haveACorrespondingFile))
+          }
+          "is blank" in {
+            assertReplyMessage(
+              generateValidLocalMessageForEchoService().copy(correlationId = Some("")),
+              "Invalid JMSMessageID"
+            )
+          }
+        }
+
+        "the message" - {
+          "is blank" in {
+            assertReplyMessage(
+              generateValidLocalMessageForEchoService().copy(messageText = ""),
+              "Message text is blank: Echo Text cannot be empty."
+            )
+          }
+        }
+
+      }
+      "the service" - {
+        "isn't provided" in {
+          assertReplyMessage(
+            generateValidLocalMessageForEchoService().copy(serviceId = None),
+            "Missing OMGMessageTypeID"
+          )
+        }
+        "isn't valid" in {
+          assertReplyMessage(
+            generateValidLocalMessageForEchoService().copy(serviceId = Some("ECHO001")),
+            "Invalid OMGMessageTypeID"
+          )
+        }
+      }
+      "the calling application ID" - {
+        "isn't provided" in {
+          assertReplyMessage(
+            generateValidLocalMessageForEchoService().copy(applicationId = None),
+            "Missing OMGApplicationID;Invalid OMGResponseAddress"
+          )
+        }
+        "isn't valid" in {
+          assertReplyMessage(
+            generateValidLocalMessageForEchoService().copy(applicationId = Some("ABC001")),
+            "Invalid OMGApplicationID;Invalid OMGResponseAddress"
+          )
+        }
+      }
+      "the JMS message timestamp" - {
+        "isn't provided" in {
+          assertReplyMessage(
+            generateValidLocalMessageForEchoService().copy(epochTimeInMilliseconds = None),
+            "Missing JMSTimestamp"
+          )
+        }
+      }
+      "the message format" - {
+        "isn't provided" in {
+          assertReplyMessage(
+            generateValidLocalMessageForEchoService().copy(messageFormat = None),
+            "Missing OMGMessageFormat"
+          )
+        }
+        "isn't valid" in {
+          assertReplyMessage(
+            generateValidLocalMessageForEchoService().copy(messageFormat = Some("text/plain")),
+            "Invalid OMGMessageFormat"
+          )
+        }
+      }
+      "the auth token" - {
+        "isn't provided" in {
+          assertReplyMessage(
+            generateValidLocalMessageForEchoService().copy(authToken = None),
+            "Missing OMGToken"
+          )
+        }
+        "is invalid" in {
+          assertReplyMessage(
+            generateValidLocalMessageForEchoService().copy(authToken = Some("")),
+            "Invalid OMGToken"
+          )
+        }
+      }
+      "the response address" - {
+        "isn't provided" in {
+          assertReplyMessage(
+            generateValidLocalMessageForEchoService().copy(responseAddress = None),
+            "Missing OMGResponseAddress"
+          )
+        }
+        "is invalid" in {
+          assertReplyMessage(
+            generateValidLocalMessageForEchoService().copy(responseAddress = Some("ABCD002.")),
+            "Invalid OMGResponseAddress"
+          )
+        }
       }
     }
+
 
     "for message recovery then it should run recovery and delete all the local messages" in {
       val mockJmsMessage1 = "Hello, world"
@@ -91,18 +184,40 @@ class DispatcherSpec
         localMessageStore.readMessage(messageId2).asserting(_.failure.exception mustBe a[NoSuchFileException])
     }
 
-    "for an unknown service it should reply with an error message" in {
-      pending // Until completion of https://national-archives.atlassian.net/browse/PACT-836
-    }
+  }
+  
 
-    "without a message ID it should reply with an error message" in {
-      pending // Until completion of https://national-archives.atlassian.net/browse/PACT-836
-    }
+  private def assertReplyMessage(localMessage: LocalMessage, expectedReplyMessage: String): Assertion = {
 
-    "without any text it should reply with an error message" in {
-      pending // Until completion of https://national-archives.atlassian.net/browse/PACT-836
+
+    writeMessageFile(localMessage.persistentMessageId, localMessage.messageText)
+
+    await {
+      Queue.bounded[IO, LocalMessage](1).flatMap { queue =>
+        queue.offer(localMessage) *>
+          dispatcher.run(1)(queue).andWait(1.seconds) *>
+          IO(testLocalProducer.message).asserting(_ mustBe expectedReplyMessage) *>
+          queue.size.asserting(_ mustBe 0) *>
+          IO.pure(localMessage.persistentMessageId).asserting(_ must not(haveACorrespondingFile))
+      }
     }
   }
+
+  private def await[T](io: IO[T]): T =
+    Await.result(io.unsafeToFuture(), 5.second)
+
+  private def generateValidLocalMessageForEchoService(): LocalMessage =
+    LocalMessage(
+      Version1UUID.generate(),
+      "Hello World!",
+      Some("OSGESZZZ100"),
+      Some(UUID.randomUUID().toString),
+      applicationId = Some("ABCD002"),
+      Some(System.currentTimeMillis()),
+      Some("application/json"),
+      Some(UUID.randomUUID().toString),
+      Some("ABCD002.a")
+    )
 
   /** It is the APIService which is responsible for writing the local message file.
     *
