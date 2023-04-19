@@ -167,15 +167,14 @@ class DispatcherSpec
       }
     }
 
-
     "for message recovery then it should run recovery and delete all the local messages" in {
       val mockJmsMessage1 = "Hello, world"
       val messageId1 = Version1UUID.generate()
       val mockJmsMessage2 = "Hello, world, again"
       val messageId2 = Version1UUID.generate()
 
-      writeMessageFile(LocalMessage(messageId1, mockJmsMessage1, None, None))
-      writeMessageFile(LocalMessage(messageId2, mockJmsMessage2, None, None))
+      writeMessageFile(LocalMessage(messageId1, mockJmsMessage1, None, None, None, None, None, None, None))
+      writeMessageFile(LocalMessage(messageId2, mockJmsMessage2, None, None, None, None, None, None, None))
 
       val localMessages = localMessageStore.readAllFilesInDirectory().unsafeRunSync()
 
@@ -185,12 +184,10 @@ class DispatcherSpec
     }
 
   }
-  
 
   private def assertReplyMessage(localMessage: LocalMessage, expectedReplyMessage: String): Assertion = {
 
-
-    writeMessageFile(localMessage.persistentMessageId, localMessage.messageText)
+    writeMessageFile(localMessage)
 
     await {
       Queue.bounded[IO, LocalMessage](1).flatMap { queue =>

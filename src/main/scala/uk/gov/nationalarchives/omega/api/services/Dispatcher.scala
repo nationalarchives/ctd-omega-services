@@ -56,7 +56,7 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
 
   private def processMessage(localMessage: LocalMessage, dispatcherId: Int): IO[Unit] =
     for {
-      _                       <- logger.info(s"processing message: ${localMessage.messageText}")
+      _ <- logger.info(s"processing message: ${localMessage.messageText}")
       _ <- logger.info(s"Dispatcher # $dispatcherId, processing message id: ${localMessage.persistentMessageId}")
       _ <- process(localMessage)
       _ <- remove(localMessage)
