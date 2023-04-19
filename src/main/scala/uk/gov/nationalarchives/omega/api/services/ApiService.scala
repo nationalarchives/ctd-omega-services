@@ -100,7 +100,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
         val dispatcher = generateDispatcher(producer, localMessageStore)
         dispatcher.runRecovery(0)(savedFiles)
     }
-  } //.useEval
+  }.useEval
 
   private def getLocalMessageStore: IO[Either[ExitCode, LocalMessageStore]] = IO {
     val messageStoreFolder = Paths.get(config.tempMessageDir)

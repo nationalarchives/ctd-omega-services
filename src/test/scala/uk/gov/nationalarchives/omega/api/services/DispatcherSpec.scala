@@ -168,21 +168,20 @@ class DispatcherSpec
     }
 
     "for message recovery then it should run recovery and delete all the local messages" in {
-      val mockJmsMessage1 = "Hello, world"
-      val messageId1 = Version1UUID.generate()
-      val mockJmsMessage2 = "Hello, world, again"
-      val messageId2 = Version1UUID.generate()
-
-      writeMessageFile(LocalMessage(messageId1, mockJmsMessage1, None, None, None, None, None, None, None))
-      writeMessageFile(LocalMessage(messageId2, mockJmsMessage2, None, None, None, None, None, None, None))
-
+      val testMessage = "Testing message recovery!"
+      // create a valid message
+      generateValidLocalMessageForEchoService().copy(messageText = testMessage)
+      // write the message to file in the temporary message store
+      writeMessageFile(generateValidLocalMessageForEchoService().copy(messageText = testMessage))
+      // read the file from the message store
       val localMessages = localMessageStore.readAllFilesInDirectory().unsafeRunSync()
-
+      // pass the file to runRecovery
       dispatcher.runRecovery(0)(localMessages) *>
-        localMessageStore.readMessage(messageId1).asserting(_.failure.exception mustBe a[NoSuchFileException]) *>
-        localMessageStore.readMessage(messageId2).asserting(_.failure.exception mustBe a[NoSuchFileException])
+        // it should send back the expected reply
+        IO(testLocalProducer.message).asserting(_ mustBe s"The Echo Service says: $testMessage") *>
+        // you can also check there are no longer any files the local message store
+        localMessageStore.readAllFilesInDirectory().asserting(_.length mustBe 0)
     }
-
   }
 
   private def assertReplyMessage(localMessage: LocalMessage, expectedReplyMessage: String): Assertion = {

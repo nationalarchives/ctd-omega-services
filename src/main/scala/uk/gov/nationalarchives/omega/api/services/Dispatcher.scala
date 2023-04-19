@@ -77,6 +77,7 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
     validatedLocalMessage: ValidatedLocalMessage,
     originalLocalMessage: LocalMessage
   ): IO[Unit] = {
+
     val (businessService: BusinessService, businessServiceRequest: BusinessServiceRequest) =
       createServiceRequest(validatedLocalMessage)
     validateBusinessServiceRequest(businessService, businessServiceRequest) match {

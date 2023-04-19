@@ -5,23 +5,24 @@ import jms4s.JmsAutoAcknowledgerConsumer.AutoAckAction
 import jms4s.config.QueueName
 import jms4s.jms.JmsMessage
 import jms4s.sqs.simpleQueueService
-import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP }
+import jms4s.sqs.simpleQueueService.{Config, Credentials, DirectAddress, HTTP}
 import org.apache.commons.lang3.SerializationUtils
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
-import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach, FutureOutcome }
-import org.scalatest.concurrent.{ Eventually, IntegrationPatience }
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FutureOutcome}
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.time.{ Millis, Seconds, Span }
+import org.scalatest.time.{Millis, Seconds, Span}
 import org.typelevel.log4cats.slf4j.Slf4jFactory
-import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
+import org.typelevel.log4cats.{LoggerFactory, SelfAwareStructuredLogger}
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
-import uk.gov.nationalarchives.omega.api.services.{ ApiService, LocalMessage, LocalMessageStore }
+import uk.gov.nationalarchives.omega.api.services.{ApiService, LocalMessage, LocalMessageStore}
 
-import java.nio.file.{ FileSystems, Files, NoSuchFileException, Path, Paths, StandardOpenOption }
+import java.nio.file.{FileSystems, Files, NoSuchFileException, Path, Paths, StandardOpenOption}
+import java.util.UUID
 import scala.concurrent.duration.DurationInt
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 class MessageRecoveryISpec
     extends AsyncFreeSpec with AsyncIOSpec with Matchers with Eventually with IntegrationPatience
@@ -31,12 +32,13 @@ class MessageRecoveryISpec
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
   implicit override val patienceConfig: PatienceConfig =
-    PatienceConfig(timeout = scaled(Span(10, Seconds)), interval = scaled(Span(5, Millis)))
+    PatienceConfig(timeout = scaled(Span(30, Seconds)), interval = scaled(Span(5, Millis)))
 
   private val requestQueueName = "request-general"
   private val replyQueueName = "omega-editorial-web-application-instance-1"
   private val sqsHostName = "localhost"
   private val sqsPort = 9324
+  private val messageText = "Message recovery test!"
 
   private val messageId = Version1UUID.generate()
 
@@ -65,7 +67,7 @@ class MessageRecoveryISpec
 
   override protected def beforeAll(): Unit = {
     // load messages to disk
-    val path = writeMessageFile(new LocalMessage(messageId, "Test World!", None, None, None, None, None, None, None))
+    val path = writeMessageFile(generateValidLocalMessageForEchoService().copy(messageText = messageText))
     println(s"Message file path [${path.toString}]")
     tempMsgDir = Some(path.getParent.toString)
     apiService = Some(
@@ -114,9 +116,8 @@ class MessageRecoveryISpec
       val messageStoreFolder = Paths.get(tempMsgDir.get)
       val localMessageStore = new LocalMessageStore(messageStoreFolder)
       eventually {
-        //localMessageStore.readMessage(messageId).asserting(_.failure.exception mustBe a[NoSuchFileException]) // *>
-          //IO.pure(replyMessageText).asserting(_ mustBe Some("The Echo Service says: Test World!"))
-        IO.pure(2 + 2).asserting(_ mustBe 4)
+        localMessageStore.readMessage(messageId).asserting(_.failure.exception mustBe a[NoSuchFileException]) *>
+          IO.pure(replyMessageText).asserting(_ mustBe Some(s"The Echo Service says: $messageText"))
       }
     }
 
@@ -138,5 +139,18 @@ class MessageRecoveryISpec
 
   def generateExpectedFilepath(messageId: Version1UUID): String =
     Files.createTempDirectory("temp").toAbsolutePath.toString + "/" + messageId + ".msg"
+
+  private def generateValidLocalMessageForEchoService(): LocalMessage =
+    LocalMessage(
+      Version1UUID.generate(),
+      "Hello World!",
+      Some("OSGESZZZ100"),
+      Some(UUID.randomUUID().toString),
+      applicationId = Some("ABCD002"),
+      Some(System.currentTimeMillis()),
+      Some("application/json"),
+      Some(UUID.randomUUID().toString),
+      Some("ABCD002.a")
+    )
 
 }

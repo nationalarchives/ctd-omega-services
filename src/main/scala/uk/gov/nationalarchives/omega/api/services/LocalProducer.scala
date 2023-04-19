@@ -43,12 +43,16 @@ trait LocalProducer {
 
   def localMessageValidationErrorsToReplyMessage(
     localMessageValidationErrors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
-  ): String = localMessageValidationErrors
+  ): String = {
+    val errors = localMessageValidationErrors
     .map(localMessageValidationError => toErrorMessage(localMessageValidationError))
     .filter(_.isDefined)
     .map(_.get)
     .toList
     .mkString(";")
+    println(s"Errors: $errors")
+    errors
+  }
 
   def businessRequestValidationErrorToReplyMessage(
     errors: NonEmptyChain[BusinessRequestValidationError]
@@ -106,7 +110,8 @@ class LocalProducerImpl(val jmsProducer: JmsProducer[IO], val outputQueue: Queue
   override def sendWhenGenericRequestIsInvalid(
     localMessage: LocalMessage,
     errors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
-  ): IO[Unit] =
+  ): IO[Unit] = {
+    logger.info("Message is invalid") *>
     localMessage.correlationId
       .filter(_.trim.nonEmpty)
       .map { correlationId =>
@@ -119,6 +124,7 @@ class LocalProducerImpl(val jmsProducer: JmsProducer[IO], val outputQueue: Queue
         } *> IO.unit
       }
       .getOrElse(IO.pure {})
+  }
 
   override def sendWhenBusinessRequestIsInvalid(
     localMessage: LocalMessage,
