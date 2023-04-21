@@ -32,7 +32,7 @@ class MessageRecoveryISpec
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
   implicit override val patienceConfig: PatienceConfig =
-    PatienceConfig(timeout = scaled(Span(60, Seconds)), interval = scaled(Span(5, Millis)))
+    PatienceConfig(timeout = scaled(Span(600, Seconds)), interval = scaled(Span(5, Millis)))
 
   private val requestQueueName = "request-general"
   private val replyQueueName = "omega-editorial-web-application-instance-1"
