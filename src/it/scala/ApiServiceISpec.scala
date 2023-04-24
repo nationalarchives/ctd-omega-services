@@ -17,6 +17,7 @@ import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.services.ApiService
 
 import javax.jms.{ Connection, MessageProducer, Session, TextMessage }
+import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
 class ApiServiceISpec
@@ -96,7 +97,7 @@ class ApiServiceISpec
   }
 
   override def afterAll(): Unit =
-    apiService.stop().unsafeToFuture()
+    Await.result(apiService.stop().unsafeToFuture(), 1.minute)
 
   override def afterEach(): Unit = replyMessageText = None
 

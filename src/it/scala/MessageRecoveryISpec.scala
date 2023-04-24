@@ -21,6 +21,7 @@ import uk.gov.nationalarchives.omega.api.services.{ ApiService, LocalMessage, Lo
 
 import java.nio.file.{ FileSystems, Files, NoSuchFileException, Path, Paths, StandardOpenOption }
 import java.util.UUID
+import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import scala.util.{ Failure, Success, Try }
 
@@ -99,7 +100,7 @@ class MessageRecoveryISpec
     ()
   }
   override def afterAll(): Unit =
-    apiService.get.stop().unsafeToFuture()
+    Await.result(apiService.get.stop().unsafeToFuture(), 1.minute)
 
   "The Message Recovery API" - {
 
