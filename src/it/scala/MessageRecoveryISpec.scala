@@ -1,4 +1,4 @@
-import cats.effect.IO
+import cats.effect.{ IO, Ref }
 import cats.effect.kernel.Resource
 import cats.effect.testing.scalatest.AsyncIOSpec
 import jms4s.JmsAutoAcknowledgerConsumer.AutoAckAction
@@ -8,7 +8,7 @@ import jms4s.sqs.simpleQueueService
 import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP }
 import org.apache.commons.lang3.SerializationUtils
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
-import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach, FutureOutcome }
+import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach }
 import org.scalatest.concurrent.{ Eventually, IntegrationPatience }
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -33,7 +33,7 @@ class MessageRecoveryISpec
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
   implicit override val patienceConfig: PatienceConfig =
-    PatienceConfig(timeout = scaled(Span(600, Seconds)), interval = scaled(Span(5, Millis)))
+    PatienceConfig(timeout = scaled(Span(60, Seconds)), interval = scaled(Span(5, Millis)))
 
   private val requestQueueName = "request-general"
   private val replyQueueName = "omega-editorial-web-application-instance-1"
@@ -43,7 +43,7 @@ class MessageRecoveryISpec
 
   private var messageId: Option[Version1UUID] = None
 
-  var replyMessageText: Option[String] = None
+  var replyMessageText: IO[Ref[IO, Option[String]]] = Ref[IO].of(Option.empty[String])
   var tempMsgDir: Option[String] = None
   var apiService: Option[ApiService] = None
 
@@ -57,10 +57,10 @@ class MessageRecoveryISpec
   )
 
   private def readTextMessage(jmsMessage: JmsMessage): IO[Unit] =
-    jmsMessage.asTextF[IO].attempt.map {
+    jmsMessage.asTextF[IO].attempt.flatMap {
       case Right(text) =>
-        replyMessageText = Some(text)
-      case Left(e) => fail(s"Unable to read message contents due to ${e.getMessage}")
+        replyMessageText.map(_.set(Some(text)))
+      case Left(e) => IO.delay(fail(s"Unable to read message contents due to ${e.getMessage}"))
     }
 
   override protected def beforeAll(): Unit = {
@@ -109,7 +109,7 @@ class MessageRecoveryISpec
       val localMessageStore = new LocalMessageStore(messageStoreFolder)
       eventually {
         localMessageStore.readMessage(messageId.get).asserting(_.failure.exception mustBe a[NoSuchFileException]) *>
-          IO.pure(replyMessageText).asserting(_ mustBe Some(s"The Echo Service says: $testMessage"))
+          replyMessageText.flatMap(_.get.asserting(_ mustBe Some(s"The Echo Service says: $testMessage")))
       }
     }
 
