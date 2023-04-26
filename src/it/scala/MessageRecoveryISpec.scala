@@ -43,7 +43,7 @@ class MessageRecoveryISpec
 
   private var messageId: Option[Version1UUID] = None
 
-  var replyMessageText: IO[Ref[IO, Option[String]]] = Ref[IO].of(Option.empty[String])
+  val replyMessageText: IO[Ref[IO, Option[String]]] = Ref[IO].of(Option.empty[String])
   var tempMsgDir: Option[String] = None
   var apiService: Option[ApiService] = None
 
@@ -59,7 +59,7 @@ class MessageRecoveryISpec
   private def readTextMessage(jmsMessage: JmsMessage): IO[Unit] =
     jmsMessage.asTextF[IO].attempt.flatMap {
       case Right(text) =>
-        replyMessageText.map(_.set(Some(text)))
+        replyMessageText.flatMap(ref => ref.set(Some(text)))
       case Left(e) => IO.delay(fail(s"Unable to read message contents due to ${e.getMessage}"))
     }
 
