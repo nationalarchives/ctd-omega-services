@@ -22,5 +22,5 @@
 package uk.gov.nationalarchives.omega.api.business
 
 trait BusinessService {
-  def process(request: BusinessServiceRequest): Either[BusinessServiceError, BusinessServiceResponse]
+  def process(request: BusinessServiceRequest): Either[BusinessServiceError, BusinessServiceReply]
 }

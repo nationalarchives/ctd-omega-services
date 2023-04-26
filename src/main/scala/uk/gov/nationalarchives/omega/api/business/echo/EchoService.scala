@@ -32,10 +32,10 @@ class EchoService extends BusinessService with BusinessRequestValidation {
       NonEmptyChain.one(TextIsNonEmptyCharacters("Echo Text cannot be empty."))
     )
 
-  override def process(request: BusinessServiceRequest): Either[BusinessServiceError, BusinessServiceResponse] =
+  override def process(request: BusinessServiceRequest): Either[BusinessServiceError, BusinessServiceReply] =
     if (request.text.contains("ERROR")) {
       Left(EchoExplicitError(s"Explicit error: ${request.text}"))
     } else {
-      Right(EchoResponse(s"The Echo Service says: ${request.text}"))
+      Right(EchoReply(s"The Echo Service says: ${request.text}"))
     }
 }

@@ -34,5 +34,5 @@ final case class ValidatedLocalMessage(
   jmsLocalDateTime: LocalDateTime,
   omgMessageFormat: String,
   authToken: String,
-  omgResponseAddress: String
+  omgReplyAddress: String
 )

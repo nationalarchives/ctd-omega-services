@@ -28,7 +28,7 @@ import jms4s.jms.JmsMessage
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
-import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{ InvalidApplicationID, InvalidAuthToken, InvalidJMSMessageID, InvalidMessageFormat, InvalidMessageTypeID, InvalidReplyAddress, MissingApplicationID, MissingAuthToken, MissingJMSMessageID, MissingJMSTimestamp, MissingMessageFormat, MissingMessageTypeID, MissingReplyAddress, ValidationResult, acceptableMimeTypes, patternForApplicationId, patternForResponseAddress, patternForServiceId }
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{ InvalidApplicationID, InvalidAuthToken, InvalidJMSMessageID, InvalidMessageFormat, InvalidMessageTypeID, InvalidReplyAddress, MissingApplicationID, MissingAuthToken, MissingJMSMessageID, MissingJMSTimestamp, MissingMessageFormat, MissingMessageTypeID, MissingReplyAddress, ValidationResult, acceptableMimeTypes, patternForApplicationId, patternForReplyAddress, patternForServiceId }
 
 import java.time.{ Instant, LocalDateTime, ZoneOffset }
 import scala.util.matching.Regex
@@ -95,7 +95,7 @@ final case class LocalMessage(
       validateJmsTimestamp(jmsTimestamp),
       validateOmgMessageFormat(omgMessageFormat),
       validatedOmgToken,
-      validateOmgResponseAddress(omgReplyAddress, omgApplicationId)
+      validateOmgReplyAddress(omgReplyAddress, omgApplicationId)
     )
       .mapN {
         (
@@ -105,7 +105,7 @@ final case class LocalMessage(
           validatedJmsTimestamp,
           validatedOmgMessageFormat,
           validatedOmgToken,
-          validatedOmgResponseAddress
+          validatedOmgReplyAddress
         ) =>
           ValidatedLocalMessage(
             persistentMessageId,
@@ -116,7 +116,7 @@ final case class LocalMessage(
             LocalDateTime.ofInstant(Instant.ofEpochMilli(validatedJmsTimestamp), ZoneOffset.UTC),
             validatedOmgMessageFormat,
             validatedOmgToken,
-            validatedOmgResponseAddress
+            validatedOmgReplyAddress
           )
 
       }
@@ -159,14 +159,14 @@ final case class LocalMessage(
     }
   }
 
-  private def validateOmgResponseAddress(
-    omgResponseAddressOpt: Option[String],
+  private def validateOmgReplyAddress(
+    omgReplyAddressOpt: Option[String],
     omgApplicationIdOpt: Option[String]
   ): ValidationResult[String] =
-    (omgResponseAddressOpt, omgApplicationIdOpt) match {
-      case (Some(omgResponseAddress), Some(omgApplicationId))
-          if patternForResponseAddress.matches(omgResponseAddress) && omgResponseAddress.startsWith(omgApplicationId) =>
-        omgResponseAddress.validNec
+    (omgReplyAddressOpt, omgApplicationIdOpt) match {
+      case (Some(omgReplyddress), Some(omgApplicationId))
+          if patternForReplyAddress.matches(omgReplyddress) && omgReplyddress.startsWith(omgApplicationId) =>
+        omgReplyddress.validNec
       case (None, _) => MissingReplyAddress.invalidNec
       case _         => InvalidReplyAddress.invalidNec
     }
@@ -179,7 +179,7 @@ object LocalMessage {
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
   val patternForApplicationId: Regex = "[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])".r
-  val patternForResponseAddress: Regex = "[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])(\\.[A-Za-z0-9])+".r
+  val patternForReplyAddress: Regex = "[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])(\\.[A-Za-z0-9])+".r
   val patternForServiceId: Regex = "(OS|OD|OE)(LI|GE|UP|CR|RE)(S|F)[A-Z]{3}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])".r
 
   val acceptableMimeTypes: Set[String] = Set("application/json")

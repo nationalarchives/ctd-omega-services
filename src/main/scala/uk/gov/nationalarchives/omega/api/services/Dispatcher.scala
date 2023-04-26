@@ -128,13 +128,13 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
         Validated.valid(businessServiceRequest)
     }
 
-  private def execBusinessService[T <: BusinessServiceRequest, U <: BusinessServiceResponse, E <: BusinessServiceError](
+  private def execBusinessService[T <: BusinessServiceRequest, U <: BusinessServiceReply, E <: BusinessServiceError](
     businessService: BusinessService,
     validatedBusinessServiceRequest: T
-  ): Either[BusinessServiceError, BusinessServiceResponse] =
+  ): Either[BusinessServiceError, BusinessServiceReply] =
     businessService.process(validatedBusinessServiceRequest)
 
-  private def sendResultToJmsQueue[U <: BusinessServiceResponse, E <: BusinessServiceError](
+  private def sendResultToJmsQueue[U <: BusinessServiceReply, E <: BusinessServiceError](
     businessResult: Either[E, U],
     requestMessage: ValidatedLocalMessage
   ): IO[Unit] =

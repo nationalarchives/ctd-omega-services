@@ -19,8 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.business
+package uk.gov.nationalarchives.omega.api.business.echo
 
-trait BusinessServiceResponse {
-  val content: String
-}
+import uk.gov.nationalarchives.omega.api.business.BusinessServiceReply
+
+case class EchoReply(override val content: String) extends BusinessServiceReply
