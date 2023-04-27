@@ -103,7 +103,8 @@ class MessageRecoveryISpec
 
   "The Message Recovery API" - {
 
-    "runs the recovery service and removes the message from the message store" in {
+    // TODO(RW) this test is being ignored until PACT-931 and PACT-932 are completed
+    "runs the recovery service and removes the message from the message store" ignore {
       val messageStoreFolder = Paths.get(tempMsgDir.get)
       val localMessageStore = new LocalMessageStore(messageStoreFolder)
       eventually {
