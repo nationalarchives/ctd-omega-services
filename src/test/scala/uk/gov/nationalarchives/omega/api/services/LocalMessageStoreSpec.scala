@@ -31,10 +31,10 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach }
 import uk.gov.nationalarchives.omega.api.LocalMessageSupport
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
-import uk.gov.nationalarchives.omega.api.messages.MessageProperties
+import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, LocalMessageStore, MessageProperties }
 
 import java.nio.file.{ AccessDeniedException, NoSuchFileException }
-import java.time.{ LocalDate, LocalDateTime, ZoneOffset }
+import java.time.{ LocalDateTime, ZoneOffset }
 import java.util.UUID
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -152,7 +152,7 @@ class LocalMessageStoreSpec
       "check if a directory is empty" - {
         "when is is not empty" in {
           val mockJmsMessage = generateMockJmsMessage("")
-          val messageId = persistMessage(mockJmsMessage)
+          val _ = persistMessage(mockJmsMessage)
 
           LocalMessageStore.checkDirectoryExists(tempDirectoryPath) mustBe true
           LocalMessageStore.checkDirectoryNonEmpty(tempDirectoryPath) mustBe true

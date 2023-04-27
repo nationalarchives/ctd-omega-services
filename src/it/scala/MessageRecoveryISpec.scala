@@ -1,6 +1,6 @@
-import cats.effect.{ IO, Ref }
 import cats.effect.kernel.Resource
 import cats.effect.testing.scalatest.AsyncIOSpec
+import cats.effect.{ IO, Ref }
 import jms4s.JmsAutoAcknowledgerConsumer.AutoAckAction
 import jms4s.config.QueueName
 import jms4s.jms.JmsMessage
@@ -8,18 +8,19 @@ import jms4s.sqs.simpleQueueService
 import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP }
 import org.apache.commons.lang3.SerializationUtils
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
-import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach }
 import org.scalatest.concurrent.{ Eventually, IntegrationPatience }
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.time.{ Millis, Seconds, Span }
+import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach }
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
-import uk.gov.nationalarchives.omega.api.services.{ ApiService, LocalMessage, LocalMessageStore }
+import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, LocalMessageStore }
+import uk.gov.nationalarchives.omega.api.services.ApiService
 
-import java.nio.file.{ FileSystems, Files, NoSuchFileException, Path, Paths, StandardOpenOption }
+import java.nio.file._
 import java.util.UUID
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -140,7 +141,7 @@ class MessageRecoveryISpec
       "Hello World!",
       Some("OSGESZZZ100"),
       Some(UUID.randomUUID().toString),
-      applicationId = Some("ABCD002"),
+      omgApplicationId = Some("ABCD002"),
       Some(System.currentTimeMillis()),
       Some("application/json"),
       Some(UUID.randomUUID().toString),

@@ -109,6 +109,7 @@ class ApiServiceISpec
   override def afterEach(): Unit = {
     replyMessageText.set(Option.empty[String]).unsafeRunSync()
     replyMessageId.set(Option.empty[String]).unsafeRunSync()
+    messageTypeId.set(Option.empty[String]).unsafeRunSync()
   }
 
   "The Message API" - {
@@ -284,9 +285,8 @@ class ApiServiceISpec
         case Left(e) => fail(s"Unable to read message contents due to ${e.getMessage}")
       }
 
-  private def readMessageTypeID(jmsMessage: JmsMessage): IO[Unit] = IO {
+  private def readMessageTypeID(jmsMessage: JmsMessage): IO[Unit] =
     messageTypeId.set(jmsMessage.getStringProperty(MessageProperties.OMGMessageTypeID))
-  }
 
   private def getExpectedJsonErrors(errorMap: Map[ErrorCode, String]): String = {
     val entries = errorMap.map { entry =>
