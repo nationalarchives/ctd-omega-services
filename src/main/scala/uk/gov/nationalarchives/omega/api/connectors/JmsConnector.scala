@@ -52,7 +52,7 @@ class JmsConnector(serviceConfig: ServiceConfig) {
         )
     } yield jmsProducerAndConsumer
 
-  private def createJmsClient()(implicit L: Logger[IO]): Resource[IO, JmsClient[IO]] =
+  def createJmsClient()(implicit L: Logger[IO]): Resource[IO, JmsClient[IO]] =
     simpleQueueService.makeJmsClient[IO](
       Config(
         endpoint = simpleQueueService.Endpoint(Some(DirectAddress(HTTP, "localhost", Some(9324))), "elasticmq"),
@@ -62,7 +62,7 @@ class JmsConnector(serviceConfig: ServiceConfig) {
       )
     )
 
-  private def createJmsProducer(client: JmsClient[IO])(concurrencyLevel: Int): Resource[IO, JmsProducer[IO]] =
+  def createJmsProducer(client: JmsClient[IO])(concurrencyLevel: Int): Resource[IO, JmsProducer[IO]] =
     client.createProducer(concurrencyLevel)
 
   private def createJmsInputQueueConsumer(client: JmsClient[IO])(

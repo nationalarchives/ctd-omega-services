@@ -22,7 +22,7 @@
 package uk.gov.nationalarchives.omega.api.services
 
 import cats.effect.std.Queue
-import cats.effect.{ ExitCode, IO }
+import cats.effect.{ ExitCode, IO, Resource }
 import cats.implicits.catsSyntaxParallelTraverse_
 import jms4s.JmsAcknowledgerConsumer.AckAction
 import jms4s.config.QueueName
@@ -68,9 +68,11 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     // TODO(AR) request queue will typically be 1 (plus maybe a few more for expedited ops), response queues will be per external application
     val localQueue: IO[Queue[IO, LocalMessage]] = Queue.bounded[IO, LocalMessage](config.maxLocalQueueSize)
     val jmsConnector = new JmsConnector(config)
+
     getLocalMessageStore.flatMap {
       case Right(localMessageStore) =>
         val result = for {
+          _ <- runRecovery(localMessageStore, jmsConnector)
           q <- localQueue
           res <-
             jmsConnector.getJmsProducerAndConsumer(QueueName(config.requestQueue)).use {
@@ -82,6 +84,18 @@ class ApiService(val config: ServiceConfig) extends Stateful {
       case Left(exitCode) => IO.pure(exitCode)
     }
   }
+
+  private def runRecovery(localMessageStore: LocalMessageStore, jmsConnector: JmsConnector): IO[Unit] = {
+    for {
+      savedFiles <- Resource.eval(localMessageStore.readAllFilesInDirectory())
+      jmsClient  <- jmsConnector.createJmsClient()
+      producer   <- jmsConnector.createJmsProducer(jmsClient)(config.maxProducers)
+    } yield producer match {
+      case producer =>
+        val dispatcher = generateDispatcher(producer, localMessageStore)
+        dispatcher.runRecovery(0)(savedFiles)
+    }
+  }.useEval
 
   private def getLocalMessageStore: IO[Either[ExitCode, LocalMessageStore]] = IO {
     val messageStoreFolder = Paths.get(config.tempMessageDir)

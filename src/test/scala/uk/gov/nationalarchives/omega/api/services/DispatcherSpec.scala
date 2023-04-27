@@ -25,6 +25,8 @@ import cats.effect.IO
 import cats.effect.std.Queue
 import cats.effect.testing.scalatest.AsyncIOSpec
 import jms4s.config.QueueName
+import org.apache.commons.lang3.SerializationUtils
+import org.scalatest.TryValues
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{ Assertion, BeforeAndAfterAll }
@@ -32,15 +34,15 @@ import uk.gov.nationalarchives.omega.api.LocalMessageSupport
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
 
-import java.nio.charset.StandardCharsets.UTF_8
-import java.nio.file.{ FileSystems, Files, StandardOpenOption }
+import java.nio.file.{ FileSystems, Files, NoSuchFileException, StandardOpenOption }
 import java.util.UUID
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import scala.util.{ Failure, Success, Try }
 
 class DispatcherSpec
-    extends AsyncFreeSpec with BeforeAndAfterAll with AsyncIOSpec with Matchers with LocalMessageSupport {
+    extends AsyncFreeSpec with BeforeAndAfterAll with AsyncIOSpec with Matchers with TryValues
+    with LocalMessageSupport {
 
   private val testQueue = QueueName("test-queue")
   private val testLocalProducer = new TestProducerImpl(testQueue)
@@ -164,11 +166,26 @@ class DispatcherSpec
         }
       }
     }
+
+    "for message recovery then it should run recovery and delete all the local messages" in {
+      val testMessage = "Testing message recovery!"
+      // create a valid message
+      // write the message to file in the temporary message store
+      writeMessageFile(generateValidLocalMessageForEchoService().copy(messageText = testMessage))
+      // read the file from the message store
+      val localMessages = localMessageStore.readAllFilesInDirectory().unsafeRunSync()
+      // pass the file to runRecovery
+      dispatcher.runRecovery(0)(localMessages) *>
+        // it should send back the expected reply
+        IO(testLocalProducer.message).asserting(_ mustBe s"The Echo Service says: $testMessage") *>
+        // you can also check there are no longer any files the local message store
+        localMessageStore.readAllFilesInDirectory().asserting(_.length mustBe 0)
+    }
   }
 
   private def assertReplyMessage(localMessage: LocalMessage, expectedReplyMessage: String): Assertion = {
 
-    writeMessageFile(localMessage.persistentMessageId, localMessage.messageText)
+    writeMessageFile(localMessage)
 
     await {
       Queue.bounded[IO, LocalMessage](1).flatMap { queue =>
@@ -203,18 +220,18 @@ class DispatcherSpec
     *
     * As such, we need to simulate this.
     */
-  private def writeMessageFile(messageId: Version1UUID, messageText: String): Unit =
+  private def writeMessageFile(message: LocalMessage): Unit =
     Try(
       Files.write(
-        FileSystems.getDefault.getPath(generateExpectedFilepath(messageId)),
-        messageText.getBytes(UTF_8),
+        FileSystems.getDefault.getPath(generateExpectedFilepath(message.persistentMessageId)),
+        SerializationUtils.serialize(message),
         StandardOpenOption.CREATE_NEW,
         StandardOpenOption.WRITE,
         StandardOpenOption.DSYNC
       )
     ) match {
       case Success(_) => ()
-      case Failure(e) => fail(s"Unable to write the message file for message [$messageId]: [$e]")
+      case Failure(e) => fail(s"Unable to write the message file for message [${message.persistentMessageId}]: [$e]")
     }
 
 }

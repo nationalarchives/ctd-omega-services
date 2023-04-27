@@ -38,10 +38,10 @@ object Version1UUID {
   }
 
   def apply(value: UUID): Version1UUID =
-    if (value.version() == 1) new Version1UUIDImpl(value)
+    if (value.version() == 1) Version1UUIDImpl(value)
     else
       throw new IllegalArgumentException(s"Provided UUID must be version 1; this one is version [${value.version()}]")
 
-  def generate(): Version1UUID = new Version1UUIDImpl(generator.generate())
+  def generate(): Version1UUID = Version1UUIDImpl(generator.generate())
 
 }

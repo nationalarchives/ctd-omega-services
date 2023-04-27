@@ -24,6 +24,7 @@ package uk.gov.nationalarchives.omega.api.services
 import cats.data.{ Validated, ValidatedNec }
 import cats.effect.IO
 import cats.effect.std.Queue
+import cats.effect.unsafe.implicits.global
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.business._
@@ -38,9 +39,24 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
   implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
+  import cats.syntax.all._
+
+  def runRecovery(dispatcherId: Int)(recoveredMessages: List[LocalMessage]): IO[Unit] =
+    IO {
+      recoveredMessages.foreach { recoveredMessage =>
+        processMessage(recoveredMessage, dispatcherId).unsafeRunSync()
+      }
+    }
+
   def run(dispatcherId: Int)(q: Queue[IO, LocalMessage]): IO[Unit] =
     for {
-      localMessage <- q.take
+      requestMessage <- q.take
+      res            <- processMessage(requestMessage, dispatcherId)
+    } yield ()
+
+  private def processMessage(localMessage: LocalMessage, dispatcherId: Int): IO[Unit] =
+    for {
+      _ <- logger.info(s"processing message: ${localMessage.messageText}")
       _ <- logger.info(s"Dispatcher # $dispatcherId, processing message id: ${localMessage.persistentMessageId}")
       _ <- process(localMessage)
       _ <- remove(localMessage)
@@ -87,7 +103,6 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
       case _ =>
         Validated.valid(businessServiceRequest)
     }
-  // }
 
   private def execBusinessService[T <: BusinessServiceRequest, U <: BusinessServiceResponse, E <: BusinessServiceError](
     businessService: BusinessService,
