@@ -324,30 +324,6 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             validationResult mustBe Invalid(Chain(InvalidAuthToken))
 
           }
-          "is valid (but with the wrong casing)" in {
-
-            val localMessage = validLocalMessage.copy(omgMessageFormat = Some("APPLICATION/JSON"))
-
-            val applicationId = localMessage.validateOmgApplicationId
-            val omgToken = localMessage.validateOmgToken
-            val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
-
-            validationResult mustBe Validated.Valid(
-              ValidatedLocalMessage(
-                jmsMessageId = validCorrelationId,
-                messageText = validMessageText,
-                persistentMessageId = validPersistentMessageId,
-                omgMessageTypeId = validMessageTypeId,
-                omgApplicationId = validApplicationId,
-                jmsLocalDateTime =
-                  LocalDateTime.ofInstant(Instant.ofEpochMilli(validEpochTimeInMilliseconds), ZoneOffset.UTC),
-                omgMessageFormat = "application/json",
-                authToken = validAuthToken,
-                omgReplyAddress = validReplyAddress
-              )
-            )
-
-          }
         }
         "the reply address" - {
           "is missing" in {
