@@ -1,4 +1,4 @@
-import cats.effect.IO
+import cats.effect.{ IO, Ref }
 import cats.effect.kernel.Resource
 import cats.effect.testing.scalatest.AsyncIOSpec
 import jms4s.JmsAutoAcknowledgerConsumer.AutoAckAction
@@ -56,8 +56,8 @@ class ApiServiceISpec
     )
   )
 
-  var replyMessageText: Option[String] = None
-  var replyMessageId: Option[String] = None
+  private val replyMessageText: Ref[IO, Option[String]] = Ref[IO].of(Option.empty[String]).unsafeRunSync()
+  private val replyMessageId: Ref[IO, Option[String]] = Ref[IO].of(Option.empty[String]).unsafeRunSync()
 
   private val jmsClient = simpleQueueService.makeJmsClient[IO](
     Config(
@@ -99,7 +99,10 @@ class ApiServiceISpec
   override def afterAll(): Unit =
     Await.result(apiService.stop().unsafeToFuture(), 1.minute)
 
-  override def afterEach(): Unit = replyMessageText = None
+  override def afterEach(): Unit = {
+    replyMessageText.set(Option.empty[String]).unsafeRunSync()
+    replyMessageId.set(Option.empty[String]).unsafeRunSync()
+  }
 
   "The Message API" - {
 
@@ -247,18 +250,17 @@ class ApiServiceISpec
     textMessage
   }
 
-  private def readTextMessage(jmsMessage: JmsMessage): IO[Unit] = {
-    replyMessageId = jmsMessage.getJMSCorrelationId
-    jmsMessage.asTextF[IO].attempt.map {
-      case Right(text) =>
-        replyMessageText = Some(text)
-      case Left(e) => fail(s"Unable to read message contents due to ${e.getMessage}")
-    }
-  }
+  private def readTextMessage(jmsMessage: JmsMessage): IO[Unit] =
+    replyMessageId.set(jmsMessage.getJMSCorrelationId) *>
+      jmsMessage.asTextF[IO].attempt.flatMap {
+        case Right(text) =>
+          replyMessageText.set(Some(text))
+        case Left(e) => fail(s"Unable to read message contents due to ${e.getMessage}")
+      }
 
   private def assertReplyMessage(expectedContents: String): IO[Assertion] =
     eventually {
-      IO.pure(replyMessageText).asserting(_ mustBe Some(expectedContents))
+      replyMessageText.get.asserting(_ mustBe Some(expectedContents))
     }
 
   private def sendMessage(session: Session, producer: MessageProducer, textMessageConfig: TextMessageConfig): Unit =

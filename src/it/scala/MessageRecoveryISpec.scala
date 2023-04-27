@@ -41,11 +41,10 @@ class MessageRecoveryISpec
   private val sqsPort = 9324
   private val testMessage = "Testing message recovery!"
 
-  private var messageId: Option[Version1UUID] = None
-
-  val replyMessageText: IO[Ref[IO, Option[String]]] = Ref[IO].of(Option.empty[String])
-  var tempMsgDir: Option[String] = None
-  var apiService: Option[ApiService] = None
+  private val messageId: Ref[IO, Option[Version1UUID]] = Ref[IO].of(Option.empty[Version1UUID]).unsafeRunSync()
+  private val replyMessageText: Ref[IO, Option[String]] = Ref[IO].of(Option.empty[String]).unsafeRunSync()
+  private var tempMsgDir: Option[String] = None
+  private var apiService: Option[ApiService] = None
 
   private val jmsClient = simpleQueueService.makeJmsClient[IO](
     Config(
@@ -59,7 +58,7 @@ class MessageRecoveryISpec
   private def readTextMessage(jmsMessage: JmsMessage): IO[Unit] =
     jmsMessage.asTextF[IO].attempt.flatMap {
       case Right(text) =>
-        replyMessageText.flatMap(ref => ref.set(Some(text)))
+        replyMessageText.set(Some(text))
       case Left(e) => IO.delay(fail(s"Unable to read message contents due to ${e.getMessage}"))
     }
 
@@ -69,7 +68,7 @@ class MessageRecoveryISpec
     val tmpMessage = generateValidLocalMessageForEchoService().copy(messageText = testMessage)
     // write the message to file in the temporary message store
     val path = writeMessageFile(tmpMessage)
-    messageId = Some(tmpMessage.persistentMessageId)
+    messageId.set(Some(tmpMessage.persistentMessageId)).unsafeRunSync()
     tempMsgDir = Some(path.getParent.toString)
     apiService = Some(
       new ApiService(
@@ -108,8 +107,10 @@ class MessageRecoveryISpec
       val messageStoreFolder = Paths.get(tempMsgDir.get)
       val localMessageStore = new LocalMessageStore(messageStoreFolder)
       eventually {
-        localMessageStore.readMessage(messageId.get).asserting(_.failure.exception mustBe a[NoSuchFileException]) *>
-          replyMessageText.flatMap(_.get.asserting(_ mustBe Some(s"The Echo Service says: $testMessage")))
+        messageId.get
+          .flatMap(maybeId => localMessageStore.readMessage(maybeId.get))
+          .asserting(_.failure.exception mustBe a[NoSuchFileException]) *>
+          replyMessageText.get.asserting(_ mustBe Some(s"The Echo Service says: $testMessage"))
       }
     }
 
