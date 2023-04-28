@@ -19,20 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.services
+package uk.gov.nationalarchives.omega.api.business
 
-import enumeratum._
-
-sealed trait ServiceIdentifier extends EnumEntry
-object ServiceIdentifier extends Enum[ServiceIdentifier] {
-
-  val values: IndexedSeq[ServiceIdentifier] = findValues
-
-  case object ECHO001 extends ServiceIdentifier {
-    // This happens to follow the regex; otherwise, it's arbitrary.
-    override val entryName = "OSGESZZZ100"
-  }
-
-  // add more service identifiers here
-
+trait BusinessServiceReply {
+  val content: String
 }

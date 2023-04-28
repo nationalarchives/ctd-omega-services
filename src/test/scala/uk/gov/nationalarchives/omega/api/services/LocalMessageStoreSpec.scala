@@ -31,9 +31,10 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach }
 import uk.gov.nationalarchives.omega.api.LocalMessageSupport
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
+import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, LocalMessageStore, MessageProperties }
 
 import java.nio.file.{ AccessDeniedException, NoSuchFileException }
-import java.time.{ LocalDate, LocalDateTime, ZoneOffset }
+import java.time.{ LocalDateTime, ZoneOffset }
 import java.util.UUID
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
@@ -151,7 +152,7 @@ class LocalMessageStoreSpec
       "check if a directory is empty" - {
         "when is is not empty" in {
           val mockJmsMessage = generateMockJmsMessage("")
-          val messageId = persistMessage(mockJmsMessage)
+          val _ = persistMessage(mockJmsMessage)
 
           LocalMessageStore.checkDirectoryExists(tempDirectoryPath) mustBe true
           LocalMessageStore.checkDirectoryNonEmpty(tempDirectoryPath) mustBe true
@@ -212,11 +213,12 @@ class LocalMessageStoreSpec
     when(mockJmsMessage.asTextF[IO]).thenReturn(IO.pure(text))
     when(mockJmsMessage.getJMSMessageId).thenReturn(Some(UUID.randomUUID().toString))
     when(mockJmsMessage.getJMSTimestamp).thenReturn(Some(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)))
-    when(mockJmsMessage.getStringProperty(eqTo("OMGMessageTypeID"))).thenReturn(Some("OSGESZZZ100"))
-    when(mockJmsMessage.getStringProperty(eqTo("OMGApplicationID"))).thenReturn(Some("ABCD002"))
-    when(mockJmsMessage.getStringProperty(eqTo("OMGMessageFormat"))).thenReturn(Some("application/json"))
-    when(mockJmsMessage.getStringProperty(eqTo("OMGToken"))).thenReturn(Some("application"))
-    when(mockJmsMessage.getStringProperty(eqTo("OMGResponseAddress"))).thenReturn(Some("ABCD002.a"))
+    when(mockJmsMessage.getStringProperty(eqTo(MessageProperties.OMGMessageTypeID))).thenReturn(Some("OSGESZZZ100"))
+    when(mockJmsMessage.getStringProperty(eqTo(MessageProperties.OMGApplicationID))).thenReturn(Some("ABCD002"))
+    when(mockJmsMessage.getStringProperty(eqTo(MessageProperties.OMGMessageFormat)))
+      .thenReturn(Some("application/json"))
+    when(mockJmsMessage.getStringProperty(eqTo(MessageProperties.OMGToken))).thenReturn(Some("application"))
+    when(mockJmsMessage.getStringProperty(eqTo(MessageProperties.OMGReplyAddress))).thenReturn(Some("ABCD002.a"))
     mockJmsMessage
   }
 

@@ -19,23 +19,20 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.business.echo
+package uk.gov.nationalarchives.omega.api.messages
 
-import cats.data.{ NonEmptyChain, Validated }
-import uk.gov.nationalarchives.omega.api.business._
-class EchoService extends BusinessService with BusinessRequestValidation {
+import enumeratum._
 
-  override def validateRequest(request: BusinessServiceRequest): ValidationResult =
-    Validated.cond(
-      request.text.trim.nonEmpty,
-      request,
-      NonEmptyChain.one(TextIsNonEmptyCharacters("Echo Text cannot be empty."))
-    )
+sealed trait IncomingMessageType extends EnumEntry
+object IncomingMessageType extends Enum[IncomingMessageType] {
 
-  override def process(request: BusinessServiceRequest): Either[BusinessServiceError, BusinessServiceReply] =
-    if (request.text.contains("ERROR")) {
-      Left(EchoExplicitError(s"Explicit error: ${request.text}"))
-    } else {
-      Right(EchoReply(s"The Echo Service says: ${request.text}"))
-    }
+  val values: IndexedSeq[IncomingMessageType] = findValues
+
+  case object ECHO001 extends IncomingMessageType {
+    // This happens to follow the regex; otherwise, it's arbitrary.
+    override val entryName = "OSGESZZZ100"
+  }
+
+  // add more service identifiers here
+
 }

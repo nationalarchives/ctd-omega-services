@@ -24,7 +24,8 @@ package uk.gov.nationalarchives.omega.api.services
 import cats.data.NonEmptyChain
 import cats.effect.IO
 import jms4s.config.QueueName
-import uk.gov.nationalarchives.omega.api.business.BusinessRequestValidationError
+import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidationError, BusinessServiceError }
+import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, ValidatedLocalMessage }
 
 class TestProducerImpl(val queueName: QueueName) extends LocalProducer {
 
@@ -35,11 +36,11 @@ class TestProducerImpl(val queueName: QueueName) extends LocalProducer {
     IO.unit
   }
 
-  override def sendWhenGenericRequestIsInvalid(
+  override def sendInvalidMessageFormatError(
     localMessage: LocalMessage,
     errors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
   ): IO[Unit] = {
-    message = localMessageValidationErrorsToReplyMessage(errors)
+    message = localMessageValidationErrorsToReplyMessage(errors).toString()
     IO.unit
   }
 
@@ -47,7 +48,30 @@ class TestProducerImpl(val queueName: QueueName) extends LocalProducer {
     localMessage: LocalMessage,
     errors: NonEmptyChain[BusinessRequestValidationError]
   ): IO[Unit] = {
-    message = businessRequestValidationErrorToReplyMessage(errors)
+    message = businessRequestValidationErrorToReplyMessage(errors).toString()
+    IO.unit
+  }
+
+  override def sendProcessingError(
+    businessServiceError: BusinessServiceError,
+    requestMessage: ValidatedLocalMessage
+  ): IO[Unit] = IO.unit
+
+  override def sendUnrecognisedMessageTypeError(localMessage: LocalMessage): IO[Unit] = IO.unit
+
+  override def sendInvalidApplicationError(
+    localMessage: LocalMessage,
+    errors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
+  ): IO[Unit] = {
+    message = localMessageValidationErrorsToReplyMessage(errors).toString()
+    IO.unit
+  }
+
+  override def sendAuthenticationError(
+    localMessage: LocalMessage,
+    errors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
+  ): IO[Unit] = {
+    message = localMessageValidationErrorsToReplyMessage(errors).toString()
     IO.unit
   }
 }

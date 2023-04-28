@@ -34,6 +34,8 @@ object ApiServiceApp extends IOApp {
   implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
+  val applicationId = "PACS001"
+
   override def run(args: List[String]): IO[ExitCode] = {
     val serviceConfig = ConfigSource.default.loadOrThrow[ServiceConfig]
     val apiService = new ApiService(serviceConfig)

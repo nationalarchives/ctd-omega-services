@@ -19,23 +19,29 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.business.echo
+package uk.gov.nationalarchives.omega.api.common
 
-import cats.data.{ NonEmptyChain, Validated }
-import uk.gov.nationalarchives.omega.api.business._
-class EchoService extends BusinessService with BusinessRequestValidation {
+import enumeratum.{ CirceEnum, Enum, EnumEntry }
 
-  override def validateRequest(request: BusinessServiceRequest): ValidationResult =
-    Validated.cond(
-      request.text.trim.nonEmpty,
-      request,
-      NonEmptyChain.one(TextIsNonEmptyCharacters("Echo Text cannot be empty."))
-    )
+sealed trait ErrorCode extends EnumEntry
+object ErrorCode extends Enum[ErrorCode] with CirceEnum[ErrorCode] {
 
-  override def process(request: BusinessServiceRequest): Either[BusinessServiceError, BusinessServiceReply] =
-    if (request.text.contains("ERROR")) {
-      Left(EchoExplicitError(s"Explicit error: ${request.text}"))
-    } else {
-      Right(EchoReply(s"The Echo Service says: ${request.text}"))
-    }
+  val values: IndexedSeq[ErrorCode] = findValues
+
+  case object PROC001 extends ErrorCode
+  case object MISS001 extends ErrorCode
+  case object MISS002 extends ErrorCode
+  case object MISS003 extends ErrorCode
+  case object MISS004 extends ErrorCode
+  case object MISS005 extends ErrorCode
+  case object MISS006 extends ErrorCode
+  case object MISS007 extends ErrorCode
+  case object INVA001 extends ErrorCode
+  case object INVA002 extends ErrorCode
+  case object INVA003 extends ErrorCode
+  case object INVA005 extends ErrorCode
+  case object INVA006 extends ErrorCode
+  case object INVA007 extends ErrorCode
+  case object BLAN001 extends ErrorCode
+
 }

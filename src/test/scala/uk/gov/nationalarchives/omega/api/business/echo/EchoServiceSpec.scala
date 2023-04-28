@@ -26,7 +26,7 @@ import cats.data.Validated.{ Invalid, Valid }
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.{ MatchResult, Matcher }
-import uk.gov.nationalarchives.omega.api.business.{ BusinessServiceError, BusinessServiceRequest, BusinessServiceResponse, TextIsNonEmptyCharacters }
+import uk.gov.nationalarchives.omega.api.business.{ BusinessServiceError, BusinessServiceReply, BusinessServiceRequest, TextIsNonEmptyCharacters }
 
 class EchoServiceSpec extends AnyFreeSpec with Matchers {
 
@@ -256,16 +256,16 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
         s"We didn't expect the validation result to be invalid - with the error message [$expectedErrorMessage] - but it was."
       )
 
-  def beASuccess(expectedMessage: String): Matcher[Either[BusinessServiceError, BusinessServiceResponse]] =
-    (processingResult: Either[BusinessServiceError, BusinessServiceResponse]) =>
+  def beASuccess(expectedMessage: String): Matcher[Either[BusinessServiceError, BusinessServiceReply]] =
+    (processingResult: Either[BusinessServiceError, BusinessServiceReply]) =>
       MatchResult(
-        processingResult == Right(EchoResponse(expectedMessage)),
+        processingResult == Right(EchoReply(expectedMessage)),
         s"We expected the processing result to be successful, with the message [$expectedMessage], but it was actually [$processingResult].",
         s"We didn't expect the processing result to be successful, with the message [$expectedMessage], but it was."
       )
 
-  def beAFailure(expectedErrorMessage: String): Matcher[Either[BusinessServiceError, BusinessServiceResponse]] =
-    (processingResult: Either[BusinessServiceError, BusinessServiceResponse]) =>
+  def beAFailure(expectedErrorMessage: String): Matcher[Either[BusinessServiceError, BusinessServiceReply]] =
+    (processingResult: Either[BusinessServiceError, BusinessServiceReply]) =>
       MatchResult(
         processingResult == Left(EchoExplicitError(expectedErrorMessage)),
         s"We expected the processing result to be a failure, with the error message [$expectedErrorMessage], but it was actually [$processingResult].",

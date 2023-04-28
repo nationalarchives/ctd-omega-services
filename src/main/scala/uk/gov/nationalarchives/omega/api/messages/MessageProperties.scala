@@ -19,8 +19,14 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.business
+package uk.gov.nationalarchives.omega.api.messages
 
-trait BusinessServiceResponse {
-  val content: String
+object MessageProperties {
+
+  val OMGApplicationID = "OMGApplicationID"
+  val OMGMessageTypeID = "OMGMessageTypeID"
+  val OMGMessageFormat = "OMGMessageFormat"
+  val OMGToken = "OMGToken"
+  val OMGReplyAddress = "OMGReplyAddress"
+
 }

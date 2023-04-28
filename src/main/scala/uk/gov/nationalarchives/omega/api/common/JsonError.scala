@@ -19,20 +19,16 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.services
+package uk.gov.nationalarchives.omega.api.common
 
-import uk.gov.nationalarchives.omega.api.common.Version1UUID
+import io.circe.{ Encoder, Json }
+import io.circe.syntax._
 
-import java.time.LocalDateTime
-
-final case class ValidatedLocalMessage(
-  persistentMessageId: Version1UUID,
-  serviceId: ServiceIdentifier,
-  messageText: String,
-  correlationId: String,
-  applicationId: String,
-  time: LocalDateTime,
-  messageFormat: String,
-  authToken: String,
-  responseAddress: String
-)
+final case class JsonError(code: ErrorCode, description: String)
+object JsonError {
+  implicit val encodeJsonError: Encoder[JsonError] = (jsonError: JsonError) =>
+    Json.obj(
+      ("code", jsonError.code.asJson),
+      ("description", jsonError.description.asJson)
+    )
+}
