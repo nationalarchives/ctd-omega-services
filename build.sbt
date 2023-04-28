@@ -51,7 +51,7 @@ lazy val root = Project("ctd-omega-services", file("."))
       ),
       Developer(
         id = "adamretter",
-        name = "Adam Retetr",
+        name = "Adam Retter",
         email = "adam@evolvedbinary.com",
         url = url("https://www.evolvedbinary.com")
       )
