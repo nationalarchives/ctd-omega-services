@@ -26,6 +26,10 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import scala.util.{ Failure, Success, Try }
 
+/** This is for testing the Message Recovery function in the ApiService to process the
+  * LocalMessage[uk.gov.nationalarchives.omega.api.messages.LocalMessage] files in the LocalMessageStore and sending
+  * response messages to the client when the application starts
+  */
 class MessageRecoveryISpec
     extends AsyncFreeSpec with AsyncIOSpec with Matchers with Eventually with IntegrationPatience
     with BeforeAndAfterEach with BeforeAndAfterAll {
@@ -105,7 +109,7 @@ class MessageRecoveryISpec
   "The Message Recovery API" - {
 
     // TODO(RW) this test is being ignored until PACT-931 and PACT-932 are completed
-    "runs the recovery service and removes the message from the message store" ignore {
+    "runs the recovery service and removes the message from the message store" in {
       val messageStoreFolder = Paths.get(tempMsgDir.get)
       val localMessageStore = new LocalMessageStore(messageStoreFolder)
       eventually {
