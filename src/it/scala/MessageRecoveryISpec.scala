@@ -26,6 +26,10 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import scala.util.{ Failure, Success, Try }
 
+/** This is for testing the Message Recovery function in the ApiService to process the
+  * LocalMessage[uk.gov.nationalarchives.omega.api.messages.LocalMessage] files in the LocalMessageStore and sending
+  * response messages to the client when the application starts
+  */
 class MessageRecoveryISpec
     extends AsyncFreeSpec with AsyncIOSpec with Matchers with Eventually with IntegrationPatience
     with BeforeAndAfterEach with BeforeAndAfterAll {
@@ -63,11 +67,12 @@ class MessageRecoveryISpec
       case Left(e) => IO.delay(fail(s"Unable to read message contents due to ${e.getMessage}"))
     }
 
+  /** Setup resources and services for the test:
+    * 1.create a LocalMessage and Serialize the LocalMessage to a temporary directory 2.create an instance of the
+    * ApiService 3.set up the consumer to handle messages for the test 4.start the consumer and the ApiService
+    */
   override protected def beforeAll(): Unit = {
-    // load messages to disk
-    // create a valid message
     val tmpMessage = generateValidLocalMessageForEchoService().copy(messageText = testMessage)
-    // write the message to file in the temporary message store
     val path = writeMessageFile(tmpMessage)
     messageId.set(Some(tmpMessage.persistentMessageId)).unsafeRunSync()
     tempMsgDir = Some(path.getParent.toString)
