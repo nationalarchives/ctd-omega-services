@@ -377,7 +377,10 @@ components:
               application and must be prefixed with the OMGApplicationID of the
               application that is making the request.
             type: string
-            pattern: '[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])(\.[A-Za-z0-9])+'
+            pattern: '[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])_([A-Za-z0-9_])+'
+            examples:
+              - 'PACE001_REPLY_1'
+              - 'OMGR002_REPLY'
   schemas:
 
     LegalStatusSummary:
