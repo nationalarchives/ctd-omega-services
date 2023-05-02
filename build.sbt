@@ -1,7 +1,7 @@
 val CatsEffectVersion = "3.4.8"
 val Log4CatsVersion = "2.5.0"
 val PureConfigVersion = "0.17.2"
-val Jms4SVersion = "0.0.1-53518bb-SNAPSHOT"
+val Jms4SVersion = "0.5.0-TNA-OMG-0.1.0"
 val AwsJavaSdkVersion = "2.18.1"
 val CirceVersion = "0.14.5"
 val EnumeratumVersion = "1.7.2"
@@ -30,12 +30,6 @@ lazy val root = Project("ctd-omega-services", file("."))
     organizationName := "The National Archives",
     organizationHomepage := Some(url("http://nationalarchives.gov.uk")),
     maintainer := "webmaster@nationalarchives.gov.uk",
-    githubOwner := "nationalarchives",
-    githubRepository := "ctd-omega-services",
-    githubTokenSource := TokenSource.Or(
-      TokenSource.Environment("GITHUB_TOKEN"),
-      TokenSource.GitConfig("github.token")
-    ),
     scmInfo := Some(
       ScmInfo(
         url("https://github.com/nationalarchives/ctd-omega-services"),
@@ -51,7 +45,7 @@ lazy val root = Project("ctd-omega-services", file("."))
       ),
       Developer(
         id = "adamretter",
-        name = "Adam Retetr",
+        name = "Adam Retter",
         email = "adam@evolvedbinary.com",
         url = url("https://www.evolvedbinary.com")
       )
@@ -65,22 +59,22 @@ lazy val root = Project("ctd-omega-services", file("."))
       // concurrency abstractions and primitives (Concurrent, Sync, Async etc.)
       "org.typelevel" %% "cats-effect-kernel" % CatsEffectVersion,
       // standard "effect" library (Queues, Console, Random etc.)
-      "org.typelevel"         %% "cats-effect-std"               % CatsEffectVersion,
-      "dev.fpinbo"            %% "jms4s"                         % Jms4SVersion,
-      "dev.fpinbo"            %% "jms4s-simple-queue-service"    % Jms4SVersion,
-      "com.github.pureconfig" %% "pureconfig-core"               % PureConfigVersion,
-      "com.github.pureconfig" %% "pureconfig-generic"            % PureConfigVersion,
-      "com.github.pureconfig" %% "pureconfig-generic-base"       % PureConfigVersion,
-      "com.fasterxml.uuid"     % "java-uuid-generator"           % "4.1.0",
-      "com.beachape"          %% "enumeratum"                    % EnumeratumVersion,
-      "com.beachape"          %% "enumeratum-circe"              % EnumeratumVersion,
-      "org.typelevel"         %% "log4cats-core"                 % Log4CatsVersion,
-      "org.typelevel"         %% "log4cats-slf4j"                % Log4CatsVersion,
-      "com.chuusai"           %% "shapeless"                     % "2.3.10",
-      "org.apache.commons"     % "commons-lang3"                 % "3.12.0",
-      "io.circe"              %% "circe-core"                    % CirceVersion,
-      "io.circe"              %% "circe-generic"                 % CirceVersion,
-      "io.circe"              %% "circe-parser"                  % CirceVersion,
+      "org.typelevel"                                 %% "cats-effect-std"            % CatsEffectVersion,
+      "uk.gov.nationalarchives.thirdparty.dev.fpinbo" %% "jms4s"                      % Jms4SVersion,
+      "uk.gov.nationalarchives.thirdparty.dev.fpinbo" %% "jms4s-simple-queue-service" % Jms4SVersion,
+      "com.github.pureconfig"                         %% "pureconfig-core"            % PureConfigVersion,
+      "com.github.pureconfig"                         %% "pureconfig-generic"         % PureConfigVersion,
+      "com.github.pureconfig"                         %% "pureconfig-generic-base"    % PureConfigVersion,
+      "com.fasterxml.uuid"                             % "java-uuid-generator"        % "4.1.0",
+      "com.beachape"                                  %% "enumeratum"                 % EnumeratumVersion,
+      "com.beachape"                                  %% "enumeratum-circe"           % EnumeratumVersion,
+      "org.typelevel"                                 %% "log4cats-core"              % Log4CatsVersion,
+      "org.typelevel"                                 %% "log4cats-slf4j"             % Log4CatsVersion,
+      "com.chuusai"                                   %% "shapeless"                  % "2.3.10",
+      "org.apache.commons"                             % "commons-lang3"              % "3.12.0",
+      "io.circe"                                      %% "circe-core"                 % CirceVersion,
+      "io.circe"                                      %% "circe-generic"              % CirceVersion,
+      "io.circe"                                      %% "circe-parser"               % CirceVersion,
       "ch.qos.logback"         % "logback-classic"               % "1.3.5"   % Runtime, // Java 8 compatible
       "net.logstash.logback"   % "logstash-logback-encoder"      % "7.3"     % Runtime,
       "org.scalatest"         %% "scalatest"                     % "3.2.15"  % "it,test",
@@ -94,8 +88,7 @@ lazy val root = Project("ctd-omega-services", file("."))
 
       // better monadic for compiler plugin as suggested by documentation
       compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
-    ),
-    resolvers += Resolver.githubPackages("rwalpole")
+    )
   )
 Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oD", "-h", "target/test-reports")
 IntegrationTest / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/it-reports")
