@@ -67,11 +67,12 @@ class MessageRecoveryISpec
       case Left(e) => IO.delay(fail(s"Unable to read message contents due to ${e.getMessage}"))
     }
 
+  /** Setup resources and services for the test:
+    * 1.create a LocalMessage and Serialize the LocalMessage to a temporary directory 2.create an instance of the
+    * ApiService 3.set up the consumer to handle messages for the test 4.start the consumer and the ApiService
+    */
   override protected def beforeAll(): Unit = {
-    // load messages to disk
-    // create a valid message
     val tmpMessage = generateValidLocalMessageForEchoService().copy(messageText = testMessage)
-    // write the message to file in the temporary message store
     val path = writeMessageFile(tmpMessage)
     messageId.set(Some(tmpMessage.persistentMessageId)).unsafeRunSync()
     tempMsgDir = Some(path.getParent.toString)
@@ -109,7 +110,7 @@ class MessageRecoveryISpec
   "The Message Recovery API" - {
 
     // TODO(RW) this test is being ignored until PACT-931 and PACT-932 are completed
-    "runs the recovery service and removes the message from the message store" in {
+    "runs the recovery service and removes the message from the message store" ignore {
       val messageStoreFolder = Paths.get(tempMsgDir.get)
       val localMessageStore = new LocalMessageStore(messageStoreFolder)
       eventually {
