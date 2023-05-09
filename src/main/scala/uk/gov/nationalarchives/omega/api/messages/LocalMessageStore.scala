@@ -65,7 +65,7 @@ class LocalMessageStore(directoryPath: Path) {
         deserializeFile(path.toPath).map {
           case Success(s) => Some(s)
           case Failure(e) =>
-            logger.info(s"Error during reading files in directory $e")
+            logger.info(s"Error $e during reading files in directory ${path.toPath} ")
             None
         }
       )
