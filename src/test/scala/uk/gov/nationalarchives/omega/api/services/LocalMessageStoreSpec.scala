@@ -22,11 +22,11 @@
 package uk.gov.nationalarchives.omega.api.services
 
 import cats.effect.IO
-import cats.effect.unsafe.implicits.global
+import cats.effect.testing.scalatest.AsyncIOSpec
 import jms4s.jms.JmsMessage
 import org.mockito.ArgumentMatchersSugar.eqTo
 import org.mockito.MockitoSugar
-import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach }
 import uk.gov.nationalarchives.omega.api.LocalMessageSupport
@@ -36,17 +36,14 @@ import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, LocalMessageSt
 import java.nio.file.{ AccessDeniedException, NoSuchFileException }
 import java.time.{ LocalDateTime, ZoneOffset }
 import java.util.UUID
-import scala.concurrent.Await
-import scala.concurrent.duration.DurationInt
-import scala.util.{ Failure, Success }
 
 class LocalMessageStoreSpec
-    extends AnyFreeSpec with Matchers with BeforeAndAfterAll with BeforeAndAfterEach with MockitoSugar
-    with LocalMessageSupport {
+    extends AsyncFreeSpec with AsyncIOSpec with Matchers with BeforeAndAfterAll with BeforeAndAfterEach
+    with MockitoSugar with LocalMessageSupport {
 
   override protected def afterAll(): Unit = {
-    super.afterAll()
     deleteTempDirectory()
+    super.afterAll()
   }
 
   "The LocalMessageStore when" - {
@@ -58,9 +55,9 @@ class LocalMessageStoreSpec
 
           val messageId = persistMessage(mockJmsMessage)
 
-          messageId must haveFileContents("")
+          messageId.asserting(_ must haveFileContents(""))
 
-          removeMessage(messageId)
+          messageId.flatMap(removeMessage).asserting(_ mustBe ())
 
         }
         "not empty" in {
@@ -69,9 +66,9 @@ class LocalMessageStoreSpec
 
           val messageId = persistMessage(mockJmsMessage)
 
-          messageId must haveFileContents("Hello, world")
+          messageId.asserting(_ must haveFileContents("Hello, world"))
 
-          removeMessage(messageId)
+          messageId.flatMap(removeMessage).asserting(_ mustBe ())
 
         }
 
@@ -82,9 +79,7 @@ class LocalMessageStoreSpec
 
         makeTempDirectoryReadOnly()
 
-        assertThrows[AccessDeniedException] {
-          persistMessage(mockJmsMessage)
-        }
+        persistMessage(mockJmsMessage).assertThrows[AccessDeniedException]
 
       }
     }
@@ -94,10 +89,11 @@ class LocalMessageStoreSpec
           val mockJmsMessage = generateMockJmsMessage("Hello, world")
 
           val messageId = persistMessage(mockJmsMessage)
-          val writtenMessage = readMessage(messageId)
+          val writtenMessage = messageId.flatMap(id => readMessage(id))
 
-          removeMessage(messageId)
-          writtenMessage.messageText mustEqual "Hello, world"
+          messageId.flatMap(removeMessage).asserting(_ mustBe ())
+
+          writtenMessage.asserting(_.messageText mustEqual "Hello, world")
         }
       }
       "when multiple messages have been written" - {
@@ -105,11 +101,10 @@ class LocalMessageStoreSpec
           val mockJmsMessage1 = generateMockJmsMessage("Hello, world")
           val mockJmsMessage2 = generateMockJmsMessage("Hello, world, again")
 
-          persistMessage(mockJmsMessage1)
-          persistMessage(mockJmsMessage2)
-
-          // TODO: Messages are not being cleaned up before this test.
-          readAllMessages().map(_.messageText).toSet mustEqual Set("Hello, world", "Hello, world, again")
+          persistMessage(mockJmsMessage1) *>
+            persistMessage(mockJmsMessage2) *>
+            // TODO: Messages are not being cleaned up before this test.
+            readAllMessages().asserting(_.map(_.messageText).toSet mustEqual Set("Hello, world", "Hello, world, again"))
 
         }
       }
@@ -121,32 +116,27 @@ class LocalMessageStoreSpec
           val messageId = Version1UUID.generate()
           messageId must not(haveACorrespondingFile)
 
-          assertThrows[NoSuchFileException] {
-            removeMessage(messageId)
-          }
-
+          removeMessage(messageId).assertThrows[NoSuchFileException]
         }
         "has a corresponding file" in {
 
-          val messageId = givenThatAFileHasBeenWritten()
-
-          removeMessage(messageId)
-
-          messageId must not(haveACorrespondingFile)
-
+          givenThatAFileHasBeenWritten().flatMap { messageId =>
+            removeMessage(messageId).asserting(_ mustBe ()) *>
+              IO.pure(messageId).asserting(_ must not(haveACorrespondingFile))
+          }
         }
       }
 
       "when there's a IO failure" in {
 
-        val messageId = givenThatAFileHasBeenWritten()
-        makeTempDirectoryReadOnly()
+        val messageId = for {
+          id <- givenThatAFileHasBeenWritten()
+          _  <- IO.delay(makeTempDirectoryReadOnly()) *> IO.unit
+        } yield id
 
-        assertThrows[AccessDeniedException] {
-          removeMessage(messageId)
-        }
+        messageId.flatMap(removeMessage).assertThrows[AccessDeniedException]
 
-        messageId must haveACorrespondingFile
+        messageId.asserting(_ must haveACorrespondingFile)
 
       }
       "check if a directory is empty" - {
@@ -176,37 +166,36 @@ class LocalMessageStoreSpec
     prepareTempDirectory()
   }
 
-  private def givenThatAFileHasBeenWritten(): Version1UUID = {
+  private def givenThatAFileHasBeenWritten(): IO[Version1UUID] = {
     val contents = "Lorem ipsum dolor sit amet"
-    val mockJmsMessage = generateMockJmsMessage(contents)
-    val messageId = persistMessage(mockJmsMessage)
-    messageId must haveFileContents(contents)
-    messageId
+    val messageId = for {
+      mockJmsMessage <- IO.delay(generateMockJmsMessage(contents))
+      id             <- persistMessage(mockJmsMessage)
+    } yield id
+    messageId.asserting(_ must haveFileContents(contents)) *>
+      messageId
   }
 
-  private def persistMessage(mockJmsMessage: JmsMessage): Version1UUID =
-    await(localMessageStore.persistMessage(mockJmsMessage)) match {
-      case Success(messageId) => messageId
-      case Failure(e)         => throw e
-    }
+  private def persistMessage(mockJmsMessage: JmsMessage): IO[Version1UUID] =
+    for {
+      tryPersist <- localMessageStore.persistMessage(mockJmsMessage)
+      messageId  <- IO.fromTry(tryPersist)
+    } yield messageId
 
-  private def readMessage(messageId: Version1UUID): LocalMessage =
-    await(localMessageStore.readMessage(messageId)) match {
-      case Success(message) => message
-      case Failure(e)       => throw e
-    }
+  private def readMessage(messageId: Version1UUID): IO[LocalMessage] =
+    for {
+      tryRead <- localMessageStore.readMessage(messageId)
+      message <- IO.fromTry(tryRead)
+    } yield message
 
-  private def readAllMessages(): List[LocalMessage] =
-    await(localMessageStore.readAllFilesInDirectory())
+  private def readAllMessages(): IO[List[LocalMessage]] =
+    localMessageStore.readAllFilesInDirectory()
 
-  private def removeMessage(messageId: Version1UUID): Unit =
-    await(localMessageStore.removeMessage(messageId)) match {
-      case Success(_) =>
-      case Failure(e) => throw e
-    }
-
-  private def await[T](io: IO[T]): T =
-    Await.result(io.unsafeToFuture(), 1.second)
+  private def removeMessage(messageId: Version1UUID): IO[Unit] =
+    for {
+      tryRemove <- localMessageStore.removeMessage(messageId)
+      result    <- IO.fromTry(tryRemove)
+    } yield result
 
   private def generateMockJmsMessage(text: String): JmsMessage = {
     val mockJmsMessage = mock[JmsMessage]
