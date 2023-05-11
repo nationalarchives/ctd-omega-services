@@ -29,10 +29,11 @@ import jms4s.config.QueueName
 import jms4s.jms.JmsMessage
 import jms4s.{ JmsAcknowledgerConsumer, JmsProducer }
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
+import uk.gov.nationalarchives.omega.api.business.legalstatus.LegalStatusService
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.connectors.JmsConnector
-import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, LocalMessageStore }
+import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, LocalMessageStore, StubDataImpl }
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.createLocalMessage
 import uk.gov.nationalarchives.omega.api.services.ServiceState.{ Started, Starting, Stopped, Stopping }
 
@@ -69,16 +70,17 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     // TODO(AR) request queue will typically be 1 (plus maybe a few more for expedited ops), reply queues will be per external application
     val localQueue: IO[Queue[IO, LocalMessage]] = Queue.bounded[IO, LocalMessage](config.maxLocalQueueSize)
     val jmsConnector = new JmsConnector(config)
+    val stubData = new StubDataImpl()
 
     getLocalMessageStore.flatMap {
       case Right(localMessageStore) =>
         val result = for {
-          _ <- runRecovery(localMessageStore, jmsConnector)
+          _ <- runRecovery(localMessageStore, jmsConnector, stubData)
           q <- localQueue
           res <-
             jmsConnector.getJmsProducerAndConsumer(QueueName(config.requestQueue)).use {
               case (jmsProducer, jmsConsumer) =>
-                startHandlerAndDispatchers(q, jmsConsumer, jmsProducer, localMessageStore)
+                startHandlerAndDispatchers(q, jmsConsumer, jmsProducer, localMessageStore, stubData)
             }
         } yield res
         result.as(ExitCode.Success)
@@ -86,14 +88,18 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     }
   }
 
-  private def runRecovery(localMessageStore: LocalMessageStore, jmsConnector: JmsConnector): IO[Unit] = {
+  private def runRecovery(
+    localMessageStore: LocalMessageStore,
+    jmsConnector: JmsConnector,
+    stubData: StubDataImpl
+  ): IO[Unit] = {
     for {
       savedFiles <- Resource.eval(localMessageStore.readAllFilesInDirectory())
       jmsClient  <- jmsConnector.createJmsClient()
       producer   <- jmsConnector.createJmsProducer(jmsClient)(config.maxProducers)
     } yield producer match {
       case producer =>
-        val dispatcher = generateDispatcher(producer, localMessageStore)
+        val dispatcher = generateDispatcher(producer, localMessageStore, stubData)
         dispatcher.runRecovery(0)(savedFiles)
     }
   }.useEval
@@ -116,23 +122,29 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     queue: Queue[IO, LocalMessage],
     consumer: JmsAcknowledgerConsumer[IO],
     producer: JmsProducer[IO],
-    localMessageStore: LocalMessageStore
+    localMessageStore: LocalMessageStore,
+    stubData: StubDataImpl
   ): IO[Either[Unit, Unit]] =
     IO.race(
       createMessageHandler(queue, localMessageStore)(consumer),
       List.range(start = 0, end = config.maxDispatchers).parTraverse_ { i =>
         logger.info(s"Starting consumer #${i + 1}") >>
-          generateDispatcher(producer, localMessageStore)
+          generateDispatcher(producer, localMessageStore, stubData)
             .run(i)(queue)
             .foreverM
       }
     )
 
-  private def generateDispatcher(jmsProducer: JmsProducer[IO], localMessageStore: LocalMessageStore) =
+  private def generateDispatcher(
+    jmsProducer: JmsProducer[IO],
+    localMessageStore: LocalMessageStore,
+    stubData: StubDataImpl
+  ) =
     new Dispatcher(
       new LocalProducerImpl(jmsProducer, QueueName(config.replyQueue)),
       localMessageStore,
-      new EchoService()
+      new EchoService(),
+      new LegalStatusService(stubData)
     )
 
   private def doStop(): IO[ExitCode] =

@@ -19,23 +19,16 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages
+package uk.gov.nationalarchives.omega.api.support
 
-import enumeratum._
+import uk.gov.nationalarchives.omega.api.messages.StubData
+import uk.gov.nationalarchives.omega.api.models.LegalStatus
 
-sealed trait IncomingMessageType extends EnumEntry
-object IncomingMessageType extends Enum[IncomingMessageType] {
+class TestStubData extends StubData {
 
-  val values: IndexedSeq[IncomingMessageType] = findValues
-
-  case object ECHO001 extends IncomingMessageType {
-    // This happens to follow the regex; otherwise, it's arbitrary.
-    override val entryName = "OSGESZZZ100"
-  }
-
-  case object OSLISALS001 extends IncomingMessageType {
-    override val entryName = "OSLISALS001"
-  }
-  // add more service identifiers here
+  override def getLegalStatuses(): Seq[LegalStatus] = Seq(
+    LegalStatus("http://catalogue.nationalarchives.gov.uk/public-record", "Public Record"),
+    LegalStatus("http://catalogue.nationalarchives.gov.uk/non-public-record", "Non-Public Record")
+  )
 
 }

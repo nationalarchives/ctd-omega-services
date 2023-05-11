@@ -21,21 +21,21 @@
 
 package uk.gov.nationalarchives.omega.api.messages
 
-import enumeratum._
+import uk.gov.nationalarchives.omega.api.models.LegalStatus
 
-sealed trait IncomingMessageType extends EnumEntry
-object IncomingMessageType extends Enum[IncomingMessageType] {
+class StubDataImpl extends StubData
 
-  val values: IndexedSeq[IncomingMessageType] = findValues
+trait StubData {
 
-  case object ECHO001 extends IncomingMessageType {
-    // This happens to follow the regex; otherwise, it's arbitrary.
-    override val entryName = "OSGESZZZ100"
-  }
-
-  case object OSLISALS001 extends IncomingMessageType {
-    override val entryName = "OSLISALS001"
-  }
-  // add more service identifiers here
+  def getLegalStatuses(): Seq[LegalStatus] = Seq(
+    LegalStatus("http://catalogue.nationalarchives.gov.uk/public-record", "Public Record"),
+    LegalStatus("http://catalogue.nationalarchives.gov.uk/non-public-record", "Non-Public Record"),
+    LegalStatus(
+      "http://catalogue.nationalarchives.gov.uk/public-record-unless-otherwise-stated",
+      "Public Record (unless otherwise stated)"
+    ),
+    LegalStatus("http://catalogue.nationalarchives.gov.uk/welsh-public-record", "Welsh Public Record"),
+    LegalStatus("http://catalogue.nationalarchives.gov.uk/non-record-material", "Non-Record Material")
+  )
 
 }

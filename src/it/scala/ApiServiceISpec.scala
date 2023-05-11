@@ -123,6 +123,46 @@ class ApiServiceISpec
 
     }
 
+    "returns legal statuses message when given a valid message type" in { f =>
+      val textMessageConfig = generateValidMessageConfig().copy(messageTypeId = Some("OSLISALS001"))
+
+      sendMessage(f.session, f.producer, textMessageConfig)
+
+      assertReplyMessage(s"""[
+  {
+    "identifier" : "http://catalogue.nationalarchives.gov.uk/public-record",
+    "name" : "Public Record"
+  },
+  {
+    "identifier" : "http://catalogue.nationalarchives.gov.uk/non-public-record",
+    "name" : "Non-Public Record"
+  },
+  {
+    "identifier" : "http://catalogue.nationalarchives.gov.uk/public-record-unless-otherwise-stated",
+    "name" : "Public Record (unless otherwise stated)"
+  },
+  {
+    "identifier" : "http://catalogue.nationalarchives.gov.uk/welsh-public-record",
+    "name" : "Welsh Public Record"
+  },
+  {
+    "identifier" : "http://catalogue.nationalarchives.gov.uk/non-record-material",
+    "name" : "Non-Record Material"
+  }
+]""".stripMargin)
+
+    }
+
+    "returns an echo message when the message body is" - {
+      "empty (with padding)" in { f =>
+        val textMessageConfig = generateValidMessageConfig().copy(contents = " ")
+
+        sendMessage(f.session, f.producer, textMessageConfig)
+
+        assertReplyMessage("The Echo Service says:  ")
+      }
+    }
+
     "returns an error message when" - {
       "the OMGMessageTypeID (aka SID)" - {
         "isn't provided" in { f =>
@@ -229,19 +269,6 @@ class ApiServiceISpec
 
         assertReplyMessage(getExpectedJsonErrors(Map(INVA007 -> "Invalid OMGReplyAddress"))) *>
           assertMessageType(OutgoingMessageType.InvalidMessageFormatError.entryName)
-
-      }
-    }
-    "the message body is" - {
-      "empty (with padding)" in { f =>
-        val textMessageConfig = generateValidMessageConfig().copy(contents = " ")
-
-        sendMessage(f.session, f.producer, textMessageConfig)
-
-        assertReplyMessage(
-          getExpectedJsonErrors(Map(BLAN001 -> "Message text is blank: Echo Text cannot be empty."))
-        ) *>
-          assertMessageType(OutgoingMessageType.InvalidMessageError.entryName)
 
       }
     }

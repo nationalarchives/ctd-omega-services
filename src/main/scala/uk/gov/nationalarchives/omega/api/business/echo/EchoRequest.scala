@@ -23,4 +23,4 @@ package uk.gov.nationalarchives.omega.api.business.echo
 
 import uk.gov.nationalarchives.omega.api.business.BusinessServiceRequest
 
-case class EchoRequest(text: String) extends BusinessServiceRequest
+case class EchoRequest(text: Option[String]) extends BusinessServiceRequest
