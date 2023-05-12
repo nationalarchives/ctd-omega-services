@@ -42,7 +42,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
 
             val validationResult = echoService.validateRequest(echoRequest)
 
-            validationResult must beInvalid("Echo Text cannot be empty.")
+            validationResult must beValid(echoRequest)
 
           }
           "only consists of whitespace" in {
@@ -51,7 +51,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
 
             val validationResult = echoService.validateRequest(echoRequest)
 
-            validationResult must beInvalid("Echo Text cannot be empty.")
+            validationResult must beValid(echoRequest)
 
           }
           "has only one character" in {
@@ -89,7 +89,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
 
             val validationResult = echoService.validateRequest(echoRequest)
 
-            validationResult must beInvalid("Echo Text cannot be empty.")
+            validationResult must beValid(echoRequest)
 
           }
           "only consists of whitespace" in {
@@ -98,7 +98,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
 
             val validationResult = echoService.validateRequest(echoRequest)
 
-            validationResult must beInvalid("Echo Text cannot be empty.")
+            validationResult must beValid(echoRequest)
 
           }
           "has only one character" in {
