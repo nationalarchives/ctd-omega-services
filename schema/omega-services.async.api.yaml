@@ -60,6 +60,10 @@ channels:
         oneOf:
           - $ref: '#/components/messages/ListAssetLegalStatusSummary'
           - $ref: '#/components/messages/ListAssetLegalStatusFull'
+          - $ref: '#/components/messages/ListAgentSummary'
+          - $ref: '#/components/messages/ListAgentFull'
+          - $ref: '#/components/messages/GetAgentSummary'
+          - $ref: '#/components/messages/GetAgentFull'
 
   catalogue.editorial.web.application.instance.1:
     description: >-
@@ -81,6 +85,10 @@ channels:
           - $ref: '#/components/messages/ProcessingError'
           - $ref: '#/components/messages/AssetLegalStatusSummaryList'
           - $ref: '#/components/messages/AssetLegalStatusFullList'
+          - $ref: '#/components/messages/AgentSummaryList'
+          - $ref: '#/components/messages/AgentFullList'
+          - $ref: '#/components/messages/AgentSummary'
+          - $ref: '#/components/messages/AgentFull'
 
 
 components:
@@ -125,6 +133,69 @@ components:
         - $ref: '#/components/messageTraits/OMGRequest'
         - $ref: '#/components/messageTraits/OMGAuthentication'
 
+    ListAgentSummary:
+      messageId: OSLISAGT001
+      name: ListAgentSummary
+      title: List Agent Summaries
+      description: List a summary description of each Agent
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/OMGMessage'
+        - $ref: '#/components/messageTraits/OMGRequest'
+        - $ref: '#/components/messageTraits/OMGAuthentication'
+      payload:
+        $ref: '#/components/schemas/ListAgentParameters'
+
+    ListAgentFull:
+      messageId: OSLIFAGT001
+      name: ListAgentFull
+      title: List Agent
+      description: List a full description of each Agent
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/OMGMessage'
+        - $ref: '#/components/messageTraits/OMGRequest'
+        - $ref: '#/components/messageTraits/OMGAuthentication'
+      payload:
+        $ref: '#/components/schemas/ListAgentParameters'
+
+    GetAgentSummary:
+      messageId: OSGESAGT001
+      name: GetAgentSummary
+      title: Get Agent Summary
+      description: Get a summary description of an Agent
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/OMGMessage'
+        - $ref: '#/components/messageTraits/OMGRequest'
+        - $ref: '#/components/messageTraits/OMGAuthentication'
+      payload:
+        type: object
+        required:
+          - identifier
+        properties:
+          identifier:
+            $ref: '#/components/schemas/GeneralIdentifier'
+
+    GetAgentFull:
+      messageId: OSGEFAGT001
+      name: GetAgentFull
+      title: Get Agent
+      description: Get a full description of an Agent
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/OMGMessage'
+        - $ref: '#/components/messageTraits/OMGRequest'
+        - $ref: '#/components/messageTraits/OMGAuthentication'
+      payload:
+        type: object
+        required:
+          - identifier
+        properties:
+          identifier:
+            $ref: '#/components/schemas/GeneralIdentifier'
+
+
   ## Data Messages (may also be used as Service Reply Messages)
 
     AssetLegalStatusSummaryList:
@@ -156,6 +227,58 @@ components:
         type: array
         items:
           $ref: '#/components/schemas/LegalStatusFull'
+
+    AgentSummaryList:
+      messageId: ODLISAGT001
+      name: AgentSummaryList
+      title: Agent Summary List
+      description: List of summary descriptions of each Agent
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/JMSReply'
+        - $ref: '#/components/messageTraits/OMGMessage'
+      payload:
+        type: array
+        items:
+          - $ref: '#/components/schemas/AgentSummary'
+
+    AgentFullList:
+      messageId: ODLIFAGT001
+      name: AgentFullList
+      title: Agent Full List
+      description: List of full descriptions of each Agent
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/JMSReply'
+        - $ref: '#/components/messageTraits/OMGMessage'
+      payload:
+        type: array
+        items:
+          $ref: '#/components/schemas/AgentFull'
+
+    AgentSummary:
+      messageId: ODENSAGT001
+      name: AgentSummary
+      title: Agent Summary
+      description: Summary description of an Agent
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/JMSReply'
+        - $ref: '#/components/messageTraits/OMGMessage'
+      payload:
+        $ref: '#/components/schemas/AgentSummary'
+
+    AgentFull:
+      messageId: ODENFAGT001
+      name: AgentFull
+      title: Agent Full
+      description: Full description of an Agent
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/JMSReply'
+        - $ref: '#/components/messageTraits/OMGMessage'
+      payload:
+        $ref: '#/components/schemas/AgentFull'
 
   ## Error Messages
     GeneralError:
@@ -407,6 +530,7 @@ components:
         - $ref: '#/components/schemas/LegalStatusSummary'
         - $ref: '#/components/schemas/DescriptionOfConcept'
 
+    # SKOS like description of concept
     DescriptionOfConcept:
       type: object
       required:
@@ -420,6 +544,230 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GeneralDatedDescription'
+
+    ListAgentParameters:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/AgentTypes'
+          description: Limits the list to one-or-more types of Agent. If omitted, all types of agents are included in the list.
+        authority-file:
+          $ref: '#/components/schemas/AuthorityFile'
+          description: Limits the list of Agent(s) to only those that are (or are not) also Authority Files. If omitted both authorative and non-authorative Agents are included in the list.
+        depository:
+          $ref: '#/components/schemas/Depository'
+          description: Limits the list of Agent(s) to only those that are (or are not) also a depository. If omitted both depository and non-depository Agents are included in the list.
+        version-timestamp:
+          $ref: '#/components/schemas/VersionTimestamp'
+          description: Limits the list of Agent(s) to only those that have a version timestamp that is greated than or equal to this timestamp.
+          default: latest
+
+    AgentSummary:
+      type: object
+      required:
+        - identifier
+        - type
+        - current-description
+        - description
+      properties:
+        identifier:
+          $ref: '#/components/schemas/GeneralIdentifier'
+        type:
+          $ref: '#/components/schemas/AgentType'
+        current-description:
+          $ref: '#/components/schemas/GeneralIdentifier'
+          description: the identifier of the current description of the Agent concept
+        description:
+          type: array
+          items:
+            '#/components/schemas/AgentDescriptionSummary'
+
+    AgentFull:
+      type: object
+      required:
+        - identifier
+        - type
+        - current-description
+        - description
+      properties:
+        identifier:
+          $ref: '#/components/schemas/GeneralIdentifier'
+        type:
+          $ref: '#/components/schemas/AgentType'
+        current-description:
+          $ref: '#/components/schemas/GeneralIdentifier'
+          description: the identifier of the current description of the Agent concept
+        description:
+          type: array
+          items:
+            $ref: '#/components/schemas/AgentDescriptionFull'
+
+    AgentDescriptionSummary:
+      type: object
+      required:
+        - identifier
+        - label
+        - depository
+        - authority-file
+        - version-timestamp
+      properties:
+        identifier:
+          $ref: '#/components/schemas/GeneralIdentifier'
+        label:
+          $ref: '#/components/schemas/GeneralLabel'
+        authority-file:
+          $ref: '#/components/schemas/AuthorityFile'
+        depository:
+          $ref: '#/components/schemas/Depository'
+        version-timestamp:
+          $ref: '#/components/schemas/VersionTimestamp'
+        previous-description:
+          $ref: '#/components/schemas/GeneralIdentifier'
+
+    AgentDescriptionFull:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/AgentDescriptionSummary'
+        - $ref: '#/components/schemas/AgentDescriptionProperties'
+
+    AgentDescriptionProperties:
+      type: object
+      properties:
+        ### TODO (AR) finish this bit
+        honourific-title:
+          type: array
+          items:
+            type: string
+        title:
+          type: string
+        given-name:
+          type: array
+          items:
+            type: string
+        surname:
+          type: string
+        name:
+          type: array
+          items:
+            type: string
+        variant-name:
+          type: array
+          items:
+            type: string
+        prefererred-name:
+          type: array
+          items:
+            type: string
+        fuller-form-of-name:
+          type: string
+        member-of:
+          type: array
+          items:
+            type: object
+            required:
+              - prominent
+              - agent
+            properties:
+              prominent:
+                type: boolean
+              agent:
+                type:
+                  $ref: '#/components/schemas/GeneralIdentifier'
+        predecesor:
+          type: array
+          items:
+            type:
+              $ref: '#/components/schemas/GeneralIdentifier'
+        sucessor:
+          type: array
+          items:
+            type:
+              $ref: '#/components/schemas/GeneralIdentifier'
+        descendant:
+          type: array
+          items:
+            type:
+              $ref: '#/components/schemas/GeneralIdentifier'
+        broader-affiliation:
+          type: array
+          items:
+            type:
+              $ref: '#/components/schemas/GeneralIdentifier'
+        founder:
+          type: array
+          items:
+            type:
+              $ref: '#/components/schemas/GeneralIdentifier'
+        assoocitaed-place:
+          type: array
+          items:
+            type:
+              $ref: '#/components/schemas/GeneralIdentifier'
+        relation:
+          type: array
+          items:
+            type:
+              $ref: '#/components/schemas/GeneralIdentifier'
+        date-from:
+          type: date
+        date-to:
+          type: date
+        field-of-activity:
+          type: array
+          items:
+            type: string
+        archon-code: string
+        consulted-source:
+          type: array
+          items:
+            type:
+              $ref: '#/components/schemas/GeneralIdentifier'
+        status-of-identification:
+          type: string
+        timespan-note:
+          type: array
+          items:
+            type: object
+            properties:
+              date-from:
+                type: date
+              date-to:
+                type: date
+              note:
+                type: string
+        note:
+          type: array
+          items:
+            type: string
+
+    AgentTypes:
+      type: array
+      items:
+        $ref: '#/components/schemas/AgentType'
+      description: One or more types of Agent
+
+    AgentType:
+      type: string
+      enum:
+        - Collective Agent
+        - Corporate Body
+        - Family
+        - Hardware Agent
+        - Person
+        - Software Agent
+      description: A type of Agent
+
+    Depository:
+      type: boolean
+      description: true to indicate a Place of Deposit, false otherwise
+
+    AuthorityFile:
+      type: boolean
+      description: true to indicate that this Agent is also considered an Authority File, false otherwise
+
+    VersionTimestamp:
+      type: [date-time, string]
+      description: A version timestamp, or the string constants `latest` or `all`.
 
     GeneralIdentifier:
       type: string
