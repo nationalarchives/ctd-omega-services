@@ -75,4 +75,10 @@ object OutgoingMessageType extends Enum[OutgoingMessageType] {
     override val entryName = "OELIFERR007"
   }
 
+  /** Message Id for the legal status summary reply AssetLegalStatusSummaryList response as described in the AsyncAPI
+    * schema
+    */
+  case object AssetLegalStatusSummaryList extends OutgoingMessageType {
+    override val entryName = "ODLISALS001"
+  }
 }

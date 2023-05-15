@@ -31,6 +31,7 @@ import uk.gov.nationalarchives.omega.api.ApiServiceApp
 import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidationError, BusinessServiceError, TextIsNonEmptyCharacters }
 import uk.gov.nationalarchives.omega.api.common.ErrorCode._
 import uk.gov.nationalarchives.omega.api.common.JsonError
+import uk.gov.nationalarchives.omega.api.messages.IncomingMessageType.OSLISALS001
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage._
 import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, MessageProperties, OutgoingMessageType, ValidatedLocalMessage }
 
@@ -38,7 +39,6 @@ trait LocalProducer {
 
   val jsonContentType = "application/json"
   def send(replyMessage: String, requestMessage: ValidatedLocalMessage): IO[Unit]
-
   def sendProcessingError(businessServiceError: BusinessServiceError, requestMessage: ValidatedLocalMessage): IO[Unit]
 
   def sendInvalidMessageFormatError(
@@ -126,6 +126,20 @@ class LocalProducerImpl(val jmsProducer: JmsProducer[IO], val outputQueue: Queue
       val msg = mf.makeTextMessage(replyMessage)
       msg.map { m =>
         m.setJMSCorrelationId(requestMessage.jmsMessageId)
+        m.setStringProperty(MessageProperties.OMGApplicationID, ApiServiceApp.applicationId)
+        m.setStringProperty(
+          MessageProperties.OMGMessageFormat,
+          jsonContentType
+        )
+        requestMessage.omgMessageTypeId match {
+          case OSLISALS001.entryName =>
+            m.setStringProperty(
+              MessageProperties.OMGMessageTypeID,
+              OutgoingMessageType.AssetLegalStatusSummaryList.entryName
+            )
+          case _ => ()
+
+        }
         (m, outputQueue)
       }
     } *> IO.unit
