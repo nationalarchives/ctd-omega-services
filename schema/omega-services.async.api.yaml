@@ -72,6 +72,13 @@ channels:
         Application
       message:
         oneOf:
+          - $ref: '#/components/messages/GeneralError'
+          - $ref: '#/components/messages/InvalidMessageFormatError'
+          - $ref: '#/components/messages/InvalidApplicationError'
+          - $ref: '#/components/messages/AuthenticationError'
+          - $ref: '#/components/messages/UnrecognisedMessageTypeError'
+          - $ref: '#/components/messages/InvalidMessageError'
+          - $ref: '#/components/messages/ProcessingError'
           - $ref: '#/components/messages/AssetLegalStatusSummaryList'
           - $ref: '#/components/messages/AssetLegalStatusFullList'
 
