@@ -580,7 +580,7 @@ components:
         description:
           type: array
           items:
-            '#/components/schemas/AgentDescriptionSummary'
+            $ref: '#/components/schemas/AgentDescriptionSummary'
 
     AgentFull:
       type: object
@@ -671,57 +671,49 @@ components:
               prominent:
                 type: boolean
               agent:
-                type:
-                  $ref: '#/components/schemas/GeneralIdentifier'
+                $ref: '#/components/schemas/GeneralIdentifier'
         predecesor:
           type: array
           items:
-            type:
-              $ref: '#/components/schemas/GeneralIdentifier'
+            $ref: '#/components/schemas/GeneralIdentifier'
         sucessor:
           type: array
           items:
-            type:
-              $ref: '#/components/schemas/GeneralIdentifier'
+            $ref: '#/components/schemas/GeneralIdentifier'
         descendant:
           type: array
           items:
-            type:
-              $ref: '#/components/schemas/GeneralIdentifier'
+            $ref: '#/components/schemas/GeneralIdentifier'
         broader-affiliation:
           type: array
           items:
-            type:
-              $ref: '#/components/schemas/GeneralIdentifier'
+            $ref: '#/components/schemas/GeneralIdentifier'
         founder:
           type: array
           items:
-            type:
-              $ref: '#/components/schemas/GeneralIdentifier'
-        assoocitaed-place:
+            $ref: '#/components/schemas/GeneralIdentifier'
+        assoociated-place:
           type: array
           items:
-            type:
-              $ref: '#/components/schemas/GeneralIdentifier'
+            $ref: '#/components/schemas/GeneralIdentifier'
         relation:
           type: array
           items:
-            type:
-              $ref: '#/components/schemas/GeneralIdentifier'
+            $ref: '#/components/schemas/GeneralIdentifier'
         date-from:
-          type: date
+          $ref: '#/components/schemas/ISODate'
         date-to:
-          type: date
+          $ref: '#/components/schemas/ISODate'
         field-of-activity:
           type: array
           items:
             type: string
-        archon-code: string
+        archon-code:
+          type: string
         consulted-source:
           type: array
           items:
-            type:
-              $ref: '#/components/schemas/GeneralIdentifier'
+            $ref: '#/components/schemas/GeneralIdentifier'
         status-of-identification:
           type: string
         timespan-note:
@@ -730,9 +722,9 @@ components:
             type: object
             properties:
               date-from:
-                type: date
+                $ref: '#/components/schemas/ISODate'
               date-to:
-                type: date
+                $ref: '#/components/schemas/ISODate'
               note:
                 type: string
         note:
