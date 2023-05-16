@@ -33,9 +33,9 @@ class EchoService extends BusinessService with BusinessRequestValidation {
     )
 
   override def process(request: BusinessServiceRequest): Either[BusinessServiceError, BusinessServiceReply] =
-    if (request.text.get.contains("ERROR")) {
+    if (request.text.nonEmpty && request.text.get.contains("ERROR")) {
       Left(EchoExplicitError(s"Explicit error: ${request.text.get}"))
     } else {
-      Right(EchoReply(s"The Echo Service says: ${request.text.get}"))
+      Right(EchoReply(s"The Echo Service says: ${request.text.getOrElse("")}"))
     }
 }
