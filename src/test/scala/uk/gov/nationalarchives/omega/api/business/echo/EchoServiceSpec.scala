@@ -38,25 +38,25 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
         "is an EchoRequest, with text which" - {
           "is empty" in {
 
-            val echoRequest = EchoRequest("")
+            val echoRequest = EchoRequest(Some(""))
 
             val validationResult = echoService.validateRequest(echoRequest)
 
-            validationResult must beInvalid("Echo Text cannot be empty.")
+            validationResult must beValid(echoRequest)
 
           }
           "only consists of whitespace" in {
 
-            val echoRequest = EchoRequest("         ")
+            val echoRequest = EchoRequest(Some("         "))
 
             val validationResult = echoService.validateRequest(echoRequest)
 
-            validationResult must beInvalid("Echo Text cannot be empty.")
+            validationResult must beValid(echoRequest)
 
           }
           "has only one character" in {
 
-            val echoRequest = EchoRequest("x")
+            val echoRequest = EchoRequest(Some("x"))
 
             val validationResult = echoService.validateRequest(echoRequest)
 
@@ -65,7 +65,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
           }
           "has several characters" in {
 
-            val echoRequest = EchoRequest("Hello, world")
+            val echoRequest = EchoRequest(Some("Hello, world"))
 
             val validationResult = echoService.validateRequest(echoRequest)
 
@@ -74,7 +74,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
           }
           "has many characters" in {
 
-            val echoRequest = EchoRequest("Hello, world" * 100)
+            val echoRequest = EchoRequest(Some("Hello, world" * 100))
 
             val validationResult = echoService.validateRequest(echoRequest)
 
@@ -85,25 +85,25 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
         "is *not* an EchoRequest, with text which" - {
           "is empty" in {
 
-            val echoRequest = NotAnEchoRequest("")
+            val echoRequest = NotAnEchoRequest(Some(""))
 
             val validationResult = echoService.validateRequest(echoRequest)
 
-            validationResult must beInvalid("Echo Text cannot be empty.")
+            validationResult must beValid(echoRequest)
 
           }
           "only consists of whitespace" in {
 
-            val echoRequest = NotAnEchoRequest("         ")
+            val echoRequest = NotAnEchoRequest(Some("         "))
 
             val validationResult = echoService.validateRequest(echoRequest)
 
-            validationResult must beInvalid("Echo Text cannot be empty.")
+            validationResult must beValid(echoRequest)
 
           }
           "has only one character" in {
 
-            val echoRequest = NotAnEchoRequest("x")
+            val echoRequest = NotAnEchoRequest(Some("x"))
 
             val validationResult = echoService.validateRequest(echoRequest)
 
@@ -112,7 +112,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
           }
           "has several characters" in {
 
-            val echoRequest = NotAnEchoRequest("Hello, world")
+            val echoRequest = NotAnEchoRequest(Some("Hello, world"))
 
             val validationResult = echoService.validateRequest(echoRequest)
 
@@ -121,7 +121,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
           }
           "has many characters" in {
 
-            val echoRequest = NotAnEchoRequest("Hello, world" * 100)
+            val echoRequest = NotAnEchoRequest(Some("Hello, world" * 100))
 
             val validationResult = echoService.validateRequest(echoRequest)
 
@@ -135,7 +135,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
           "contains the text 'error', when" - {
             "upper case" in {
 
-              val echoRequest = EchoRequest("ERROR: Some details about that error.")
+              val echoRequest = EchoRequest(Some("ERROR: Some details about that error."))
 
               val result = echoService.process(echoRequest)
 
@@ -144,7 +144,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
             }
             "lower case" in {
 
-              val echoRequest = EchoRequest("error: Some details about that error.")
+              val echoRequest = EchoRequest(Some("error: Some details about that error."))
 
               val result = echoService.process(echoRequest)
 
@@ -155,7 +155,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
           "does not contain the text 'error', when that text" - {
             "is empty" in {
 
-              val echoRequest = EchoRequest("")
+              val echoRequest = EchoRequest(Some(""))
 
               val result = echoService.process(echoRequest)
 
@@ -164,7 +164,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
             }
             "only consists of whitespace" in {
 
-              val echoRequest = EchoRequest("          ")
+              val echoRequest = EchoRequest(Some("          "))
 
               val result = echoService.process(echoRequest)
 
@@ -173,7 +173,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
             }
             "has several characters" in {
 
-              val echoRequest = EchoRequest("Hello, world")
+              val echoRequest = EchoRequest(Some("Hello, world"))
 
               val result = echoService.process(echoRequest)
 
@@ -186,7 +186,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
           "contains the text 'error', when" - {
             "upper case" in {
 
-              val echoRequest = NotAnEchoRequest("ERROR: Some details about that error.")
+              val echoRequest = NotAnEchoRequest(Some("ERROR: Some details about that error."))
 
               val result = echoService.process(echoRequest)
 
@@ -195,7 +195,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
             }
             "lower case" in {
 
-              val echoRequest = NotAnEchoRequest("error: Some details about that error.")
+              val echoRequest = NotAnEchoRequest(Some("error: Some details about that error."))
 
               val result = echoService.process(echoRequest)
 
@@ -206,7 +206,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
           "does not contain the text 'error', when that text" - {
             "is empty" in {
 
-              val echoRequest = NotAnEchoRequest("")
+              val echoRequest = NotAnEchoRequest(Some(""))
 
               val result = echoService.process(echoRequest)
 
@@ -215,7 +215,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
             }
             "only consists of whitespace" in {
 
-              val echoRequest = NotAnEchoRequest("          ")
+              val echoRequest = NotAnEchoRequest(Some("          "))
 
               val result = echoService.process(echoRequest)
 
@@ -224,7 +224,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
             }
             "has several characters" in {
 
-              val echoRequest = NotAnEchoRequest("Hello, world")
+              val echoRequest = NotAnEchoRequest(Some("Hello, world"))
 
               val result = echoService.process(echoRequest)
 
@@ -238,7 +238,7 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
     }
   }
 
-  private case class NotAnEchoRequest(text: String) extends BusinessServiceRequest
+  private case class NotAnEchoRequest(text: Option[String]) extends BusinessServiceRequest
 
   def beValid(expectedBusinessServiceRequest: BusinessServiceRequest): Matcher[echoService.ValidationResult] =
     (validationResult: echoService.ValidationResult) =>

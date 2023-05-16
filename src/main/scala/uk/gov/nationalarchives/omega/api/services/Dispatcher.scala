@@ -30,13 +30,19 @@ import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.business._
 import uk.gov.nationalarchives.omega.api.business.echo.{ EchoRequest, EchoService }
-import uk.gov.nationalarchives.omega.api.messages.IncomingMessageType.ECHO001
+import uk.gov.nationalarchives.omega.api.business.legalstatus.{ LegalStatusRequest, LegalStatusService }
+import uk.gov.nationalarchives.omega.api.messages.IncomingMessageType.{ ECHO001, OSLISALS001 }
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.ValidationResult
 import uk.gov.nationalarchives.omega.api.messages.{ IncomingMessageType, LocalMessage, LocalMessageStore, ValidatedLocalMessage }
 
 import scala.util.Try
 
-class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessageStore, echoService: EchoService) {
+class Dispatcher(
+  val localProducer: LocalProducer,
+  localMessageStore: LocalMessageStore,
+  echoService: EchoService,
+  legalStatusService: LegalStatusService
+) {
 
   implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
@@ -112,7 +118,8 @@ class Dispatcher(val localProducer: LocalProducer, localMessageStore: LocalMessa
     messageType: IncomingMessageType
   ): (BusinessService, BusinessServiceRequest) =
     messageType match {
-      case ECHO001 => (echoService, EchoRequest(localMessage.messageText))
+      case ECHO001     => (echoService, EchoRequest(Some(localMessage.messageText)))
+      case OSLISALS001 => (legalStatusService, LegalStatusRequest())
       // add more service IDs here
     }
 

@@ -22,5 +22,5 @@
 package uk.gov.nationalarchives.omega.api.business
 
 trait BusinessServiceRequest {
-  def text: String
+  def text: Option[String]
 }

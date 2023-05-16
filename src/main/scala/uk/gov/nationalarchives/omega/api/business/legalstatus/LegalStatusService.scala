@@ -19,23 +19,17 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages
+package uk.gov.nationalarchives.omega.api.business.legalstatus
 
-import enumeratum._
+import cats.data.Validated
+import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidation, BusinessService, BusinessServiceError, BusinessServiceReply, BusinessServiceRequest }
+import uk.gov.nationalarchives.omega.api.messages.StubData
+import io.circe.syntax.EncoderOps
 
-sealed trait IncomingMessageType extends EnumEntry
-object IncomingMessageType extends Enum[IncomingMessageType] {
+class LegalStatusService(val stubData: StubData) extends BusinessService with BusinessRequestValidation {
 
-  val values: IndexedSeq[IncomingMessageType] = findValues
+  override def validateRequest(request: BusinessServiceRequest): ValidationResult = Validated.valid(request)
 
-  case object ECHO001 extends IncomingMessageType {
-    // This happens to follow the regex; otherwise, it's arbitrary.
-    override val entryName = "OSGESZZZ100"
-  }
-
-  case object OSLISALS001 extends IncomingMessageType {
-    override val entryName = "OSLISALS001"
-  }
-  // add more service identifiers here
-
+  override def process(request: BusinessServiceRequest): Either[BusinessServiceError, BusinessServiceReply] =
+    Right(LegalStatusReply(stubData.getLegalStatuses().asJson.toString()))
 }
