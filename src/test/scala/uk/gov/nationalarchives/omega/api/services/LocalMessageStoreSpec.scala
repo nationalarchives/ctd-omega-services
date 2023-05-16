@@ -203,11 +203,11 @@ class LocalMessageStoreSpec
     when(mockJmsMessage.getJMSMessageId).thenReturn(Some(UUID.randomUUID().toString))
     when(mockJmsMessage.getJMSTimestamp).thenReturn(Some(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)))
     when(mockJmsMessage.getStringProperty(eqTo(MessageProperties.OMGMessageTypeID))).thenReturn(Some("OSGESZZZ100"))
-    when(mockJmsMessage.getStringProperty(eqTo(MessageProperties.OMGApplicationID))).thenReturn(Some("ABCD002"))
+    when(mockJmsMessage.getStringProperty(eqTo(MessageProperties.OMGApplicationID))).thenReturn(Some("PACE001"))
     when(mockJmsMessage.getStringProperty(eqTo(MessageProperties.OMGMessageFormat)))
       .thenReturn(Some("application/json"))
     when(mockJmsMessage.getStringProperty(eqTo(MessageProperties.OMGToken))).thenReturn(Some("application"))
-    when(mockJmsMessage.getStringProperty(eqTo(MessageProperties.OMGReplyAddress))).thenReturn(Some("ABCD002.a"))
+    when(mockJmsMessage.getStringProperty(eqTo(MessageProperties.OMGReplyAddress))).thenReturn(Some("PACE001_reply"))
     mockJmsMessage
   }
 

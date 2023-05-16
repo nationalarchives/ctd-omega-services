@@ -21,6 +21,7 @@
 
 package uk.gov.nationalarchives.omega.api.messages
 
+import jms4s.config.QueueName
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
 
 import java.time.LocalDateTime
@@ -34,5 +35,5 @@ final case class ValidatedLocalMessage(
   jmsLocalDateTime: LocalDateTime,
   omgMessageFormat: String,
   authToken: String,
-  omgReplyAddress: String
+  omgReplyAddress: QueueName
 )

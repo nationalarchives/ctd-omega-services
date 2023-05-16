@@ -27,6 +27,8 @@ import io.circe.Json
 import io.circe.syntax.EncoderOps
 import jms4s.JmsProducer
 import jms4s.config.QueueName
+import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
+import org.typelevel.log4cats.slf4j.Slf4jFactory
 import uk.gov.nationalarchives.omega.api.ApiServiceApp
 import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidationError, BusinessServiceError, TextIsNonEmptyCharacters }
 import uk.gov.nationalarchives.omega.api.common.ErrorCode._
@@ -112,7 +114,10 @@ trait LocalProducer {
 /** In JMS terms a producer can have one or many destinations - in this implementation we have one destination, if we
   * want many destinations we need to modify the send method to pass the destination with each call
   */
-class LocalProducerImpl(val jmsProducer: JmsProducer[IO], val outputQueue: QueueName) extends LocalProducer {
+class LocalProducerImpl(val jmsProducer: JmsProducer[IO]) extends LocalProducer {
+
+  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
+  implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
   /** Send the given reply message to the output queue
     * @param replyMessage
@@ -122,27 +127,28 @@ class LocalProducerImpl(val jmsProducer: JmsProducer[IO], val outputQueue: Queue
     * @return
     */
   def send(replyMessage: String, requestMessage: ValidatedLocalMessage): IO[Unit] =
-    jmsProducer.send { mf =>
-      val msg = mf.makeTextMessage(replyMessage)
-      msg.map { m =>
-        m.setJMSCorrelationId(requestMessage.jmsMessageId)
-        m.setStringProperty(MessageProperties.OMGApplicationID, ApiServiceApp.applicationId)
-        m.setStringProperty(
-          MessageProperties.OMGMessageFormat,
-          jsonContentType
-        )
-        requestMessage.omgMessageTypeId match {
-          case OSLISALS001.entryName =>
-            m.setStringProperty(
-              MessageProperties.OMGMessageTypeID,
-              OutgoingMessageType.AssetLegalStatusSummaryList.entryName
-            )
-          case _ => ()
+    IO.println(s"Reply address: ${requestMessage.omgReplyAddress.value}") *>
+      jmsProducer.send { mf =>
+        val msg = mf.makeTextMessage(replyMessage)
+        msg.map { m =>
+          m.setJMSCorrelationId(requestMessage.jmsMessageId)
+          m.setStringProperty(MessageProperties.OMGApplicationID, ApiServiceApp.applicationId)
+          m.setStringProperty(
+            MessageProperties.OMGMessageFormat,
+            jsonContentType
+          )
+          requestMessage.omgMessageTypeId match {
+            case OSLISALS001.entryName =>
+              m.setStringProperty(
+                MessageProperties.OMGMessageTypeID,
+                OutgoingMessageType.AssetLegalStatusSummaryList.entryName
+              )
+            case _ => ()
 
+          }
+          (m, requestMessage.omgReplyAddress)
         }
-        (m, outputQueue)
-      }
-    } *> IO.unit
+      } *> IO.unit
 
   override def sendProcessingError(
     businessServiceError: BusinessServiceError,
@@ -150,6 +156,7 @@ class LocalProducerImpl(val jmsProducer: JmsProducer[IO], val outputQueue: Queue
   ): IO[Unit] =
     sendError(
       requestMessage.jmsMessageId,
+      requestMessage.omgReplyAddress,
       OutgoingMessageType.ProcessingError,
       createProcessingErrorMessage(businessServiceError).asJson
     )
@@ -214,14 +221,22 @@ class LocalProducerImpl(val jmsProducer: JmsProducer[IO], val outputQueue: Queue
     localMessage: LocalMessage,
     outgoingMessageType: OutgoingMessageType,
     jsonErrors: Json
-  ): IO[Unit] =
-    localMessage.jmsMessageId
-      .filter(_.trim.nonEmpty)
-      .map(requestMessageId => sendError(requestMessageId, outgoingMessageType, jsonErrors))
-      .getOrElse(IO.unit)
+  ): IO[Unit] = {
+    val result: Option[(String, String)] = for {
+      messageId    <- localMessage.jmsMessageId
+      replyAddress <- localMessage.omgReplyAddress
+    } yield (messageId, replyAddress)
+    result match {
+      case Some((messageId, replyAddress)) =>
+        sendError(messageId, QueueName(replyAddress), outgoingMessageType, jsonErrors)
+      case _ =>
+        logger.error(s"Unable to reply to message ${localMessage.persistentMessageId} due to insufficient information.")
+    }
+  }
 
   private def sendError(
     requestMessageId: String,
+    replyAddress: QueueName,
     outgoingMessageType: OutgoingMessageType,
     jsonErrors: Json
   ): IO[Unit] =
@@ -240,7 +255,7 @@ class LocalProducerImpl(val jmsProducer: JmsProducer[IO], val outputQueue: Queue
           MessageProperties.OMGMessageFormat,
           jsonContentType
         )
-        (replyMessage, outputQueue)
+        (replyMessage, replyAddress)
       }
     } *> IO.unit
 
