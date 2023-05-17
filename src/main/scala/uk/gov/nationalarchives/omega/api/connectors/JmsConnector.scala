@@ -26,16 +26,13 @@ import jms4s.config.QueueName
 import jms4s.{ JmsAcknowledgerConsumer, JmsClient, JmsProducer }
 import jms4s.sqs.simpleQueueService
 import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP }
-import org.typelevel.log4cats.slf4j.Slf4jFactory
-import org.typelevel.log4cats.{ Logger, LoggerFactory, SelfAwareStructuredLogger }
+import org.typelevel.log4cats.Logger
+import uk.gov.nationalarchives.omega.api.common.AppLogger
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 
 import scala.concurrent.duration.{ DurationInt, FiniteDuration }
 
-class JmsConnector(serviceConfig: ServiceConfig) {
-
-  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
-  implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
+class JmsConnector(serviceConfig: ServiceConfig) extends AppLogger {
 
   /** Binds together a JMS producer and consumer
     * @param inputQueue

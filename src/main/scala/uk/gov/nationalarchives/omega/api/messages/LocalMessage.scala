@@ -25,9 +25,7 @@ import cats.data.ValidatedNec
 import cats.effect.IO
 import cats.syntax.all._
 import jms4s.jms.JmsMessage
-import org.typelevel.log4cats.slf4j.Slf4jFactory
-import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
-import uk.gov.nationalarchives.omega.api.common.Version1UUID
+import uk.gov.nationalarchives.omega.api.common.{ AppLogger, Version1UUID }
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{ InvalidApplicationID, InvalidAuthToken, InvalidJMSMessageID, InvalidMessageFormat, InvalidMessageTypeID, InvalidReplyAddress, MissingApplicationID, MissingAuthToken, MissingJMSMessageID, MissingJMSTimestamp, MissingMessageFormat, MissingMessageTypeID, MissingReplyAddress, ValidationResult, acceptableMimeTypes, patternForApplicationId, patternForReplyAddress, patternForServiceId }
 
 import java.time.{ Instant, LocalDateTime, ZoneOffset }
@@ -171,12 +169,9 @@ final case class LocalMessage(
       case _         => InvalidReplyAddress.invalidNec
     }
 }
-object LocalMessage {
+object LocalMessage extends AppLogger {
 
   type ValidationResult[A] = ValidatedNec[LocalMessageValidationError, A]
-
-  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
-  implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
   val patternForApplicationId: Regex = "[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])".r
   val patternForReplyAddress: Regex = "[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])(\\.[A-Za-z0-9])+".r

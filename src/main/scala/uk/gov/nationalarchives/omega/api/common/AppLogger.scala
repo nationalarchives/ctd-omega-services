@@ -19,30 +19,15 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api
+package uk.gov.nationalarchives.omega.api.common
 
-import cats.effect.{ ExitCode, IO, IOApp }
-import pureconfig.ConfigSource
-import pureconfig.generic.auto._
-import uk.gov.nationalarchives.omega.api.common.AppLogger
-import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
-import uk.gov.nationalarchives.omega.api.services.ApiService
+import cats.effect.IO
+import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
+import org.typelevel.log4cats.slf4j.Slf4jFactory
 
-object ApiServiceApp extends IOApp with AppLogger {
+trait AppLogger {
+  implicit val logging: LoggerFactory[IO] = Slf4jFactory[IO]
 
-  val applicationId = "PACS001"
-
-  override def run(args: List[String]): IO[ExitCode] = {
-    val serviceConfig = ConfigSource.default.loadOrThrow[ServiceConfig]
-    val apiService = new ApiService(serviceConfig)
-
-    // install a shutdown hook on the API Service so that when the App receives SIGTERM it stops gracefully
-    sys.ShutdownHookThread {
-      apiService.stop()
-    }
-
-    // start the API Service
-    apiService.start
-  }
+  implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
 }

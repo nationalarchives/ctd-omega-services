@@ -22,16 +22,12 @@
 package uk.gov.nationalarchives.omega.api.services
 
 import cats.effect.IO
-import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
-import org.typelevel.log4cats.slf4j.Slf4jFactory
+import uk.gov.nationalarchives.omega.api.common.AppLogger
 import uk.gov.nationalarchives.omega.api.services.ServiceState.Stopped
 
 import java.util.concurrent.atomic.AtomicReference
 
-trait Stateful {
-
-  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
-  implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
+trait Stateful extends AppLogger {
 
   private val state = new AtomicReference[ServiceState](Stopped)
 

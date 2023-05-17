@@ -25,17 +25,12 @@ import cats.effect.IO
 import cats.syntax.all._
 import jms4s.jms.JmsMessage
 import org.apache.commons.lang3.SerializationUtils
-import org.typelevel.log4cats.slf4j.Slf4jFactory
-import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
-import uk.gov.nationalarchives.omega.api.common.Version1UUID
+import uk.gov.nationalarchives.omega.api.common.{ AppLogger, Version1UUID }
 
 import java.nio.file.{ Files, Path, StandardOpenOption }
 import scala.util.{ Failure, Success, Try }
 
-class LocalMessageStore(directoryPath: Path) {
-
-  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
-  implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
+class LocalMessageStore(directoryPath: Path) extends AppLogger {
 
   def persistMessage(jmsMessage: JmsMessage): IO[Try[Version1UUID]] = {
     val messageId = Version1UUID.generate()

@@ -11,13 +11,11 @@ import org.scalatest.freespec.FixtureAsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.time.{ Seconds, Span }
 import org.scalatest.{ Assertion, BeforeAndAfterAll, BeforeAndAfterEach, FutureOutcome }
-import org.typelevel.log4cats.slf4j.Slf4jFactory
-import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.services.ApiService
 import io.circe._
 import io.circe.parser._
-import uk.gov.nationalarchives.omega.api.common.ErrorCode
+import uk.gov.nationalarchives.omega.api.common.{ AppLogger, ErrorCode }
 import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ BLAN001, INVA002, INVA003, INVA005, INVA006, INVA007, MISS002, MISS003, MISS005, MISS006, MISS007 }
 import uk.gov.nationalarchives.omega.api.messages.{ MessageProperties, OutgoingMessageType }
 
@@ -26,7 +24,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
 class ApiServiceISpec
-    extends FixtureAsyncFreeSpec with AsyncIOSpec with Matchers with Eventually with IntegrationPatience
+    extends FixtureAsyncFreeSpec with AsyncIOSpec with Matchers with Eventually with IntegrationPatience with AppLogger
     with BeforeAndAfterEach with BeforeAndAfterAll {
 
   /** Note: Now that we have multiple scenarios, we see that we cannot run more than one at a time, likely because there
@@ -37,9 +35,6 @@ class ApiServiceISpec
     *
     * I think the whole approach to the reply message assertion needs to be improved.
     */
-
-  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
-  implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = scaled(Span(30, Seconds)), interval = scaled(Span(1, Seconds)))
