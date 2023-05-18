@@ -70,13 +70,11 @@ class Dispatcher(
       _ <- remove(localMessage)
     } yield ()
 
-  private def checkAndReply(localMessage: LocalMessage): IO[Unit] = {
-    println(s"LocalMessage.omgReplyAddress = ${localMessage.omgReplyAddress}")
+  private def checkAndReply(localMessage: LocalMessage): IO[Unit] =
     localMessage.validateOmgApplicationId match {
       case Valid(applicationId) => checkAuthToken(applicationId.validNec, localMessage)
       case Invalid(errors)      => localProducer.sendInvalidApplicationError(localMessage, errors)
     }
-  }
 
   private def checkAuthToken(applicationId: ValidationResult[String], localMessage: LocalMessage): IO[Unit] =
     localMessage.validateOmgToken match {
@@ -149,8 +147,7 @@ class Dispatcher(
   ): IO[Unit] =
     businessResult match {
       case Right(businessResult) =>
-        IO.println("Want to send a message..") *>
-          localProducer.send(businessResult.content, requestMessage)
+        localProducer.send(businessResult.content, requestMessage)
       case Left(serviceError) =>
         localProducer.sendProcessingError(serviceError, requestMessage)
 
