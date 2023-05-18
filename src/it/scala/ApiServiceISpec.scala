@@ -278,7 +278,6 @@ class ApiServiceISpec
       textMessage.setStringProperty(MessageProperties.OMGToken, token)
     }
     messageConfig.replyAddress.foreach { replyAddress =>
-      println(s"The reply address is: $replyAddress")
       textMessage.setStringProperty(MessageProperties.OMGReplyAddress, replyAddress)
     }
     textMessage
