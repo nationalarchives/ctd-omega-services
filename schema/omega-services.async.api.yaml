@@ -615,6 +615,10 @@ components:
           $ref: '#/components/schemas/GeneralIdentifier'
         label:
           $ref: '#/components/schemas/GeneralLabel'
+        date-from:
+          $ref: '#/components/schemas/ISODate'
+        date-to:
+          $ref: '#/components/schemas/ISODate'
         authority-file:
           $ref: '#/components/schemas/AuthorityFile'
         depository:
@@ -700,10 +704,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GeneralIdentifier'
-        date-from:
-          $ref: '#/components/schemas/ISODate'
-        date-to:
-          $ref: '#/components/schemas/ISODate'
         field-of-activity:
           type: array
           items:
