@@ -21,6 +21,7 @@
 
 package uk.gov.nationalarchives.omega.api
 
+import cats.effect.std.Supervisor
 import cats.effect.{ ExitCode, IO, IOApp }
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
@@ -28,6 +29,8 @@ import pureconfig.ConfigSource
 import pureconfig.generic.auto._
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.services.ApiService
+
+import scala.concurrent.duration.DurationInt
 
 object ApiServiceApp extends IOApp {
 
@@ -38,15 +41,17 @@ object ApiServiceApp extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] = {
     val serviceConfig = ConfigSource.default.loadOrThrow[ServiceConfig]
-    val apiService = new ApiService(serviceConfig)
-
-    // install a shutdown hook on the API Service so that when the App receives SIGTERM it stops gracefully
-    sys.ShutdownHookThread {
-      apiService.stop()
-    }
-
-    // start the API Service
-    apiService.start
+    val service = new ApiService(serviceConfig)
+    val task = service.start
+    Supervisor[IO](await = false)
+      .use { supervisor =>
+        for {
+          _ <- supervisor.supervise[ExitCode](task.foreverM)
+          _ <- IO.sleep(5.seconds).foreverM
+        } yield ()
+      }
+      .onCancel(service.stop())
+      .as(ExitCode.Success)
   }
 
 }

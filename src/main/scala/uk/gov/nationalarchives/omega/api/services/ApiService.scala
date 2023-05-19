@@ -56,11 +56,11 @@ class ApiService(val config: ServiceConfig) extends Stateful {
           doStop() *> switchState(Starting, Stopped) *> IO.pure(ExitCode.Error)
       )
 
-  def stop(): IO[ExitCode] =
+  def stop(): IO[Unit] =
     switchState(Started, Stopping).ifM(
       logger.info("Closing connection..") *>
-        switchState(Stopping, Stopped).ifM(doStop(), IO.pure(ExitCode(invalidState))),
-      IO.pure(ExitCode(invalidState))
+        switchState(Stopping, Stopped).ifM(doStop(), IO.unit),
+      IO.unit
     )
 
   private def doStart(): IO[ExitCode] = {
@@ -147,9 +147,9 @@ class ApiService(val config: ServiceConfig) extends Stateful {
       new LegalStatusService(stubData)
     )
 
-  private def doStop(): IO[ExitCode] =
+  private def doStop(): IO[Unit] =
     // TODO(RW) this is where we will need to close any external connections, for example to OpenSearch
-    logger.info("Connection closed.") *> IO.pure(ExitCode.Success)
+    logger.info("Connection closed.")
 
   private def acknowledgeMessage(): IO[AckAction[IO]] =
     logger.info("Acknowledged message") *> IO(AckAction.ack)
