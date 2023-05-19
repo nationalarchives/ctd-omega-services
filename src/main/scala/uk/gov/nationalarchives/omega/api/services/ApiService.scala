@@ -22,25 +22,25 @@
 package uk.gov.nationalarchives.omega.api.services
 
 import cats.effect.std.Queue
-import cats.effect.{ ExitCode, IO, Resource }
+import cats.effect.{ExitCode, IO, Resource}
 import cats.implicits.catsSyntaxParallelTraverse_
 import jms4s.JmsAcknowledgerConsumer.AckAction
 import jms4s.config.QueueName
 import jms4s.jms.JmsMessage
-import jms4s.{ JmsAcknowledgerConsumer, JmsProducer }
+import jms4s.{JmsAcknowledgerConsumer, JmsProducer}
 import uk.gov.nationalarchives.omega.api.business.agents.ListAgentSummaryService
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.business.legalstatus.LegalStatusService
-import uk.gov.nationalarchives.omega.api.common.{ AppLogger, Version1UUID }
+import uk.gov.nationalarchives.omega.api.common.Version1UUID
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
-import uk.gov.nationalarchives.omega.api.connectors.{ JmsConnector, SparqlEndpointConnector }
-import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, LocalMessageStore, StubDataImpl }
+import uk.gov.nationalarchives.omega.api.connectors.{JmsConnector, SparqlEndpointConnector}
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.createLocalMessage
-import uk.gov.nationalarchives.omega.api.repository.{ AbstractRepository, OmegaRepository }
-import uk.gov.nationalarchives.omega.api.services.ServiceState.{ Started, Starting, Stopped, Stopping }
+import uk.gov.nationalarchives.omega.api.messages.{LocalMessage, LocalMessageStore, StubDataImpl}
+import uk.gov.nationalarchives.omega.api.repository.{AbstractRepository, OmegaRepository}
+import uk.gov.nationalarchives.omega.api.services.ServiceState.{Started, Starting, Stopped, Stopping}
 
-import java.nio.file.{ Files, Paths }
-import scala.util.{ Failure, Success }
+import java.nio.file.{Files, Paths}
+import scala.util.{Failure, Success}
 
 class ApiService(val config: ServiceConfig) extends Stateful {
 
@@ -58,11 +58,11 @@ class ApiService(val config: ServiceConfig) extends Stateful {
           doStop() *> switchState(Starting, Stopped) *> IO.pure(ExitCode.Error)
       )
 
-  def stop(): IO[ExitCode] =
+  def stop(): IO[Unit] =
     switchState(Started, Stopping).ifM(
-      logger.info(s"Closing connection..") *>
-        switchState(Stopping, Stopped).ifM(doStop(), IO.pure(ExitCode(invalidState))),
-      IO.pure(ExitCode(invalidState))
+      logger.info("Closing connection..") *>
+        switchState(Stopping, Stopped).ifM(doStop(), IO.unit),
+      IO.unit
     )
 
   private def doStart(): IO[ExitCode] = {
@@ -156,9 +156,9 @@ class ApiService(val config: ServiceConfig) extends Stateful {
       new ListAgentSummaryService(stubData)
     )
 
-  private def doStop(): IO[ExitCode] =
+  private def doStop(): IO[Unit] =
     // TODO(RW) this is where we will need to close any external connections, for example to OpenSearch
-    logger.info("Connection closed.") *> IO.pure(ExitCode.Success)
+    logger.info("Connection closed.")
 
   private def acknowledgeMessage(): IO[AckAction[IO]] =
     logger.info("Acknowledged message") *> IO(AckAction.ack)
