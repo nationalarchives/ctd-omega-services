@@ -141,7 +141,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     stubData: StubDataImpl
   ) =
     new Dispatcher(
-      new LocalProducerImpl(jmsProducer, QueueName(config.replyQueue)),
+      new LocalProducerImpl(jmsProducer),
       localMessageStore,
       new EchoService(),
       new LegalStatusService(stubData)

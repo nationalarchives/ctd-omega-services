@@ -27,6 +27,5 @@ case class ServiceConfig(
   maxProducers: Int,
   maxDispatchers: Int,
   maxLocalQueueSize: Int,
-  requestQueue: String,
-  replyQueue: String
+  requestQueue: String
 )

@@ -166,7 +166,7 @@ class DispatcherSpec
         }
         "is invalid" in {
           assertReplyMessage(
-            generateValidLocalMessageForEchoService().copy(omgReplyAddress = Some("ABCD002.")),
+            generateValidLocalMessageForEchoService().copy(omgReplyAddress = Some("PACE001.reply")),
             getExpectedJsonErrors(Map(INVA007 -> "Invalid OMGReplyAddress"))
           )
         }
@@ -213,11 +213,11 @@ class DispatcherSpec
       "Hello World!",
       Some("OSGESZZZ100"),
       Some(UUID.randomUUID().toString),
-      omgApplicationId = Some("ABCD002"),
+      omgApplicationId = Some("PACE001"),
       Some(System.currentTimeMillis()),
       Some("application/json"),
       Some(UUID.randomUUID().toString),
-      Some("ABCD002.a")
+      Some("PACE001_reply")
     )
 
   /** It is the APIService which is responsible for writing the local message file.

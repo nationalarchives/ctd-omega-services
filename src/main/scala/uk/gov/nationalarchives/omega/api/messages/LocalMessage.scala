@@ -24,6 +24,7 @@ package uk.gov.nationalarchives.omega.api.messages
 import cats.data.ValidatedNec
 import cats.effect.IO
 import cats.syntax.all._
+import jms4s.config.QueueName
 import jms4s.jms.JmsMessage
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
@@ -116,7 +117,7 @@ final case class LocalMessage(
             LocalDateTime.ofInstant(Instant.ofEpochMilli(validatedJmsTimestamp), ZoneOffset.UTC),
             validatedOmgMessageFormat,
             validatedOmgToken,
-            validatedOmgReplyAddress
+            QueueName(validatedOmgReplyAddress)
           )
 
       }
@@ -179,7 +180,7 @@ object LocalMessage {
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
   val patternForApplicationId: Regex = "[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])".r
-  val patternForReplyAddress: Regex = "[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])(\\.[A-Za-z0-9])+".r
+  val patternForReplyAddress: Regex = "[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])_([A-Za-z0-9_])+".r
   val patternForServiceId: Regex = "(OS|OD|OE)(LI|GE|UP|CR|RE)(S|F)[A-Z]{3}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])".r
 
   val acceptableMimeTypes: Set[String] = Set("application/json")

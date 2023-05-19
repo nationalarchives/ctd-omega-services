@@ -40,8 +40,8 @@ class MessageRecoveryISpec
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = scaled(Span(60, Seconds)), interval = scaled(Span(5, Millis)))
 
-  private val requestQueueName = "request-general"
-  private val replyQueueName = "omega-editorial-web-application-instance-1"
+  private val requestQueueName = "PACS001_request"
+  private val defaultReplyQueueName = "PACE001_reply"
   private val sqsHostName = "localhost"
   private val sqsPort = 9324
   private val testMessage = "Testing message recovery!"
@@ -84,8 +84,7 @@ class MessageRecoveryISpec
           maxProducers = 1,
           maxDispatchers = 1,
           maxLocalQueueSize = 1,
-          requestQueue = requestQueueName,
-          replyQueue = replyQueueName
+          requestQueue = requestQueueName
         )
       )
     )
@@ -93,7 +92,7 @@ class MessageRecoveryISpec
     val consumerRes = for {
       client <- jmsClient
       consumer <-
-        client.createAutoAcknowledgerConsumer(QueueName(replyQueueName), 1, 100.millis)
+        client.createAutoAcknowledgerConsumer(QueueName(defaultReplyQueueName), 1, 100.millis)
       _ <- Resource.eval(consumer.handle { (jmsMessage, _) =>
              for {
                _ <- readTextMessage(jmsMessage)
@@ -146,11 +145,11 @@ class MessageRecoveryISpec
       "Hello World!",
       Some("OSGESZZZ100"),
       Some(UUID.randomUUID().toString),
-      omgApplicationId = Some("ABCD002"),
+      omgApplicationId = Some("PACE001"),
       Some(System.currentTimeMillis()),
       Some("application/json"),
       Some(UUID.randomUUID().toString),
-      Some("ABCD002.a")
+      Some("PACE001_reply")
     )
 
 }
