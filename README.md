@@ -11,8 +11,7 @@ The PAC API is implemented using Cats Effect, to provide an asynchronous runtime
 ### Echo Service
 * Service Identifier (SID): ECHO001
 * Description: The echo service accepts a text message which it returns to the sender
-* Request Queue: request-general
-* Reply Queue: omega-editorial-web-application-instance-1
+* Request Queue: PACS001_request
 * Message Format: plain text
 
 ## Pre-requisites for building and running the project
@@ -47,11 +46,11 @@ docker-compose up -d
 ```
 docker ps -a
 ```
-6. Go to http://localhost:9325/ in a web browser and you should see the message queues configured in `custom.conf`, e.g. `request-general` and `omega-editorial-web-application-instance-1`
+6. Go to http://localhost:9325/ in a web browser and you should see the message queues used by the application and its clients that are configured in `custom.conf`, e.g. `PACS001_request` and `PACE001_reply`
  
 7. To run the unit tests you can use `sbt test`. 
 
-8. To run the Pan-Archival Catalogue Services locally you can use ` sbt run`. Note that the queue names configured in the `application.conf` file used by application must match those in the `custom.conf` file used by ElasticMQ.
+8. To run the Pan-Archival Catalogue Services locally you can use ` sbt run`. Note that the request queue name configured in the `application.conf` file used by application must match the one in the `custom.conf` file used by ElasticMQ.
 
 9. Your message service is now running and ready to respond to requests.
 ## Testing

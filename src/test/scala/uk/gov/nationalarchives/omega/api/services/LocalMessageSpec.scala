@@ -23,6 +23,7 @@ package uk.gov.nationalarchives.omega.api.services
 
 import cats.data.Validated.Invalid
 import cats.data.{ Chain, Validated }
+import jms4s.config.QueueName
 import org.mockito.scalatest.MockitoSugar
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -38,12 +39,12 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
   private val validPersistentMessageId = Version1UUID.generate()
   private val validCorrelationId = UUID.randomUUID().toString
   private val validMessageText = "At vero eos et accusamus et iusto odio dignissimos"
-  private val validApplicationId = "ABCD002"
+  private val validApplicationId = "PACE001"
   private val validMessageTypeId = "OSGESZZZ100"
   private val validEpochTimeInMilliseconds = System.currentTimeMillis()
   private val validMessageFormat = "application/json"
   private val validAuthToken = "AbCdEf123456"
-  private val validReplyAddress = "ABCD002.a"
+  private val validReplyAddress = "PACE001_reply"
   private val validServiceId = "OSGESZZZ100"
   lazy private val validLocalMessage =
     LocalMessage(
@@ -79,7 +80,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
               LocalDateTime.ofInstant(Instant.ofEpochMilli(validEpochTimeInMilliseconds), ZoneOffset.UTC),
             omgMessageFormat = validMessageFormat,
             authToken = validAuthToken,
-            omgReplyAddress = validReplyAddress
+            omgReplyAddress = QueueName(validReplyAddress)
           )
         )
 
@@ -175,7 +176,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
                   LocalDateTime.ofInstant(Instant.ofEpochMilli(validEpochTimeInMilliseconds), ZoneOffset.UTC),
                 omgMessageFormat = "application/json",
                 authToken = validAuthToken,
-                omgReplyAddress = validReplyAddress
+                omgReplyAddress = QueueName(validReplyAddress)
               )
             )
 
@@ -260,7 +261,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
                   LocalDateTime.ofInstant(Instant.ofEpochMilli(validEpochTimeInMilliseconds), ZoneOffset.UTC),
                 omgMessageFormat = "application/json",
                 authToken = validAuthToken,
-                omgReplyAddress = validReplyAddress
+                omgReplyAddress = QueueName(validReplyAddress)
               )
             )
 
@@ -284,7 +285,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
                   LocalDateTime.ofInstant(Instant.ofEpochMilli(validEpochTimeInMilliseconds), ZoneOffset.UTC),
                 omgMessageFormat = "application/json",
                 authToken = validAuthToken,
-                omgReplyAddress = validReplyAddress
+                omgReplyAddress = QueueName(validReplyAddress)
               )
             )
 

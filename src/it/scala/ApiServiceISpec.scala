@@ -1,6 +1,8 @@
-import cats.effect.{ IO, Ref }
 import cats.effect.kernel.Resource
 import cats.effect.testing.scalatest.AsyncIOSpec
+import cats.effect.{ IO, Ref }
+import io.circe._
+import io.circe.parser._
 import jms4s.JmsAutoAcknowledgerConsumer.AutoAckAction
 import jms4s.config.QueueName
 import jms4s.jms.JmsMessage
@@ -11,13 +13,11 @@ import org.scalatest.freespec.FixtureAsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.time.{ Seconds, Span }
 import org.scalatest.{ Assertion, BeforeAndAfterAll, BeforeAndAfterEach, FutureOutcome }
-import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
-import uk.gov.nationalarchives.omega.api.services.ApiService
-import io.circe._
-import io.circe.parser._
 import uk.gov.nationalarchives.omega.api.common.{ AppLogger, ErrorCode }
-import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ BLAN001, INVA002, INVA003, INVA005, INVA006, INVA007, MISS002, MISS003, MISS005, MISS006, MISS007 }
+import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ INVA002, INVA003, INVA005, INVA006, MISS002, MISS003, MISS005, MISS006 }
+import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.messages.{ MessageProperties, OutgoingMessageType }
+import uk.gov.nationalarchives.omega.api.services.ApiService
 
 import javax.jms.{ Connection, MessageProducer, Session, TextMessage }
 import scala.concurrent.Await
@@ -39,8 +39,8 @@ class ApiServiceISpec
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = scaled(Span(30, Seconds)), interval = scaled(Span(1, Seconds)))
 
-  private val requestQueueName = "request-general"
-  private val replyQueueName = "omega-editorial-web-application-instance-1"
+  private val requestQueueName = "PACS001_request"
+  private val replyQueueName = "PACE001_reply"
   private val sqsHostName = "localhost"
   private val sqsPort = 9324
 
@@ -51,8 +51,7 @@ class ApiServiceISpec
       maxProducers = 1,
       maxDispatchers = 1,
       maxLocalQueueSize = 1,
-      requestQueue = requestQueueName,
-      replyQueue = replyQueueName
+      requestQueue = requestQueueName
     )
   )
 
@@ -247,54 +246,34 @@ class ApiServiceISpec
       }
     }
 
-    "the OMGReplyAddress" - {
-      "isn't provided" in { f =>
-        val textMessageConfig = generateValidMessageConfig().copy(replyAddress = None)
-
-        sendMessage(f.session, f.producer, textMessageConfig)
-
-        assertReplyMessage(getExpectedJsonErrors(Map(MISS007 -> "Missing OMGReplyAddress"))) *>
-          assertMessageType(OutgoingMessageType.InvalidMessageFormatError.entryName)
-
-      }
-      "isn't valid" in { f =>
-        val textMessageConfig = generateValidMessageConfig().copy(replyAddress = Some("ABCD002."))
-
-        sendMessage(f.session, f.producer, textMessageConfig)
-
-        assertReplyMessage(getExpectedJsonErrors(Map(INVA007 -> "Invalid OMGReplyAddress"))) *>
-          assertMessageType(OutgoingMessageType.InvalidMessageFormatError.entryName)
-
-      }
-    }
   }
 
   private def generateValidMessageConfig(): TextMessageConfig =
     TextMessageConfig(
       contents = "Hello, World",
       messageTypeId = Some("OSGESZZZ100"),
-      applicationId = Some("ABCD002"),
+      applicationId = Some("PACE001"),
       messageFormat = Some("application/json"),
       token = Some("AbCdEf123456"),
-      replyAddress = Some("ABCD002.a")
+      replyAddress = Some("PACE001_reply")
     )
 
   private def asTextMessage(session: Session, messageConfig: TextMessageConfig): TextMessage = {
     val textMessage: TextMessage = session.createTextMessage(messageConfig.contents)
     messageConfig.messageTypeId.foreach { messageTypeId =>
-      textMessage.setStringProperty("OMGMessageTypeID", messageTypeId)
+      textMessage.setStringProperty(MessageProperties.OMGMessageTypeID, messageTypeId)
     }
     messageConfig.applicationId.foreach { applicationId =>
-      textMessage.setStringProperty("OMGApplicationID", applicationId)
+      textMessage.setStringProperty(MessageProperties.OMGApplicationID, applicationId)
     }
     messageConfig.messageFormat.foreach { messageFormat =>
-      textMessage.setStringProperty("OMGMessageFormat", messageFormat)
+      textMessage.setStringProperty(MessageProperties.OMGMessageFormat, messageFormat)
     }
     messageConfig.token.foreach { token =>
-      textMessage.setStringProperty("OMGToken", token)
+      textMessage.setStringProperty(MessageProperties.OMGToken, token)
     }
     messageConfig.replyAddress.foreach { replyAddress =>
-      textMessage.setStringProperty("OMGReplyAddress", replyAddress)
+      textMessage.setStringProperty(MessageProperties.OMGReplyAddress, replyAddress)
     }
     textMessage
   }
