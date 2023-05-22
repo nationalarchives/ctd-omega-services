@@ -27,8 +27,6 @@ import io.circe.Json
 import io.circe.syntax.EncoderOps
 import jms4s.JmsProducer
 import jms4s.config.QueueName
-import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
-import org.typelevel.log4cats.slf4j.Slf4jFactory
 import uk.gov.nationalarchives.omega.api.ApiServiceApp
 import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidationError, BusinessServiceError, TextIsNonEmptyCharacters }
 import uk.gov.nationalarchives.omega.api.common.ErrorCode._
@@ -226,7 +224,7 @@ class LocalProducerImpl(val jmsProducer: JmsProducer[IO]) extends LocalProducer 
       case Some((messageId, replyAddress)) =>
         sendError(messageId, QueueName(replyAddress), outgoingMessageType, jsonErrors)
       case _ =>
-        logger.error(
+        getAppLoggerFromName(this.getClass.getSimpleName).error(
           s"Unable to reply to message ${localMessage.persistentMessageId} due to missing messageId or replyAddress."
         )
     }

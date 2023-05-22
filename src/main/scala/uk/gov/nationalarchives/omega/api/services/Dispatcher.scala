@@ -45,6 +45,8 @@ class Dispatcher(
 
   import cats.syntax.all._
 
+  private val className: String = this.getClass.getSimpleName
+
   def runRecovery(dispatcherId: Int)(recoveredMessages: List[LocalMessage]): IO[Unit] =
     IO {
       recoveredMessages.foreach { recoveredMessage =>
@@ -60,8 +62,11 @@ class Dispatcher(
 
   private def processMessage(localMessage: LocalMessage, dispatcherId: Int): IO[Unit] =
     for {
-      _ <- logger.info(s"processing message: ${localMessage.messageText}")
-      _ <- logger.info(s"Dispatcher # $dispatcherId, processing message id: ${localMessage.persistentMessageId}")
+      _ <- getAppLoggerFromName(className).info(s"processing message: ${localMessage.messageText}")
+      _ <- getAppLoggerFromName(className)
+             .info(
+               s"Dispatcher # $dispatcherId, processing message id: ${localMessage.persistentMessageId}"
+             )
       _ <- checkAndReply(localMessage)
       _ <- remove(localMessage)
     } yield ()

@@ -33,12 +33,14 @@ trait Stateful extends AppLogger {
 
   val invalidState = 99
 
-  def switchState(from: ServiceState, to: ServiceState): IO[Boolean] = IO {
-    val switched = state.compareAndSet(from, to)
-    if (!switched) {
-      logger.error(s"Unable to switch ${this.getClass.getSimpleName} state from: $from, to: $to.")
+  def switchState(from: ServiceState, to: ServiceState): IO[Boolean] =
+    IO {
+      val switched = state.compareAndSet(from, to)
+      if (!switched) {
+        getAppLoggerFromName(this.getClass.getSimpleName)
+          .error(s"Unable to switch ${this.getClass.getSimpleName} state from: $from, to: $to.")
+      }
+      switched
     }
-    switched
-  }
 
 }

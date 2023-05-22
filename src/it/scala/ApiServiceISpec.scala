@@ -13,6 +13,7 @@ import org.scalatest.freespec.FixtureAsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.time.{ Seconds, Span }
 import org.scalatest.{ Assertion, BeforeAndAfterAll, BeforeAndAfterEach, FutureOutcome }
+import org.typelevel.log4cats.SelfAwareStructuredLogger
 import uk.gov.nationalarchives.omega.api.common.{ AppLogger, ErrorCode }
 import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ INVA002, INVA003, INVA005, INVA006, MISS002, MISS003, MISS005, MISS006 }
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
@@ -35,7 +36,7 @@ class ApiServiceISpec
     *
     * I think the whole approach to the reply message assertion needs to be improved.
     */
-
+  implicit val logger: SelfAwareStructuredLogger[IO] = getAppLoggerFromName(this.getClass.getSimpleName)
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = scaled(Span(30, Seconds)), interval = scaled(Span(1, Seconds)))
 

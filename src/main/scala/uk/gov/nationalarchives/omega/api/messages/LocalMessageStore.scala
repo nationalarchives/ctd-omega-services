@@ -32,15 +32,19 @@ import scala.util.{ Failure, Success, Try }
 
 class LocalMessageStore(directoryPath: Path) extends AppLogger {
 
+  private val className: String = this.getClass.getSimpleName
+
   def persistMessage(jmsMessage: JmsMessage): IO[Try[Version1UUID]] = {
     val messageId = Version1UUID.generate()
     val localMessage = LocalMessage.createLocalMessage(messageId, jmsMessage)
     writeFile(generateFilePath(messageId), localMessage).map {
       case Success(_) =>
-        logger.info(s"Successfully persisted the message for ID [$messageId]")
+        getAppLoggerFromName(className)
+          .info(s"Successfully persisted the message for ID [$messageId]")
         Success(messageId)
       case Failure(e) =>
-        logger.error(s"Failed to persist the message for ID [$messageId]")
+        getAppLoggerFromName(className)
+          .error(s"Failed to persist the message for ID [$messageId]")
         Failure[Version1UUID](e)
     }
   }
@@ -60,7 +64,8 @@ class LocalMessageStore(directoryPath: Path) extends AppLogger {
         deserializeFile(path.toPath).map {
           case Success(s) => Some(s)
           case Failure(e) =>
-            logger.info(s"Error $e during reading files in directory ${path.toPath} ")
+            getAppLoggerFromName(className)
+              .info(s"Error $e during reading files in directory ${path.toPath} ")
             None
         }
       )
