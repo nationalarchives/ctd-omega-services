@@ -758,8 +758,12 @@ components:
       description: true to indicate that this Agent is also considered an Authority File, false otherwise
 
     VersionTimestamp:
-      type: [date-time, string]
-      description: A version timestamp, or the string constants `latest` or `all`.
+      oneOf:
+        - type: string
+          format: 'date-time'
+        - type: string
+          enum: ['latest', 'all']
+      description: An ISO Date Time value (e.g. `date-time` in JSON Schema parlance, or `xs:dateTime` in XML Schema parlance) version timestamp, or the string constants `latest` or `all`.
 
     GeneralIdentifier:
       type: string
