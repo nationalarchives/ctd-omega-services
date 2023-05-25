@@ -22,7 +22,7 @@ info:
 
     * Buffering during individual system outages
 
-    * Abilility to Backpressure and easily introduce "Circuit Breakers"
+    * Ability to Backpressure and easily introduce "Circuit Breakers"
 
     ### Check out our latest features:
 
