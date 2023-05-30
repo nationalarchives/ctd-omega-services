@@ -32,8 +32,6 @@ import scala.util.{ Failure, Success, Try }
 
 class LocalMessageStore(directoryPath: Path) extends AppLogger {
 
-  private val className: String = this.getClass.getSimpleName
-
   def persistMessage(jmsMessage: JmsMessage): IO[Try[Version1UUID]] = {
     val messageId = Version1UUID.generate()
     val localMessage = LocalMessage.createLocalMessage(messageId, jmsMessage)
