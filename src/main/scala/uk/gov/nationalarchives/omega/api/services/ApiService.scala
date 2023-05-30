@@ -42,8 +42,6 @@ import scala.util.{ Failure, Success }
 
 class ApiService(val config: ServiceConfig) extends Stateful {
 
-  private val className: String = this.getClass.getSimpleName
-
   def start: IO[ExitCode] =
     switchState(Stopped, Starting).ifM(attemptStartUp(), IO.pure(ExitCode(invalidState)))
 
@@ -54,13 +52,13 @@ class ApiService(val config: ServiceConfig) extends Stateful {
         IO.pure(ExitCode(invalidState))
       )
       .handleErrorWith(error =>
-        getAppLoggerFromName(className).error(s"Shutting down due to ${error.getMessage}") *>
+        logger.error(s"Shutting down due to ${error.getMessage}") *>
           doStop() *> switchState(Starting, Stopped) *> IO.pure(ExitCode.Error)
       )
 
   def stop(): IO[ExitCode] =
     switchState(Started, Stopping).ifM(
-      getAppLoggerFromName(className).info(s"Closing connection..") *>
+      logger.info(s"Closing connection..") *>
         switchState(Stopping, Stopped).ifM(doStop(), IO.pure(ExitCode(invalidState))),
       IO.pure(ExitCode(invalidState))
     )
@@ -97,7 +95,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
   ): IO[Unit] = {
     for {
       savedFiles <- Resource.eval(localMessageStore.readAllFilesInDirectory())
-      jmsClient  <- jmsConnector.createJmsClient()(getAppLoggerFromName(className))
+      jmsClient  <- jmsConnector.createJmsClient() // (getAppLoggerFromName(className))
       producer   <- jmsConnector.createJmsProducer(jmsClient)(config.maxProducers)
     } yield producer match {
       case producer =>
@@ -111,7 +109,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     Files.createDirectories(messageStoreFolder)
     Right(new LocalMessageStore(messageStoreFolder))
   }.handleErrorWith(ex =>
-    getAppLoggerFromName(className)
+    logger
       .error(s"Failed to created local message store due to ${ex.getMessage}") *> IO.pure(Left(ExitCode.Error))
   )
 
@@ -131,7 +129,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     IO.race(
       createMessageHandler(queue, localMessageStore)(consumer),
       List.range(start = 0, end = config.maxDispatchers).parTraverse_ { i =>
-        getAppLoggerFromName(className).info(s"Starting consumer #${i + 1}") >>
+        logger.info(s"Starting consumer #${i + 1}") >>
           generateDispatcher(producer, localMessageStore, stubData)
             .run(i)(queue)
             .foreverM
@@ -152,10 +150,10 @@ class ApiService(val config: ServiceConfig) extends Stateful {
 
   private def doStop(): IO[ExitCode] =
     // TODO(RW) this is where we will need to close any external connections, for example to OpenSearch
-    getAppLoggerFromName(className).info("Connection closed.") *> IO.pure(ExitCode.Success)
+    logger.info("Connection closed.") *> IO.pure(ExitCode.Success)
 
   private def acknowledgeMessage(): IO[AckAction[IO]] =
-    getAppLoggerFromName(className).info("Acknowledged message") *> IO(AckAction.ack)
+    logger.info("Acknowledged message") *> IO(AckAction.ack)
 
   private def createMessageHandler(
     queue: Queue[IO, LocalMessage],
@@ -169,7 +167,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
             _   <- queueMessage(queue, messageId, jmsMessage)
           } yield res
         case Failure(e) =>
-          getAppLoggerFromName(className)
+          logger
             .error(
               s"Failed to create message handler as unable to persist message: [$e]"
             )
@@ -184,7 +182,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
   ): IO[Unit] =
     for {
       localMessageResult <- createLocalMessage(persistentMessageId, jmsMessage)
-      _ <- queue.offer(localMessageResult) *> getAppLoggerFromName(className)
+      _ <- queue.offer(localMessageResult) *> logger
              .info(
                s"Queued message: $persistentMessageId"
              )

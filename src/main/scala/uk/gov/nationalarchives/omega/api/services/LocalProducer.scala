@@ -224,7 +224,7 @@ class LocalProducerImpl(val jmsProducer: JmsProducer[IO]) extends LocalProducer 
       case Some((messageId, replyAddress)) =>
         sendError(messageId, QueueName(replyAddress), outgoingMessageType, jsonErrors)
       case _ =>
-        getAppLoggerFromName(this.getClass.getSimpleName).error(
+        logger.error(
           s"Unable to reply to message ${localMessage.persistentMessageId} due to missing messageId or replyAddress."
         )
     }

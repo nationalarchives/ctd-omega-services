@@ -188,8 +188,7 @@ object LocalMessage extends AppLogger {
       val messageText = result match {
         case Right(text) => text
         case Left(e) =>
-          getAppLoggerFromName(this.getClass.getSimpleName)
-            .error(s"Failed to retrieve message content due to ${e.getMessage}")
+          logger.error(s"Failed to retrieve message content due to ${e.getMessage}")
           ""
       }
       LocalMessage(

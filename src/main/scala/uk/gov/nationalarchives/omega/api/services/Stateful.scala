@@ -37,8 +37,7 @@ trait Stateful extends AppLogger {
     IO {
       val switched = state.compareAndSet(from, to)
       if (!switched) {
-        getAppLoggerFromName(this.getClass.getSimpleName)
-          .error(s"Unable to switch ${this.getClass.getSimpleName} state from: $from, to: $to.")
+        logger.error(s"Unable to switch ${this.getClass.getSimpleName} state from: $from, to: $to.")
       }
       switched
     }

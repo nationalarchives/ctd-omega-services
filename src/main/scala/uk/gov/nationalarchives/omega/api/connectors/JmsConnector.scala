@@ -41,7 +41,7 @@ class JmsConnector(serviceConfig: ServiceConfig) extends AppLogger {
     */
   def getJmsProducerAndConsumer(inputQueue: QueueName): Resource[IO, (JmsProducer[IO], JmsAcknowledgerConsumer[IO])] =
     for {
-      jmsClient <- createJmsClient()(getAppLoggerFromName(this.getClass.getSimpleName))
+      jmsClient <- createJmsClient()
       jmsProducerAndConsumer <-
         Resource.both(
           createJmsProducer(jmsClient)(serviceConfig.maxProducers),

@@ -39,12 +39,10 @@ class LocalMessageStore(directoryPath: Path) extends AppLogger {
     val localMessage = LocalMessage.createLocalMessage(messageId, jmsMessage)
     writeFile(generateFilePath(messageId), localMessage).map {
       case Success(_) =>
-        getAppLoggerFromName(className)
-          .info(s"Successfully persisted the message for ID [$messageId]")
+        logger.info(s"Successfully persisted the message for ID [$messageId]")
         Success(messageId)
       case Failure(e) =>
-        getAppLoggerFromName(className)
-          .error(s"Failed to persist the message for ID [$messageId]")
+        logger.error(s"Failed to persist the message for ID [$messageId]")
         Failure[Version1UUID](e)
     }
   }
@@ -64,8 +62,7 @@ class LocalMessageStore(directoryPath: Path) extends AppLogger {
         deserializeFile(path.toPath).map {
           case Success(s) => Some(s)
           case Failure(e) =>
-            getAppLoggerFromName(className)
-              .info(s"Error $e during reading files in directory ${path.toPath} ")
+            logger.info(s"Error $e during reading files in directory ${path.toPath} ")
             None
         }
       )
