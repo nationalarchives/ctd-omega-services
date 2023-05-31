@@ -95,7 +95,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
   ): IO[Unit] = {
     for {
       savedFiles <- Resource.eval(localMessageStore.readAllFilesInDirectory())
-      jmsClient  <- jmsConnector.createJmsClient() // (getAppLoggerFromName(className))
+      jmsClient  <- jmsConnector.createJmsClient()
       producer   <- jmsConnector.createJmsProducer(jmsClient)(config.maxProducers)
     } yield producer match {
       case producer =>
