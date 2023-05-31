@@ -19,27 +19,13 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.services
+package uk.gov.nationalarchives.omega.api.common
 
 import cats.effect.IO
-import uk.gov.nationalarchives.omega.api.common.AppLogger
-import uk.gov.nationalarchives.omega.api.services.ServiceState.Stopped
+import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
+import org.typelevel.log4cats.slf4j.Slf4jFactory
 
-import java.util.concurrent.atomic.AtomicReference
-
-trait Stateful extends AppLogger {
-
-  private val state = new AtomicReference[ServiceState](Stopped)
-
-  val invalidState = 99
-
-  def switchState(from: ServiceState, to: ServiceState): IO[Boolean] =
-    IO {
-      val switched = state.compareAndSet(from, to)
-      if (!switched) {
-        logger.error(s"Unable to switch ${this.getClass.getSimpleName} state from: $from, to: $to.")
-      }
-      switched
-    }
-
+trait AppLogger {
+  implicit val logging: LoggerFactory[IO] = Slf4jFactory[IO]
+  implicit val logger: SelfAwareStructuredLogger[IO] = logging.getLoggerFromName(this.getClass.getSimpleName)
 }

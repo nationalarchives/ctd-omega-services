@@ -30,7 +30,7 @@ import jms4s.jms.JmsMessage
 import jms4s.{ JmsAcknowledgerConsumer, JmsProducer }
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.business.legalstatus.LegalStatusService
-import uk.gov.nationalarchives.omega.api.common.Version1UUID
+import uk.gov.nationalarchives.omega.api.common.{ AppLogger, Version1UUID }
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.connectors.JmsConnector
 import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, LocalMessageStore, StubDataImpl }
@@ -58,7 +58,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
 
   def stop(): IO[ExitCode] =
     switchState(Started, Stopping).ifM(
-      logger.info("Closing connection..") *>
+      logger.info(s"Closing connection..") *>
         switchState(Stopping, Stopped).ifM(doStop(), IO.pure(ExitCode(invalidState))),
       IO.pure(ExitCode(invalidState))
     )
@@ -109,7 +109,8 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     Files.createDirectories(messageStoreFolder)
     Right(new LocalMessageStore(messageStoreFolder))
   }.handleErrorWith(ex =>
-    logger.error(s"Failed to created local message store due to ${ex.getMessage}") *> IO.pure(Left(ExitCode.Error))
+    logger
+      .error(s"Failed to created local message store due to ${ex.getMessage}") *> IO.pure(Left(ExitCode.Error))
   )
 
   /* This method uses IO.race() to run the message handler and dispatcher in parallel. The common component between the
@@ -166,7 +167,10 @@ class ApiService(val config: ServiceConfig) extends Stateful {
             _   <- queueMessage(queue, messageId, jmsMessage)
           } yield res
         case Failure(e) =>
-          logger.error(s"Failed to create message handler as unable to persist message: [$e]")
+          logger
+            .error(
+              s"Failed to create message handler as unable to persist message: [$e]"
+            )
           IO(AckAction.noAck)
       }
     }
@@ -178,7 +182,10 @@ class ApiService(val config: ServiceConfig) extends Stateful {
   ): IO[Unit] =
     for {
       localMessageResult <- createLocalMessage(persistentMessageId, jmsMessage)
-      _                  <- queue.offer(localMessageResult) *> logger.info(s"Queued message: $persistentMessageId")
+      _ <- queue.offer(localMessageResult) *> logger
+             .info(
+               s"Queued message: $persistentMessageId"
+             )
     } yield ()
 
 }

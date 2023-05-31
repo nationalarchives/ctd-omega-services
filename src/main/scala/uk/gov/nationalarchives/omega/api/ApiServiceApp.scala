@@ -22,17 +22,13 @@
 package uk.gov.nationalarchives.omega.api
 
 import cats.effect.{ ExitCode, IO, IOApp }
-import org.typelevel.log4cats.slf4j.Slf4jFactory
-import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import pureconfig.ConfigSource
 import pureconfig.generic.auto._
+import uk.gov.nationalarchives.omega.api.common.AppLogger
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.services.ApiService
 
-object ApiServiceApp extends IOApp {
-
-  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
-  implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
+object ApiServiceApp extends IOApp with AppLogger {
 
   val applicationId = "PACS001"
 

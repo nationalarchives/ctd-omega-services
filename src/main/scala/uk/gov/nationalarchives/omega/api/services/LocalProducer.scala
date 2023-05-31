@@ -27,12 +27,10 @@ import io.circe.Json
 import io.circe.syntax.EncoderOps
 import jms4s.JmsProducer
 import jms4s.config.QueueName
-import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
-import org.typelevel.log4cats.slf4j.Slf4jFactory
 import uk.gov.nationalarchives.omega.api.ApiServiceApp
 import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidationError, BusinessServiceError, TextIsNonEmptyCharacters }
 import uk.gov.nationalarchives.omega.api.common.ErrorCode._
-import uk.gov.nationalarchives.omega.api.common.JsonError
+import uk.gov.nationalarchives.omega.api.common.{ AppLogger, JsonError }
 import uk.gov.nationalarchives.omega.api.messages.IncomingMessageType.OSLISALS001
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage._
 import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, MessageProperties, OutgoingMessageType, ValidatedLocalMessage }
@@ -114,10 +112,7 @@ trait LocalProducer {
 /** In JMS terms a producer can have one or many destinations - in this implementation we have one destination, if we
   * want many destinations we need to modify the send method to pass the destination with each call
   */
-class LocalProducerImpl(val jmsProducer: JmsProducer[IO]) extends LocalProducer {
-
-  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
-  implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
+class LocalProducerImpl(val jmsProducer: JmsProducer[IO]) extends LocalProducer with AppLogger {
 
   /** Send the given reply message to the output queue
     * @param replyMessage
