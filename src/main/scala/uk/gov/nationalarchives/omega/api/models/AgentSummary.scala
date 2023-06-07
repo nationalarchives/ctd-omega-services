@@ -19,22 +19,26 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.support
+package uk.gov.nationalarchives.omega.api.models
 
-import uk.gov.nationalarchives.omega.api.messages.{ AgentType, StubData }
-import uk.gov.nationalarchives.omega.api.models.{ AgentSummary, LegalStatus }
+import io.circe.{ Encoder, Json }
+import uk.gov.nationalarchives.omega.api.messages.AgentType
 
-class TestStubData extends StubData {
+case class AgentSummary(
+  agentType: AgentType,
+  identifier: String,
+  label: String,
+  dateFrom: Option[String],
+  dateTo: Option[String]
+)
+object AgentSummary {
+  implicit val encodeAgentSummary: Encoder[AgentSummary] = (agentSummary: AgentSummary) =>
+    Json.obj(
+      ("agentType", Json.fromString(agentSummary.agentType.entryName)),
+      ("identifier", Json.fromString(agentSummary.identifier)),
+      ("label", Json.fromString(agentSummary.label)),
+      ("dateFrom", Json.fromString(agentSummary.dateFrom.getOrElse(""))),
+      ("dateTo", Json.fromString(agentSummary.dateTo.getOrElse("")))
+    )
 
-  override def getLegalStatuses(): Seq[LegalStatus] = Seq(
-    LegalStatus("http://catalogue.nationalarchives.gov.uk/public-record", "Public Record"),
-    LegalStatus("http://catalogue.nationalarchives.gov.uk/non-public-record", "Non-Public Record")
-  )
-
-  override def getAgentSummaries(): Seq[AgentSummary] = Seq(
-    AgentSummary(AgentType.Person, "48N", "Baden-Powell, Lady Olave St Clair", Some("1889"), Some("1977")),
-    AgentSummary(AgentType.Person, "46F", "Fawkes, Guy", Some("1570"), Some("1606")),
-    AgentSummary(AgentType.CorporateBody, "92W", "Joint Milk Quality Committee", Some("1948"), Some("1948")),
-    AgentSummary(AgentType.CorporateBody, "8R6", "Queen Anne's Bounty", None, None)
-  )
 }

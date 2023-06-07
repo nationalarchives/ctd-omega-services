@@ -29,6 +29,7 @@ object ErrorCode extends Enum[ErrorCode] with CirceEnum[ErrorCode] {
   val values: IndexedSeq[ErrorCode] = findValues
 
   case object PROC001 extends ErrorCode
+  case object PROC002 extends ErrorCode
   case object MISS001 extends ErrorCode
   case object MISS002 extends ErrorCode
   case object MISS003 extends ErrorCode

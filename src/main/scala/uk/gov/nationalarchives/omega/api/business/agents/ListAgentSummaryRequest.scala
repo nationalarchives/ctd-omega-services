@@ -19,22 +19,10 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.support
+package uk.gov.nationalarchives.omega.api.business.agents
 
-import uk.gov.nationalarchives.omega.api.messages.{ AgentType, StubData }
-import uk.gov.nationalarchives.omega.api.models.{ AgentSummary, LegalStatus }
+import uk.gov.nationalarchives.omega.api.business.BusinessServiceRequest
+import uk.gov.nationalarchives.omega.api.models.ListAgentSummary
 
-class TestStubData extends StubData {
-
-  override def getLegalStatuses(): Seq[LegalStatus] = Seq(
-    LegalStatus("http://catalogue.nationalarchives.gov.uk/public-record", "Public Record"),
-    LegalStatus("http://catalogue.nationalarchives.gov.uk/non-public-record", "Non-Public Record")
-  )
-
-  override def getAgentSummaries(): Seq[AgentSummary] = Seq(
-    AgentSummary(AgentType.Person, "48N", "Baden-Powell, Lady Olave St Clair", Some("1889"), Some("1977")),
-    AgentSummary(AgentType.Person, "46F", "Fawkes, Guy", Some("1570"), Some("1606")),
-    AgentSummary(AgentType.CorporateBody, "92W", "Joint Milk Quality Committee", Some("1948"), Some("1948")),
-    AgentSummary(AgentType.CorporateBody, "8R6", "Queen Anne's Bounty", None, None)
-  )
-}
+case class ListAgentSummaryRequest(text: Option[String] = None, listAgentSummary: Option[ListAgentSummary] = None)
+    extends BusinessServiceRequest

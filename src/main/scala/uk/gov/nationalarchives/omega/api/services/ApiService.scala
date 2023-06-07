@@ -28,6 +28,7 @@ import jms4s.JmsAcknowledgerConsumer.AckAction
 import jms4s.config.QueueName
 import jms4s.jms.JmsMessage
 import jms4s.{ JmsAcknowledgerConsumer, JmsProducer }
+import uk.gov.nationalarchives.omega.api.business.agents.ListAgentSummaryService
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.business.legalstatus.LegalStatusService
 import uk.gov.nationalarchives.omega.api.common.{ AppLogger, Version1UUID }
@@ -145,7 +146,8 @@ class ApiService(val config: ServiceConfig) extends Stateful {
       new LocalProducerImpl(jmsProducer),
       localMessageStore,
       new EchoService(),
-      new LegalStatusService(stubData)
+      new LegalStatusService(stubData),
+      new ListAgentSummaryService(stubData)
     )
 
   private def doStop(): IO[ExitCode] =

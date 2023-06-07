@@ -35,6 +35,7 @@ import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.common.{ ErrorCode, Version1UUID }
 import io.circe._
 import io.circe.parser._
+import uk.gov.nationalarchives.omega.api.business.agents.ListAgentSummaryService
 import uk.gov.nationalarchives.omega.api.business.legalstatus.LegalStatusService
 import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ BLAN001, INVA001, INVA002, INVA003, INVA005, INVA006, INVA007, MISS001, MISS002, MISS003, MISS004, MISS005, MISS006, MISS007 }
 import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, StubDataImpl }
@@ -53,7 +54,9 @@ class DispatcherSpec
   private val testLocalProducer = new TestProducerImpl(testQueue)
   private val echoService = new EchoService()
   private val legalStatusService = new LegalStatusService(new StubDataImpl)
-  private lazy val dispatcher = new Dispatcher(testLocalProducer, localMessageStore, echoService, legalStatusService)
+  private val listAgentSummaryService = new ListAgentSummaryService(new StubDataImpl)
+  private lazy val dispatcher =
+    new Dispatcher(testLocalProducer, localMessageStore, echoService, legalStatusService, listAgentSummaryService)
 
   override protected def afterAll(): Unit = {
     super.afterAll()

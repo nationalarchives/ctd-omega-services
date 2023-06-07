@@ -24,3 +24,8 @@ package uk.gov.nationalarchives.omega.api.business
 sealed class BusinessRequestValidationError(val message: String, val cause: Option[Throwable] = None)
 final case class TextIsNonEmptyCharacters(override val message: String, override val cause: Option[Throwable] = None)
     extends BusinessRequestValidationError(message, cause)
+
+final case class InvalidAgentSummaryRequestError(
+  override val message: String,
+  override val cause: Option[Throwable] = None
+) extends BusinessRequestValidationError(message, cause)

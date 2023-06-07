@@ -27,10 +27,11 @@ import cats.effect.IO
 import cats.effect.std.Queue
 import cats.effect.unsafe.implicits.global
 import uk.gov.nationalarchives.omega.api.business._
+import uk.gov.nationalarchives.omega.api.business.agents.{ ListAgentSummaryRequest, ListAgentSummaryService }
 import uk.gov.nationalarchives.omega.api.business.echo.{ EchoRequest, EchoService }
 import uk.gov.nationalarchives.omega.api.business.legalstatus.{ LegalStatusRequest, LegalStatusService }
 import uk.gov.nationalarchives.omega.api.common.AppLogger
-import uk.gov.nationalarchives.omega.api.messages.IncomingMessageType.{ ECHO001, OSLISALS001 }
+import uk.gov.nationalarchives.omega.api.messages.IncomingMessageType.{ ECHO001, OSLISAGT001, OSLISALS001 }
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.ValidationResult
 import uk.gov.nationalarchives.omega.api.messages.{ IncomingMessageType, LocalMessage, LocalMessageStore, ValidatedLocalMessage }
 
@@ -40,7 +41,8 @@ class Dispatcher(
   val localProducer: LocalProducer,
   localMessageStore: LocalMessageStore,
   echoService: EchoService,
-  legalStatusService: LegalStatusService
+  legalStatusService: LegalStatusService,
+  listAgentSummaryService: ListAgentSummaryService
 ) extends AppLogger {
 
   import cats.syntax.all._
@@ -118,6 +120,7 @@ class Dispatcher(
     messageType match {
       case ECHO001     => (echoService, EchoRequest(Some(localMessage.messageText)))
       case OSLISALS001 => (legalStatusService, LegalStatusRequest())
+      case OSLISAGT001 => (listAgentSummaryService, ListAgentSummaryRequest())
       // add more service IDs here
     }
 

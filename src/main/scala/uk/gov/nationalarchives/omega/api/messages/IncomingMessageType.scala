@@ -36,6 +36,10 @@ object IncomingMessageType extends Enum[IncomingMessageType] {
   case object OSLISALS001 extends IncomingMessageType {
     override val entryName = "OSLISALS001"
   }
+
+  case object OSLISAGT001 extends IncomingMessageType {
+    override val entryName = "OSLISAGT001"
+  }
   // add more service identifiers here
 
 }
