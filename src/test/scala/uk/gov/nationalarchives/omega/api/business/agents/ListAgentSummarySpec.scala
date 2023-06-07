@@ -175,7 +175,6 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
                   |}""".stripMargin)
         )
         val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
-        println(result.toString)
         result mustBe Valid(
           ListAgentSummaryRequest(
             None,
@@ -193,7 +192,6 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
                   |}""".stripMargin)
         )
         val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
-        println(result.toString)
         result mustBe Valid(
           ListAgentSummaryRequest(
             None,
