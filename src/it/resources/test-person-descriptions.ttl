@@ -1,0 +1,272 @@
+@prefix premis: <http://www.loc.gov/premis/rdf/v3/> .
+@prefix schema: <https://schema.org/> .
+@prefix rdac:  <http://rdaregistry.info/Elements/c/> .
+@prefix ver:   <http://purl.org/linked-data/version#> .
+@prefix rdaa:  <http://rdaregistry.info/Elements/a/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdat:  <http://rdaregistry.info/Elements/t/> .
+@prefix rdau:  <http://rdaregistry.info/Elements/u/> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix cat:   <http://cat.nationalarchives.gov.uk/> .
+@prefix time:  <http://www.w3.org/2006/time#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+
+cat:agent.4N6.1  a             foaf:Person , rdac:C10004 , premis:Person ;
+        dct:created            "2003-02-12T13:33:21.917Z"^^xsd:dateTime ;
+        dct:identifier         "agent.4N6.1" ;
+        dct:type               cat:person-description ;
+        rdaa:P50110            "Knight" ;
+        rdaa:P50113            "Author and lecturer; member of Anglo-Russian Commission, 1915-1918; chief of the British Intelligence Service in Soviet Russia, 1918-1920. Knighted 1920." ;
+        rdaa:P50116            "Male" ;
+        rdaa:P50120            [ a                rdac:C10010 , time:Instant ;
+                                 time:inXSDgYear  "1967"^^xsd:gYear
+                               ] ;
+        rdaa:P50121            [ a                rdac:C10010 , time:Instant ;
+                                 time:inXSDgYear  "1889"^^xsd:gYear
+                               ] ;
+        rdaa:P50291            "Dukes" ;
+        rdaa:P50292            "Paul" ;
+        rdau:P61160            cat:soi-approved-complete ;
+        prov:generatedAtTime   "2023-01-25T14:18:41.93Z"^^xsd:dateTime ;
+        prov:specializationOf  cat:agent.4N6 ;
+        prov:wasAttributedTo   cat:agent.S7 ;
+        foaf:title             "Sir" ;
+        schema:identifier      [ a                  schema:identifier ;
+                                 schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                 schema:value       "person.2001"
+                               ] .
+
+
+cat:agent.2YK.1  a             foaf:Person , rdac:C10004 , premis:Person ;
+        dct:created            "2000-09-25T09:57:29.99Z"^^xsd:dateTime ;
+        dct:identifier         "agent.2YK.1" ;
+        dct:type               cat:person-description ;
+        rdaa:P50110            "1st Baron Ashbourne" ;
+        rdaa:P50116            "Male" ;
+        rdaa:P50120            [ a                rdac:C10010 , time:Instant ;
+                                 time:inXSDgYear  "1913"^^xsd:gYear
+                               ] ;
+        rdaa:P50121            [ a                rdac:C10010 , time:Instant ;
+                                 time:inXSDgYear  "1837"^^xsd:gYear
+                               ] ;
+        rdaa:P50291            "Gibson" ;
+        rdaa:P50292            "Edward" ;
+        rdau:P61160            cat:soi-approved-complete ;
+        prov:generatedAtTime   "2023-01-25T14:18:41.146Z"^^xsd:dateTime ;
+        prov:specializationOf  cat:agent.2YK ;
+        prov:wasAttributedTo   cat:agent.S7 ;
+        schema:identifier      [ a                  schema:identifier ;
+                                 schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                 schema:value       "person.848"
+                               ] .
+
+cat:agent.4W4.1  a             foaf:Person , premis:Person , rdac:C10004 ;
+        dct:created            "2003-08-06T14:40:34.963Z"^^xsd:dateTime ;
+        dct:identifier         "agent.4W4.1" ;
+        dct:type               cat:person-description ;
+        rdaa:P50113            "Assistant Crown Agent 1964-1967; Crown Agent 1968-1971" ;
+        rdaa:P50116            "Male" ;
+        rdaa:P50120            [ a                rdac:C10010 , time:Instant ;
+                                 time:inXSDgYear  "1997"^^xsd:gYear
+                               ] ;
+        rdaa:P50121            [ a                rdac:C10010 , time:Instant ;
+                                 time:inXSDgYear  "1910"^^xsd:gYear
+                               ] ;
+        rdaa:P50291            "Morris" ;
+        rdaa:P50292            "Edward Allan" ;
+        rdau:P61160            cat:soi-approved-complete ;
+        prov:generatedAtTime   "2023-01-25T14:18:41.932Z"^^xsd:dateTime ;
+        prov:specializationOf  cat:agent.4W4 ;
+        prov:wasAttributedTo   cat:agent.S7 ;
+        schema:identifier      [ a                  schema:identifier ;
+                                 schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                 schema:value       "person.2165"
+                               ] .
+
+cat:agent.4VS.1  a             foaf:Person , premis:Person , rdac:C10004 ;
+        dct:created            "2003-06-10T13:34:22.04Z"^^xsd:dateTime ;
+        dct:identifier         "agent.4VS.1" ;
+        dct:type               cat:person-description ;
+        rdaa:P50116            "Male" ;
+        rdaa:P50291            "Winchilsea, 6th Earl" ;
+        rdau:P61160            cat:soi-approved-complete ;
+        prov:generatedAtTime   "2023-01-25T14:18:41.932Z"^^xsd:dateTime ;
+        prov:specializationOf  cat:agent.4VS ;
+        prov:wasAttributedTo   cat:agent.S7 ;
+        schema:identifier      [ a                  schema:identifier ;
+                                 schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                 schema:value       "person.2152"
+                               ] .
+
+cat:agent.FJ.1  a              rdac:C10004 , premis:Person , foaf:Person ;
+        dct:created            "2000-09-25T09:57:29.99Z"^^xsd:dateTime ;
+        dct:identifier         "agent.FJ.1" ;
+        dct:type               cat:person-description ;
+        rdaa:P50110            "Knight" ;
+        rdaa:P50113            "Conservative MP from 1950 to 2001. Minister of Labour 1959-1960; Lord Privy Seal 1960-1963; Secretary of State for Trade and Industry, and President of Board of Trade 1963-1964. Leader of the Opposition 1965-1970 and 1974-1975. Prime Minister 1970-1974. Knighted 1992." ;
+        rdaa:P50116            "Male" ;
+        rdaa:P50120            [ a                rdac:C10010 , time:Instant ;
+                                 time:inXSDgYear  "2005"^^xsd:gYear
+                               ] ;
+        rdaa:P50121            [ a                rdac:C10010 , time:Instant ;
+                                 time:inXSDgYear  "1916"^^xsd:gYear
+                               ] ;
+        rdaa:P50291            "Heath" ;
+        rdaa:P50292            "Edward Richard George" ;
+        rdau:P61160            cat:soi-approved-complete ;
+        prov:generatedAtTime   "2023-01-25T14:18:40.778Z"^^xsd:dateTime ;
+        prov:specializationOf  cat:agent.FJ ;
+        prov:wasAttributedTo   cat:agent.S7 ;
+        foaf:title             "Sir" ;
+        schema:identifier      [ a                  schema:identifier ;
+                                 schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                 schema:value       "person.542"
+                               ] .
+
+cat:agent.5Q.1  a              rdac:C10004 , foaf:Person , premis:Person ;
+        dct:created            "2001-09-19T15:10:06.24Z"^^xsd:dateTime ;
+        dct:identifier         "agent.5Q.1" ;
+        dct:type               cat:person-description ;
+        rdaa:P50110            "Baron Mulley of Manor Park" ;
+        rdaa:P50113            "Labour MP from 1950-1983. Minister of Aviation, 1965-1967; Minister of State at the FO and FCO, 1967-1969 (Minister for Disarmament); Minister for Transport, 1969-1970 and 1974-1975; Sec of State for Education and Science, 1975-1976; Sec of State for Defence, 1976-1979. Created baron in 1984." ;
+        rdaa:P50116            "Male" ;
+        rdaa:P50120            [ a                rdac:C10010 , time:Instant ;
+                                 time:inXSDgYear  "1995"^^xsd:gYear
+                               ] ;
+        rdaa:P50121            [ a                rdac:C10010 , time:Instant ;
+                                 time:inXSDgYear  "1918"^^xsd:gYear
+                               ] ;
+        rdaa:P50291            "Mulley" ;
+        rdaa:P50292            "Frederick William" ;
+        rdau:P61160            cat:soi-approved-complete ;
+        prov:generatedAtTime   "2023-01-25T14:18:41.921Z"^^xsd:dateTime ;
+        prov:specializationOf  cat:agent.5Q ;
+        prov:wasAttributedTo   cat:agent.S7 ;
+        schema:identifier      [ a                  schema:identifier ;
+                                 schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                 schema:value       "person.1749"
+                               ] .
+
+cat:agent.331.1  a             premis:Person , foaf:Person , rdac:C10004 ;
+        dct:created            "2000-09-25T09:57:29.99Z"^^xsd:dateTime ;
+        dct:identifier         "agent.331.1" ;
+        dct:type               cat:person-description ;
+        rdaa:P50291            "Hampstead" ;
+        rdau:P61160            cat:soi-approved-complete ;
+        prov:generatedAtTime   "2023-01-25T14:18:41.235Z"^^xsd:dateTime ;
+        prov:specializationOf  cat:agent.331 ;
+        prov:wasAttributedTo   cat:agent.S7 ;
+        schema:identifier      [ a                  schema:identifier ;
+                                 schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                 schema:value       "person.920"
+                               ] .
+
+cat:agent.2R1.1  a             premis:Person , foaf:Person , rdac:C10004 ;
+        dct:created            "2000-09-25T09:57:29.99Z"^^xsd:dateTime ;
+        dct:identifier         "agent.2R1.1" ;
+        dct:type               cat:person-description ;
+        rdaa:P50113            "Diplomat. Secretary of British Legation to the Holy See, Rome 1921-1925. Counsellor of Embassy at Tokyo 1926-1929. Envoy Extraordinary & Minister Plenipotentiary in Bangkok & Oslo. Ambassador to Polish Government in Exile 1941-1943." ;
+        rdaa:P50116            "Male" ;
+        rdaa:P50120            [ a                rdac:C10010 , time:Instant ;
+                                 time:inXSDgYear  "1979"^^xsd:gYear
+                               ] ;
+        rdaa:P50121            [ a                rdac:C10010 , time:Instant ;
+                                 time:inXSDgYear  "1883"^^xsd:gYear
+                               ] ;
+        rdaa:P50291            "Dormer" ;
+        rdaa:P50292            "Charles Francis Joseph" ;
+        rdau:P61160            cat:soi-approved-complete ;
+        prov:generatedAtTime   "2023-01-25T14:18:40.917Z"^^xsd:dateTime ;
+        prov:specializationOf  cat:agent.2R1 ;
+        prov:wasAttributedTo   cat:agent.S7 ;
+        schema:identifier      [ a                  schema:identifier ;
+                                 schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                 schema:value       "person.653"
+                               ] .
+
+cat:agent.4NX.1  a             rdac:C10004 , foaf:Person , premis:Person ;
+        dct:created            "2003-04-11T08:55:34.733Z"^^xsd:dateTime ;
+        dct:identifier         "agent.4NX.1" ;
+        dct:type               cat:person-description ;
+        rdaa:P50113            "Director of Pest Infestation Research at the Agricultural Research Council, 1940-1968." ;
+        rdaa:P50116            "Male" ;
+        rdaa:P50120            [ a                rdac:C10010 , time:Instant ;
+                                 time:inXSDgYear  "2000"^^xsd:gYear
+                               ] ;
+        rdaa:P50121            [ a                rdac:C10010 , time:Instant ;
+                                 time:inXSDgYear  "1905"^^xsd:gYear
+                               ] ;
+        rdaa:P50291            "Herford" ;
+        rdaa:P50292            "Geoffrey Vernon Brooke" ;
+        rdau:P61160            cat:soi-approved-complete ;
+        prov:generatedAtTime   "2023-01-25T14:18:41.93Z"^^xsd:dateTime ;
+        prov:specializationOf  cat:agent.4NX ;
+        prov:wasAttributedTo   cat:agent.S7 ;
+        schema:identifier      [ a                  schema:identifier ;
+                                 schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                 schema:value       "person.2025"
+                               ] .
+
+cat:agent.3LG.1  a             premis:Person , rdac:C10004 , foaf:Person ;
+        dct:created            "2000-09-25T09:57:29.99Z"^^xsd:dateTime ;
+        dct:identifier         "agent.3LG.1" ;
+        dct:type               cat:person-description ;
+        rdaa:P50113            "Inventor & author. Brother of Sir Rowland Hill. Supervisor of stamps at Somerset House, 1840-1872, under Board of Stamps & Board of Inland Revenue. Joint inventor of machine for folding envelopes. Published 'Principles of Currency' (1856)." ;
+        rdaa:P50116            "Male" ;
+        rdaa:P50120            [ a                rdac:C10010 , time:Instant ;
+                                 time:inXSDgYear  "1876"^^xsd:gYear
+                               ] ;
+        rdaa:P50121            [ a                rdac:C10010 , time:Instant ;
+                                 time:inXSDgYear  "1793"^^xsd:gYear
+                               ] ;
+        rdaa:P50291            "Hill" ;
+        rdaa:P50292            "Edwin" ;
+        rdau:P61160            cat:soi-approved-complete ;
+        prov:generatedAtTime   "2023-01-25T14:18:41.668Z"^^xsd:dateTime ;
+        prov:specializationOf  cat:agent.3LG ;
+        prov:wasAttributedTo   cat:agent.S7 ;
+        schema:identifier      [ a                  schema:identifier ;
+                                 schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                 schema:value       "person.1277"
+                               ] .
+
+cat:agent.4X7.1  a             rdac:C10004 , premis:Person , foaf:Person ;
+        dct:created            "2004-04-14T14:48:21.577Z"^^xsd:dateTime ;
+        dct:identifier         "agent.4X7.1" ;
+        dct:type               cat:person-description ;
+        rdaa:P50110            "Knight" ;
+        rdaa:P50113            "Mathematician. Vice-chancellor of Bristol University, Director of the Isaac Newton Institute for Mathematics Sciences and chairman of the Committee of Inquiry into the Teaching of the English Language in 1987-88. Knighted 1985." ;
+        rdaa:P50116            "Male" ;
+        rdaa:P50121            [ a                rdac:C10010 , time:Instant ;
+                                 time:inXSDgYear  "1939"^^xsd:gYear
+                               ] ;
+        rdaa:P50291            "Kingman" ;
+        rdaa:P50292            "John Frank Charles" ;
+        rdau:P61160            cat:soi-approved-complete ;
+        prov:generatedAtTime   "2023-01-25T14:18:41.932Z"^^xsd:dateTime ;
+        prov:specializationOf  cat:agent.4X7 ;
+        prov:wasAttributedTo   cat:agent.S7 ;
+        foaf:title             "Sir" ;
+        schema:identifier      [ a                  schema:identifier ;
+                                 schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                 schema:value       "person.2201"
+                               ] .
+
+cat:agent.4WV.1  a             rdac:C10004 , premis:Person , foaf:Person ;
+        dct:created            "2003-12-02T13:31:08.387Z"^^xsd:dateTime ;
+        dct:identifier         "agent.4WV.1" ;
+        dct:type               cat:person-description ;
+        rdaa:P50116            "Male" ;
+        rdaa:P50291            "Kidlington, Baron" ;
+        rdau:P61160            cat:soi-approved-complete ;
+        prov:generatedAtTime   "2023-01-25T14:18:41.932Z"^^xsd:dateTime ;
+        prov:specializationOf  cat:agent.4WV ;
+        prov:wasAttributedTo   cat:agent.S7 ;
+        schema:identifier      [ a                  schema:identifier ;
+                                 schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                 schema:value       "person.2189"
+                               ] .
+
