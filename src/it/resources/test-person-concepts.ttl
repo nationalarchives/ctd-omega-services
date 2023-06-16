@@ -1,0 +1,94 @@
+@prefix premis: <http://www.loc.gov/premis/rdf/v3/> .
+@prefix rdac:  <http://rdaregistry.info/Elements/c/> .
+@prefix ver:   <http://purl.org/linked-data/version#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix cat:   <http://cat.nationalarchives.gov.uk/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+
+cat:agent.4N6  a              rdac:C10004 , foaf:Person , premis:Person ;
+        dct:identifier        "agent.4N6" ;
+        dct:type              cat:person-concept ;
+        ver:currentVersion    cat:agent.4N6.1 ;
+        prov:generatedAtTime  "2023-01-25T14:18:41.93Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.2YK  a              rdac:C10004 , foaf:Person , premis:Person ;
+        dct:identifier        "agent.2YK" ;
+        dct:type              cat:person-concept ;
+        ver:currentVersion    cat:agent.2YK.1 ;
+        prov:generatedAtTime  "2023-01-25T14:18:41.146Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.4W4  a              rdac:C10004 , foaf:Person , premis:Person ;
+        dct:identifier        "agent.4W4" ;
+        dct:type              cat:person-concept ;
+        ver:currentVersion    cat:agent.4W4.1 ;
+        prov:generatedAtTime  "2023-01-25T14:18:41.932Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.4VS  a              rdac:C10004 , foaf:Person , premis:Person ;
+        dct:identifier        "agent.4VS" ;
+        dct:type              cat:person-concept ;
+        ver:currentVersion    cat:agent.4VS.1 ;
+        prov:generatedAtTime  "2023-01-25T14:18:41.932Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.FJ  a               rdac:C10004 , foaf:Person , premis:Person ;
+        dct:identifier        "agent.FJ" ;
+        dct:type              cat:person-concept ;
+        ver:currentVersion    cat:agent.FJ.1 ;
+        prov:generatedAtTime  "2023-01-25T14:18:40.778Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.5Q  a               rdac:C10004 , foaf:Person , premis:Person ;
+        dct:identifier        "agent.5Q" ;
+        dct:type              cat:person-concept ;
+        ver:currentVersion    cat:agent.5Q.1 ;
+        prov:generatedAtTime  "2023-01-25T14:18:41.921Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.331  a              rdac:C10004 , foaf:Person , premis:Person ;
+        dct:identifier        "agent.331" ;
+        dct:type              cat:person-concept ;
+        ver:currentVersion    cat:agent.331.1 ;
+        prov:generatedAtTime  "2023-01-25T14:18:41.235Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.2R1  a              rdac:C10004 , foaf:Person , premis:Person ;
+        dct:identifier        "agent.2R1" ;
+        dct:type              cat:person-concept ;
+        ver:currentVersion    cat:agent.2R1.1 ;
+        prov:generatedAtTime  "2023-01-25T14:18:40.917Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.4NX  a              rdac:C10004 , foaf:Person , premis:Person ;
+        dct:identifier        "agent.4NX" ;
+        dct:type              cat:person-concept ;
+        ver:currentVersion    cat:agent.4NX.1 ;
+        prov:generatedAtTime  "2023-01-25T14:18:41.93Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.3LG  a              rdac:C10004 , foaf:Person , premis:Person ;
+        dct:identifier        "agent.3LG" ;
+        dct:type              cat:person-concept ;
+        ver:currentVersion    cat:agent.3LG.1 ;
+        prov:generatedAtTime  "2023-01-25T14:18:41.668Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.4X7  a              rdac:C10004 , foaf:Person , premis:Person ;
+        dct:identifier        "agent.4X7" ;
+        dct:type              cat:person-concept ;
+        ver:currentVersion    cat:agent.4X7.1 ;
+        prov:generatedAtTime  "2023-01-25T14:18:41.932Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.4WV  a              rdac:C10004 , foaf:Person , premis:Person ;
+        dct:identifier        "agent.4WV" ;
+        dct:type              cat:person-concept ;
+        ver:currentVersion    cat:agent.4WV.1 ;
+        prov:generatedAtTime  "2023-01-25T14:18:41.932Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
