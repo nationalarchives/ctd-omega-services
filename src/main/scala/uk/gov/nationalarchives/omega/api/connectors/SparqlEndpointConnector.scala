@@ -19,17 +19,34 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.support
+package uk.gov.nationalarchives.omega.api.connectors
 
-import org.apache.jena.ext.xerces.util.URI
-import uk.gov.nationalarchives.omega.api.messages.StubData
-import uk.gov.nationalarchives.omega.api.models.LegalStatus
+import org.apache.jena.query.{ Query, QueryExecutionFactory }
+import org.phenoscape.sparql.FromQuerySolution
+import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 
-class TestStubData extends StubData {
+import scala.jdk.CollectionConverters._
+import scala.util.{ Try, Using }
 
-  override def getLegalStatuses(): List[LegalStatus] = List(
-    LegalStatus(new URI("http://catalogue.nationalarchives.gov.uk/public-record"), "Public Record"),
-    LegalStatus(new URI("http://catalogue.nationalarchives.gov.uk/non-public-record"), "Non-Public Record")
-  )
+class SparqlEndpointConnector(config: ServiceConfig) {
+
+  /** Executes the provided SPARQL query against the configured endpoint and decodes the result with the provided
+    * decoder
+    * @param query
+    *   \- the SPARQL to execute
+    * @param queryDecoder
+    *   \- a decoder for the result
+    * @tparam T
+    *   \- the result type
+    * @return
+    */
+  def execute[T](query: Query, queryDecoder: FromQuerySolution[T]): Try[List[T]] =
+    Using(QueryExecutionFactory.createServiceRequest(config.sparqlEndpoint, query)) { queryEngine =>
+      val resultSet = queryEngine.execSelect()
+      val itResults = resultSet.asScala.toList
+      itResults.flatMap { querySolution =>
+        queryDecoder.fromQuerySolution(querySolution).toOption
+      }
+    }
 
 }
