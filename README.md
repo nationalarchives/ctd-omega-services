@@ -47,12 +47,19 @@ docker-compose up -d
 docker ps -a
 ```
 6. Go to http://localhost:9325/ in a web browser and you should see the message queues used by the application and its clients that are configured in `custom.conf`, e.g. `PACS001_request` and `PACE001_reply`
- 
-7. To run the unit tests you can use `sbt test`. 
+7. Run the `curl` command to verify the RD4J is configured and running on `localhost:8080` as below :
+```
+curl -L http://localhost:8080/rdf4j-workbench/
+```
+8. Using the project IDE for `ctd-omega-services-prototype` , run the `BulkLoadData` app to load the test data.
+   ElasticSearch is now setup and ready to handle requests from the Messaging system.
+   `BulkLoadData` will also create a new repository in RDF4J named 'Pact' and load the corporate body data into the newly created repository.
 
-8. To run the Pan-Archival Catalogue Services locally you can use ` sbt run`. Note that the request queue name configured in the `application.conf` file used by application must match the one in the `custom.conf` file used by ElasticMQ.
+9. To run the unit tests you can use `sbt test`. 
 
-9. Your message service is now running and ready to respond to requests.
+10. To run the Pan-Archival Catalogue Services locally you can use ` sbt run`. Note that the request queue name configured in the `application.conf` file used by application must match the one in the `custom.conf` file used by ElasticMQ.
+
+11. Your message service is now running and ready to respond to requests.
 ## Testing
 Unit tests can be run from sbt using `sbt test`
 

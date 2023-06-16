@@ -10,4 +10,14 @@ services:
         source: ./custom.conf
         target: /opt/elasticmq.conf
     image: softwaremill/elasticmq-native
-    privileged: true
+    privileged: truenative
+  rdf4j-service:
+    container_name: ctd-omega-services_rdf4j-container
+    environment:
+      - JAVA_OPTS=-Xms128m -Xmx512m
+    volumes:
+      - "/var/rdf4j"
+      - "/usr/local/tomcat/logs"
+    ports:
+      - 8080:8080
+    image: eclipse/rdf4j-workbench
