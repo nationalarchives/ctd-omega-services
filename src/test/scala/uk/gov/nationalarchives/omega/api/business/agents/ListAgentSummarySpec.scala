@@ -49,7 +49,6 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
                   |}""".stripMargin)
         )
         val result = listAgentSummaryService.process(listAgentSummaryRequest)
-        println(result)
         result mustBe
           Right(ListAgentSummaryReply(getExpectedAgentSummaries))
       }
