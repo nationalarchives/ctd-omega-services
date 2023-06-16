@@ -23,22 +23,21 @@ package uk.gov.nationalarchives.omega.api.models
 
 import io.circe.{ Encoder, Json }
 import uk.gov.nationalarchives.omega.api.messages.AgentType
+import io.circe.syntax._
 
 case class AgentSummary(
   agentType: AgentType,
   identifier: String,
-  label: String,
-  dateFrom: Option[String],
-  dateTo: Option[String]
+  currentDescription: String,
+  description: List[AgentDescription]
 )
 object AgentSummary {
   implicit val encodeAgentSummary: Encoder[AgentSummary] = (agentSummary: AgentSummary) =>
     Json.obj(
-      ("agentType", Json.fromString(agentSummary.agentType.entryName)),
+      ("type", Json.fromString(agentSummary.agentType.entryName)),
       ("identifier", Json.fromString(agentSummary.identifier)),
-      ("label", Json.fromString(agentSummary.label)),
-      ("dateFrom", Json.fromString(agentSummary.dateFrom.getOrElse(""))),
-      ("dateTo", Json.fromString(agentSummary.dateTo.getOrElse("")))
+      ("current-description", Json.fromString(agentSummary.currentDescription)),
+      ("description", agentSummary.description.asJson)
     )
 
 }

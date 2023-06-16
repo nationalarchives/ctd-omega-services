@@ -21,32 +21,29 @@
 
 package uk.gov.nationalarchives.omega.api.models
 
-import io.circe.{ Decoder, Encoder, Json }
-import uk.gov.nationalarchives.omega.api.messages.AgentType
+import io.circe.{ Encoder, Json }
 import io.circe.syntax._
 
-case class ListAgentSummary(
-  agentType: List[AgentType],
+case class AgentDescription(
+  identifier: String,
+  label: String,
+  authorityFile: Boolean,
+  depository: Boolean,
   versionTimestamp: String,
-  depository: Option[Boolean],
-  authorityFile: Option[Boolean]
+  dateFrom: Option[String],
+  dateTo: Option[String],
+  previousDescription: Option[String] = None
 )
-
-object ListAgentSummary {
-  implicit val encodeListAgentSummary: Encoder[ListAgentSummary] = (listAgentSummary: ListAgentSummary) =>
+object AgentDescription {
+  implicit val encodeAgentDescription: Encoder[AgentDescription] = (agentDescription: AgentDescription) =>
     Json.obj(
-      ("type", listAgentSummary.agentType.asJson),
-      ("depository", listAgentSummary.depository.asJson),
-      ("authority-file", listAgentSummary.authorityFile.asJson),
-      ("version-timestamp", listAgentSummary.versionTimestamp.asJson)
+      ("identifier", agentDescription.identifier.asJson),
+      ("label", agentDescription.label.asJson),
+      ("authority-file", agentDescription.authorityFile.asJson),
+      ("depository", agentDescription.depository.asJson),
+      ("version-timestamp", agentDescription.versionTimestamp.asJson),
+      ("date-from", agentDescription.dateFrom.asJson),
+      ("date-to", agentDescription.dateTo.asJson),
+      ("previous-description", agentDescription.previousDescription.asJson)
     )
-
-  implicit val decodeListAgentSummary: Decoder[ListAgentSummary] = json =>
-    for {
-      agentType     <- json.get[List[AgentType]]("type")
-      depository    <- json.get[Option[Boolean]]("depository")
-      authorityFile <- json.get[Option[Boolean]]("authority-file")
-      version       <- json.get[String]("version-timestamp")
-    } yield ListAgentSummary(agentType, version, depository, authorityFile)
-
 }

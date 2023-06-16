@@ -42,15 +42,16 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
 
         val listAgentSummaryRequest = ListAgentSummaryRequest(
           Some(s"""{
-                  |    "agentType" : ["CorporateBody","Person"],
-                  |    "authorityFile" : false,
+                  |    "type" : ["CorporateBody","Person"],
+                  |    "authority-file" : false,
                   |    "depository" : false,
-                  |    "version" : "all"
+                  |    "version-timestamp" : "all"
                   |}""".stripMargin)
         )
         val result = listAgentSummaryService.process(listAgentSummaryRequest)
-
-        result mustBe Right(ListAgentSummaryReply(getExpectedAgentSummaries))
+        println(result)
+        result mustBe
+          Right(ListAgentSummaryReply(getExpectedAgentSummaries))
       }
 
       "an empty payload request" in {
@@ -67,10 +68,10 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
       "an invalid AgentType " in {
         val listAgentSummaryRequest = ListAgentSummaryRequest(
           Some(s"""{
-                  |    "agentType" : ["CorporateBody2","Person"],
-                  |    "authorityFile" : true,
+                  |    "type" : ["CorporateBody2","Person"],
+                  |    "authority-file" : true,
                   |    "depository" : false,
-                  |    "version" : "latest"
+                  |    "version-timestamp" : "latest"
                   |}""".stripMargin)
         )
         val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
@@ -87,10 +88,10 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
       "null value for authorityFile" in {
         val listAgentSummaryRequest = ListAgentSummaryRequest(
           Some(s"""{
-                  |    "agentType" : ["CorporateBody"],
-                  |    "authorityFile" : "",
+                  |    "type" : ["CorporateBody"],
+                  |    "authority-file" : "",
                   |    "depository" : false,
-                  |    "version" : "latest"
+                  |    "version-timestamp" : "latest"
                   |}""".stripMargin)
         )
         val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
@@ -108,10 +109,10 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
       "non Boolean value for authorityFile" in {
         val listAgentSummaryRequest = ListAgentSummaryRequest(
           Some(s"""{
-                  |    "agentType" : ["CorporateBody"],
-                  |    "authorityFile" : maybe,
+                  |    "type" : ["CorporateBody"],
+                  |    "authorit-file" : maybe,
                   |    "depository" : false,
-                  |    "version" : "latest"
+                  |    "version-timestamp" : "latest"
                   |}""".stripMargin)
         )
         val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
@@ -127,10 +128,10 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
       "unrecognised version identifier" in {
         val listAgentSummaryRequest = ListAgentSummaryRequest(
           Some(s"""{
-                  |    "agentType" : ["CorporateBody"],
-                  |    "authorityFile" : false,
+                  |    "type" : ["CorporateBody"],
+                  |    "authority-file" : false,
                   |    "depository" : false,
-                  |    "version" : "latest1"
+                  |    "version-timestamp" : "latest1"
                   |}""".stripMargin)
         )
         val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
@@ -146,10 +147,10 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
       "invalid version timestamp" in {
         val listAgentSummaryRequest = ListAgentSummaryRequest(
           Some(s"""{
-                  |    "agentType" : ["CorporateBody"],
-                  |    "authorityFile" : false,
+                  |    "type" : ["CorporateBody"],
+                  |    "authority-file" : false,
                   |    "depository" : false,
-                  |    "version" : "2020-05-19"
+                  |    "version-timestamp" : "2020-05-19"
                   |}""".stripMargin)
         )
         val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
@@ -168,34 +169,34 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
       "valid version timestamp" in {
         val listAgentSummaryRequest = ListAgentSummaryRequest(
           Some(s"""{
-                  |    "agentType" : ["CorporateBody"],
-                  |    "authorityFile" : false,
+                  |    "type" : ["CorporateBody"],
+                  |    "authority-file" : false,
                   |    "depository" : false,
-                  |    "version" : "2022-06-22T02:00:00-0500"
+                  |    "version-timestamp" : "2022-06-22T02:00:00-0500"
                   |}""".stripMargin)
         )
         val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
         result mustBe Valid(
           ListAgentSummaryRequest(
             None,
-            Some(ListAgentSummary(List(CorporateBody), Some(false), Some(false), "2022-06-22T02:00:00-0500"))
+            Some(ListAgentSummary(List(CorporateBody), "2022-06-22T02:00:00-0500", Some(false), Some(false)))
           )
         )
       }
       "valid version identifier" in {
         val listAgentSummaryRequest = ListAgentSummaryRequest(
           Some(s"""{
-                  |    "agentType" : ["CorporateBody"],
-                  |    "authorityFile" : false,
+                  |    "type" : ["CorporateBody"],
+                  |    "authority-file" : false,
                   |    "depository" : false,
-                  |    "version" : "latest"
+                  |    "version-timestamp" : "latest"
                   |}""".stripMargin)
         )
         val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
         result mustBe Valid(
           ListAgentSummaryRequest(
             None,
-            Some(ListAgentSummary(List(CorporateBody), Some(false), Some(false), "latest"))
+            Some(ListAgentSummary(List(CorporateBody), "latest", Some(false), Some(false)))
           )
         )
       }
@@ -204,33 +205,72 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
 
   private def getExpectedAgentSummaries: String = s"""[
   {
-    "agentType" : "Person",
+    "type" : "Person",
     "identifier" : "48N",
-    "label" : "Baden-Powell, Lady Olave St Clair",
-    "dateFrom" : "1889",
-    "dateTo" : "1977"
+    "current-description" : "current",
+    "description" : [
+      {
+        "identifier" : "48N",
+        "label" : "Baden-Powell",
+        "authority-file" : false,
+        "depository" : false,
+        "version-timestamp" : "2022-06-22T02:00:00-0500",
+        "date-from" : "1889",
+        "date-to" : "1977",
+        "previous-description" : null
+      }
+    ]
   },
   {
-    "agentType" : "Person",
+    "type" : "Person",
     "identifier" : "46F",
-    "label" : "Fawkes, Guy",
-    "dateFrom" : "1570",
-    "dateTo" : "1606"
+    "current-description" : "current description",
+    "description" : [
+      {
+        "identifier" : "46F",
+        "label" : "Fawkes, Guy",
+        "authority-file" : false,
+        "depository" : false,
+        "version-timestamp" : "2022-06-22T02:00:00-0500",
+        "date-from" : "1570",
+        "date-to" : "1606",
+        "previous-description" : null
+      }
+    ]
   },
   {
-    "agentType" : "CorporateBody",
+    "type" : "CorporateBody",
     "identifier" : "92W",
-    "label" : "Joint Milk Quality Committee",
-    "dateFrom" : "1948",
-    "dateTo" : "1948"
+    "current-description" : "current description",
+    "description" : [
+      {
+        "identifier" : "92W",
+        "label" : "Joint Milk Quality Committee",
+        "authority-file" : false,
+        "depository" : false,
+        "version-timestamp" : "2022-06-22T02:00:00-0500",
+        "date-from" : "1948",
+        "date-to" : "1948",
+        "previous-description" : null
+      }
+    ]
   },
   {
-    "agentType" : "CorporateBody",
+    "type" : "CorporateBody",
     "identifier" : "8R6",
-    "label" : "Queen Anne's Bounty",
-    "dateFrom" : "",
-    "dateTo" : ""
+    "current-description" : "current description",
+    "description" : [
+      {
+        "identifier" : "8R6",
+        "label" : "Queen Anne's Bounty",
+        "authority-file" : false,
+        "depository" : false,
+        "version-timestamp" : "2022-06-22T02:00:00-0500",
+        "date-from" : null,
+        "date-to" : null,
+        "previous-description" : null
+      }
+    ]
   }
 ]""".stripMargin
-
 }

@@ -29,10 +29,7 @@ import uk.gov.nationalarchives.omega.api.messages.StubData
 import uk.gov.nationalarchives.omega.api.models.ListAgentSummary
 
 import java.text.SimpleDateFormat
-import java.time.{ LocalDate, ZoneOffset }
-import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalAccessor
-import java.util.{ Date, Locale }
+import java.util.Date
 import scala.util.Try
 
 class ListAgentSummaryService(val stubData: StubData) extends BusinessService with BusinessRequestValidation {
@@ -58,10 +55,10 @@ class ListAgentSummaryService(val stubData: StubData) extends BusinessService wi
       decode[ListAgentSummary](request.text.get) match {
         case Right(request) =>
           val versionIdentifiers: List[String] = List("latest", "all")
-          if (versionIdentifiers.contains(request.version))
+          if (versionIdentifiers.contains(request.versionTimestamp))
             Validated.valid(ListAgentSummaryRequest(None, Some(request)))
           else {
-            validateDate(request.version) match {
+            validateDate(request.versionTimestamp) match {
               case Some(_) =>
                 Validated.valid(ListAgentSummaryRequest(None, Some(request)))
               case _ =>
@@ -91,10 +88,10 @@ class ListAgentSummaryService(val stubData: StubData) extends BusinessService wi
 
   private def defaultRequest: String = {
     val defaultRequest = new StringBuilder(s"""{
-                                              |    "agentType" : ["CorporateBody","Person"],
-                                              |    "authorityFile" : false,
+                                              |    "type" : ["CorporateBody","Person"],
+                                              |    "authority-file" : false,
                                               |    "depository" : false,
-                                              |    "version" : "latest"
+                                              |    "version-timestamp" : "latest"
                                               |}""".stripMargin)
     defaultRequest.mkString
   }
