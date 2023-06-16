@@ -75,6 +75,8 @@ lazy val root = Project("ctd-omega-services", file("."))
       "io.circe"                                      %% "circe-core"                 % CirceVersion,
       "io.circe"                                      %% "circe-generic"              % CirceVersion,
       "io.circe"                                      %% "circe-parser"               % CirceVersion,
+      "org.phenoscape"                                %% "sparql-utils"               % "1.3.1",
+      "org.apache.jena"                                % "jena-arq"                   % "4.8.0",
       "ch.qos.logback"         % "logback-classic"               % "1.3.5"   % Runtime, // Java 8 compatible
       "net.logstash.logback"   % "logstash-logback-encoder"      % "7.3"     % Runtime,
       "org.scalatest"         %% "scalatest"                     % "3.2.15"  % "it,test",

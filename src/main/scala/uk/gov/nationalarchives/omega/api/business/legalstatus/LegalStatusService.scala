@@ -25,11 +25,18 @@ import cats.data.Validated
 import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidation, BusinessService, BusinessServiceError, BusinessServiceReply, BusinessServiceRequest }
 import uk.gov.nationalarchives.omega.api.messages.StubData
 import io.circe.syntax.EncoderOps
+import uk.gov.nationalarchives.omega.api.repository.{ AbstractRepository, OmegaRepository }
 
-class LegalStatusService(val stubData: StubData) extends BusinessService with BusinessRequestValidation {
+import scala.util.{ Failure, Success }
+
+class LegalStatusService(val stubData: StubData, repository: AbstractRepository)
+    extends BusinessService with BusinessRequestValidation {
 
   override def validateRequest(request: BusinessServiceRequest): ValidationResult = Validated.valid(request)
 
   override def process(request: BusinessServiceRequest): Either[BusinessServiceError, BusinessServiceReply] =
-    Right(LegalStatusReply(stubData.getLegalStatuses().asJson.toString()))
+    repository.getLegalStatusSummaries match {
+      case Success(legalStatusSummaries) => Right(LegalStatusReply(legalStatusSummaries.asJson.toString()))
+      case Failure(e)                    => Left(LegalStatusError(e.getMessage))
+    }
 }

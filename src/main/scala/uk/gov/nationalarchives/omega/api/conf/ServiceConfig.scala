@@ -27,5 +27,6 @@ case class ServiceConfig(
   maxProducers: Int,
   maxDispatchers: Int,
   maxLocalQueueSize: Int,
-  requestQueue: String
+  requestQueue: String,
+  sparqlEndpoint: String
 )

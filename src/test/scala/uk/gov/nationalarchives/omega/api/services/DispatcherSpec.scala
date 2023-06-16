@@ -24,35 +24,37 @@ package uk.gov.nationalarchives.omega.api.services
 import cats.effect.IO
 import cats.effect.std.Queue
 import cats.effect.testing.scalatest.AsyncIOSpec
-import jms4s.config.QueueName
-import org.apache.commons.lang3.SerializationUtils
-import org.scalatest.TryValues
-import org.scalatest.freespec.AsyncFreeSpec
-import org.scalatest.matchers.must.Matchers
-import org.scalatest.{ Assertion, BeforeAndAfterAll }
-import uk.gov.nationalarchives.omega.api.LocalMessageSupport
-import uk.gov.nationalarchives.omega.api.business.echo.EchoService
-import uk.gov.nationalarchives.omega.api.common.{ ErrorCode, Version1UUID }
 import io.circe._
 import io.circe.parser._
+import jms4s.config.QueueName
+import org.apache.commons.lang3.SerializationUtils
+import org.mockito.MockitoSugar
+import org.scalatest.freespec.AsyncFreeSpec
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.{ Assertion, BeforeAndAfterAll, TryValues }
+import uk.gov.nationalarchives.omega.api.LocalMessageSupport
+import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.business.legalstatus.LegalStatusService
-import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ BLAN001, INVA001, INVA002, INVA003, INVA005, INVA006, INVA007, MISS001, MISS002, MISS003, MISS004, MISS005, MISS006, MISS007 }
+import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ INVA001, INVA002, INVA003, INVA005, INVA006, INVA007, MISS001, MISS002, MISS003, MISS004, MISS005, MISS006, MISS007 }
+import uk.gov.nationalarchives.omega.api.common.{ ErrorCode, Version1UUID }
 import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, StubDataImpl }
+import uk.gov.nationalarchives.omega.api.repository.OmegaRepository
 
-import java.nio.file.{ FileSystems, Files, NoSuchFileException, StandardOpenOption }
+import java.nio.file.{ FileSystems, Files, StandardOpenOption }
 import java.util.UUID
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import scala.util.{ Failure, Success, Try }
 
 class DispatcherSpec
-    extends AsyncFreeSpec with BeforeAndAfterAll with AsyncIOSpec with Matchers with TryValues
-    with LocalMessageSupport {
+    extends AsyncFreeSpec with BeforeAndAfterAll with AsyncIOSpec with Matchers with TryValues with LocalMessageSupport
+    with MockitoSugar {
 
   private val testQueue = QueueName("test-queue")
   private val testLocalProducer = new TestProducerImpl(testQueue)
   private val echoService = new EchoService()
-  private val legalStatusService = new LegalStatusService(new StubDataImpl)
+  private val mockRepository = mock[OmegaRepository]
+  private val legalStatusService = new LegalStatusService(new StubDataImpl, mockRepository)
   private lazy val dispatcher = new Dispatcher(testLocalProducer, localMessageStore, echoService, legalStatusService)
 
   override protected def afterAll(): Unit = {

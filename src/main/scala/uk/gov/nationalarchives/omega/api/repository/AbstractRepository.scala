@@ -19,15 +19,24 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.models
+package uk.gov.nationalarchives.omega.api.repository
 
-import io.circe.{ Encoder, Json }
+import org.apache.jena.query.{ Query, QueryFactory }
+import uk.gov.nationalarchives.omega.api.models.LegalStatus
 
-case class LegalStatus(identifier: String, label: String)
-object LegalStatus {
-  implicit val encodeLegalStatus: Encoder[LegalStatus] = (legalStatus: LegalStatus) =>
-    Json.obj(
-      ("identifier", Json.fromString(legalStatus.identifier)),
-      ("label", Json.fromString(legalStatus.label))
-    )
+import java.net.URL
+import scala.util.{ Failure, Try }
+
+trait AbstractRepository {
+
+  def getLegalStatusSummaries: Try[List[LegalStatus]]
+
+  protected def getQueryResource(queryResource: String): Try[URL] =
+    Try(getClass.getClassLoader.getResource(queryResource))
+
+  protected def getQuery(queryUrl: URL): Try[Query] =
+    Try(QueryFactory.read(queryUrl.getPath)).recoverWith { case _: NullPointerException =>
+      Failure(new IllegalArgumentException(s"Unable to read query from: $queryUrl"))
+    }
+
 }

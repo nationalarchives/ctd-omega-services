@@ -1,0 +1,15 @@
+[{
+    "identifier": "http://catalogue.nationalarchives.gov.uk/agent.S2",
+    "type": "CorporateBody",
+    "current-description": "http://catalogue.nationalarchives.gov.uk/agent.S2.2",
+    "description": [{
+        "identifer": "http://catalogue.nationalarchives.gov.uk/agent.S2.2",
+        "label": "The National Archives",
+        "date-from": "2003",
+        "date-to": "2023",
+        "authority-file": true,
+        "depository": true,
+        "version-timestamp": "2023-01-25T14:14:48.651Z",
+        "previous-description": "http://catalogue.nationalarchives.gov.uk/agent.S2.2"
+    }]
+}]

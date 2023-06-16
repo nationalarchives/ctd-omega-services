@@ -21,14 +21,17 @@
 
 package uk.gov.nationalarchives.omega.api.business.legalstatus
 
+import org.mockito.MockitoSugar
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import uk.gov.nationalarchives.omega.api.repository.OmegaRepository
 import uk.gov.nationalarchives.omega.api.support.TestStubData
 
-class LegalStatusServiceSpec extends AnyFreeSpec with Matchers {
+class LegalStatusServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar {
 
   val stubData = new TestStubData
-  val legalStatusService = new LegalStatusService(stubData)
+  val mockRepository = mock[OmegaRepository]
+  val legalStatusService = new LegalStatusService(stubData, mockRepository)
 
   "The LegalStatusService" - {
     "when receives" - {

@@ -19,15 +19,31 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.models
+package uk.gov.nationalarchives.omega.api.connectors
 
-import io.circe.{ Encoder, Json }
+import org.apache.jena.query.Query
+import org.apache.jena.sparql.exec.http.QueryExecutionHTTP
+import org.phenoscape.sparql.FromQuerySolution
+import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 
-case class LegalStatus(identifier: String, label: String)
-object LegalStatus {
-  implicit val encodeLegalStatus: Encoder[LegalStatus] = (legalStatus: LegalStatus) =>
-    Json.obj(
-      ("identifier", Json.fromString(legalStatus.identifier)),
-      ("label", Json.fromString(legalStatus.label))
-    )
+import scala.jdk.CollectionConverters._
+import scala.util.{ Try, Using }
+
+class SparqlEndpointConnector(config: ServiceConfig) {
+
+  def execute[T](query: Query, queryDecoder: FromQuerySolution[T]): Try[List[T]] = {
+    val queryExecutionBuilder = QueryExecutionHTTP
+      .newBuilder()
+      .query(query)
+      .endpoint(config.sparqlEndpoint)
+
+    Using(queryExecutionBuilder.build()) { queryExecution =>
+      val resultsSet = queryExecution.execSelect()
+      val itResults = resultsSet.asScala.toList
+      itResults.flatMap { querySolution =>
+        queryDecoder.fromQuerySolution(querySolution).toOption
+      }
+    }
+  }
+
 }

@@ -19,15 +19,15 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.models
+package uk.gov.nationalarchives.omega.api.business.legalstatus
 
-import io.circe.{ Encoder, Json }
+import uk.gov.nationalarchives.omega.api.business.BusinessServiceError
+import uk.gov.nationalarchives.omega.api.common.ErrorCode
 
-case class LegalStatus(identifier: String, label: String)
-object LegalStatus {
-  implicit val encodeLegalStatus: Encoder[LegalStatus] = (legalStatus: LegalStatus) =>
-    Json.obj(
-      ("identifier", Json.fromString(legalStatus.identifier)),
-      ("label", Json.fromString(legalStatus.label))
-    )
+case class LegalStatusError(message: String) extends BusinessServiceError {
+
+  override val code = ErrorCode.PROC001
+
+  override def description: String = message
+
 }
