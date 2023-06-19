@@ -27,7 +27,7 @@ import io.circe.syntax._
 
 case class ListAgentSummary(
   agentType: List[AgentType],
-  versionTimestamp: String,
+  versionTimestamp: Option[String],
   depository: Option[Boolean],
   authorityFile: Option[Boolean]
 )
@@ -46,7 +46,7 @@ object ListAgentSummary {
       agentType     <- json.get[List[AgentType]]("type")
       depository    <- json.get[Option[Boolean]]("depository")
       authorityFile <- json.get[Option[Boolean]]("authority-file")
-      version       <- json.get[String]("version-timestamp")
+      version       <- json.get[Option[String]]("version-timestamp")
     } yield ListAgentSummary(agentType, version, depository, authorityFile)
 
 }

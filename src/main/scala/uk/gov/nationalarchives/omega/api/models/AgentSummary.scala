@@ -33,11 +33,13 @@ case class AgentSummary(
 )
 object AgentSummary {
   implicit val encodeAgentSummary: Encoder[AgentSummary] = (agentSummary: AgentSummary) =>
-    Json.obj(
-      ("type", Json.fromString(agentSummary.agentType.entryName)),
-      ("identifier", Json.fromString(agentSummary.identifier)),
-      ("current-description", Json.fromString(agentSummary.currentDescription)),
-      ("description", agentSummary.description.asJson)
-    )
+    Json
+      .obj(
+        ("type", Json.fromString(agentSummary.agentType.entryName)),
+        ("identifier", Json.fromString(agentSummary.identifier)),
+        ("current-description", Json.fromString(agentSummary.currentDescription)),
+        ("description", agentSummary.description.asJson)
+      )
+      .deepDropNullValues
 
 }

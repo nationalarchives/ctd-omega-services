@@ -55,10 +55,10 @@ class ListAgentSummaryService(val stubData: StubData) extends BusinessService wi
       decode[ListAgentSummary](request.text.get) match {
         case Right(request) =>
           val versionIdentifiers: List[String] = List("latest", "all")
-          if (versionIdentifiers.contains(request.versionTimestamp))
+          if (request.versionTimestamp.isEmpty || versionIdentifiers.contains(request.versionTimestamp.get))
             Validated.valid(ListAgentSummaryRequest(None, Some(request)))
           else {
-            validateDate(request.versionTimestamp) match {
+            validateDate(request.versionTimestamp.get) match {
               case Some(_) =>
                 Validated.valid(ListAgentSummaryRequest(None, Some(request)))
               case _ =>

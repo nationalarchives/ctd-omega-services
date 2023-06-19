@@ -178,7 +178,22 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
         result mustBe Valid(
           ListAgentSummaryRequest(
             None,
-            Some(ListAgentSummary(List(CorporateBody), "2022-06-22T02:00:00-0500", Some(false), Some(false)))
+            Some(ListAgentSummary(List(CorporateBody), Some("2022-06-22T02:00:00-0500"), Some(false), Some(false)))
+          )
+        )
+      }
+      "no version timestamp and authority file" in {
+        val listAgentSummaryRequest = ListAgentSummaryRequest(
+          Some(s"""{
+                  |    "type" : ["CorporateBody"],
+                  |    "depository" : true
+                  |}""".stripMargin)
+        )
+        val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
+        result mustBe Valid(
+          ListAgentSummaryRequest(
+            None,
+            Some(ListAgentSummary(List(CorporateBody), None, Some(true), None))
           )
         )
       }
@@ -186,16 +201,16 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
         val listAgentSummaryRequest = ListAgentSummaryRequest(
           Some(s"""{
                   |    "type" : ["CorporateBody"],
+                  |    "version-timestamp" : "latest",
                   |    "authority-file" : false,
-                  |    "depository" : false,
-                  |    "version-timestamp" : "latest"
+                  |    "depository" : false
                   |}""".stripMargin)
         )
         val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
         result mustBe Valid(
           ListAgentSummaryRequest(
             None,
-            Some(ListAgentSummary(List(CorporateBody), "latest", Some(false), Some(false)))
+            Some(ListAgentSummary(List(CorporateBody), Some("latest"), Some(false), Some(false)))
           )
         )
       }
@@ -215,8 +230,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
         "depository" : false,
         "version-timestamp" : "2022-06-22T02:00:00-0500",
         "date-from" : "1889",
-        "date-to" : "1977",
-        "previous-description" : null
+        "date-to" : "1977"
       }
     ]
   },
@@ -232,8 +246,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
         "depository" : false,
         "version-timestamp" : "2022-06-22T02:00:00-0500",
         "date-from" : "1570",
-        "date-to" : "1606",
-        "previous-description" : null
+        "date-to" : "1606"
       }
     ]
   },
@@ -249,8 +262,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
         "depository" : false,
         "version-timestamp" : "2022-06-22T02:00:00-0500",
         "date-from" : "1948",
-        "date-to" : "1948",
-        "previous-description" : null
+        "date-to" : "1948"
       }
     ]
   },
@@ -264,10 +276,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
         "label" : "Queen Anne's Bounty",
         "authority-file" : false,
         "depository" : false,
-        "version-timestamp" : "2022-06-22T02:00:00-0500",
-        "date-from" : null,
-        "date-to" : null,
-        "previous-description" : null
+        "version-timestamp" : "2022-06-22T02:00:00-0500"
       }
     ]
   }
