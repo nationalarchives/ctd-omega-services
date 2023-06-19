@@ -76,13 +76,14 @@ lazy val root = Project("ctd-omega-services", file("."))
       "io.circe"                                      %% "circe-generic"              % CirceVersion,
       "io.circe"                                      %% "circe-parser"               % CirceVersion,
       "org.phenoscape"                                %% "sparql-utils"               % "1.3.1",
+      "org.apache.jena"                                % "jena-core"                  % "4.8.0",
       "org.apache.jena"                                % "jena-arq"                   % "4.8.0",
       "ch.qos.logback"         % "logback-classic"               % "1.3.5"   % Runtime, // Java 8 compatible
       "net.logstash.logback"   % "logstash-logback-encoder"      % "7.3"     % Runtime,
       "org.scalatest"         %% "scalatest"                     % "3.2.15"  % "it,test",
       "org.typelevel"         %% "cats-effect-testing-scalatest" % "1.5.0"   % "it,test",
       "com.vladsch.flexmark"   % "flexmark-profile-pegdown"      % "0.62.2"  % "it,test", // Java 8 compatible
-      "org.mockito"           %% "mockito-scala-scalatest"       % "1.17.12" % Test,
+      "org.mockito"           %% "mockito-scala-scalatest"       % "1.17.12" % "it,test",
       "software.amazon.awssdk" % "auth"                          % "2.18.1"  % "it",
       "software.amazon.awssdk" % "regions"                       % "2.18.1"  % "it",
       "software.amazon.awssdk" % "sqs"                           % "2.18.1"  % "it",

@@ -50,7 +50,8 @@ class ApiServiceISpec
       maxProducers = 1,
       maxDispatchers = 1,
       maxLocalQueueSize = 1,
-      requestQueue = requestQueueName
+      requestQueue = requestQueueName,
+      sparqlEndpoint = "http://localhost:8080/rdf4j-server/repositories/PACT"
     )
   )
 

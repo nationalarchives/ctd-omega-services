@@ -21,13 +21,14 @@
 
 package uk.gov.nationalarchives.omega.api.models
 
-import io.circe.{ Encoder, Json }
+import io.circe.{Encoder, Json}
+import org.apache.jena.ext.xerces.util.URI
 
-case class LegalStatus(identifier: String, label: String)
+case class LegalStatus(identifier: URI, label: String)
 object LegalStatus {
   implicit val encodeLegalStatus: Encoder[LegalStatus] = (legalStatus: LegalStatus) =>
     Json.obj(
-      ("identifier", Json.fromString(legalStatus.identifier)),
+      ("identifier", Json.fromString(legalStatus.identifier.toString)),
       ("label", Json.fromString(legalStatus.label))
     )
 }
