@@ -25,7 +25,6 @@ PREFIX premis: <http://www.loc.gov/premis/rdf/v3/>
 
 SELECT ?identifier ?label
 WHERE {
-    ?resource rdf:type premis:InstitutionalPolicy ;
+    ?identifier rdf:type premis:InstitutionalPolicy ;
               skos:prefLabel ?label .
-    BIND(STR(?resource) as ?identifier)
 }
