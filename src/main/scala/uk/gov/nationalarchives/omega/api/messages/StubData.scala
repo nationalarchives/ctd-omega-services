@@ -1037,7 +1037,17 @@ trait StubData {
       AgentType.CorporateBody,
       "G6N",
       "current description",
-      List(AgentDescription("G6N", "Magnetic Department", false, false, "", Some("1839"), Some("1839")))
+      List(
+        AgentDescription(
+          "G6N",
+          "Magnetic Department",
+          false,
+          false,
+          "2022-06-22T02:00:00-0500",
+          Some("1839"),
+          Some("1839")
+        )
+      )
     ),
     AgentSummary(
       AgentType.CorporateBody,
@@ -1107,7 +1117,7 @@ trait StubData {
       AgentType.CorporateBody,
       "TSL",
       "current description",
-      List(AgentDescription("TSL", "National Archives, The", false, false, "", None, None))
+      List(AgentDescription("TSL", "National Archives, The", false, false, "2022-06-22T02:00:00-0500", None, None))
     ),
     AgentSummary(
       AgentType.CorporateBody,
@@ -1231,7 +1241,7 @@ trait StubData {
           "Overseas Finance, International Finance, IF1 International Financial Institutions and Debt Division",
           false,
           false,
-          "",
+          "2022-06-22T02:00:00-0500",
           Some("1990"),
           Some("1990")
         )

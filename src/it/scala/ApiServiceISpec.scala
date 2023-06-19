@@ -174,7 +174,6 @@ class ApiServiceISpec
       " an empty payload" in { f =>
         val textMessageConfig = generateValidMessageConfig()
           .copy(messageTypeId = Some("OSLISAGT001"))
-          .copy(contents = "")
 
         sendMessage(f.session, f.producer, textMessageConfig)
         assertReplyMessage(agentSummariesExpectedResult)
