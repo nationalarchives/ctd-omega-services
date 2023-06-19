@@ -1,0 +1,96 @@
+@prefix premis: <http://www.loc.gov/premis/rdf/v3/> .
+@prefix rdac:  <http://rdaregistry.info/Elements/c/> .
+@prefix ver:   <http://purl.org/linked-data/version#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix cat:   <http://cat.nationalarchives.gov.uk/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+
+cat:agent.24  a               rdac:C10005 , foaf:Organization , premis:Organization ;
+        dct:identifier        "agent.24" ;
+        dct:type              cat:corporate-body-concept ;
+        ver:currentVersion    cat:agent.24.1 ;
+        prov:generatedAtTime  "2023-01-25T14:14:45.269Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.S7  a               rdac:C10005 , foaf:Organization , premis:Organization ;
+        dct:identifier        "agent.S7" ;
+        dct:type              cat:corporate-body-concept ;
+        ver:currentVersion    cat:agent.S7.1 ;
+        prov:generatedAtTime  "2023-01-25T14:14:44.246Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.63V  a              rdac:C10005 , foaf:Organization , premis:Organization ;
+        dct:identifier        "agent.63V" ;
+        dct:type              cat:corporate-body-concept ;
+        ver:currentVersion    cat:agent.63V.1 ;
+        prov:generatedAtTime  "2023-01-25T14:14:48.653Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.8KY  a              rdac:C10005 , foaf:Organization , premis:Organization ;
+        dct:identifier        "agent.8KY" ;
+        dct:type              cat:corporate-body-concept ;
+        ver:currentVersion    cat:agent.8KY.1 ;
+        prov:generatedAtTime  "2023-01-25T14:14:46.152Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.G3F  a              rdac:C10005 , foaf:Organization , premis:Organization ;
+        dct:identifier        "agent.G3F" ;
+        dct:type              cat:corporate-body-concept ;
+        ver:currentVersion    cat:agent.G3F.1 ;
+        prov:generatedAtTime  "2023-01-25T14:14:47.165Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.FRF  a              rdac:C10005 , foaf:Organization , premis:Organization ;
+        dct:identifier        "agent.FRF" ;
+        dct:type              cat:corporate-body-concept ;
+        ver:currentVersion    cat:agent.FRF.1 ;
+        prov:generatedAtTime  "2023-01-25T14:14:47.074Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+
+cat:agent.N6L  a              rdac:C10005 , foaf:Organization , premis:Organization ;
+        dct:identifier        "agent.N6L" ;
+        dct:type              cat:corporate-body-concept ;
+        ver:currentVersion    cat:agent.N6L.1 ;
+        prov:generatedAtTime  "2023-01-25T14:14:48.5Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.W91  a              rdac:C10005 , foaf:Organization , premis:Organization ;
+        dct:identifier        "agent.W91" ;
+        dct:type              cat:corporate-body-concept ;
+        ver:currentVersion    cat:agent.W91.1 ;
+        prov:generatedAtTime  "2023-01-25T14:14:49.705Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.VX1  a              rdac:C10005 , foaf:Organization , premis:Organization ;
+        dct:identifier        "agent.VX1" ;
+        dct:type              cat:corporate-body-concept ;
+        ver:currentVersion    cat:agent.VX1.1 ;
+        prov:generatedAtTime  "2023-01-25T14:14:49.696Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.TY3  a              rdac:C10005 , foaf:Organization , premis:Organization ;
+        dct:identifier        "agent.TY3" ;
+        dct:type              cat:corporate-body-concept ;
+        ver:currentVersion    cat:agent.TY3.1 ;
+        prov:generatedAtTime  "2023-01-25T14:14:49.601Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.TXR  a              rdac:C10005 , foaf:Organization , premis:Organization ;
+        dct:identifier        "agent.TXR" ;
+        dct:type              cat:corporate-body-concept ;
+        ver:currentVersion    cat:agent.TXR.1 ;
+        prov:generatedAtTime  "2023-01-25T14:14:49.597Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+
+cat:agent.HHC  a              rdac:C10005 , foaf:Organization , premis:Organization ;
+        dct:identifier        "agent.HHC" ;
+        dct:type              cat:corporate-body-concept ;
+        ver:currentVersion    cat:agent.HHC.1 ;
+        prov:generatedAtTime  "2023-01-25T14:14:47.534Z"^^xsd:dateTime ;
+        prov:wasAttributedTo  cat:agent.S7 .
+

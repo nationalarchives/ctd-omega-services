@@ -1,0 +1,279 @@
+@prefix premis: <http://www.loc.gov/premis/rdf/v3/> .
+@prefix schema: <https://schema.org/> .
+@prefix rdac:  <http://rdaregistry.info/Elements/c/> .
+@prefix ver:   <http://purl.org/linked-data/version#> .
+@prefix rdaa:  <http://rdaregistry.info/Elements/a/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix todo:  <http://TODO/> .
+@prefix rdat:  <http://rdaregistry.info/Elements/t/> .
+@prefix rdau:  <http://rdaregistry.info/Elements/u/> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix cat:   <http://cat.nationalarchives.gov.uk/> .
+@prefix time:  <http://www.w3.org/2006/time#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+
+cat:agent.24.1  a                 foaf:Organization , rdac:C10005 , premis:Organization ;
+        todo:is-place-of-deposit  false ;
+        dct:created               "2000-09-25T09:57:28.427Z"^^xsd:dateTime ;
+        dct:identifier            "agent.24.1" ;
+        dct:type                  cat:corporate-body-description ;
+        rdaa:P50022               "Set up under the Coal Nationalisation Act 1946. Appointed 15 July 1946; vesting date 1 Jan 1947. Had sole responsibility for managing the UK coal industry. In 1986 became the British Coal Corporation." ;
+        rdaa:P50032               "National Coal Board" ;
+        rdaa:P50037               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "1946"^^xsd:gYear
+                                  ] ;
+        rdaa:P50038               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "1986"^^xsd:gYear
+                                  ] ;
+        rdau:P61160               cat:soi-approved-complete ;
+        prov:generatedAtTime      "2023-01-25T14:14:45.269Z"^^xsd:dateTime ;
+        prov:specializationOf     cat:agent.24 ;
+        prov:wasAttributedTo      cat:agent.S7 ;
+        schema:identifier         [ a                  schema:identifier ;
+                                    schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                    schema:value       "corporate_body.1547"
+                                  ] .
+
+cat:agent.S7.1  a                 foaf:Organization , rdac:C10005 , premis:Organization ;
+        todo:is-place-of-deposit  true ;
+        cat:archonCode            <http://www.nationalarchives.gov.uk/ont.archon.66> ;
+        dct:created               "2000-09-25T09:57:28.427Z"^^xsd:dateTime ;
+        dct:identifier            "agent.S7.1" ;
+        dct:type                  cat:corporate-body-description ;
+        rdaa:P50022               "(Place of Deposit). Government department and executive agency reporting to the Lord Chancellor, formed in April 2003 by bringing together the Public Record Office (PRO) and the Historical Manuscripts Commission (HMC) to become The National Archives (TNA) at Kew, Surrey. The National Archives for England, Wales and the United Kingdom acts as the custodian of the nation's collective memory as revealed in the records of government. It also collects and disseminates information about archives relating to British history wherever they are held, and administers the UK's public records system under the Public Records acts of 1958 and 1967 by supervising of the selection of government and legal records for permanent preservation, and for safeguarding them and making them publicly available." ;
+        rdaa:P50032               "The National Archives, Kew" ;
+        rdaa:P50037               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "2003"^^xsd:gYear
+                                  ] ;
+        rdau:P61160               cat:soi-approved-complete ;
+        prov:generatedAtTime      "2023-01-25T14:14:44.246Z"^^xsd:dateTime ;
+        prov:specializationOf     cat:agent.S7 ;
+        prov:wasAttributedTo      cat:agent.S7 ;
+        schema:identifier         [ a                  schema:identifier ;
+                                    schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                    schema:value       "corporate_body.96"
+                                  ] .
+
+cat:agent.63V.1  a                foaf:Organization , premis:Organization , rdac:C10005 ;
+        todo:is-place-of-deposit  true ;
+        cat:archonCode            <http://www.nationalarchives.gov.uk/ont.archon.2734> ;
+        dct:created               "2005-03-31T14:01:40.403Z"^^xsd:dateTime ;
+        dct:identifier            "agent.63V.1" ;
+        dct:type                  cat:corporate-body-description ;
+        rdaa:P50022               "The Fleet Air Arm Museum was opened in Yeovilton, Somerset, in May 1964; a charitable trust to formally administer the Museum was established in 1966. The Centre for Naval Aviation Records and Research, within the Curatorial Department of the Fleet Air Arm Museum, exists to collect records, photographs and other heritage material relevant to the people, aircraft and ships of Britain's flying Navy." ;
+        rdaa:P50032               "Fleet Air Arm Museum" ;
+        rdaa:P50037               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "1964"^^xsd:gYear
+                                  ] ;
+        rdau:P61160               cat:soi-approved-complete ;
+        prov:generatedAtTime      "2023-01-25T14:14:48.653Z"^^xsd:dateTime ;
+        prov:specializationOf     cat:agent.63V ;
+        prov:wasAttributedTo      cat:agent.S7 ;
+        schema:identifier         [ a                  schema:identifier ;
+                                    schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                    schema:value       "corporate_body.12725"
+                                  ] .
+
+
+
+
+
+
+
+
+
+
+
+
+cat:agent.8KY.1  a                premis:Organization , rdac:C10005 , foaf:Organization ;
+        todo:is-place-of-deposit  false ;
+        dct:created               "2000-09-25T09:57:28.427Z"^^xsd:dateTime ;
+        dct:identifier            "agent.8KY.1" ;
+        dct:type                  cat:corporate-body-description ;
+        rdaa:P50022               "Set up 10 Apr 1991, as a Next Steps Agency of the DSS. Responsible for collection & recording of NI contributions, maintenance of individual NI records, and provision of an advisory service. In 1999 was renamed the National Insurance Contributions Office." ;
+        rdaa:P50032               "Department of Social Security, Contributions Agency" ;
+        rdaa:P50037               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "1991"^^xsd:gYear
+                                  ] ;
+        rdaa:P50038               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "1999"^^xsd:gYear
+                                  ] ;
+        rdau:P61160               cat:soi-approved-complete ;
+        prov:generatedAtTime      "2023-01-25T14:14:46.152Z"^^xsd:dateTime ;
+        prov:specializationOf     cat:agent.8KY ;
+        prov:wasAttributedTo      cat:agent.S7 ;
+        schema:identifier         [ a                  schema:identifier ;
+                                    schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                    schema:value       "corporate_body.2496"
+                                  ] .
+
+cat:agent.G3F.1  a                rdac:C10005 , foaf:Organization , premis:Organization ;
+        todo:is-place-of-deposit  false ;
+        dct:created               "2000-09-25T09:57:28.427Z"^^xsd:dateTime ;
+        dct:identifier            "agent.G3F.1" ;
+        dct:type                  cat:corporate-body-description ;
+        rdaa:P50032               "Foreign Office, Control Commission for Germany (British Element), Political Division" ;
+        rdaa:P50037               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "1947"^^xsd:gYear
+                                  ] ;
+        rdaa:P50038               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "1950"^^xsd:gYear
+                                  ] ;
+        rdau:P61160               cat:soi-approved-complete ;
+        prov:generatedAtTime      "2023-01-25T14:14:47.165Z"^^xsd:dateTime ;
+        prov:specializationOf     cat:agent.G3F ;
+        prov:wasAttributedTo      cat:agent.S7 ;
+        schema:identifier         [ a                  schema:identifier ;
+                                    schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                    schema:value       "corporate_body.5085"
+                                  ] .
+
+cat:agent.FRF.1  a                rdac:C10005 , foaf:Organization , premis:Organization ;
+        todo:is-place-of-deposit  false ;
+        dct:created               "2000-09-25T09:57:28.427Z"^^xsd:dateTime ;
+        dct:identifier            "agent.FRF.1" ;
+        dct:type                  cat:corporate-body-description ;
+        rdaa:P50032               "Ministry of Aviation Supply, Space Division" ;
+        rdaa:P50037               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "1970"^^xsd:gYear
+                                  ] ;
+        rdaa:P50038               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "1971"^^xsd:gYear
+                                  ] ;
+        rdau:P61160               cat:soi-approved-complete ;
+        prov:generatedAtTime      "2023-01-25T14:14:47.074Z"^^xsd:dateTime ;
+        prov:specializationOf     cat:agent.FRF ;
+        prov:wasAttributedTo      cat:agent.S7 ;
+        schema:identifier         [ a                  schema:identifier ;
+                                    schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                    schema:value       "corporate_body.4837"
+                                  ] .
+
+cat:agent.N6L.1  a                foaf:Organization , premis:Organization , rdac:C10005 ;
+        todo:is-place-of-deposit  false ;
+        dct:created               "2000-09-25T09:57:28.427Z"^^xsd:dateTime ;
+        dct:identifier            "agent.N6L.1" ;
+        dct:type                  cat:corporate-body-description ;
+        rdaa:P50032               "National Coal Board, Northumberland and Durham Division" ;
+        rdaa:P50037               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "1964"^^xsd:gYear
+                                  ] ;
+        rdaa:P50038               [ a                rdac:C10010 , time:Instant ;
+                                    rdat:P70045      "?" ;
+                                    time:inXSDgYear  "1967"^^xsd:gYear
+                                  ] ;
+        rdau:P61160               cat:soi-approved-complete ;
+        prov:generatedAtTime      "2023-01-25T14:14:48.5Z"^^xsd:dateTime ;
+        prov:specializationOf     cat:agent.N6L ;
+        prov:wasAttributedTo      cat:agent.S7 ;
+        schema:identifier         [ a                  schema:identifier ;
+                                    schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                    schema:value       "corporate_body.8903"
+                                  ] .
+
+cat:agent.W91.1  a                rdac:C10005 , foaf:Organization , premis:Organization ;
+        todo:is-place-of-deposit  false ;
+        dct:created               "2013-07-30T10:29:14.827Z"^^xsd:dateTime ;
+        dct:identifier            "agent.W91.1" ;
+        dct:type                  cat:corporate-body-description ;
+        rdaa:P50022               "The Queen's Printer for Scotland (QPS) provides access to Scottish legislation and delivers a range of services to the public, information industry and government relating to the re-use of information created by the Scottish Government. The Queen's Printer for Scotland reports to Scottish Ministers and directly to the Minister for Parliamentary Business.\r\nThe Office of Queen's Printer for Scotland (QPS) was established under section 92 of the Scotland Act 1998. The QPS was specified a non-ministerial office-holder and member of the staff of the Scottish Administration with effect from 1 July 1999." ;
+        rdaa:P50032               "Queen's Printer for Scotland" ;
+        rdaa:P50037               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "1999"^^xsd:gYear
+                                  ] ;
+        rdau:P61160               cat:soi-approved-complete ;
+        prov:generatedAtTime      "2023-01-25T14:14:49.705Z"^^xsd:dateTime ;
+        prov:specializationOf     cat:agent.W91 ;
+        prov:wasAttributedTo      cat:agent.S7 ;
+        schema:identifier         [ a                  schema:identifier ;
+                                    schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                    schema:value       "corporate_body.13832"
+                                  ] .
+
+cat:agent.VX1.1  a                rdac:C10005 , foaf:Organization , premis:Organization ;
+        todo:is-place-of-deposit  false ;
+        dct:created               "2010-06-01T07:53:08.927Z"^^xsd:dateTime ;
+        dct:identifier            "agent.VX1.1" ;
+        dct:type                  cat:corporate-body-description ;
+        rdaa:P50022               "The Money Advice Trust (MAT) was formed in 1991 to increase the quality and availability of free, independent money advice in the UK to people with debt problems. It is a charity organisation which has received funding from a mixture of private sector donations and Government grants, including: Department for Trade and Industry (DTI), the Department for Constitutional Affairs (DCA), the Scottish Executive, and Department for Business, Enterprise and Regulatory Reform (BERR). MAT is responsible for the National Debtline and Business Debtline services." ;
+        rdaa:P50032               "Money Advice Trust" ;
+        rdaa:P50037               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "1991"^^xsd:gYear
+                                  ] ;
+        rdau:P61160               cat:soi-approved-complete ;
+        prov:generatedAtTime      "2023-01-25T14:14:49.696Z"^^xsd:dateTime ;
+        prov:specializationOf     cat:agent.VX1 ;
+        prov:wasAttributedTo      cat:agent.S7 ;
+        schema:identifier         [ a                  schema:identifier ;
+                                    schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                    schema:value       "corporate_body.13517"
+                                  ] .
+
+cat:agent.TY3.1  a                premis:Organization , foaf:Organization , rdac:C10005 ;
+        todo:is-place-of-deposit  false ;
+        dct:created               "2005-04-05T09:26:39.67Z"^^xsd:dateTime ;
+        dct:identifier            "agent.TY3.1" ;
+        dct:type                  cat:corporate-body-description ;
+        rdaa:P50032               "Civil Aviation Authority, Directorate of Safety (Airworthiness), Survey Department" ;
+        rdaa:P50037               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "1972"^^xsd:gYear
+                                  ] ;
+        rdaa:P50038               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "1976"^^xsd:gYear
+                                  ] ;
+        rdau:P61160               cat:soi-approved-complete ;
+        prov:generatedAtTime      "2023-01-25T14:14:49.601Z"^^xsd:dateTime ;
+        prov:specializationOf     cat:agent.TY3 ;
+        prov:wasAttributedTo      cat:agent.S7 ;
+        schema:identifier         [ a                  schema:identifier ;
+                                    schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                    schema:value       "corporate_body.12727"
+                                  ] .
+
+cat:agent.TXR.1  a                premis:Organization , foaf:Organization , rdac:C10005 ;
+        todo:is-place-of-deposit  false ;
+        dct:created               "2005-01-28T14:24:19.983Z"^^xsd:dateTime ;
+        dct:identifier            "agent.TXR.1" ;
+        dct:type                  cat:corporate-body-description ;
+        rdaa:P50022               "The main functions of the Employment Service Agency were the development and improvement of employment office services; occupational guidance; occupational classification and information; overseas vacancies and redundancies. The Agency was also responsible for services for disabled and disadvantaged people including employment rehabilitation. The Executive Committee was the main decision making body of the ESA. The Committee consisted of twelve members and was headed by the Chief Executive who acted as Chairman. It was primarily concerned with determining the policies of the Agency and examining and reviewing Agency performance. The Agency came to an end as a separate body on 31 March 1978." ;
+        rdaa:P50032               "Employment Service Agency" ;
+        rdaa:P50037               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "1974"^^xsd:gYear
+                                  ] ;
+        rdaa:P50038               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "1978"^^xsd:gYear
+                                  ] ;
+        rdau:P61160               cat:soi-approved-complete ;
+        prov:generatedAtTime      "2023-01-25T14:14:49.597Z"^^xsd:dateTime ;
+        prov:specializationOf     cat:agent.TXR ;
+        prov:wasAttributedTo      cat:agent.S7 ;
+        schema:identifier         [ a                  schema:identifier ;
+                                    schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                    schema:value       "corporate_body.12710"
+                                  ] .
+
+cat:agent.HHC.1  a                rdac:C10005 , premis:Organization , foaf:Organization ;
+        todo:is-place-of-deposit  false ;
+        dct:created               "2000-09-25T09:57:28.427Z"^^xsd:dateTime ;
+        dct:identifier            "agent.HHC.1" ;
+        dct:type                  cat:corporate-body-description ;
+        rdaa:P50032               "Cabinet, Radio and Cable Board" ;
+        rdaa:P50037               [ a                rdac:C10010 , time:Instant ;
+                                    rdat:P70045      "c" ;
+                                    time:inXSDgYear  "1946"^^xsd:gYear
+                                  ] ;
+        rdaa:P50038               [ a                rdac:C10010 , time:Instant ;
+                                    time:inXSDgYear  "1951"^^xsd:gYear
+                                  ] ;
+        rdau:P61160               cat:soi-approved-complete ;
+        prov:generatedAtTime      "2023-01-25T14:14:47.534Z"^^xsd:dateTime ;
+        prov:specializationOf     cat:agent.HHC ;
+        prov:wasAttributedTo      cat:agent.S7 ;
+        schema:identifier         [ a                  schema:identifier ;
+                                    schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                    schema:value       "corporate_body.6086"
+                                  ] .
+
