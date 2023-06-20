@@ -10,7 +10,7 @@ services:
         source: ./custom.conf
         target: /opt/elasticmq.conf
     image: softwaremill/elasticmq-native
-    privileged: truenative
+    privileged: true
   rdf4j-service:
     container_name: ctd-omega-services_rdf4j-container
     environment:

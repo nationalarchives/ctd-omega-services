@@ -28,7 +28,7 @@ Steps:
 
 1. Clone the Git repository:
 ```
-git clone https://github.com/nationalarchives/ctd-omega-services-prototype.git
+git clone https://github.com/nationalarchives/ctd-omega-services.git
 ```
 2. Switch to the newly created directory:
 ```
@@ -51,8 +51,7 @@ docker ps -a
 ```
 curl -L http://localhost:8080/rdf4j-workbench/
 ```
-8. Using the project IDE for `ctd-omega-services-prototype` , run the `BulkLoadData` app to load the test data.
-   ElasticSearch is now setup and ready to handle requests from the Messaging system.
+8. Using the project IDE for `ctd-omega-services` , run the `BulkLoadData` app to load the test data.
    `BulkLoadData` will also create a new repository in RDF4J named 'Pact' and load the corporate body data into the newly created repository.
 
 9. To run the unit tests you can use `sbt test`. 
