@@ -1,0 +1,47 @@
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX premis: <http://www.loc.gov/premis/rdf/v3/>
+PREFIX rdac: <http://rdaregistry.info/Elements/c/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX cat: <http://cat.nationalarchives.gov.uk/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX ver: <http://purl.org/linked-data/version#>
+PREFIX rdaa: <http://rdaregistry.info/Elements/a/>
+PREFIX time: <http://www.w3.org/2006/time#>
+PREFIX todo: <http://TODO/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+
+SELECT DISTINCT ?identifier ?type ?currentDescription ?label ?dateFrom ?dateTo ?depository ?versionTimestamp ?previousDescription
+WHERE {
+    ?identifier dct:type ?agentType .
+
+    VALUES (?agentType ?type ?depository) {
+    	(cat:corporate-body-concept "Corporate Body" true)
+  	}
+
+    ?identifier ver:currentVersion ?currentDescription .
+    OPTIONAL {
+	    {
+	    	?currentDescription rdaa:P50032 ?label .
+	    }
+	    UNION {
+	        ?currentDescription rdaa:P50292 ?label1  .
+	        ?currentDescription rdaa:P50291 ?label2  .
+	        BIND(CONCAT(?label1,?label2) as ?label )
+
+	    }
+    }
+    OPTIONAL {
+    	?currentDescription rdaa:P50037/time:inXSDgYear ?dateFrom .
+    }
+  	OPTIONAL {
+    	?currentDescription rdaa:P50038/time:inXSDgYear ?dateTo .
+  	}
+
+    ?currentDescription todo:is-place-of-deposit ?depository .
+
+  	?currentDescription prov:generatedAtTime ?versionTimestamp .
+  	OPTIONAL {
+  		?identifier prov:wasRevisionOf ?previousDescription .
+  	}
+}
