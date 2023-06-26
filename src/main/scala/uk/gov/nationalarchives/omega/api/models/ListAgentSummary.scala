@@ -34,12 +34,14 @@ case class ListAgentSummary(
 
 object ListAgentSummary {
   implicit val encodeListAgentSummary: Encoder[ListAgentSummary] = (listAgentSummary: ListAgentSummary) =>
-    Json.obj(
-      ("type", listAgentSummary.agentType.asJson),
-      ("depository", listAgentSummary.depository.asJson),
-      ("authority-file", listAgentSummary.authorityFile.asJson),
-      ("version-timestamp", listAgentSummary.versionTimestamp.asJson)
-    )
+    Json
+      .obj(
+        ("type", listAgentSummary.agentType.asJson),
+        ("depository", listAgentSummary.depository.asJson),
+        ("authority-file", listAgentSummary.authorityFile.asJson),
+        ("version-timestamp", listAgentSummary.versionTimestamp.asJson)
+      )
+      .dropNullValues
 
   implicit val decodeListAgentSummary: Decoder[ListAgentSummary] = json =>
     for {
