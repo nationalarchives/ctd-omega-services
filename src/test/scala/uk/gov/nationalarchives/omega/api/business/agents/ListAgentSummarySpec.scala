@@ -192,7 +192,10 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
         val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
         result mustBe Valid(
           ListAgentSummaryRequest(
-            None,
+            Some(s"""{
+                    |    "type" : ["CorporateBody"],
+                    |    "depository" : true
+                    |}""".stripMargin),
             Some(ListAgentSummary(List(CorporateBody), None, Some(true), None))
           )
         )
@@ -209,7 +212,12 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
         val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
         result mustBe Valid(
           ListAgentSummaryRequest(
-            None,
+            Some(s"""{
+                    |    "type" : ["CorporateBody"],
+                    |    "version-timestamp" : "latest",
+                    |    "authority-file" : false,
+                    |    "depository" : false
+                    |}""".stripMargin),
             Some(ListAgentSummary(List(CorporateBody), Some("latest"), Some(false), Some(false)))
           )
         )

@@ -27,9 +27,9 @@ import io.circe.syntax._
 
 case class ListAgentSummary(
   agentType: List[AgentType],
-  versionTimestamp: Option[String],
-  depository: Option[Boolean],
-  authorityFile: Option[Boolean]
+  versionTimestamp: Option[String] = None,
+  depository: Option[Boolean] = None,
+  authorityFile: Option[Boolean] = None
 )
 
 object ListAgentSummary {

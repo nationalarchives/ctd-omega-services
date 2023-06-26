@@ -34,8 +34,10 @@ import scala.util.Try
 
 class ListAgentSummaryService(val stubData: StubData) extends BusinessService with BusinessRequestValidation {
 
-  override def process(request: BusinessServiceRequest): Either[BusinessServiceError, BusinessServiceReply] =
-    decode[ListAgentSummary](request.text.getOrElse(defaultRequest)) match {
+  override def process(
+    businessServiceRequest: BusinessServiceRequest
+  ): Either[BusinessServiceError, BusinessServiceReply] =
+    decode[ListAgentSummary](businessServiceRequest.text.getOrElse(defaultRequest)) match {
       case Left(e) =>
         Left(AgentSummaryRequestError(s"There was an error reading the message: ${e.getMessage}"))
       case Right(_) =>
@@ -50,13 +52,13 @@ class ListAgentSummaryService(val stubData: StubData) extends BusinessService wi
 
     }
 
-  override def validateRequest(request: BusinessServiceRequest): ValidationResult =
-    if (request.text.nonEmpty) {
-      decode[ListAgentSummary](request.text.get) match {
+  override def validateRequest(businessServiceRequest: BusinessServiceRequest): ValidationResult =
+    if (businessServiceRequest.text.nonEmpty) {
+      decode[ListAgentSummary](businessServiceRequest.text.get) match {
         case Right(request) =>
           val versionIdentifiers: List[String] = List("latest", "all")
           if (request.versionTimestamp.isEmpty || versionIdentifiers.contains(request.versionTimestamp.get))
-            Validated.valid(ListAgentSummaryRequest(None, Some(request)))
+            Validated.valid(ListAgentSummaryRequest(businessServiceRequest.text, Some(request)))
           else {
             validateDate(request.versionTimestamp.get) match {
               case Some(_) =>
@@ -74,7 +76,7 @@ class ListAgentSummaryService(val stubData: StubData) extends BusinessService wi
       }
 
     } else {
-      Validated.valid(request)
+      Validated.valid(businessServiceRequest)
     }
 
   private def validateDate(dateStr: String): Option[Date] = {
