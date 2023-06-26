@@ -40,7 +40,6 @@ object AgentSummary {
         ("current-description", Json.fromString(agentSummary.currentDescription)),
         ("description", agentSummary.description.asJson)
       )
-      .dropNullValues
       .deepDropNullValues
 
 }
