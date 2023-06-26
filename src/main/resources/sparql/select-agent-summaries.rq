@@ -26,10 +26,9 @@ WHERE {
 	    	?currentDescription rdaa:P50032 ?label .
 	    }
 	    UNION {
-	        ?currentDescription rdaa:P50292 ?label1  .
-	        ?currentDescription rdaa:P50291 ?label2  .
-	        BIND(CONCAT(?label1,?label2) as ?label )
-
+	        ?currentDescription rdaa:P50292 ?givenName  .
+	        ?currentDescription rdaa:P50291 ?surname  .
+            BIND(CONCAT(?givenName," ",?surname) as ?label )
 	    }
     }
     OPTIONAL {
