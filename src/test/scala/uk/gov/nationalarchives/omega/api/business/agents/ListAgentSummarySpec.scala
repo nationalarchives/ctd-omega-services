@@ -42,7 +42,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
 
         val listAgentSummaryRequest = ListAgentSummaryRequest(
           Some(s"""{
-                  |    "type" : ["CorporateBody","Person"],
+                  |    "type" : ["Corporate Body","Person"],
                   |    "authority-file" : false,
                   |    "depository" : false,
                   |    "version-timestamp" : "all"
@@ -87,7 +87,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
       "null value for authorityFile" in {
         val listAgentSummaryRequest = ListAgentSummaryRequest(
           Some(s"""{
-                  |    "type" : ["CorporateBody"],
+                  |    "type" : ["Corporate Body"],
                   |    "authority-file" : "",
                   |    "depository" : false,
                   |    "version-timestamp" : "latest"
@@ -108,7 +108,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
       "non Boolean value for authorityFile" in {
         val listAgentSummaryRequest = ListAgentSummaryRequest(
           Some(s"""{
-                  |    "type" : ["CorporateBody"],
+                  |    "type" : ["Corporate Body"],
                   |    "authorit-file" : maybe,
                   |    "depository" : false,
                   |    "version-timestamp" : "latest"
@@ -127,7 +127,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
       "unrecognised version identifier" in {
         val listAgentSummaryRequest = ListAgentSummaryRequest(
           Some(s"""{
-                  |    "type" : ["CorporateBody"],
+                  |    "type" : ["Corporate Body"],
                   |    "authority-file" : false,
                   |    "depository" : false,
                   |    "version-timestamp" : "latest1"
@@ -146,7 +146,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
       "invalid version timestamp" in {
         val listAgentSummaryRequest = ListAgentSummaryRequest(
           Some(s"""{
-                  |    "type" : ["CorporateBody"],
+                  |    "type" : ["Corporate Body"],
                   |    "authority-file" : false,
                   |    "depository" : false,
                   |    "version-timestamp" : "2020-05-19"
@@ -168,24 +168,31 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
       "valid version timestamp" in {
         val listAgentSummaryRequest = ListAgentSummaryRequest(
           Some(s"""{
-                  |    "type" : ["CorporateBody"],
+                  |    "type" : ["Corporate Body"],
                   |    "authority-file" : false,
                   |    "depository" : false,
                   |    "version-timestamp" : "2022-06-22T02:00:00-0500"
                   |}""".stripMargin)
         )
         val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
-        result mustBe Valid(
-          ListAgentSummaryRequest(
-            None,
-            Some(ListAgentSummary(List(CorporateBody), Some("2022-06-22T02:00:00-0500"), Some(false), Some(false)))
+
+        result mustBe
+          Valid(
+            ListAgentSummaryRequest(
+              Some(s"""{
+                      |    "type" : ["Corporate Body"],
+                      |    "authority-file" : false,
+                      |    "depository" : false,
+                      |    "version-timestamp" : "2022-06-22T02:00:00-0500"
+                      |}""".stripMargin),
+              Some(ListAgentSummary(List(CorporateBody), Some("2022-06-22T02:00:00-0500"), Some(false), Some(false)))
+            )
           )
-        )
       }
       "no version timestamp and authority file" in {
         val listAgentSummaryRequest = ListAgentSummaryRequest(
           Some(s"""{
-                  |    "type" : ["CorporateBody"],
+                  |    "type" : ["Corporate Body"],
                   |    "depository" : true
                   |}""".stripMargin)
         )
@@ -193,7 +200,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
         result mustBe Valid(
           ListAgentSummaryRequest(
             Some(s"""{
-                    |    "type" : ["CorporateBody"],
+                    |    "type" : ["Corporate Body"],
                     |    "depository" : true
                     |}""".stripMargin),
             Some(ListAgentSummary(List(CorporateBody), None, Some(true), None))
@@ -203,7 +210,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
       "valid version identifier" in {
         val listAgentSummaryRequest = ListAgentSummaryRequest(
           Some(s"""{
-                  |    "type" : ["CorporateBody"],
+                  |    "type" : ["Corporate Body"],
                   |    "version-timestamp" : "latest",
                   |    "authority-file" : false,
                   |    "depository" : false
@@ -213,7 +220,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
         result mustBe Valid(
           ListAgentSummaryRequest(
             Some(s"""{
-                    |    "type" : ["CorporateBody"],
+                    |    "type" : ["Corporate Body"],
                     |    "version-timestamp" : "latest",
                     |    "authority-file" : false,
                     |    "depository" : false
@@ -259,7 +266,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
     ]
   },
   {
-    "type" : "CorporateBody",
+    "type" : "Corporate Body",
     "identifier" : "92W",
     "current-description" : "current description",
     "description" : [
@@ -275,7 +282,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
     ]
   },
   {
-    "type" : "CorporateBody",
+    "type" : "Corporate Body",
     "identifier" : "8R6",
     "current-description" : "current description",
     "description" : [

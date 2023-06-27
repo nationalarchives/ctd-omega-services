@@ -62,7 +62,7 @@ class ListAgentSummaryService(val stubData: StubData) extends BusinessService wi
           else {
             validateDate(request.versionTimestamp.get) match {
               case Some(_) =>
-                Validated.valid(ListAgentSummaryRequest(None, Some(request)))
+                Validated.valid(ListAgentSummaryRequest(businessServiceRequest.text, Some(request)))
               case _ =>
                 Validated.invalidNec[BusinessRequestValidationError, BusinessServiceRequest](
                   InvalidAgentSummaryRequestError(s"Error parsing invalid input date")
@@ -71,7 +71,9 @@ class ListAgentSummaryService(val stubData: StubData) extends BusinessService wi
           }
         case Left(_) =>
           Validated.invalidNec[BusinessRequestValidationError, BusinessServiceRequest](
-            InvalidAgentSummaryRequestError(s"Error decoding request message")
+            InvalidAgentSummaryRequestError(
+              s"Error decoding request message"
+            )
           )
       }
 
@@ -90,7 +92,7 @@ class ListAgentSummaryService(val stubData: StubData) extends BusinessService wi
 
   private def defaultRequest: String = {
     val defaultRequest = new StringBuilder(s"""{
-                                              |    "type" : ["CorporateBody","Person"],
+                                              |    "type" : ["Corporate Body","Person"],
                                               |    "authority-file" : false,
                                               |    "depository" : false,
                                               |    "version-timestamp" : "latest"

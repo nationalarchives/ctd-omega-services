@@ -30,10 +30,10 @@ class AgentTypeSpec extends AnyFreeSpec with Matchers {
   "AgentType" - {
     "CorporateBody" - {
       "must decode" in {
-        CorporateBody.entryName mustBe "CorporateBody"
+        CorporateBody.entryName mustBe "Corporate Body"
       }
       "must encode" in {
-        AgentType.withName("CorporateBody") mustBe CorporateBody
+        AgentType.withName("Corporate Body") mustBe CorporateBody
       }
     }
     "Person" - {
@@ -46,10 +46,10 @@ class AgentTypeSpec extends AnyFreeSpec with Matchers {
     }
     "CollectiveAgent" - {
       "must decode" in {
-        CollectiveAgent.entryName mustBe "CollectiveAgent"
+        CollectiveAgent.entryName mustBe "Collective Agent"
       }
       "must encode" in {
-        AgentType.withName("CollectiveAgent") mustBe CollectiveAgent
+        AgentType.withName("Collective Agent") mustBe CollectiveAgent
       }
     }
     "Family" - {
@@ -62,10 +62,10 @@ class AgentTypeSpec extends AnyFreeSpec with Matchers {
     }
     "HardwareAgent" - {
       "must decode" in {
-        HardwareAgent.entryName mustBe "HardwareAgent"
+        HardwareAgent.entryName mustBe "Hardware Agent"
       }
       "must encode" in {
-        AgentType.withName("HardwareAgent") mustBe HardwareAgent
+        AgentType.withName("Hardware Agent") mustBe HardwareAgent
       }
     }
   }

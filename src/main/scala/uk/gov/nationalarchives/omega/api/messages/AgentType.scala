@@ -21,9 +21,10 @@
 
 package uk.gov.nationalarchives.omega.api.messages
 
+import enumeratum.EnumEntry.CapitalWords
 import enumeratum.{ CirceEnum, Enum, EnumEntry }
 
-sealed trait AgentType extends EnumEntry
+sealed trait AgentType extends EnumEntry with CapitalWords
 
 object AgentType extends Enum[AgentType] with CirceEnum[AgentType] {
 

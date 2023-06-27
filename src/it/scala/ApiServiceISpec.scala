@@ -152,9 +152,9 @@ class ApiServiceISpec
         val textMessageConfig = generateValidMessageConfig()
           .copy(messageTypeId = Some("OSLISAGT001"))
           .copy(contents = s"""{
-                              |    "type" : ["CorporateBody","Person"],
+                              |    "type" : ["Corporate Body", "Person"]
                               |}""".stripMargin)
-
+        println("textMessage: " + textMessageConfig.contents)
         sendMessage(f.session, f.producer, textMessageConfig)
         assertReplyMessage(agentSummariesExpectedResult)
 
@@ -163,7 +163,7 @@ class ApiServiceISpec
         val textMessageConfig = generateValidMessageConfig()
           .copy(messageTypeId = Some("OSLISAGT001"))
           .copy(contents = s"""{
-                              |    "type" : ["CorporateBody"],
+                              |    "type" : ["Corporate Body"],
                               |    "depository" : true
                               |}""".stripMargin)
 

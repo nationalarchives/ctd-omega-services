@@ -31,11 +31,9 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
   "ListAgentSummary" - {
     "must decode a request with multiple types" in {
       val agentRequest =
-        """
-          |{
-          |  "type": ["CorporateBody" , "Person"]
-          |}
-          |""".stripMargin
+        s"""{
+           |    "type" : ["Corporate Body","Person"]
+           |}""".stripMargin
       decode[ListAgentSummary](agentRequest) mustBe Right(value =
         ListAgentSummary(agentType = List(CorporateBody, Person), None, None, None)
       )
@@ -44,7 +42,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
       val agentRequest =
         """
           |{
-          |  "type": ["CorporateBody"],
+          |  "type": ["Corporate Body"],
           |  "depository": true
           |}
           |""".stripMargin

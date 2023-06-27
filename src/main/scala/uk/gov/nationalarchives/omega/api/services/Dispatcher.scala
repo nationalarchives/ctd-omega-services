@@ -120,7 +120,8 @@ class Dispatcher(
     messageType match {
       case ECHO001     => (echoService, EchoRequest(Some(localMessage.messageText)))
       case OSLISALS001 => (legalStatusService, LegalStatusRequest())
-      case OSLISAGT001 => (listAgentSummaryService, ListAgentSummaryRequest())
+      case OSLISAGT001 =>
+        (listAgentSummaryService, ListAgentSummaryRequest(text = Some(localMessage.messageText)))
       // add more service IDs here
     }
 
