@@ -31,7 +31,6 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
 
   private val sparqlResourceDir = "sparql"
   private val getLegalStatusSummarySparqlResource = s"/$sparqlResourceDir/select-legal-status-summaries.rq"
-  // private val getLegalStatusSummarySparqlResource = s"/select-legal-status-summaries.rq"
 
   override def getLegalStatusSummaries: Try[List[LegalStatus]] = {
     val queryDecoder = implicitly[FromQuerySolution[LegalStatus]]
