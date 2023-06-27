@@ -19,13 +19,6 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.business
+package uk.gov.nationalarchives.omega.api.messages.request
 
-sealed class BusinessRequestValidationError(val message: String, val cause: Option[Throwable] = None)
-final case class TextIsNonEmptyCharacters(override val message: String, override val cause: Option[Throwable] = None)
-    extends BusinessRequestValidationError(message, cause)
-
-final case class InvalidAgentSummaryRequestError(
-  override val message: String,
-  override val cause: Option[Throwable] = None
-) extends BusinessRequestValidationError(message, cause)
+case class EchoRequest(text: Option[String]) extends RequestMessage

@@ -19,8 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.business.echo
+package uk.gov.nationalarchives.omega.api.messages.request
 
 import uk.gov.nationalarchives.omega.api.business.BusinessServiceRequest
 
-case class EchoRequest(text: Option[String]) extends BusinessServiceRequest
+case class ListAssetLegalStatusSummary(text: Option[String] = None) extends RequestMessage

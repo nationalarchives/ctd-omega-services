@@ -33,12 +33,10 @@ import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{ Assertion, BeforeAndAfterAll, TryValues }
 import uk.gov.nationalarchives.omega.api.LocalMessageSupport
-import uk.gov.nationalarchives.omega.api.business.echo.EchoService
-import io.circe._
-import io.circe.parser._
 import uk.gov.nationalarchives.omega.api.business.agents.ListAgentSummaryService
+import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.business.legalstatus.LegalStatusService
-import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ INVA001, INVA002, INVA003, INVA005, INVA006, INVA007, MISS001, MISS002, MISS003, MISS004, MISS005, MISS006, MISS007 }
+import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ INVA001, INVA002, INVA003, INVA005, INVA006, INVA007, INVA008, MISS001, MISS002, MISS003, MISS004, MISS005, MISS006, MISS007 }
 import uk.gov.nationalarchives.omega.api.common.{ ErrorCode, Version1UUID }
 import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, StubDataImpl }
 import uk.gov.nationalarchives.omega.api.repository.OmegaRepository
@@ -94,7 +92,7 @@ class DispatcherSpec
           "is blank" in {
             assertReplyMessage(
               generateValidLocalMessageForEchoService().copy(messageText = ""),
-              "The Echo Service says: "
+              getExpectedJsonErrors(Map(INVA008 -> "Echo Text cannot be empty."))
             )
           }
         }

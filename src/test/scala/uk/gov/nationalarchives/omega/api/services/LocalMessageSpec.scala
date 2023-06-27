@@ -95,7 +95,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(MissingJMSMessageID))
+            validationResult mustBe Invalid(Chain(MissingJMSMessageID()))
 
           }
           "is empty, without padding" in {
@@ -106,7 +106,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(InvalidJMSMessageID))
+            validationResult mustBe Invalid(Chain(InvalidJMSMessageID()))
 
           }
           "is empty, with padding" in {
@@ -117,7 +117,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(InvalidJMSMessageID))
+            validationResult mustBe Invalid(Chain(InvalidJMSMessageID()))
 
           }
         }
@@ -130,7 +130,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(MissingMessageTypeID))
+            validationResult mustBe Invalid(Chain(MissingMessageTypeID()))
 
           }
           "is blank" in {
@@ -141,7 +141,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(InvalidMessageTypeID))
+            validationResult mustBe Invalid(Chain(InvalidMessageTypeID()))
 
           }
           "isn't compliant with the expected pattern" in {
@@ -152,7 +152,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(InvalidMessageTypeID))
+            validationResult mustBe Invalid(Chain(InvalidMessageTypeID()))
 
           }
           "is compliant with the expected pattern, but is not recognised." in {
@@ -191,7 +191,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(MissingApplicationID, InvalidReplyAddress))
+            validationResult mustBe Invalid(Chain(MissingApplicationID(), InvalidReplyAddress()))
 
           }
           "is invalid" in {
@@ -202,7 +202,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(InvalidApplicationID, InvalidReplyAddress))
+            validationResult mustBe Invalid(Chain(InvalidApplicationID(), InvalidReplyAddress()))
 
           }
         }
@@ -215,7 +215,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(MissingJMSTimestamp))
+            validationResult mustBe Invalid(Chain(MissingJMSTimestamp()))
 
           }
         }
@@ -228,7 +228,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(MissingMessageFormat))
+            validationResult mustBe Invalid(Chain(MissingMessageFormat()))
 
           }
           "is invalid" in {
@@ -239,7 +239,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(InvalidMessageFormat))
+            validationResult mustBe Invalid(Chain(InvalidMessageFormat()))
 
           }
           "is valid (but with padding)" in {
@@ -300,7 +300,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(MissingAuthToken))
+            validationResult mustBe Invalid(Chain(MissingAuthToken()))
 
           }
           "is blank" in {
@@ -311,7 +311,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(InvalidAuthToken))
+            validationResult mustBe Invalid(Chain(InvalidAuthToken()))
 
           }
           "is blank (but with padding)" in {
@@ -322,7 +322,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(InvalidAuthToken))
+            validationResult mustBe Invalid(Chain(InvalidAuthToken()))
 
           }
         }
@@ -335,7 +335,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(MissingReplyAddress))
+            validationResult mustBe Invalid(Chain(MissingReplyAddress()))
 
           }
           "is blank" in {
@@ -346,7 +346,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(InvalidReplyAddress))
+            validationResult mustBe Invalid(Chain(InvalidReplyAddress()))
 
           }
           "is invalid but contains the application ID" in {
@@ -357,7 +357,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(InvalidReplyAddress))
+            validationResult mustBe Invalid(Chain(InvalidReplyAddress()))
 
           }
           "is valid (pattern-wise) but doesn't contain the application ID" in {
@@ -368,7 +368,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
             val omgToken = localMessage.validateOmgToken
             val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-            validationResult mustBe Invalid(Chain(InvalidReplyAddress))
+            validationResult mustBe Invalid(Chain(InvalidReplyAddress()))
 
           }
         }
@@ -381,7 +381,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
         val omgToken = localMessage.validateOmgToken
         val validationResult = localMessage.validateOtherHeaders(omgToken, applicationId)
 
-        validationResult mustBe Invalid(Chain(InvalidJMSMessageID, MissingMessageTypeID))
+        validationResult mustBe Invalid(Chain(InvalidJMSMessageID(), MissingMessageTypeID()))
 
       }
     }

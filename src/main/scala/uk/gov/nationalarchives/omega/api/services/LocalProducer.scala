@@ -28,7 +28,7 @@ import io.circe.syntax.EncoderOps
 import jms4s.JmsProducer
 import jms4s.config.QueueName
 import uk.gov.nationalarchives.omega.api.ApiServiceApp
-import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidationError, BusinessServiceError, TextIsNonEmptyCharacters }
+import uk.gov.nationalarchives.omega.api.business.BusinessServiceError
 import uk.gov.nationalarchives.omega.api.common.ErrorCode._
 import uk.gov.nationalarchives.omega.api.common.{ AppLogger, JsonError }
 import uk.gov.nationalarchives.omega.api.messages.IncomingMessageType.OSLISALS001
@@ -43,28 +43,28 @@ trait LocalProducer {
 
   def sendInvalidMessageFormatError(
     localMessage: LocalMessage,
-    errors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
+    errors: NonEmptyChain[LocalMessage.MessageValidationError]
   ): IO[Unit]
 
   def sendUnrecognisedMessageTypeError(localMessage: LocalMessage): IO[Unit]
 
   def sendInvalidApplicationError(
     localMessage: LocalMessage,
-    errors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
+    errors: NonEmptyChain[LocalMessage.MessageValidationError]
   ): IO[Unit]
 
   def sendAuthenticationError(
     localMessage: LocalMessage,
-    errors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
+    errors: NonEmptyChain[LocalMessage.MessageValidationError]
   ): IO[Unit]
 
   def sendWhenBusinessRequestIsInvalid(
     localMessage: LocalMessage,
-    errors: NonEmptyChain[BusinessRequestValidationError]
+    errors: NonEmptyChain[MessageValidationError]
   ): IO[Unit]
 
   def localMessageValidationErrorsToReplyMessage(
-    localMessageValidationErrors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
+    localMessageValidationErrors: NonEmptyChain[LocalMessage.MessageValidationError]
   ): Json = localMessageValidationErrors
     .map(localMessageValidationError => toErrorMessage(localMessageValidationError))
     .filter(_.isDefined)
@@ -77,8 +77,8 @@ trait LocalProducer {
 
   def createUnrecognisedMessageTypeError: Json = List(JsonError(INVA002, "Invalid OMGMessageTypeID")).asJson
 
-  def businessRequestValidationErrorToReplyMessage(
-    errors: NonEmptyChain[BusinessRequestValidationError]
+  def messageValidationErrorToReplyMessage(
+    errors: NonEmptyChain[MessageValidationError]
   ): Json = errors
     .map(error => toErrorMessage(error))
     .filter(_.isDefined)
@@ -86,27 +86,27 @@ trait LocalProducer {
     .toList
     .asJson
 
-  private def toErrorMessage(genericRequestValidationError: LocalMessageValidationError): Option[JsonError] =
+  private def toErrorMessage(genericRequestValidationError: MessageValidationError): Option[JsonError] =
     genericRequestValidationError match {
-      case MissingJMSMessageID  => Some(JsonError(MISS001, "Missing JMSMessageID"))
-      case InvalidJMSMessageID  => Some(JsonError(INVA001, "Invalid JMSMessageID"))
-      case MissingMessageTypeID => Some(JsonError(MISS002, "Missing OMGMessageTypeID"))
-      case InvalidMessageTypeID => Some(JsonError(INVA002, "Invalid OMGMessageTypeID"))
-      case MissingApplicationID => Some(JsonError(MISS003, "Missing OMGApplicationID"))
-      case InvalidApplicationID => Some(JsonError(INVA003, "Invalid OMGApplicationID"))
-      case MissingJMSTimestamp  => Some(JsonError(MISS004, "Missing JMSTimestamp"))
-      case MissingMessageFormat => Some(JsonError(MISS005, "Missing OMGMessageFormat"))
-      case InvalidMessageFormat => Some(JsonError(INVA005, "Invalid OMGMessageFormat"))
-      case MissingAuthToken     => Some(JsonError(MISS006, "Missing OMGToken"))
-      case InvalidAuthToken     => Some(JsonError(INVA006, "Invalid OMGToken"))
-      case MissingReplyAddress  => Some(JsonError(MISS007, "Missing OMGReplyAddress"))
-      case InvalidReplyAddress  => Some(JsonError(INVA007, "Invalid OMGReplyAddress"))
+      case MissingJMSMessageID(_, _)               => Some(JsonError(MISS001, "Missing JMSMessageID"))
+      case InvalidJMSMessageID(_, _)               => Some(JsonError(INVA001, "Invalid JMSMessageID"))
+      case MissingMessageTypeID(_, _)              => Some(JsonError(MISS002, "Missing OMGMessageTypeID"))
+      case InvalidMessageTypeID(_, _)              => Some(JsonError(INVA002, "Invalid OMGMessageTypeID"))
+      case MissingApplicationID(_, _)              => Some(JsonError(MISS003, "Missing OMGApplicationID"))
+      case InvalidApplicationID(_, _)              => Some(JsonError(INVA003, "Invalid OMGApplicationID"))
+      case MissingJMSTimestamp(_, _)               => Some(JsonError(MISS004, "Missing JMSTimestamp"))
+      case MissingMessageFormat(_, _)              => Some(JsonError(MISS005, "Missing OMGMessageFormat"))
+      case InvalidMessageFormat(_, _)              => Some(JsonError(INVA005, "Invalid OMGMessageFormat"))
+      case MissingAuthToken(_, _)                  => Some(JsonError(MISS006, "Missing OMGToken"))
+      case InvalidAuthToken(_, _)                  => Some(JsonError(INVA006, "Invalid OMGToken"))
+      case MissingReplyAddress(_, _)               => Some(JsonError(MISS007, "Missing OMGReplyAddress"))
+      case InvalidReplyAddress(_, _)               => Some(JsonError(INVA007, "Invalid OMGReplyAddress"))
+      case InvalidMessagePayload(Some(message), _) => Some(JsonError(INVA008, message))
+      case InvalidMessagePayload(_, Some(cause)) =>
+        Some(JsonError(INVA008, s"Message payload invalid due to ${cause.getMessage}"))
+      case InvalidMessagePayload(_, _) => Some(JsonError(INVA008, "Message payload invalid"))
     }
 
-  private def toErrorMessage(businessRequestValidationError: BusinessRequestValidationError): Option[JsonError] =
-    businessRequestValidationError match {
-      case TextIsNonEmptyCharacters(message, _) => Some(JsonError(BLAN001, s"Message text is blank: $message"))
-    }
 }
 
 /** In JMS terms a producer can have one or many destinations - in this implementation we have one destination, if we
@@ -157,7 +157,7 @@ class LocalProducerImpl(val jmsProducer: JmsProducer[IO]) extends LocalProducer 
 
   override def sendInvalidMessageFormatError(
     localMessage: LocalMessage,
-    errors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
+    errors: NonEmptyChain[LocalMessage.MessageValidationError]
   ): IO[Unit] =
     extractMessageIdAndSendError(
       localMessage,
@@ -167,12 +167,12 @@ class LocalProducerImpl(val jmsProducer: JmsProducer[IO]) extends LocalProducer 
 
   override def sendWhenBusinessRequestIsInvalid(
     localMessage: LocalMessage,
-    businessRequestValidationErrors: NonEmptyChain[BusinessRequestValidationError]
+    businessRequestValidationErrors: NonEmptyChain[MessageValidationError]
   ): IO[Unit] =
     extractMessageIdAndSendError(
       localMessage,
       OutgoingMessageType.InvalidMessageError,
-      businessRequestValidationErrorToReplyMessage(businessRequestValidationErrors)
+      messageValidationErrorToReplyMessage(businessRequestValidationErrors)
     )
 
   override def sendUnrecognisedMessageTypeError(localMessage: LocalMessage): IO[Unit] =
@@ -184,7 +184,7 @@ class LocalProducerImpl(val jmsProducer: JmsProducer[IO]) extends LocalProducer 
 
   override def sendInvalidApplicationError(
     localMessage: LocalMessage,
-    errors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
+    errors: NonEmptyChain[LocalMessage.MessageValidationError]
   ): IO[Unit] =
     extractMessageIdAndSendError(
       localMessage,
@@ -194,10 +194,10 @@ class LocalProducerImpl(val jmsProducer: JmsProducer[IO]) extends LocalProducer 
 
   override def sendAuthenticationError(
     localMessage: LocalMessage,
-    error: NonEmptyChain[LocalMessageValidationError]
+    error: NonEmptyChain[MessageValidationError]
   ): IO[Unit] =
     error.head match {
-      case InvalidAuthToken =>
+      case InvalidAuthToken(_, _) =>
         extractMessageIdAndSendError(
           localMessage,
           OutgoingMessageType.AuthenticationError,

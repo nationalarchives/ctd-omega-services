@@ -21,18 +21,19 @@
 
 package uk.gov.nationalarchives.omega.api.services
 
+import cats.data.Validated
 import cats.data.Validated.{ Invalid, Valid }
-import cats.data.{ Validated, ValidatedNec }
 import cats.effect.IO
 import cats.effect.std.Queue
 import cats.effect.unsafe.implicits.global
 import uk.gov.nationalarchives.omega.api.business._
-import uk.gov.nationalarchives.omega.api.business.agents.{ ListAgentSummaryRequest, ListAgentSummaryService }
-import uk.gov.nationalarchives.omega.api.business.echo.{ EchoRequest, EchoService }
-import uk.gov.nationalarchives.omega.api.business.legalstatus.{ LegalStatusRequest, LegalStatusService }
+import uk.gov.nationalarchives.omega.api.business.agents.ListAgentSummaryService
+import uk.gov.nationalarchives.omega.api.business.echo.EchoService
+import uk.gov.nationalarchives.omega.api.business.legalstatus.LegalStatusService
 import uk.gov.nationalarchives.omega.api.common.AppLogger
 import uk.gov.nationalarchives.omega.api.messages.IncomingMessageType.{ ECHO001, OSLISAGT001, OSLISALS001 }
-import uk.gov.nationalarchives.omega.api.messages.LocalMessage.ValidationResult
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{ InvalidMessageTypeID, ValidationResult }
+import uk.gov.nationalarchives.omega.api.messages.request.{ EchoRequest, ListAgentSummary, ListAssetLegalStatusSummary, RequestMessage }
 import uk.gov.nationalarchives.omega.api.messages.{ IncomingMessageType, LocalMessage, LocalMessageStore, ValidatedLocalMessage }
 
 import scala.util.Try
@@ -89,59 +90,41 @@ class Dispatcher(
   ): IO[Unit] =
     localMessage.validateOtherHeaders(omgToken, applicationId) match {
       case Valid(validatedLocalMessage) =>
-        createAndValidateServiceRequest(validatedLocalMessage, localMessage)
+        decodeAndDispatch(validatedLocalMessage, localMessage)
       case Invalid(errors) =>
         localProducer.sendInvalidMessageFormatError(localMessage, errors)
     }
 
-  private def createAndValidateServiceRequest(
-    validatedLocalMessage: ValidatedLocalMessage,
-    originalLocalMessage: LocalMessage
-  ): IO[Unit] =
+  private def decodeAndDispatch(validatedLocalMessage: ValidatedLocalMessage, localMessage: LocalMessage): IO[Unit] =
+    decodePayload(validatedLocalMessage) match {
+      case Validated.Valid(requestMessage) =>
+        sendResultToJmsQueue(dispatchRequest(requestMessage), validatedLocalMessage)
+      case Validated.Invalid(errors) =>
+        if (errors.contains(InvalidMessageTypeID())) {
+          localProducer.sendUnrecognisedMessageTypeError(localMessage)
+        } else {
+          localProducer.sendInvalidMessageFormatError(localMessage, errors)
+        }
+    }
+
+  private def decodePayload(validatedLocalMessage: ValidatedLocalMessage): ValidationResult[RequestMessage] =
     IncomingMessageType.withNameOption(validatedLocalMessage.omgMessageTypeId) match {
       case Some(messageType) =>
-        val (businessService: BusinessService, businessServiceRequest: BusinessServiceRequest) =
-          createServiceRequest(validatedLocalMessage, messageType)
-        validateBusinessServiceRequest(businessService, businessServiceRequest) match {
-          case Validated.Valid(validatedBusinessServiceRequest) =>
-            sendResultToJmsQueue(
-              execBusinessService(businessService, validatedBusinessServiceRequest),
-              validatedLocalMessage
-            )
-          case Validated.Invalid(errors) => localProducer.sendWhenBusinessRequestIsInvalid(originalLocalMessage, errors)
+        messageType match {
+          case ECHO001     => echoService.validateRequest(validatedLocalMessage)
+          case OSLISALS001 => legalStatusService.validateRequest(validatedLocalMessage)
+          case OSLISAGT001 => listAgentSummaryService.validateRequest(validatedLocalMessage)
         }
-      case None => localProducer.sendUnrecognisedMessageTypeError(originalLocalMessage)
+      case _ => Validated.invalidNec(InvalidMessageTypeID())
     }
 
-  private def createServiceRequest(
-    localMessage: ValidatedLocalMessage,
-    messageType: IncomingMessageType
-  ): (BusinessService, BusinessServiceRequest) =
-    messageType match {
-      case ECHO001     => (echoService, EchoRequest(Some(localMessage.messageText)))
-      case OSLISALS001 => (legalStatusService, LegalStatusRequest())
-      case OSLISAGT001 =>
-        (listAgentSummaryService, ListAgentSummaryRequest(text = Some(localMessage.messageText)))
-      // add more service IDs here
-    }
+  private def dispatchRequest(requestMessage: RequestMessage): Either[BusinessServiceError, BusinessServiceReply] =
+    requestMessage match {
+      case EchoRequest(_)                 => echoService.process(requestMessage)
+      case ListAssetLegalStatusSummary(_) => legalStatusService.process(requestMessage)
+      case ListAgentSummary(_, _, _, _)   => listAgentSummaryService.process(requestMessage)
 
-  // TODO: This is where we do the second and final stage of validation.
-  private def validateBusinessServiceRequest(
-    businessService: BusinessService,
-    businessServiceRequest: BusinessServiceRequest
-  ): ValidatedNec[BusinessRequestValidationError, BusinessServiceRequest] =
-    businessService match {
-      case value: BusinessRequestValidation =>
-        value.validateRequest(businessServiceRequest)
-      case _ =>
-        Validated.valid(businessServiceRequest)
     }
-
-  private def execBusinessService[T <: BusinessServiceRequest, U <: BusinessServiceReply, E <: BusinessServiceError](
-    businessService: BusinessService,
-    validatedBusinessServiceRequest: T
-  ): Either[BusinessServiceError, BusinessServiceReply] =
-    businessService.process(validatedBusinessServiceRequest)
 
   private def sendResultToJmsQueue[U <: BusinessServiceReply, E <: BusinessServiceError](
     businessResult: Either[E, U],

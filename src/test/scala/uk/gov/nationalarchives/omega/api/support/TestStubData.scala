@@ -22,8 +22,8 @@
 package uk.gov.nationalarchives.omega.api.support
 
 import uk.gov.nationalarchives.omega.api.messages.{ AgentType, StubData }
-import uk.gov.nationalarchives.omega.api.models.{ AgentDescription, AgentSummary, LegalStatus }
 import org.apache.jena.ext.xerces.util.URI
+import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary, LegalStatus }
 
 class TestStubData extends StubData {
 

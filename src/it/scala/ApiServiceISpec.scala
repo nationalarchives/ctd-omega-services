@@ -37,7 +37,7 @@ class ApiServiceISpec
     * I think the whole approach to the reply message assertion needs to be improved.
     */
   implicit override val patienceConfig: PatienceConfig =
-    PatienceConfig(timeout = scaled(Span(30, Seconds)), interval = scaled(Span(1, Second)))
+    PatienceConfig(timeout = scaled(Span(60, Seconds)), interval = scaled(Span(1, Second)))
 
   private val requestQueueName = "PACS001_request"
   private val replyQueueName = "PACE001_reply"

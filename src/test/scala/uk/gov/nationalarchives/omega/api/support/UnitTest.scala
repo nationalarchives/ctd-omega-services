@@ -19,8 +19,27 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.business.legalstatus
+package uk.gov.nationalarchives.omega.api.support
 
-import uk.gov.nationalarchives.omega.api.business.BusinessServiceRequest
+import jms4s.config.QueueName
+import org.mockito.MockitoSugar
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
+import uk.gov.nationalarchives.omega.api.common.Version1UUID
+import uk.gov.nationalarchives.omega.api.messages.ValidatedLocalMessage
 
-case class LegalStatusRequest(text: Option[String] = None) extends BusinessServiceRequest
+import java.time.LocalDateTime
+
+/** This trait should be the base class for all unit tests
+  */
+trait UnitTest extends AnyFreeSpec with Matchers with MockitoSugar {
+
+  /** Helper method to get a ValidatedLocalMessage instance
+    * @param messageText
+    *   the body of the message
+    * @return
+    */
+  def getValidatedLocalMessage(messageText: String): ValidatedLocalMessage =
+    ValidatedLocalMessage(Version1UUID.generate(), "", messageText, "", "", LocalDateTime.now(), "", "", QueueName(""))
+
+}

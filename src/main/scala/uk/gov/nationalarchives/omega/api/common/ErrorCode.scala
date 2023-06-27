@@ -43,6 +43,7 @@ object ErrorCode extends Enum[ErrorCode] with CirceEnum[ErrorCode] {
   case object INVA005 extends ErrorCode
   case object INVA006 extends ErrorCode
   case object INVA007 extends ErrorCode
+  case object INVA008 extends ErrorCode
   case object BLAN001 extends ErrorCode
 
 }

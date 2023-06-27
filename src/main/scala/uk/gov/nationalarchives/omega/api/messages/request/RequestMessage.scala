@@ -19,27 +19,6 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.models
+package uk.gov.nationalarchives.omega.api.messages.request
 
-import io.circe.{ Encoder, Json }
-import uk.gov.nationalarchives.omega.api.messages.AgentType
-import io.circe.syntax._
-
-case class AgentSummary(
-  agentType: AgentType,
-  identifier: String,
-  currentDescription: String,
-  description: List[AgentDescription]
-)
-object AgentSummary {
-  implicit val encodeAgentSummary: Encoder[AgentSummary] = (agentSummary: AgentSummary) =>
-    Json
-      .obj(
-        ("type", Json.fromString(agentSummary.agentType.entryName)),
-        ("identifier", Json.fromString(agentSummary.identifier)),
-        ("current-description", Json.fromString(agentSummary.currentDescription)),
-        ("description", agentSummary.description.asJson)
-      )
-      .deepDropNullValues
-
-}
+trait RequestMessage {}

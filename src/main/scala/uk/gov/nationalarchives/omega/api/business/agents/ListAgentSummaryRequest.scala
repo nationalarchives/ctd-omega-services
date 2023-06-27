@@ -22,7 +22,7 @@
 package uk.gov.nationalarchives.omega.api.business.agents
 
 import uk.gov.nationalarchives.omega.api.business.BusinessServiceRequest
-import uk.gov.nationalarchives.omega.api.models.ListAgentSummary
+import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 
 case class ListAgentSummaryRequest(text: Option[String] = None, listAgentSummary: Option[ListAgentSummary] = None)
     extends BusinessServiceRequest

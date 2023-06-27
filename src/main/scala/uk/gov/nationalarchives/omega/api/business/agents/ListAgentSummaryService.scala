@@ -24,9 +24,10 @@ package uk.gov.nationalarchives.omega.api.business.agents
 import cats.data.Validated
 import io.circe.parser.decode
 import io.circe.syntax.EncoderOps
-import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidation, BusinessRequestValidationError, BusinessService, BusinessServiceError, BusinessServiceReply, BusinessServiceRequest, InvalidAgentSummaryRequestError }
-import uk.gov.nationalarchives.omega.api.messages.StubData
-import uk.gov.nationalarchives.omega.api.models.ListAgentSummary
+import uk.gov.nationalarchives.omega.api.business._
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{ InvalidMessagePayload, MessageValidationError, ValidationResult }
+import uk.gov.nationalarchives.omega.api.messages.request.{ ListAgentSummary, RequestMessage }
+import uk.gov.nationalarchives.omega.api.messages.{ StubData, ValidatedLocalMessage }
 
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -35,50 +36,43 @@ import scala.util.Try
 class ListAgentSummaryService(val stubData: StubData) extends BusinessService with BusinessRequestValidation {
 
   override def process(
-    businessServiceRequest: BusinessServiceRequest
+    requestMessage: RequestMessage
   ): Either[BusinessServiceError, BusinessServiceReply] =
-    decode[ListAgentSummary](businessServiceRequest.text.getOrElse(defaultRequest)) match {
-      case Left(e) =>
-        Left(AgentSummaryRequestError(s"There was an error reading the message: ${e.getMessage}"))
-      case Right(_) =>
-        Right(
-          ListAgentSummaryReply(
-            stubData
-              .getAgentSummaries()
-              .asJson
-              .toString()
-          )
-        )
+    Right(
+      ListAgentSummaryReply(
+        stubData
+          .getAgentSummaries()
+          .asJson
+          .toString()
+      )
+    )
 
-    }
-
-  override def validateRequest(businessServiceRequest: BusinessServiceRequest): ValidationResult =
-    if (businessServiceRequest.text.nonEmpty) {
-      decode[ListAgentSummary](businessServiceRequest.text.get) match {
+  override def validateRequest(validatedLocalMessage: ValidatedLocalMessage): ValidationResult[RequestMessage] =
+    if (validatedLocalMessage.messageText.nonEmpty) {
+      decode[ListAgentSummary](validatedLocalMessage.messageText) match {
         case Right(request) =>
           val versionIdentifiers: List[String] = List("latest", "all")
           if (request.versionTimestamp.isEmpty || versionIdentifiers.contains(request.versionTimestamp.get))
-            Validated.valid(ListAgentSummaryRequest(businessServiceRequest.text, Some(request)))
+            Validated.valid(request)
           else {
             validateDate(request.versionTimestamp.get) match {
               case Some(_) =>
-                Validated.valid(ListAgentSummaryRequest(businessServiceRequest.text, Some(request)))
+                Validated.valid(ListAgentSummaryRequest(Some(validatedLocalMessage.messageText), Some(request)))
+                Validated.valid(request)
               case _ =>
-                Validated.invalidNec[BusinessRequestValidationError, BusinessServiceRequest](
-                  InvalidAgentSummaryRequestError(s"Error parsing invalid input date")
+                Validated.invalidNec[MessageValidationError, RequestMessage](
+                  InvalidMessagePayload(Some(s"Invalid date: ${request.versionTimestamp.get}"))
                 )
             }
           }
-        case Left(_) =>
-          Validated.invalidNec[BusinessRequestValidationError, BusinessServiceRequest](
-            InvalidAgentSummaryRequestError(
-              s"Error decoding request message"
-            )
+        case Left(error) =>
+          Validated.invalidNec[MessageValidationError, RequestMessage](
+            InvalidMessagePayload(cause = Some(error))
           )
       }
 
     } else {
-      Validated.valid(businessServiceRequest)
+      Validated.valid(ListAgentSummary(List.empty))
     }
 
   private def validateDate(dateStr: String): Option[Date] = {
@@ -88,16 +82,6 @@ class ListAgentSummaryService(val stubData: StubData) extends BusinessService wi
     if (trimmedDate.isEmpty) None
     else
       Try(dateFormatter.parse(trimmedDate)).toOption
-  }
-
-  private def defaultRequest: String = {
-    val defaultRequest = new StringBuilder(s"""{
-                                              |    "type" : ["Corporate Body","Person"],
-                                              |    "authority-file" : false,
-                                              |    "depository" : false,
-                                              |    "version-timestamp" : "latest"
-                                              |}""".stripMargin)
-    defaultRequest.mkString
   }
 
 }

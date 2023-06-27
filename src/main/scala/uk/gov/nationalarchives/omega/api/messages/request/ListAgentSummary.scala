@@ -19,18 +19,18 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.models
+package uk.gov.nationalarchives.omega.api.messages.request
 
+import io.circe.syntax._
 import io.circe.{ Decoder, Encoder, Json }
 import uk.gov.nationalarchives.omega.api.messages.AgentType
-import io.circe.syntax._
 
 case class ListAgentSummary(
   agentType: List[AgentType],
   versionTimestamp: Option[String] = None,
   depository: Option[Boolean] = None,
   authorityFile: Option[Boolean] = None
-)
+) extends RequestMessage
 
 object ListAgentSummary {
   implicit val encodeListAgentSummary: Encoder[ListAgentSummary] = (listAgentSummary: ListAgentSummary) =>

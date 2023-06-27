@@ -22,7 +22,7 @@
 package uk.gov.nationalarchives.omega.api.repository
 
 import org.apache.jena.query.{ Query, QueryFactory, Syntax }
-import uk.gov.nationalarchives.omega.api.models.LegalStatus
+import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
 
 import scala.io.Source
 import scala.util.{ Failure, Try, Using }

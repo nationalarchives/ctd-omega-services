@@ -21,11 +21,10 @@
 
 package uk.gov.nationalarchives.omega.api.messages
 
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import uk.gov.nationalarchives.omega.api.messages.AgentType.{ CollectiveAgent, CorporateBody, Family, HardwareAgent, Person }
+import uk.gov.nationalarchives.omega.api.support.UnitTest
 
-class AgentTypeSpec extends AnyFreeSpec with Matchers {
+class AgentTypeSpec extends UnitTest {
 
   "AgentType" - {
     "CorporateBody" - {
