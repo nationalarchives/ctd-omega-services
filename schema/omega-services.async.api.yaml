@@ -38,7 +38,7 @@ info:
 
 servers:
   mvp-beta:
-    url: service.mvbpeta.catalogue.nationalarchives.gov.uk:61616
+    url: jms://service.mvbpeta.catalogue.nationalarchives.gov.uk:61616
     protocol: jms
     protocolVersion: '1.1'
     description: MVP Beta - Message Broker
@@ -47,6 +47,12 @@ servers:
     tags:
       - name: env:mvp-beta
         description: This environment is for the MVP Beta
+    bindings:
+      jms:
+        jmsConnectionFactory: com.amazon.sqs.javamessaging.SQSConnectionFactory
+        properties:
+        clientID:
+        bindingVersion: 0.0.1
 defaultContentType: application/json
 
 
@@ -64,6 +70,10 @@ channels:
           - $ref: '#/components/messages/ListAgentFull'
           - $ref: '#/components/messages/GetAgentSummary'
           - $ref: '#/components/messages/GetAgentFull'
+    bindings:
+      jms:
+        destinationType: queue
+        bindingVersion: 0.0.1
 
   catalogue.editorial.web.application.instance.1:
     description: >-
@@ -89,6 +99,10 @@ channels:
           - $ref: '#/components/messages/AgentFullList'
           - $ref: '#/components/messages/AgentSummary'
           - $ref: '#/components/messages/AgentFull'
+    bindings:
+      jms:
+        destinationType: queue
+        bindingVersion: 0.0.1
 
 
 components:
@@ -403,41 +417,47 @@ components:
     JMSMessage:
       name: JMS Message
       description: Headers that are mostly common to all JMS Messages
-      headers:
-        required:
-          - JMSMessageID
-          - JMSTimestamp
-        properties:
-          JMSMessageID:
-            name: JMSMessageID
-            description: >-
-              A unique identifier for the message. We suggest using a short
-              application instance specific prefix followed by a unique
-              identifier. In the extreme case a UUID may be used. Depending on
-              your JMS provider, this may be set on your behalf.
-            type: string
-          JMSTimestamp:
-            name: JMSTimestamp
-            description: >-
-              The time the message was sent. The value of the timestamp is the
-              amount of time, measured in milliseconds, that has elapsed since
-              midnight, January 1, 1970, UTC. Depending on your JMS provider,
-              this may be set on your behalf.
-            type: number
+      bindings:
+        jms:
+          headers:
+            required:
+              - JMSMessageID
+              - JMSTimestamp
+            properties:
+              JMSMessageID:
+                name: JMSMessageID
+                description: >-
+                  A unique identifier for the message. We suggest using a short
+                  application instance specific prefix followed by a unique
+                  identifier. In the extreme case a UUID may be used. Depending on
+                  your JMS provider, this may be set on your behalf.
+                type: string
+              JMSTimestamp:
+                name: JMSTimestamp
+                description: >-
+                  The time the message was sent. The value of the timestamp is the
+                  amount of time, measured in milliseconds, that has elapsed since
+                  midnight, January 1, 1970, UTC. Depending on your JMS provider,
+                  this may be set on your behalf.
+                type: number
+          bindingVersion: 0.0.1
 
     JMSReply:
       name: JMS Reply Message
       description: JMS Message sent in reply to another JMS Message
-      headers:
-        # required: [JMSCorrelationID]  # NOTE(AR) this is intentionally left optional as it makes it possible to use data messages for both synchronous request-reply, and non-request-reply  asynchronous purposes.
-        properties:
-          JMSCorrelationID:
-            name: JMSCorrelationID
-            description: >-
-              An identifier that is used to associate this message as a reply to
-              a previous message. The value is the JMSMessageId of the previous
-              message.
-            type: string
+      bindings:
+        jms:
+          headers:
+            # required: [JMSCorrelationID]  # NOTE(AR) this is intentionally left optional as it makes it possible to use data messages for both synchronous request-reply, and non-request-reply asynchronous purposes.
+            properties:
+              JMSCorrelationID:
+                name: JMSCorrelationID
+                description: >-
+                  An identifier that is used to associate this message as a reply to
+                  a previous message. The value is the JMSMessageId of the previous
+                  message.
+                type: string
+          bindingVersion: 0.0.1
       correlationId:
         description: >-
           The value is the JMSMessageId of the previous message to which this
