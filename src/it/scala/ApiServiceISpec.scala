@@ -171,8 +171,9 @@ class ApiServiceISpec
         assertReplyMessage(agentSummariesExpectedResult)
 
       }
-      " an empty payload" in { f =>
+      " an empty payload (with padding)" in { f =>
         val textMessageConfig = generateValidMessageConfig()
+          .copy(contents = " ")
           .copy(messageTypeId = Some("OSLISAGT001"))
 
         sendMessage(f.session, f.producer, textMessageConfig)
@@ -182,7 +183,7 @@ class ApiServiceISpec
     }
     "returns an echo message when the message body is" - {
       "empty (with padding)" in { f =>
-        val textMessageConfig = generateValidMessageConfig().copy(contents = " ")
+        val textMessageConfig = generateValidMessageConfig().copy(contents = "")
 
         sendMessage(f.session, f.producer, textMessageConfig)
 
