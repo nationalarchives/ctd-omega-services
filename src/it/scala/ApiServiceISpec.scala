@@ -22,6 +22,7 @@ import uk.gov.nationalarchives.omega.api.services.ApiService
 import javax.jms.{ Connection, MessageProducer, Session, TextMessage }
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
+import scala.io.Source
 
 class ApiServiceISpec
     extends FixtureAsyncFreeSpec with AsyncIOSpec with Matchers with Eventually with IntegrationPatience with AppLogger
@@ -147,6 +148,43 @@ class ApiServiceISpec
 
     }
 
+    "returns agent summaries message when the given ListAgentSummaryRequest has" - {
+      " multiple agent types" in { f =>
+        val textMessageConfig = generateValidMessageConfig()
+          .copy(messageTypeId = Some("OSLISAGT001"))
+          .copy(contents = s"""{
+                              |    "type" : ["Corporate Body", "Person"]
+                              |}""".stripMargin)
+        sendMessage(f.session, f.producer, textMessageConfig)
+        assertReplyMessage(agentSummariesExpectedResult)
+
+      }
+      " an agent type and the depository" in { f =>
+        val textMessageConfig = generateValidMessageConfig()
+          .copy(messageTypeId = Some("OSLISAGT001"))
+          .copy(contents = s"""{
+                              |    "type" : ["Corporate Body"],
+                              |    "depository" : true
+                              |}""".stripMargin)
+
+        sendMessage(f.session, f.producer, textMessageConfig)
+        assertReplyMessage(agentSummariesExpectedResult)
+
+      }
+
+      // TODO Since it's not possible to send an empty message in SQS the empty payload cannot be tested and
+      // TODO this test is ignored as it fails on decode of spaces.
+
+      " an empty payload (with padding)" ignore { f =>
+        val textMessageConfig = generateValidMessageConfig()
+          .copy(contents = " ")
+          .copy(messageTypeId = Some("OSLISAGT001"))
+
+        sendMessage(f.session, f.producer, textMessageConfig)
+        assertReplyMessage(agentSummariesExpectedResult)
+
+      }
+    }
     "returns an echo message when the message body is" - {
       "empty (with padding)" in { f =>
         val textMessageConfig = generateValidMessageConfig().copy(contents = " ")
@@ -313,6 +351,14 @@ class ApiServiceISpec
 
   private def sendMessage(session: Session, producer: MessageProducer, textMessageConfig: TextMessageConfig): Unit =
     producer.send(asTextMessage(session, textMessageConfig))
+
+  private def agentSummariesExpectedResult = {
+    val summaries = Source.fromResource("expected-agent-summaries.json").getLines().mkString
+    parse(summaries) match {
+      case Right(json) => json.printWith(Printer.spaces2)
+      case Left(_)     => ""
+    }
+  }
 
 }
 

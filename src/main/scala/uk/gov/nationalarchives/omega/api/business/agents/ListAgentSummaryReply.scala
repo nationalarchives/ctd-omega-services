@@ -19,30 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.common
+package uk.gov.nationalarchives.omega.api.business.agents
 
-import enumeratum.{ CirceEnum, Enum, EnumEntry }
+import uk.gov.nationalarchives.omega.api.business.BusinessServiceReply
 
-sealed trait ErrorCode extends EnumEntry
-object ErrorCode extends Enum[ErrorCode] with CirceEnum[ErrorCode] {
-
-  val values: IndexedSeq[ErrorCode] = findValues
-
-  case object PROC001 extends ErrorCode
-  case object PROC002 extends ErrorCode
-  case object MISS001 extends ErrorCode
-  case object MISS002 extends ErrorCode
-  case object MISS003 extends ErrorCode
-  case object MISS004 extends ErrorCode
-  case object MISS005 extends ErrorCode
-  case object MISS006 extends ErrorCode
-  case object MISS007 extends ErrorCode
-  case object INVA001 extends ErrorCode
-  case object INVA002 extends ErrorCode
-  case object INVA003 extends ErrorCode
-  case object INVA005 extends ErrorCode
-  case object INVA006 extends ErrorCode
-  case object INVA007 extends ErrorCode
-  case object BLAN001 extends ErrorCode
-
-}
+case class ListAgentSummaryReply(override val content: String) extends BusinessServiceReply

@@ -21,9 +21,9 @@
 
 package uk.gov.nationalarchives.omega.api.support
 
+import uk.gov.nationalarchives.omega.api.messages.{ AgentType, StubData }
+import uk.gov.nationalarchives.omega.api.models.{ AgentDescription, AgentSummary, LegalStatus }
 import org.apache.jena.ext.xerces.util.URI
-import uk.gov.nationalarchives.omega.api.messages.StubData
-import uk.gov.nationalarchives.omega.api.models.LegalStatus
 
 class TestStubData extends StubData {
 
@@ -32,4 +32,42 @@ class TestStubData extends StubData {
     LegalStatus(new URI("http://catalogue.nationalarchives.gov.uk/non-public-record"), "Non-Public Record")
   )
 
+  override def getAgentSummaries(): Seq[AgentSummary] = Seq(
+    AgentSummary(
+      AgentType.Person,
+      "48N",
+      "current",
+      List(
+        AgentDescription("48N", "Baden-Powell", false, false, "2022-06-22T02:00:00-0500", Some("1889"), Some("1977"))
+      )
+    ),
+    AgentSummary(
+      AgentType.Person,
+      "46F",
+      "current description",
+      List(AgentDescription("46F", "Fawkes, Guy", false, false, "2022-06-22T02:00:00-0500", Some("1570"), Some("1606")))
+    ),
+    AgentSummary(
+      AgentType.CorporateBody,
+      "92W",
+      "current description",
+      List(
+        AgentDescription(
+          "92W",
+          "Joint Milk Quality Committee",
+          false,
+          false,
+          "2022-06-22T02:00:00-0500",
+          Some("1948"),
+          Some("1948")
+        )
+      )
+    ),
+    AgentSummary(
+      AgentType.CorporateBody,
+      "8R6",
+      "current description",
+      List(AgentDescription("8R6", "Queen Anne's Bounty", false, false, "2022-06-22T02:00:00-0500", None, None))
+    )
+  )
 }

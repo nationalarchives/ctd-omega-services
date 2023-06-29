@@ -19,30 +19,27 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.common
+package uk.gov.nationalarchives.omega.api.messages
 
+import enumeratum.EnumEntry.CapitalWords
 import enumeratum.{ CirceEnum, Enum, EnumEntry }
 
-sealed trait ErrorCode extends EnumEntry
-object ErrorCode extends Enum[ErrorCode] with CirceEnum[ErrorCode] {
+sealed trait AgentType extends EnumEntry with CapitalWords
 
-  val values: IndexedSeq[ErrorCode] = findValues
+object AgentType extends Enum[AgentType] with CirceEnum[AgentType] {
 
-  case object PROC001 extends ErrorCode
-  case object PROC002 extends ErrorCode
-  case object MISS001 extends ErrorCode
-  case object MISS002 extends ErrorCode
-  case object MISS003 extends ErrorCode
-  case object MISS004 extends ErrorCode
-  case object MISS005 extends ErrorCode
-  case object MISS006 extends ErrorCode
-  case object MISS007 extends ErrorCode
-  case object INVA001 extends ErrorCode
-  case object INVA002 extends ErrorCode
-  case object INVA003 extends ErrorCode
-  case object INVA005 extends ErrorCode
-  case object INVA006 extends ErrorCode
-  case object INVA007 extends ErrorCode
-  case object BLAN001 extends ErrorCode
+  val values = findValues
+
+  case object CorporateBody extends AgentType
+
+  case object Person extends AgentType
+
+  case object CollectiveAgent extends AgentType
+
+  case object Family extends AgentType
+
+  case object HardwareAgent extends AgentType
+
+  case object SoftwareAgent extends AgentType
 
 }

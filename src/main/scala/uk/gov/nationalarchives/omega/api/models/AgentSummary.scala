@@ -19,30 +19,27 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.common
+package uk.gov.nationalarchives.omega.api.models
 
-import enumeratum.{ CirceEnum, Enum, EnumEntry }
+import io.circe.{ Encoder, Json }
+import uk.gov.nationalarchives.omega.api.messages.AgentType
+import io.circe.syntax._
 
-sealed trait ErrorCode extends EnumEntry
-object ErrorCode extends Enum[ErrorCode] with CirceEnum[ErrorCode] {
-
-  val values: IndexedSeq[ErrorCode] = findValues
-
-  case object PROC001 extends ErrorCode
-  case object PROC002 extends ErrorCode
-  case object MISS001 extends ErrorCode
-  case object MISS002 extends ErrorCode
-  case object MISS003 extends ErrorCode
-  case object MISS004 extends ErrorCode
-  case object MISS005 extends ErrorCode
-  case object MISS006 extends ErrorCode
-  case object MISS007 extends ErrorCode
-  case object INVA001 extends ErrorCode
-  case object INVA002 extends ErrorCode
-  case object INVA003 extends ErrorCode
-  case object INVA005 extends ErrorCode
-  case object INVA006 extends ErrorCode
-  case object INVA007 extends ErrorCode
-  case object BLAN001 extends ErrorCode
+case class AgentSummary(
+  agentType: AgentType,
+  identifier: String,
+  currentDescription: String,
+  description: List[AgentDescription]
+)
+object AgentSummary {
+  implicit val encodeAgentSummary: Encoder[AgentSummary] = (agentSummary: AgentSummary) =>
+    Json
+      .obj(
+        ("type", Json.fromString(agentSummary.agentType.entryName)),
+        ("identifier", Json.fromString(agentSummary.identifier)),
+        ("current-description", Json.fromString(agentSummary.currentDescription)),
+        ("description", agentSummary.description.asJson)
+      )
+      .deepDropNullValues
 
 }

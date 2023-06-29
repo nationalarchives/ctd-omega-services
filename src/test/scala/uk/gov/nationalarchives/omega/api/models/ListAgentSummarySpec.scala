@@ -19,30 +19,37 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.common
+package uk.gov.nationalarchives.omega.api.models
 
-import enumeratum.{ CirceEnum, Enum, EnumEntry }
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
+import io.circe.parser.decode
+import uk.gov.nationalarchives.omega.api.messages.AgentType.{ CorporateBody, Person }
 
-sealed trait ErrorCode extends EnumEntry
-object ErrorCode extends Enum[ErrorCode] with CirceEnum[ErrorCode] {
+class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
 
-  val values: IndexedSeq[ErrorCode] = findValues
-
-  case object PROC001 extends ErrorCode
-  case object PROC002 extends ErrorCode
-  case object MISS001 extends ErrorCode
-  case object MISS002 extends ErrorCode
-  case object MISS003 extends ErrorCode
-  case object MISS004 extends ErrorCode
-  case object MISS005 extends ErrorCode
-  case object MISS006 extends ErrorCode
-  case object MISS007 extends ErrorCode
-  case object INVA001 extends ErrorCode
-  case object INVA002 extends ErrorCode
-  case object INVA003 extends ErrorCode
-  case object INVA005 extends ErrorCode
-  case object INVA006 extends ErrorCode
-  case object INVA007 extends ErrorCode
-  case object BLAN001 extends ErrorCode
+  "ListAgentSummary" - {
+    "must decode a request with multiple types" in {
+      val agentRequest =
+        s"""{
+           |    "type" : ["Corporate Body","Person"]
+           |}""".stripMargin
+      decode[ListAgentSummary](agentRequest) mustBe Right(value =
+        ListAgentSummary(agentType = List(CorporateBody, Person), None, None, None)
+      )
+    }
+    "must decode a request with depository" in {
+      val agentRequest =
+        """
+          |{
+          |  "type": ["Corporate Body"],
+          |  "depository": true
+          |}
+          |""".stripMargin
+      decode[ListAgentSummary](agentRequest) mustBe Right(value =
+        ListAgentSummary(agentType = List(CorporateBody), None, depository = Some(true), None)
+      )
+    }
+  }
 
 }

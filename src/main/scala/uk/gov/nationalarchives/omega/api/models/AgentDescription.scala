@@ -19,30 +19,31 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.common
+package uk.gov.nationalarchives.omega.api.models
 
-import enumeratum.{ CirceEnum, Enum, EnumEntry }
+import io.circe.{ Encoder, Json }
+import io.circe.syntax._
 
-sealed trait ErrorCode extends EnumEntry
-object ErrorCode extends Enum[ErrorCode] with CirceEnum[ErrorCode] {
-
-  val values: IndexedSeq[ErrorCode] = findValues
-
-  case object PROC001 extends ErrorCode
-  case object PROC002 extends ErrorCode
-  case object MISS001 extends ErrorCode
-  case object MISS002 extends ErrorCode
-  case object MISS003 extends ErrorCode
-  case object MISS004 extends ErrorCode
-  case object MISS005 extends ErrorCode
-  case object MISS006 extends ErrorCode
-  case object MISS007 extends ErrorCode
-  case object INVA001 extends ErrorCode
-  case object INVA002 extends ErrorCode
-  case object INVA003 extends ErrorCode
-  case object INVA005 extends ErrorCode
-  case object INVA006 extends ErrorCode
-  case object INVA007 extends ErrorCode
-  case object BLAN001 extends ErrorCode
-
+case class AgentDescription(
+  identifier: String,
+  label: String,
+  authorityFile: Boolean,
+  depository: Boolean,
+  versionTimestamp: String,
+  dateFrom: Option[String],
+  dateTo: Option[String],
+  previousDescription: Option[String] = None
+)
+object AgentDescription {
+  implicit val encodeAgentDescription: Encoder[AgentDescription] = (agentDescription: AgentDescription) =>
+    Json.obj(
+      ("identifier", agentDescription.identifier.asJson),
+      ("label", agentDescription.label.asJson),
+      ("authority-file", agentDescription.authorityFile.asJson),
+      ("depository", agentDescription.depository.asJson),
+      ("version-timestamp", agentDescription.versionTimestamp.asJson),
+      ("date-from", agentDescription.dateFrom.asJson),
+      ("date-to", agentDescription.dateTo.asJson),
+      ("previous-description", agentDescription.previousDescription.asJson)
+    )
 }
