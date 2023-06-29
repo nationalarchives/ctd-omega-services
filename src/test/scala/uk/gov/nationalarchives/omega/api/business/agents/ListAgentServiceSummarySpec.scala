@@ -30,7 +30,7 @@ import uk.gov.nationalarchives.omega.api.messages.AgentType.CorporateBody
 import uk.gov.nationalarchives.omega.api.models.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.support.TestStubData
 
-class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
+class ListAgentServiceSummarySpec extends AnyFreeSpec with Matchers {
 
   val stubData = new TestStubData
 
