@@ -21,33 +21,47 @@
 
 package uk.gov.nationalarchives.omega.api.business.legalstatus
 
+import org.mockito.MockitoSugar
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import uk.gov.nationalarchives.omega.api.repository.OmegaRepository
 import uk.gov.nationalarchives.omega.api.support.TestStubData
 
-class LegalStatusServiceSpec extends AnyFreeSpec with Matchers {
+import scala.util.{ Failure, Success }
 
-  val stubData = new TestStubData
-  val legalStatusService = new LegalStatusService(stubData)
+class LegalStatusServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar {
+
+  private val stubData = new TestStubData
+  private val mockRepository = mock[OmegaRepository]
+  private val legalStatusService = new LegalStatusService(stubData, mockRepository)
 
   "The LegalStatusService" - {
     "when receives" - {
       "a valid LegalStatusRequest" in {
         val legalStatusRequest = LegalStatusRequest()
+        when(mockRepository.getLegalStatusSummaries).thenReturn(Success(stubData.getLegalStatuses()))
 
         val result = legalStatusService.process(legalStatusRequest)
 
         result mustBe Right(LegalStatusReply(s"""[
   {
     "identifier" : "http://catalogue.nationalarchives.gov.uk/public-record",
-    "name" : "Public Record"
+    "label" : "Public Record"
   },
   {
     "identifier" : "http://catalogue.nationalarchives.gov.uk/non-public-record",
-    "name" : "Non-Public Record"
+    "label" : "Non-Public Record"
   }
 ]""".stripMargin))
       }
+    }
+    "when a processing error occurs" in {
+      val legalStatusRequest = LegalStatusRequest()
+      val errorMessage = "There was an error"
+      when(mockRepository.getLegalStatusSummaries).thenReturn(Failure(new Exception(errorMessage)))
+
+      val result = legalStatusService.process(legalStatusRequest)
+      result mustBe Left(LegalStatusError(errorMessage))
     }
   }
 

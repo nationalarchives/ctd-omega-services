@@ -22,20 +22,21 @@
 package uk.gov.nationalarchives.omega.api.messages
 
 import uk.gov.nationalarchives.omega.api.models.{ AgentDescription, AgentSummary, LegalStatus }
+import org.apache.jena.ext.xerces.util.URI
 
 class StubDataImpl extends StubData
 
 trait StubData {
 
   def getLegalStatuses(): Seq[LegalStatus] = Seq(
-    LegalStatus("http://catalogue.nationalarchives.gov.uk/public-record", "Public Record"),
-    LegalStatus("http://catalogue.nationalarchives.gov.uk/non-public-record", "Non-Public Record"),
+    LegalStatus(new URI("http://catalogue.nationalarchives.gov.uk/public-record"), "Public Record"),
+    LegalStatus(new URI("http://catalogue.nationalarchives.gov.uk/non-public-record"), "Non-Public Record"),
     LegalStatus(
-      "http://catalogue.nationalarchives.gov.uk/public-record-unless-otherwise-stated",
+      new URI("http://catalogue.nationalarchives.gov.uk/public-record-unless-otherwise-stated"),
       "Public Record (unless otherwise stated)"
     ),
-    LegalStatus("http://catalogue.nationalarchives.gov.uk/welsh-public-record", "Welsh Public Record"),
-    LegalStatus("http://catalogue.nationalarchives.gov.uk/non-record-material", "Non-Record Material")
+    LegalStatus(new URI("http://catalogue.nationalarchives.gov.uk/welsh-public-record"), "Welsh Public Record"),
+    LegalStatus(new URI("http://catalogue.nationalarchives.gov.uk/non-record-material"), "Non-Record Material")
   )
 
   def getAgentSummaries(): Seq[AgentSummary] = Seq(

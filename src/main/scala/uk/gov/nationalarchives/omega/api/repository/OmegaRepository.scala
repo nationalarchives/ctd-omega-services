@@ -19,16 +19,27 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.models
+package uk.gov.nationalarchives.omega.api.repository
 
-import io.circe.{ Encoder, Json }
-import org.apache.jena.ext.xerces.util.URI
+import org.phenoscape.sparql.FromQuerySolution
+import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
+import uk.gov.nationalarchives.omega.api.models.LegalStatus
 
-case class LegalStatus(identifier: URI, label: String)
-object LegalStatus {
-  implicit val encodeLegalStatus: Encoder[LegalStatus] = (legalStatus: LegalStatus) =>
-    Json.obj(
-      ("identifier", Json.fromString(legalStatus.identifier.toString)),
-      ("label", Json.fromString(legalStatus.label))
-    )
+import scala.util.Try
+
+class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends AbstractRepository {
+
+  private val sparqlResourceDir = "sparql"
+  private val getLegalStatusSummarySparqlResource = s"/$sparqlResourceDir/select-legal-status-summaries.rq"
+
+  override def getLegalStatusSummaries: Try[List[LegalStatus]] = {
+    val queryDecoder = implicitly[FromQuerySolution[LegalStatus]]
+    val res = for {
+      queryText <- getQueryText(getLegalStatusSummarySparqlResource)
+      query     <- getQuery(queryText)
+      result    <- sparqlConnector.execute(query, queryDecoder)
+    } yield result
+    res
+  }
+
 }

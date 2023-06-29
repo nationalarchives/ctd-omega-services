@@ -33,9 +33,10 @@ import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.business.legalstatus.LegalStatusService
 import uk.gov.nationalarchives.omega.api.common.{ AppLogger, Version1UUID }
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
-import uk.gov.nationalarchives.omega.api.connectors.JmsConnector
+import uk.gov.nationalarchives.omega.api.connectors.{ JmsConnector, SparqlEndpointConnector }
 import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, LocalMessageStore, StubDataImpl }
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.createLocalMessage
+import uk.gov.nationalarchives.omega.api.repository.{ AbstractRepository, OmegaRepository }
 import uk.gov.nationalarchives.omega.api.services.ServiceState.{ Started, Starting, Stopped, Stopping }
 
 import java.nio.file.{ Files, Paths }
@@ -72,16 +73,18 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     val localQueue: IO[Queue[IO, LocalMessage]] = Queue.bounded[IO, LocalMessage](config.maxLocalQueueSize)
     val jmsConnector = new JmsConnector(config)
     val stubData = new StubDataImpl()
+    val sparqlConnector = new SparqlEndpointConnector(config)
+    val omegaRepository = new OmegaRepository(sparqlConnector)
 
     getLocalMessageStore.flatMap {
       case Right(localMessageStore) =>
         val result = for {
-          _ <- runRecovery(localMessageStore, jmsConnector, stubData)
+          _ <- runRecovery(localMessageStore, jmsConnector, stubData, omegaRepository)
           q <- localQueue
           res <-
             jmsConnector.getJmsProducerAndConsumer(QueueName(config.requestQueue)).use {
               case (jmsProducer, jmsConsumer) =>
-                startHandlerAndDispatchers(q, jmsConsumer, jmsProducer, localMessageStore, stubData)
+                startHandlerAndDispatchers(q, jmsConsumer, jmsProducer, localMessageStore, omegaRepository, stubData)
             }
         } yield res
         result.as(ExitCode.Success)
@@ -92,7 +95,8 @@ class ApiService(val config: ServiceConfig) extends Stateful {
   private def runRecovery(
     localMessageStore: LocalMessageStore,
     jmsConnector: JmsConnector,
-    stubData: StubDataImpl
+    stubData: StubDataImpl,
+    repository: AbstractRepository
   ): IO[Unit] = {
     for {
       savedFiles <- Resource.eval(localMessageStore.readAllFilesInDirectory())
@@ -100,7 +104,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
       producer   <- jmsConnector.createJmsProducer(jmsClient)(config.maxProducers)
     } yield producer match {
       case producer =>
-        val dispatcher = generateDispatcher(producer, localMessageStore, stubData)
+        val dispatcher = generateDispatcher(producer, localMessageStore, stubData, repository)
         dispatcher.runRecovery(0)(savedFiles)
     }
   }.useEval
@@ -125,13 +129,14 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     consumer: JmsAcknowledgerConsumer[IO],
     producer: JmsProducer[IO],
     localMessageStore: LocalMessageStore,
+    omegaRepository: OmegaRepository,
     stubData: StubDataImpl
   ): IO[Either[Unit, Unit]] =
     IO.race(
       createMessageHandler(queue, localMessageStore)(consumer),
       List.range(start = 0, end = config.maxDispatchers).parTraverse_ { i =>
         logger.info(s"Starting consumer #${i + 1}") >>
-          generateDispatcher(producer, localMessageStore, stubData)
+          generateDispatcher(producer, localMessageStore, stubData, omegaRepository)
             .run(i)(queue)
             .foreverM
       }
@@ -140,13 +145,14 @@ class ApiService(val config: ServiceConfig) extends Stateful {
   private def generateDispatcher(
     jmsProducer: JmsProducer[IO],
     localMessageStore: LocalMessageStore,
-    stubData: StubDataImpl
+    stubData: StubDataImpl,
+    repository: AbstractRepository
   ) =
     new Dispatcher(
       new LocalProducerImpl(jmsProducer),
       localMessageStore,
       new EchoService(),
-      new LegalStatusService(stubData),
+      new LegalStatusService(stubData, repository),
       new ListAgentSummaryService(stubData)
     )
 

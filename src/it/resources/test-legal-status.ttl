@@ -1,0 +1,89 @@
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix premis: <http://www.loc.gov/premis/rdf/v3/> .
+@prefix cat: <http://catalogue.nationalarchives.gov.uk/> .
+
+cat:omegaVocabulary rdf:type skos:ConceptScheme;
+  dct:title "Project Omega Vocabularly" ;
+  dct:description "The vocabulary for Project Omega" ;
+  dct:license [
+    dct:identifier "MIT" ;
+    rdf:value "The MIT License" ;
+    dct:source <https://opensource.org/license/mit/>
+
+  ] ;
+  dct:creator cat:AdamRetter ;
+  dct:created "2023-03-28+02:00"^^xsd:date ;
+  skos:hasTopConcept cat:asset-legal-status
+  .
+
+cat:asset-legal-status rdf:type skos:Concept, premis:Statute ;
+  skos:prefLabel "Asset Legal Status" ;
+  skos:definition "The legal status of an asset in the catalogue" ;
+  skos:scopeNote "This is typically related to how an asset is classified in relation to the Public Records Act 1967" ;
+  dct:relation <http://www.legislation.gov.uk/ukpga/1967/44/contents> ;
+  dct:created "2023-03-28+02:00"^^xsd:date ;
+  skos:inScheme cat:omegaVocabulary
+  .
+
+cat:public-record rdf:type skos:Concept, premis:InstitutionalPolicy ;
+  skos:prefLabel "Public Record" ;
+  skos:definition "A Public Record as defined by the Public Records Act 1967" ;
+  skos:scopeNote "The legal status for an asset which is a Public Record (as defined by the Public Records Act 1967)" ;
+  dct:relation <https://www.legislation.gov.uk/ukpga/Eliz2/6-7/51/section/10> , <https://www.legislation.gov.uk/ukpga/Eliz2/6-7/51/schedule/FIRST/paragraph/2> , <https://www.legislation.gov.uk/ukpga/Eliz2/6-7/51/schedule/FIRST/paragraph/4> ;
+  skos:broader cat:asset-legal-status ;
+  dct:created "2023-03-28+02:00"^^xsd:date ;
+  skos:inScheme cat:omegaVocabulary
+  .
+
+cat:non-public-record rdf:type skos:Concept, premis:InstitutionalPolicy ;
+  skos:prefLabel "Non-Public Record" ;
+  skos:definition "A Record which is outside the jurisdiction of the Public Records Act 1967" ;
+  skos:scopeNote "The legal status for an asset whish is neither a, public record, or a welsh public record" ;
+  skos:broader cat:asset-legal-status ;
+  dct:created "2023-03-28+02:00"^^xsd:date ;
+  skos:inScheme cat:omegaVocabulary
+  .
+
+cat:public-record-unless-otherwise-stated rdf:type skos:Concept, premis:InstitutionalPolicy;
+  skos:prefLabel "Public Record (unless otherwise stated)" ;
+  skos:definition "???" ;
+  skos:scopeNote "Used with regards to TNA-CS13 at higher than 'Record level', to indicate that records at lower-levels are 'Public Records' unless they explicitly state otherwise by overriding the Legal Status property" ;
+  skos:broadMatch cat:public-record ;
+  skos:broader cat:asset-legal-status ;
+  dct:created "2023-03-28+02:00"^^xsd:date ;
+  skos:inScheme cat:omegaVocabulary ;
+  skos:editorialNote [
+    rdf:value "This is a legacy concept inheirted from how ILDB/PROCat functioned in practice; it is defined in TNA-CS13. This concept may no longer be needed if we de-normalise the legal status down the TNA-CS13 hierarchy" ;
+    dct:creator cat:AdamRetter ;
+    dct:date "2023-03-28"^^xsd:date
+  ]
+  .
+
+cat:welsh-public-record rdf:type skos:Concept, premis:InstitutionalPolicy ;
+  skos:prefLabel "Welsh Public Record" ;
+  skos:definition "A Welsh Public Record as defined by the Public Records Act 1967" ;
+  skos:scopeNote "The legal status for an asset which is a Welsh Public Record (as defined by the Public Records Act 1967)" ;
+  dct:relation <https://www.legislation.gov.uk/ukpga/Eliz2/6-7/51/schedule/FIRST/paragraph/5> , <https://www.legislation.gov.uk/ukpga/2006/32/contents> ;
+  skos:broader cat:asset-legal-status ;
+  dct:created "2023-03-28+02:00"^^xsd:date ;
+  skos:inScheme cat:omegaVocabulary
+  .
+
+cat:non-record-material rdf:type skos:Concept, premis:InstitutionalPolicy ;
+  skos:prefLabel "Non-Record Material" ;
+  skos:definition "???" ;
+  skos:scopeNote "???" ;
+  skos:broadMatch cat:non-public-record ;
+  skos:broader cat:asset-legal-status ;
+  dct:created "2023-03-28+02:00"^^xsd:date ;
+  skos:inScheme cat:omegaVocabulary ;
+  skos:editorialNote [
+    rdf:value "This is a legacy and uncomfortable concept (as it is not a Legal Status) inheirted from how ILDB and possibly use to describe 'unnumbered records'. Further clarification on this concept will be supplied by Jenny Bun, and discussions with Andrew Janes" ;
+    dct:creator cat:AdamRetter ;
+    dct:date "2023-03-28"^^xsd:date
+  ]
+  .

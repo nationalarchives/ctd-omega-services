@@ -23,12 +23,13 @@ package uk.gov.nationalarchives.omega.api.support
 
 import uk.gov.nationalarchives.omega.api.messages.{ AgentType, StubData }
 import uk.gov.nationalarchives.omega.api.models.{ AgentDescription, AgentSummary, LegalStatus }
+import org.apache.jena.ext.xerces.util.URI
 
 class TestStubData extends StubData {
 
-  override def getLegalStatuses(): Seq[LegalStatus] = Seq(
-    LegalStatus("http://catalogue.nationalarchives.gov.uk/public-record", "Public Record"),
-    LegalStatus("http://catalogue.nationalarchives.gov.uk/non-public-record", "Non-Public Record")
+  override def getLegalStatuses(): List[LegalStatus] = List(
+    LegalStatus(new URI("http://catalogue.nationalarchives.gov.uk/public-record"), "Public Record"),
+    LegalStatus(new URI("http://catalogue.nationalarchives.gov.uk/non-public-record"), "Non-Public Record")
   )
 
   override def getAgentSummaries(): Seq[AgentSummary] = Seq(
