@@ -22,10 +22,10 @@
 package uk.gov.nationalarchives.omega.api.business.legalstatus
 
 import cats.data.Validated
-import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidation, BusinessService, BusinessServiceError, BusinessServiceReply, BusinessServiceRequest }
-import uk.gov.nationalarchives.omega.api.messages.StubData
 import io.circe.syntax.EncoderOps
-import uk.gov.nationalarchives.omega.api.repository.{ AbstractRepository, OmegaRepository }
+import uk.gov.nationalarchives.omega.api.business._
+import uk.gov.nationalarchives.omega.api.messages.StubData
+import uk.gov.nationalarchives.omega.api.repository.AbstractRepository
 
 import scala.util.{ Failure, Success }
 

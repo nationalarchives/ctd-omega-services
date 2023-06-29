@@ -128,14 +128,14 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     consumer: JmsAcknowledgerConsumer[IO],
     producer: JmsProducer[IO],
     localMessageStore: LocalMessageStore,
-    repository: OmegaRepository,
+    omegaRepository: OmegaRepository,
     stubData: StubDataImpl
   ): IO[Either[Unit, Unit]] =
     IO.race(
       createMessageHandler(queue, localMessageStore)(consumer),
       List.range(start = 0, end = config.maxDispatchers).parTraverse_ { i =>
         logger.info(s"Starting consumer #${i + 1}") >>
-          generateDispatcher(producer, localMessageStore, stubData, repository)
+          generateDispatcher(producer, localMessageStore, stubData, omegaRepository)
             .run(i)(queue)
             .foreverM
       }
