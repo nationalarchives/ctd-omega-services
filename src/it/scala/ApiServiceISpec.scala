@@ -172,18 +172,18 @@ class ApiServiceISpec
 
       }
 
-      // TODO commented out test as it fails on decode of spaces.
-      // Since it's not possible to send an empty message in SQS the empty payload cannot be tested.
+      // TODO Since it's not possible to send an empty message in SQS the empty payload cannot be tested and
+      // TODO this test is ignored as it fails on decode of spaces.
 
-//      " an empty payload (with padding)" in { f =>
-//        val textMessageConfig = generateValidMessageConfig()
-//          .copy(contents = " ")
-//          .copy(messageTypeId = Some("OSLISAGT001"))
-//
-//        sendMessage(f.session, f.producer, textMessageConfig)
-//        assertReplyMessage(agentSummariesExpectedResult)
-//
-//      }
+      " an empty payload (with padding)" ignore { f =>
+        val textMessageConfig = generateValidMessageConfig()
+          .copy(contents = " ")
+          .copy(messageTypeId = Some("OSLISAGT001"))
+
+        sendMessage(f.session, f.producer, textMessageConfig)
+        assertReplyMessage(agentSummariesExpectedResult)
+
+      }
     }
     "returns an echo message when the message body is" - {
       "empty (with padding)" in { f =>
