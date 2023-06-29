@@ -19,17 +19,27 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.support
+package uk.gov.nationalarchives.omega.api.repository
 
-import org.apache.jena.ext.xerces.util.URI
-import uk.gov.nationalarchives.omega.api.messages.StubData
+import org.phenoscape.sparql.FromQuerySolution
+import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.models.LegalStatus
 
-class TestStubData extends StubData {
+import scala.util.Try
 
-  override def getLegalStatuses(): List[LegalStatus] = List(
-    LegalStatus(new URI("http://catalogue.nationalarchives.gov.uk/public-record"), "Public Record"),
-    LegalStatus(new URI("http://catalogue.nationalarchives.gov.uk/non-public-record"), "Non-Public Record")
-  )
+class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends AbstractRepository {
+
+  private val sparqlResourceDir = "sparql"
+  private val getLegalStatusSummarySparqlResource = s"/$sparqlResourceDir/select-legal-status-summaries.rq"
+
+  override def getLegalStatusSummaries: Try[List[LegalStatus]] = {
+    val queryDecoder = implicitly[FromQuerySolution[LegalStatus]]
+    val res = for {
+      queryText <- getQueryText(getLegalStatusSummarySparqlResource)
+      query     <- getQuery(queryText)
+      result    <- sparqlConnector.execute(query, queryDecoder)
+    } yield result
+    res
+  }
 
 }

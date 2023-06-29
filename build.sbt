@@ -5,6 +5,7 @@ val Jms4SVersion = "0.5.0-TNA-OMG-0.1.0"
 val AwsJavaSdkVersion = "2.18.1"
 val CirceVersion = "0.14.5"
 val EnumeratumVersion = "1.7.2"
+val JenaVersion = "3.17.0"
 
 ThisBuild / versionScheme := Some("semver-spec")
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation")
@@ -75,12 +76,15 @@ lazy val root = Project("ctd-omega-services", file("."))
       "io.circe"                                      %% "circe-core"                 % CirceVersion,
       "io.circe"                                      %% "circe-generic"              % CirceVersion,
       "io.circe"                                      %% "circe-parser"               % CirceVersion,
+      "org.phenoscape"                                %% "sparql-utils"               % "1.3.1",
+      "org.apache.jena"                                % "jena-core"                  % JenaVersion,
+      "org.apache.jena"                                % "jena-arq"                   % JenaVersion,
       "ch.qos.logback"         % "logback-classic"               % "1.3.5"   % Runtime, // Java 8 compatible
       "net.logstash.logback"   % "logstash-logback-encoder"      % "7.3"     % Runtime,
       "org.scalatest"         %% "scalatest"                     % "3.2.15"  % "it,test",
       "org.typelevel"         %% "cats-effect-testing-scalatest" % "1.5.0"   % "it,test",
       "com.vladsch.flexmark"   % "flexmark-profile-pegdown"      % "0.62.2"  % "it,test", // Java 8 compatible
-      "org.mockito"           %% "mockito-scala-scalatest"       % "1.17.12" % Test,
+      "org.mockito"           %% "mockito-scala-scalatest"       % "1.17.12" % "it,test",
       "software.amazon.awssdk" % "auth"                          % "2.18.1"  % "it",
       "software.amazon.awssdk" % "regions"                       % "2.18.1"  % "it",
       "software.amazon.awssdk" % "sqs"                           % "2.18.1"  % "it",

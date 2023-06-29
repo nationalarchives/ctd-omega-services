@@ -20,4 +20,4 @@ services:
       - "/usr/local/tomcat/logs"
     ports:
       - 8080:8080
-    image: eclipse/rdf4j-workbench
+    image: eclipse/rdf4j-workbench:4.2.3

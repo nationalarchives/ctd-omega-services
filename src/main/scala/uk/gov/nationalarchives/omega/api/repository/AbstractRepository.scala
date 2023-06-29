@@ -19,17 +19,26 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.support
+package uk.gov.nationalarchives.omega.api.repository
 
-import org.apache.jena.ext.xerces.util.URI
-import uk.gov.nationalarchives.omega.api.messages.StubData
+import org.apache.jena.query.{ Query, QueryFactory, Syntax }
 import uk.gov.nationalarchives.omega.api.models.LegalStatus
 
-class TestStubData extends StubData {
+import scala.io.Source
+import scala.util.{ Failure, Try, Using }
 
-  override def getLegalStatuses(): List[LegalStatus] = List(
-    LegalStatus(new URI("http://catalogue.nationalarchives.gov.uk/public-record"), "Public Record"),
-    LegalStatus(new URI("http://catalogue.nationalarchives.gov.uk/non-public-record"), "Non-Public Record")
-  )
+trait AbstractRepository {
+
+  def getLegalStatusSummaries: Try[List[LegalStatus]]
+
+  protected def getQueryText(queryResource: String): Try[String] =
+    Using(Source.fromInputStream(getClass.getResourceAsStream(queryResource))) { resource =>
+      resource.getLines().mkString("\n")
+    }
+
+  protected def getQuery(queryText: String): Try[Query] =
+    Try(QueryFactory.create(queryText, Syntax.syntaxSPARQL_11)).recoverWith { case _: NullPointerException =>
+      Failure(new IllegalArgumentException(s"Unable to read query from text: $queryText"))
+    }
 
 }

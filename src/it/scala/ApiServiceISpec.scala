@@ -11,10 +11,10 @@ import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP }
 import org.scalatest.concurrent.{ Eventually, IntegrationPatience }
 import org.scalatest.freespec.FixtureAsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.time.{ Seconds, Span }
+import org.scalatest.time.{ Second, Seconds, Span }
 import org.scalatest.{ Assertion, BeforeAndAfterAll, BeforeAndAfterEach, FutureOutcome }
-import uk.gov.nationalarchives.omega.api.common.{ AppLogger, ErrorCode }
 import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ INVA002, INVA003, INVA005, INVA006, MISS002, MISS003, MISS005, MISS006 }
+import uk.gov.nationalarchives.omega.api.common.{ AppLogger, ErrorCode }
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.messages.{ MessageProperties, OutgoingMessageType }
 import uk.gov.nationalarchives.omega.api.services.ApiService
@@ -36,7 +36,7 @@ class ApiServiceISpec
     * I think the whole approach to the reply message assertion needs to be improved.
     */
   implicit override val patienceConfig: PatienceConfig =
-    PatienceConfig(timeout = scaled(Span(30, Seconds)), interval = scaled(Span(1, Seconds)))
+    PatienceConfig(timeout = scaled(Span(30, Seconds)), interval = scaled(Span(1, Second)))
 
   private val requestQueueName = "PACS001_request"
   private val replyQueueName = "PACE001_reply"
@@ -50,7 +50,8 @@ class ApiServiceISpec
       maxProducers = 1,
       maxDispatchers = 1,
       maxLocalQueueSize = 1,
-      requestQueue = requestQueueName
+      requestQueue = requestQueueName,
+      sparqlEndpoint = "http://localhost:8080/rdf4j-server/repositories/PACT"
     )
   )
 
@@ -93,7 +94,7 @@ class ApiServiceISpec
     } yield consumer
     consumerRes.useForever.unsafeToFuture()
     apiService.start.unsafeToFuture()
-    ()
+    BulkLoadData.createRepository().unsafeRunSync()
   }
 
   override def afterAll(): Unit =
@@ -124,23 +125,23 @@ class ApiServiceISpec
       assertReplyMessage(s"""[
   {
     "identifier" : "http://catalogue.nationalarchives.gov.uk/public-record",
-    "name" : "Public Record"
+    "label" : "Public Record"
   },
   {
     "identifier" : "http://catalogue.nationalarchives.gov.uk/non-public-record",
-    "name" : "Non-Public Record"
+    "label" : "Non-Public Record"
   },
   {
     "identifier" : "http://catalogue.nationalarchives.gov.uk/public-record-unless-otherwise-stated",
-    "name" : "Public Record (unless otherwise stated)"
+    "label" : "Public Record (unless otherwise stated)"
   },
   {
     "identifier" : "http://catalogue.nationalarchives.gov.uk/welsh-public-record",
-    "name" : "Welsh Public Record"
+    "label" : "Welsh Public Record"
   },
   {
     "identifier" : "http://catalogue.nationalarchives.gov.uk/non-record-material",
-    "name" : "Non-Record Material"
+    "label" : "Non-Record Material"
   }
 ]""".stripMargin)
 

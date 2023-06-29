@@ -19,17 +19,15 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.support
+package uk.gov.nationalarchives.omega.api.business.legalstatus
 
-import org.apache.jena.ext.xerces.util.URI
-import uk.gov.nationalarchives.omega.api.messages.StubData
-import uk.gov.nationalarchives.omega.api.models.LegalStatus
+import uk.gov.nationalarchives.omega.api.business.BusinessServiceError
+import uk.gov.nationalarchives.omega.api.common.ErrorCode
 
-class TestStubData extends StubData {
+case class LegalStatusError(message: String) extends BusinessServiceError {
 
-  override def getLegalStatuses(): List[LegalStatus] = List(
-    LegalStatus(new URI("http://catalogue.nationalarchives.gov.uk/public-record"), "Public Record"),
-    LegalStatus(new URI("http://catalogue.nationalarchives.gov.uk/non-public-record"), "Non-Public Record")
-  )
+  override val code: ErrorCode = ErrorCode.PROC001
+
+  override def description: String = message
 
 }

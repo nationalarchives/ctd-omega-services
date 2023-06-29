@@ -1,9 +1,11 @@
-import java.nio.file.{Path, Paths}
+import cats.effect.IO
+
+import java.nio.file.{ Path, Paths }
 import scala.sys.process._
 
 /** This is used to load corporate body test data to ElasticSearch instance in Docker container
   */
-object BulkLoadData extends App {
+object BulkLoadData {
 
   val repositoryConfig: Path = Paths.get(getClass.getClassLoader.getResource("repositoryConfig.ttl").toURI)
   val corporateBodyConceptData: Path =
@@ -17,16 +19,15 @@ object BulkLoadData extends App {
   val legalStatusData: Path =
     Paths.get(getClass.getClassLoader.getResource("test-legal-status.ttl").toURI)
 
-  val deleteRepositoryConfig = Seq(
+  private val deleteRepositoryConfig = Seq(
     "curl",
     "-v",
     "-X",
     "DELETE",
     "http://localhost:8080/rdf4j-server/repositories/PACT"
   )
-  deleteRepositoryConfig.!
 
-  val createRepositoryConfig = Seq(
+  private val createRepositoryConfig = Seq(
     "curl",
     "-v",
     "-X",
@@ -37,8 +38,8 @@ object BulkLoadData extends App {
     s"@$repositoryConfig",
     "http://localhost:8080/rdf4j-server/repositories/PACT"
   )
-  createRepositoryConfig.!
-  val postCorporateBodyConceptData = Seq(
+
+  private val postCorporateBodyConceptData = Seq(
     "curl",
     "-X",
     "POST",
@@ -48,8 +49,8 @@ object BulkLoadData extends App {
     s"@$corporateBodyConceptData",
     "http://localhost:8080/rdf4j-server/repositories/PACT/statements"
   )
-  postCorporateBodyConceptData.!
-  val postCorporateBodyDescriptionData = Seq(
+
+  private val postCorporateBodyDescriptionData = Seq(
     "curl",
     "-X",
     "POST",
@@ -59,9 +60,8 @@ object BulkLoadData extends App {
     s"@$corporateBodyDescriptionData",
     "http://localhost:8080/rdf4j-server/repositories/PACT/statements"
   )
-  postCorporateBodyDescriptionData.!
 
-  val postPersonConceptData = Seq(
+  private val postPersonConceptData = Seq(
     "curl",
     "-X",
     "POST",
@@ -71,9 +71,8 @@ object BulkLoadData extends App {
     s"@$personConceptData",
     "http://localhost:8080/rdf4j-server/repositories/PACT/statements"
   )
-  postPersonConceptData.!
 
-  val postPersonDescriptionData = Seq(
+  private val postPersonDescriptionData = Seq(
     "curl",
     "-X",
     "POST",
@@ -83,9 +82,8 @@ object BulkLoadData extends App {
     s"@$personDescriptionData",
     "http://localhost:8080/rdf4j-server/repositories/PACT/statements"
   )
-  postPersonDescriptionData.!
 
-  val postLegalStatusData = Seq(
+  private val postLegalStatusData = Seq(
     "curl",
     "-X",
     "POST",
@@ -95,6 +93,14 @@ object BulkLoadData extends App {
     s"@$legalStatusData",
     "http://localhost:8080/rdf4j-server/repositories/PACT/statements"
   )
-  postLegalStatusData.!
+
+  def createRepository(): IO[Unit] =
+    IO.blocking(deleteRepositoryConfig.!) *>
+      IO.blocking(createRepositoryConfig.!) *>
+      IO.blocking(postCorporateBodyConceptData.!) *>
+      IO.blocking(postCorporateBodyDescriptionData.!) *>
+      IO.blocking(postPersonConceptData.!) *>
+      IO.blocking(postPersonDescriptionData.!) *>
+      IO.blocking(postLegalStatusData.!) *> IO.unit
 
 }
