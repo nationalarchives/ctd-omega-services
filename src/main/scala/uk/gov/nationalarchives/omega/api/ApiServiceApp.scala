@@ -22,7 +22,7 @@
 package uk.gov.nationalarchives.omega.api
 
 import cats.effect.std.Supervisor
-import cats.effect.{ExitCode, IO, IOApp}
+import cats.effect.{ ExitCode, IO, IOApp }
 import pureconfig.ConfigSource
 import pureconfig.generic.auto._
 import uk.gov.nationalarchives.omega.api.common.AppLogger
@@ -38,11 +38,11 @@ object ApiServiceApp extends IOApp with AppLogger {
   override def run(args: List[String]): IO[ExitCode] = {
     val serviceConfig = ConfigSource.default.loadOrThrow[ServiceConfig]
     val service = new ApiService(serviceConfig)
-    val task = service.start
+    val apiService = service.start
     Supervisor[IO](await = false)
       .use { supervisor =>
         for {
-          _ <- supervisor.supervise[ExitCode](task.foreverM)
+          _ <- supervisor.supervise[ExitCode](apiService.foreverM)
           _ <- IO.sleep(5.seconds).foreverM
         } yield ()
       }

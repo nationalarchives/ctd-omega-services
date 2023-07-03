@@ -21,6 +21,7 @@
 
 package uk.gov.nationalarchives.omega.api
 
+import cats.data.OptionT
 import cats.effect.std.Supervisor
 import cats.effect.{ExitCode, IO, IOApp}
 
@@ -35,40 +36,77 @@ object MockApp extends IOApp {
 
     // TODO(AR) we want to:
     //  1. Start our MockService (i.e. `MockService#start`) and have it run forever. However:
-    //  2. If startup fails we need to report this to the CLI and exit
-    //  3. If SIGINT (e.g. Ctrl-C) is received we should shutdown our MockService (i.e. `MockService#stop`)
+    //  2. If startup fails we need to report this to the CLI and exit - InvalidStateException
+    //  3. If SIGINT (e.g. Ctrl-C) is received we should shutdown our MockService (i.e. `MockService#stop`) - call stop and return success
     //  3.1 If shutdown fails we need to report this to the CLI and exit with a non-zero exit code
     //  3.2 If shutdown succeeds we need to exit OK
 
     // NOTE(AR) at the moment only (1) and (3.2) are working, i.e. (failStart = false, failStop = false)
 
-    Supervisor[IO](await = false)
+    // There are only two scenarios where the application should stop:
+    // 1. An unrecoverable error occurs
+    // 2. The application is cancelled
+
+    Supervisor[IO](await = true)
       .use { supervisor =>
         for {
-          _ <- supervisor.supervise(service.start)
-          _ <- IO.sleep(5.seconds).foreverM
-        } yield ()
-      }.handleErrorWith(t => IO.println(s"Error: ${t.getMessage}") >> service.stop)
-      .onCancel(IO.println("Called Supervisor Stop...") >> service.stop().handleErrorWith(e => IO.println(s"Error: ${e.getMessage}"))).as(ExitCode.Success)
-  }
-}
+          exc <- supervisor.supervise[Option[ExitCode]](service.start *> IO.pure(None))//.handleErrorWith {
+//                   case isex: InvalidStateException =>
+//                     IO.println(s"Error: ${isex.getMessage}") >> service.stop >> IO.pure(ExitCode(99))
+//                   case ex => IO.println(s"Error: ${ex.getMessage}") >> service.stop >> IO.pure(ExitCode(99))
+//                 }) //.flatMap(_ -> IO.pure(ExitCode.Success))
+          oc <- exc.joinWith(onCancel(service)).handleErrorWith(errorHandler)
+          // _ <- IO.sleep(5.seconds).foreverM
+        } yield oc match {
+          case Some(ec) =>
+            //println(ec)
+            ec
+          case _ =>
+            ExitCode.Success
+        }
+      }
+//      .onCancel(
+//        IO.println("Called Supervisor Stop...") >> service
+//          .stop()
+//          .handleErrorWith(e => IO.println(s"Error: ${e.getMessage}"))
+//      )
+    } //.flatMap(f => f.joinWith(IO.unit)) //.pure(ExitCode(98))))
 
+  def onCancel(service: MockService): IO[Option[ExitCode]] =
+    IO.println("Called Supervisor Stop...") >> stopService(service)
+      .handleErrorWith(errorHandler)
+
+  private def errorHandler(e: Throwable): IO[Option[ExitCode]] = e match {
+    case isex: InvalidStateException =>
+      IO.println(s"Error: ${isex.getMessage}") >> IO.pure(Some(ExitCode(99)))
+    case ex => IO.println(s"Error: ${ex.getMessage}") >> IO.pure(Some(ExitCode(97)))
+  }
+
+  private def stopService(service: MockService): IO[Option[ExitCode]] = {
+    service.stop().handleErrorWith(errorHandler) *> IO.pure(Some(ExitCode.Success))
+  }
+
+}
 
 
 class MockService(failStart: Boolean, failStop: Boolean) {
 
-  /**
-    * This function will either return a `Some(ErrorCondition)` relatively quickly if startup fails,
-    * or if startup succeeds it will run (i.e. block) forever!
+  /** This function will either return a `Some(ErrorCondition)` relatively quickly if startup fails, or if startup
+    * succeeds it will run (i.e. block) forever!
     */
-  def start: IO[Unit] =
-    // if `failStart` is set return an errorCode, else run forever...
+  def start: IO[Unit] = {
+    // 1) print
+    // 2) check for failure
+    // 3) sleep 10 secs
+    // 4) print
     IO.println("Start has started...") >>
-      IO.raiseWhen(failStart)(InvalidStateException("START FAILED")) *> IO.never <* IO.println("Start has finished!")
+      IO.raiseWhen(failStart)(InvalidStateException("START FAILED")) >> IO.never &> IO.println(
+        "Start has finished!"
+      )
+  }
 
-  /**
-    * This function will either return a `Some(ErrorCondition)` relatively quickly if shutdown fails,
-    * or if shutdown succeeds it will run for as long as it takes to stop the running services and will then return.
+  /** This function will either return a `Some(ErrorCondition)` relatively quickly if shutdown fails, or if shutdown
+    * succeeds it will run for as long as it takes to stop the running services and will then return.
     */
   def stop(): IO[Unit] =
     IO.println("Stop has started...") >>
