@@ -32,7 +32,7 @@ object MockApp extends IOApp {
   override def run(args: List[String]): IO[ExitCode] = {
 
     // TODO(AR) flip these boolean flags to simulate startup and shutdown failures
-    val service = new MockService(failStart = false, failStop = false)
+    val service = new MockService(failStart = false, failStop = true)
 
     // TODO(AR) we want to:
     //  1. Start our MockService (i.e. `MockService#start`) and have it run forever. However:
@@ -50,40 +50,18 @@ object MockApp extends IOApp {
     Supervisor[IO](await = true)
       .use { supervisor =>
         for {
-          exc <- supervisor.supervise[Option[ExitCode]](service.start *> IO.pure(None))//.handleErrorWith {
-//                   case isex: InvalidStateException =>
-//                     IO.println(s"Error: ${isex.getMessage}") >> service.stop >> IO.pure(ExitCode(99))
-//                   case ex => IO.println(s"Error: ${ex.getMessage}") >> service.stop >> IO.pure(ExitCode(99))
-//                 }) //.flatMap(_ -> IO.pure(ExitCode.Success))
-          oc <- exc.joinWith(onCancel(service)).handleErrorWith(errorHandler)
-          // _ <- IO.sleep(5.seconds).foreverM
-        } yield oc match {
-          case Some(ec) =>
-            //println(ec)
-            ec
-          case _ =>
-            ExitCode.Success
-        }
+          fiber <- supervisor.supervise(service.start)
+          outcome <- fiber.join
+        } yield outcome.fold(ExitCode.Success, getErrorExitCode, _ => ExitCode.Success)
       }
-//      .onCancel(
-//        IO.println("Called Supervisor Stop...") >> service
-//          .stop()
-//          .handleErrorWith(e => IO.println(s"Error: ${e.getMessage}"))
-//      )
-    } //.flatMap(f => f.joinWith(IO.unit)) //.pure(ExitCode(98))))
-
-  def onCancel(service: MockService): IO[Option[ExitCode]] =
-    IO.println("Called Supervisor Stop...") >> stopService(service)
-      .handleErrorWith(errorHandler)
-
-  private def errorHandler(e: Throwable): IO[Option[ExitCode]] = e match {
-    case isex: InvalidStateException =>
-      IO.println(s"Error: ${isex.getMessage}") >> IO.pure(Some(ExitCode(99)))
-    case ex => IO.println(s"Error: ${ex.getMessage}") >> IO.pure(Some(ExitCode(97)))
   }
 
-  private def stopService(service: MockService): IO[Option[ExitCode]] = {
-    service.stop().handleErrorWith(errorHandler) *> IO.pure(Some(ExitCode.Success))
+  private def getErrorExitCode(throwable: Throwable) = {
+    println(s"Error: ${throwable.getMessage}")
+    throwable match {
+      case _: InvalidStateException => ExitCode(99)
+      case _ => ExitCode.Error
+    }
   }
 
 }
@@ -100,7 +78,7 @@ class MockService(failStart: Boolean, failStop: Boolean) {
     // 3) sleep 10 secs
     // 4) print
     IO.println("Start has started...") >>
-      IO.raiseWhen(failStart)(InvalidStateException("START FAILED")) >> IO.never &> IO.println(
+      IO.raiseWhen(failStart)(InvalidStateException("START FAILED")) >> IO.never.onCancel(stop()) &> IO.println(
         "Start has finished!"
       )
   }

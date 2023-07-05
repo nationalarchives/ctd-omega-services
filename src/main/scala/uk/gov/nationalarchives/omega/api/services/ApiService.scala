@@ -22,7 +22,7 @@
 package uk.gov.nationalarchives.omega.api.services
 
 import cats.effect.std.Queue
-import cats.effect.{ ExitCode, IO, Resource }
+import cats.effect.{ IO, Resource }
 import cats.implicits.catsSyntaxParallelTraverse_
 import jms4s.JmsAcknowledgerConsumer.AckAction
 import jms4s.config.QueueName
@@ -44,18 +44,18 @@ import scala.util.{ Failure, Success }
 
 class ApiService(val config: ServiceConfig) extends Stateful {
 
-  def start: IO[ExitCode] =
-    switchState(Stopped, Starting).ifM(attemptStartUp(), IO.pure(ExitCode(invalidState)))
+  def start: IO[Unit] =
+    switchState(Stopped, Starting).ifM(attemptStartUp(), IO.unit)
 
-  private def attemptStartUp(): IO[ExitCode] =
+  private def attemptStartUp(): IO[Unit] =
     switchState(Starting, Started)
       .ifM(
         doStart(),
-        IO.pure(ExitCode(invalidState))
+        IO.unit
       )
       .handleErrorWith(error =>
         logger.error(s"Shutting down due to ${error.getMessage}") *>
-          doStop() *> switchState(Starting, Stopped) *> IO.pure(ExitCode.Error)
+          doStop() *> switchState(Starting, Stopped) *> IO.unit
       )
 
   def stop(): IO[Unit] =
@@ -65,7 +65,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
       IO.unit
     )
 
-  private def doStart(): IO[ExitCode] = {
+  private def doStart(): IO[Unit] = {
 
     // TODO(AR) - one client, how to ack a consumer message after local persistence and then process it, and then produce a reply
     // TODO(AR) how to wire up queues and services using a config file or DSL?
@@ -87,8 +87,8 @@ class ApiService(val config: ServiceConfig) extends Stateful {
                 startHandlerAndDispatchers(q, jmsConsumer, jmsProducer, localMessageStore, omegaRepository, stubData)
             }
         } yield res
-        result.as(ExitCode.Success)
-      case Left(exitCode) => IO.pure(exitCode)
+        result.as(()) // TODO this is weird
+      case Left(_) => IO.unit
     }
   }
 
@@ -109,13 +109,13 @@ class ApiService(val config: ServiceConfig) extends Stateful {
     }
   }.useEval
 
-  private def getLocalMessageStore: IO[Either[ExitCode, LocalMessageStore]] = IO {
+  private def getLocalMessageStore: IO[Either[Unit, LocalMessageStore]] = IO {
     val messageStoreFolder = Paths.get(config.tempMessageDir)
     Files.createDirectories(messageStoreFolder)
     Right(new LocalMessageStore(messageStoreFolder))
   }.handleErrorWith(ex =>
     logger
-      .error(s"Failed to created local message store due to ${ex.getMessage}") *> IO.pure(Left(ExitCode.Error))
+      .error(s"Failed to created local message store due to ${ex.getMessage}") *> IO.pure(Left(())) // TODO this should return an error
   )
 
   /* This method uses IO.race() to run the message handler and dispatcher in parallel. The common component between the

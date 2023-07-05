@@ -23,19 +23,33 @@ package uk.gov.nationalarchives.omega.api
 
 import cats.effect.std.Supervisor
 import cats.effect.{ExitCode, IO, IOApp}
+import pureconfig.ConfigSource
+import pureconfig.generic.auto._
+import uk.gov.nationalarchives.omega.api.common.AppLogger
+import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
+import uk.gov.nationalarchives.omega.api.services.ApiService
 
-class MockApp2 extends IOApp {
+import scala.concurrent.duration.DurationInt
+
+object ApiServiceApp2 extends IOApp with AppLogger {
+
+  val applicationId = "PACS001"
 
   override def run(args: List[String]): IO[ExitCode] = {
-    val service = new MockService(failStart = false, failStop = false)
-
-    Supervisor[IO](await = true).use { supervisor =>
-      val oc = for {
-        fiber <- supervisor.supervise(service.start *> IO.pure(ExitCode.Success))
-        outcome <- fiber.joinWith(IO.pure(ExitCode.Success))
-      } yield outcome
-      oc.handleErrorWith(_ => IO.pure(ExitCode.Error))
-    }
-
+    val serviceConfig = ConfigSource.default.loadOrThrow[ServiceConfig]
+    val service = new ApiService(serviceConfig)
+    val apiService = service.start
+    Supervisor[IO](await = true)
+      .use { supervisor =>
+        for {
+          fiber <- supervisor.supervise(apiService)
+          outcome <- fiber.join
+        } yield outcome.fold(ExitCode.Success, getErrorExitCode, _ => ExitCode.Success)
+      }
+      .onCancel(service.stop())
+      .as(ExitCode.Success)
   }
+
+  private def getErrorExitCode(t: Throwable): ExitCode = ExitCode.Error
+
 }

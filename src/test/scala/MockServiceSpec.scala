@@ -19,23 +19,32 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api
-
+import cats.effect.kernel.Fiber
 import cats.effect.std.Supervisor
-import cats.effect.{ExitCode, IO, IOApp}
+import cats.effect.{ExitCode, IO}
+import cats.effect.testing.scalatest.AsyncIOSpec
+import org.mockito.MockitoSugar
+import org.scalatest.{BeforeAndAfterAll, FutureOutcome, TryValues}
+import org.scalatest.freespec.{AsyncFreeSpec, FixtureAsyncFreeSpec}
+import org.scalatest.matchers.must.Matchers
+import uk.gov.nationalarchives.omega.api.{LocalMessageSupport, MockApp, MockService}
 
-class MockApp2 extends IOApp {
+import scala.concurrent.duration.DurationInt
 
-  override def run(args: List[String]): IO[ExitCode] = {
-    val service = new MockService(failStart = false, failStop = false)
+class MockServiceSpec extends AsyncFreeSpec with BeforeAndAfterAll with AsyncIOSpec with Matchers with TryValues with LocalMessageSupport with MockitoSugar {
 
-    Supervisor[IO](await = true).use { supervisor =>
-      val oc = for {
-        fiber <- supervisor.supervise(service.start *> IO.pure(ExitCode.Success))
-        outcome <- fiber.joinWith(IO.pure(ExitCode.Success))
+  "dsadasda" - {
+    "dsadas" in {
+      val service = new MockService(false,false)
+      val serviceIO = service.start
+      val result = for {
+        fiber <- serviceIO.start
+        _ <- IO.sleep(10.seconds)
+        outcome <- fiber.cancel
       } yield outcome
-      oc.handleErrorWith(_ => IO.pure(ExitCode.Error))
+      result.asserting(_ mustBe ())
     }
-
   }
+
+
 }
