@@ -1,6 +1,8 @@
+import cats.effect
 import cats.effect.kernel.Resource
 import cats.effect.testing.scalatest.AsyncIOSpec
 import cats.effect.{ IO, Ref }
+import jms4s.JmsAutoAcknowledgerConsumer
 import jms4s.JmsAutoAcknowledgerConsumer.AutoAckAction
 import jms4s.config.QueueName
 import jms4s.jms.JmsMessage
@@ -9,10 +11,10 @@ import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP }
 import org.apache.commons.lang3.SerializationUtils
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.concurrent.{ Eventually, IntegrationPatience }
-import org.scalatest.freespec.AsyncFreeSpec
+import org.scalatest.freespec.{ AsyncFreeSpec, FixtureAsyncFreeSpec }
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.time.{ Millis, Seconds, Span }
-import org.scalatest.{ BeforeAndAfterAll, BeforeAndAfterEach }
+import org.scalatest.{ Assertion, BeforeAndAfterAll, BeforeAndAfterEach, FutureOutcome }
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
@@ -22,7 +24,7 @@ import uk.gov.nationalarchives.omega.api.services.ApiService
 
 import java.nio.file._
 import java.util.UUID
-import scala.concurrent.Await
+import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 import scala.util.{ Failure, Success, Try }
 
@@ -31,7 +33,7 @@ import scala.util.{ Failure, Success, Try }
   * response messages to the client when the application starts
   */
 class MessageRecoveryISpec
-    extends AsyncFreeSpec with AsyncIOSpec with Matchers with Eventually with IntegrationPatience
+    extends FixtureAsyncFreeSpec with AsyncIOSpec with Matchers with Eventually with IntegrationPatience
     with BeforeAndAfterEach with BeforeAndAfterAll {
 
   implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
@@ -49,7 +51,6 @@ class MessageRecoveryISpec
   private val messageId: Ref[IO, Option[Version1UUID]] = Ref[IO].of(Option.empty[Version1UUID]).unsafeRunSync()
   private val replyMessageText: Ref[IO, Option[String]] = Ref[IO].of(Option.empty[String]).unsafeRunSync()
   private var tempMsgDir: Option[String] = None
-  private var apiService: Option[ApiService] = None
 
   private val jmsClient = simpleQueueService.makeJmsClient[IO](
     Config(
@@ -67,29 +68,10 @@ class MessageRecoveryISpec
       case Left(e) => IO.delay(fail(s"Unable to read message contents due to ${e.getMessage}"))
     }
 
-  /** Setup resources and services for the test:
-    * 1.create a LocalMessage and Serialize the LocalMessage to a temporary directory 2.create an instance of the
-    * ApiService 3.set up the consumer to handle messages for the test 4.start the consumer and the ApiService
-    */
-  override protected def beforeAll(): Unit = {
-    val tmpMessage = generateValidLocalMessageForEchoService().copy(messageText = testMessage)
-    val path = writeMessageFile(tmpMessage)
-    messageId.set(Some(tmpMessage.persistentMessageId)).unsafeRunSync()
-    tempMsgDir = Some(path.getParent.toString)
-    apiService = Some(
-      new ApiService(
-        ServiceConfig(
-          tempMessageDir = tempMsgDir.get,
-          maxConsumers = 1,
-          maxProducers = 1,
-          maxDispatchers = 1,
-          maxLocalQueueSize = 1,
-          requestQueue = requestQueueName,
-          sparqlEndpoint = "http://localhost:8080/rdf4j-server/repositories/PACT"
-        )
-      )
-    )
+  case class MessageRecoveryFixture(consumerRes: Resource[IO, JmsAutoAcknowledgerConsumer[IO]])
 
+  override type FixtureParam = MessageRecoveryFixture
+  override def withFixture(test: OneArgAsyncTest): FutureOutcome = {
     val consumerRes = for {
       client <- jmsClient
       consumer <-
@@ -100,28 +82,46 @@ class MessageRecoveryISpec
              } yield AutoAckAction.noOp
            })
     } yield consumer
-    consumerRes.useForever.unsafeToFuture()
-    apiService.get.start.unsafeToFuture()
+    super.withFixture(test.toNoArgAsyncTest(MessageRecoveryFixture(consumerRes)))
+  }
+
+  /** Setup resources and services for the test:
+    * 1.create a LocalMessage and Serialize the LocalMessage to a temporary directory 2.create an instance of the
+    * ApiService 3.set up the consumer to handle messages for the test 4.start the consumer and the ApiService
+    */
+  override protected def beforeAll(): Unit = {
+    val tmpMessage = generateValidLocalMessageForEchoService().copy(messageText = testMessage)
+    val path = writeMessageFile(tmpMessage)
+    messageId.set(Some(tmpMessage.persistentMessageId)).unsafeRunSync()
+    tempMsgDir = Some(path.getParent.toString)
     ()
   }
-  override def afterAll(): Unit =
-    Await.result(apiService.get.stop().unsafeToFuture(), 1.minute)
 
   "The Message Recovery API" - {
 
-    // TODO(RW) this test is being ignored until PACT-931 and PACT-932 are completed
-    "runs the recovery service and removes the message from the message store" ignore {
+    "runs the recovery service and removes the message from the message store" in { f =>
       val messageStoreFolder = Paths.get(tempMsgDir.get)
       val localMessageStore = new LocalMessageStore(messageStoreFolder)
-      eventually {
-        messageId.get
-          .flatMap(maybeId => localMessageStore.readMessage(maybeId.get))
-          .asserting(_.failure.exception mustBe a[NoSuchFileException]) *>
-          replyMessageText.get.asserting(_ mustBe Some(s"The Echo Service says: $testMessage"))
-      }
+      val apiService = new ApiService(getServiceConfig(tempMsgDir.get))
+      val serviceIO = apiService.startSuspended
+      val res = for {
+        consumerFiber   <- f.consumerRes.start
+        apiServiceFiber <- Resource.liftK(serviceIO.start)
+        result          <- Resource.liftK(assertRecoveredMessage(localMessageStore))
+        _               <- Resource.eval(apiServiceFiber.cancel)
+        _               <- consumerFiber.cancel
+      } yield result
+      res.use(assert => IO.pure(assert))
     }
-
   }
+
+  private def assertRecoveredMessage(localMessageStore: LocalMessageStore): IO[Assertion] =
+    eventually {
+      messageId.get
+        .flatMap(maybeId => localMessageStore.readMessage(maybeId.get))
+        .asserting(_.failure.exception mustBe a[NoSuchFileException]) *>
+        replyMessageText.get.asserting(_ mustBe Some(s"The Echo Service says: $testMessage"))
+    }
 
   private def writeMessageFile(message: LocalMessage): Path =
     Try(
@@ -152,5 +152,15 @@ class MessageRecoveryISpec
       Some(UUID.randomUUID().toString),
       Some("PACE001_reply")
     )
+
+  private def getServiceConfig(tempMsgDir: String): ServiceConfig = ServiceConfig(
+    tempMessageDir = tempMsgDir,
+    maxConsumers = 1,
+    maxProducers = 1,
+    maxDispatchers = 1,
+    maxLocalQueueSize = 1,
+    requestQueue = requestQueueName,
+    sparqlEndpoint = "http://localhost:8080/rdf4j-server/repositories/PACT"
+  )
 
 }
