@@ -37,7 +37,8 @@ class ListAgentSummaryService(val stubData: StubData) extends BusinessService wi
 
   override def process(
     requestMessage: RequestMessage
-  ): Either[BusinessServiceError, BusinessServiceReply] =
+  ): Either[BusinessServiceError, BusinessServiceReply] = {
+    val listAgentSummary = requestMessage.asInstanceOf[ListAgentSummary]
     Right(
       ListAgentSummaryReply(
         stubData
@@ -46,6 +47,7 @@ class ListAgentSummaryService(val stubData: StubData) extends BusinessService wi
           .toString()
       )
     )
+  }
 
   override def validateRequest(validatedLocalMessage: ValidatedLocalMessage): ValidationResult[RequestMessage] =
     if (validatedLocalMessage.messageText.nonEmpty) {
@@ -57,7 +59,6 @@ class ListAgentSummaryService(val stubData: StubData) extends BusinessService wi
           else {
             validateDate(request.versionTimestamp.get) match {
               case Some(_) =>
-                Validated.valid(ListAgentSummaryRequest(Some(validatedLocalMessage.messageText), Some(request)))
                 Validated.valid(request)
               case _ =>
                 Validated.invalidNec[MessageValidationError, RequestMessage](
