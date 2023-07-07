@@ -31,23 +31,25 @@ import uk.gov.nationalarchives.omega.api.messages.{ StubData, ValidatedLocalMess
 
 import java.text.SimpleDateFormat
 import java.util.Date
-import scala.util.Try
+import scala.util.{ Failure, Success, Try }
 
 class ListAgentSummaryService(val stubData: StubData) extends BusinessService with BusinessRequestValidation {
 
   override def process(
     requestMessage: RequestMessage
-  ): Either[BusinessServiceError, BusinessServiceReply] = {
-    val listAgentSummary = requestMessage.asInstanceOf[ListAgentSummary]
-    Right(
-      ListAgentSummaryReply(
-        stubData
-          .getAgentSummaries()
-          .asJson
-          .toString()
-      )
-    )
-  }
+  ): Either[BusinessServiceError, BusinessServiceReply] =
+    Try(requestMessage.asInstanceOf[ListAgentSummary]) match {
+      case Success(_) =>
+        Right(
+          ListAgentSummaryReply(
+            stubData
+              .getAgentSummaries()
+              .asJson
+              .toString()
+          )
+        )
+      case Failure(exception) => Left(ListAgentSummaryError(exception.getMessage))
+    }
 
   override def validateRequest(validatedLocalMessage: ValidatedLocalMessage): ValidationResult[RequestMessage] =
     if (validatedLocalMessage.messageText.nonEmpty) {

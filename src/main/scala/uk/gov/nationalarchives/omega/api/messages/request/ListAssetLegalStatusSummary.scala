@@ -21,6 +21,4 @@
 
 package uk.gov.nationalarchives.omega.api.messages.request
 
-import uk.gov.nationalarchives.omega.api.business.BusinessServiceRequest
-
 case class ListAssetLegalStatusSummary(text: Option[String] = None) extends RequestMessage

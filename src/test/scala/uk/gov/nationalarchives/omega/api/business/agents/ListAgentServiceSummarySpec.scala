@@ -50,7 +50,9 @@ class ListAgentServiceSummarySpec extends UnitTest {
           Right(ListAgentSummaryReply(getExpectedAgentSummaries))
       }
 
-      "an empty payload request" in {
+      // NOTE (RW): This test is ignored as empty requests are not allowed by SQS although they are allowed by the schema
+      // PACT-1025 refers
+      "an empty payload request" ignore {
 
         val listAgentSummaryRequest = ListAgentSummary(List())
         val result = listAgentSummaryService.process(listAgentSummaryRequest)

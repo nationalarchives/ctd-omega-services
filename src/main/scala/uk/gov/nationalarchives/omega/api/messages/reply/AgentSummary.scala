@@ -50,8 +50,8 @@ case class AgentDescription(
   authorityFile: Boolean,
   depository: Boolean,
   versionTimestamp: String,
-  dateFrom: Option[String],
-  dateTo: Option[String],
+  dateFrom: Option[String] = None,
+  dateTo: Option[String] = None,
   previousDescription: Option[String] = None
 )
 object AgentDescription {
