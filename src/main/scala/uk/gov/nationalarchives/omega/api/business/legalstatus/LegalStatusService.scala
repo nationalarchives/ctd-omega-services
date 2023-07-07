@@ -23,8 +23,10 @@ package uk.gov.nationalarchives.omega.api.business.legalstatus
 
 import cats.data.Validated
 import io.circe.syntax.EncoderOps
-import uk.gov.nationalarchives.omega.api.business._
-import uk.gov.nationalarchives.omega.api.messages.StubData
+import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidation, BusinessService, BusinessServiceError, BusinessServiceReply }
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage.ValidationResult
+import uk.gov.nationalarchives.omega.api.messages.request.{ ListAssetLegalStatusSummary, RequestMessage }
+import uk.gov.nationalarchives.omega.api.messages.{ StubData, ValidatedLocalMessage }
 import uk.gov.nationalarchives.omega.api.repository.AbstractRepository
 
 import scala.util.{ Failure, Success }
@@ -32,9 +34,10 @@ import scala.util.{ Failure, Success }
 class LegalStatusService(val stubData: StubData, repository: AbstractRepository)
     extends BusinessService with BusinessRequestValidation {
 
-  override def validateRequest(request: BusinessServiceRequest): ValidationResult = Validated.valid(request)
+  override def validateRequest(validatedLocalMessage: ValidatedLocalMessage): ValidationResult[RequestMessage] =
+    Validated.valid(ListAssetLegalStatusSummary())
 
-  override def process(request: BusinessServiceRequest): Either[BusinessServiceError, BusinessServiceReply] =
+  override def process(request: RequestMessage): Either[BusinessServiceError, BusinessServiceReply] =
     repository.getLegalStatusSummaries match {
       case Success(legalStatusSummaries) => Right(LegalStatusReply(legalStatusSummaries.asJson.toString()))
       case Failure(e)                    => Left(LegalStatusError(e.getMessage))

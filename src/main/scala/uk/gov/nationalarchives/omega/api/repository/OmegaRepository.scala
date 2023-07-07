@@ -23,7 +23,7 @@ package uk.gov.nationalarchives.omega.api.repository
 
 import org.phenoscape.sparql.FromQuerySolution
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
-import uk.gov.nationalarchives.omega.api.models.LegalStatus
+import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
 
 import scala.util.Try
 

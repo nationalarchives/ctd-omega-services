@@ -25,6 +25,7 @@ import org.mockito.MockitoSugar
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import uk.gov.nationalarchives.omega.api.repository.OmegaRepository
+import uk.gov.nationalarchives.omega.api.messages.request.ListAssetLegalStatusSummary
 import uk.gov.nationalarchives.omega.api.support.TestStubData
 
 import scala.util.{ Failure, Success }
@@ -38,7 +39,7 @@ class LegalStatusServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar
   "The LegalStatusService" - {
     "when receives" - {
       "a valid LegalStatusRequest" in {
-        val legalStatusRequest = LegalStatusRequest()
+        val legalStatusRequest = ListAssetLegalStatusSummary()
         when(mockRepository.getLegalStatusSummaries).thenReturn(Success(stubData.getLegalStatuses()))
 
         val result = legalStatusService.process(legalStatusRequest)
@@ -56,7 +57,7 @@ class LegalStatusServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar
       }
     }
     "when a processing error occurs" in {
-      val legalStatusRequest = LegalStatusRequest()
+      val legalStatusRequest = ListAssetLegalStatusSummary()
       val errorMessage = "There was an error"
       when(mockRepository.getLegalStatusSummaries).thenReturn(Failure(new Exception(errorMessage)))
 

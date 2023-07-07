@@ -24,7 +24,7 @@ package uk.gov.nationalarchives.omega.api.services
 import cats.data.NonEmptyChain
 import cats.effect.IO
 import jms4s.config.QueueName
-import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidationError, BusinessServiceError }
+import uk.gov.nationalarchives.omega.api.business.BusinessServiceError
 import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, ValidatedLocalMessage }
 
 class TestProducerImpl(val queueName: QueueName) extends LocalProducer {
@@ -38,7 +38,7 @@ class TestProducerImpl(val queueName: QueueName) extends LocalProducer {
 
   override def sendInvalidMessageFormatError(
     localMessage: LocalMessage,
-    errors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
+    errors: NonEmptyChain[LocalMessage.MessageValidationError]
   ): IO[Unit] = {
     message = localMessageValidationErrorsToReplyMessage(errors).toString()
     IO.unit
@@ -46,9 +46,9 @@ class TestProducerImpl(val queueName: QueueName) extends LocalProducer {
 
   override def sendWhenBusinessRequestIsInvalid(
     localMessage: LocalMessage,
-    errors: NonEmptyChain[BusinessRequestValidationError]
+    errors: NonEmptyChain[LocalMessage.MessageValidationError]
   ): IO[Unit] = {
-    message = businessRequestValidationErrorToReplyMessage(errors).toString()
+    message = messageValidationErrorToReplyMessage(errors).toString()
     IO.unit
   }
 
@@ -61,7 +61,7 @@ class TestProducerImpl(val queueName: QueueName) extends LocalProducer {
 
   override def sendInvalidApplicationError(
     localMessage: LocalMessage,
-    errors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
+    errors: NonEmptyChain[LocalMessage.MessageValidationError]
   ): IO[Unit] = {
     message = localMessageValidationErrorsToReplyMessage(errors).toString()
     IO.unit
@@ -69,9 +69,10 @@ class TestProducerImpl(val queueName: QueueName) extends LocalProducer {
 
   override def sendAuthenticationError(
     localMessage: LocalMessage,
-    errors: NonEmptyChain[LocalMessage.LocalMessageValidationError]
+    errors: NonEmptyChain[LocalMessage.MessageValidationError]
   ): IO[Unit] = {
     message = localMessageValidationErrorsToReplyMessage(errors).toString()
     IO.unit
   }
+
 }

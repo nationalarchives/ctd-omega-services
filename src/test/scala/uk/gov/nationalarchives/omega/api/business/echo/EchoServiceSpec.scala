@@ -23,12 +23,13 @@ package uk.gov.nationalarchives.omega.api.business.echo
 
 import cats.data.Chain
 import cats.data.Validated.{ Invalid, Valid }
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.{ MatchResult, Matcher }
-import uk.gov.nationalarchives.omega.api.business.{ BusinessServiceError, BusinessServiceReply, BusinessServiceRequest, TextIsNonEmptyCharacters }
+import uk.gov.nationalarchives.omega.api.business.{ BusinessServiceError, BusinessServiceReply }
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage.InvalidMessagePayload
+import uk.gov.nationalarchives.omega.api.messages.request.EchoRequest
+import uk.gov.nationalarchives.omega.api.support.UnitTest
 
-class EchoServiceSpec extends AnyFreeSpec with Matchers {
+class EchoServiceSpec extends UnitTest {
 
   val echoService = new EchoService()
 
@@ -37,95 +38,43 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
       "validate a request, when that request" - {
         "is an EchoRequest, with text which" - {
           "is empty" in {
+            val message = getValidatedLocalMessage("")
 
-            val echoRequest = EchoRequest(Some(""))
+            val validationResult = echoService.validateRequest(message)
 
-            val validationResult = echoService.validateRequest(echoRequest)
-
-            validationResult must beValid(echoRequest)
-
-          }
-          "only consists of whitespace" in {
-
-            val echoRequest = EchoRequest(Some("         "))
-
-            val validationResult = echoService.validateRequest(echoRequest)
-
-            validationResult must beValid(echoRequest)
-
-          }
-          "has only one character" in {
-
-            val echoRequest = EchoRequest(Some("x"))
-
-            val validationResult = echoService.validateRequest(echoRequest)
-
-            validationResult must beValid(echoRequest)
-
-          }
-          "has several characters" in {
-
-            val echoRequest = EchoRequest(Some("Hello, world"))
-
-            val validationResult = echoService.validateRequest(echoRequest)
-
-            validationResult must beValid(echoRequest)
-
-          }
-          "has many characters" in {
-
-            val echoRequest = EchoRequest(Some("Hello, world" * 100))
-
-            val validationResult = echoService.validateRequest(echoRequest)
-
-            validationResult must beValid(echoRequest)
-
-          }
-        }
-        "is *not* an EchoRequest, with text which" - {
-          "is empty" in {
-
-            val echoRequest = NotAnEchoRequest(Some(""))
-
-            val validationResult = echoService.validateRequest(echoRequest)
-
-            validationResult must beValid(echoRequest)
+            validationResult mustBe Invalid(Chain(InvalidMessagePayload(Some("Echo Text cannot be empty."))))
 
           }
           "only consists of whitespace" in {
+            val mockMessage = getValidatedLocalMessage("         ")
 
-            val echoRequest = NotAnEchoRequest(Some("         "))
+            val validationResult = echoService.validateRequest(mockMessage)
 
-            val validationResult = echoService.validateRequest(echoRequest)
-
-            validationResult must beValid(echoRequest)
+            validationResult mustBe Valid(EchoRequest(Some("         ")))
 
           }
           "has only one character" in {
+            val message = getValidatedLocalMessage("x")
 
-            val echoRequest = NotAnEchoRequest(Some("x"))
+            val validationResult = echoService.validateRequest(message)
 
-            val validationResult = echoService.validateRequest(echoRequest)
-
-            validationResult must beValid(echoRequest)
+            validationResult mustBe Valid(EchoRequest(Some("x")))
 
           }
           "has several characters" in {
+            val message = getValidatedLocalMessage("Hello, world")
 
-            val echoRequest = NotAnEchoRequest(Some("Hello, world"))
+            val validationResult = echoService.validateRequest(message)
 
-            val validationResult = echoService.validateRequest(echoRequest)
-
-            validationResult must beValid(echoRequest)
+            validationResult mustBe Valid(EchoRequest(Some("Hello, world")))
 
           }
           "has many characters" in {
+            val message = getValidatedLocalMessage("Hello, world" * 100)
 
-            val echoRequest = NotAnEchoRequest(Some("Hello, world" * 100))
+            val validationResult = echoService.validateRequest(message)
 
-            val validationResult = echoService.validateRequest(echoRequest)
-
-            validationResult must beValid(echoRequest)
+            validationResult mustBe Valid(EchoRequest(Some("Hello, world" * 100)))
 
           }
         }
@@ -182,79 +131,10 @@ class EchoServiceSpec extends AnyFreeSpec with Matchers {
             }
           }
         }
-        "is *not* an EchoRequest which" - {
-          "contains the text 'error', when" - {
-            "upper case" in {
-
-              val echoRequest = NotAnEchoRequest(Some("ERROR: Some details about that error."))
-
-              val result = echoService.process(echoRequest)
-
-              result must beAFailure("Explicit error: ERROR: Some details about that error.")
-
-            }
-            "lower case" in {
-
-              val echoRequest = NotAnEchoRequest(Some("error: Some details about that error."))
-
-              val result = echoService.process(echoRequest)
-
-              result must beASuccess("The Echo Service says: error: Some details about that error.")
-
-            }
-          }
-          "does not contain the text 'error', when that text" - {
-            "is empty" in {
-
-              val echoRequest = NotAnEchoRequest(Some(""))
-
-              val result = echoService.process(echoRequest)
-
-              result must beASuccess("The Echo Service says: ")
-
-            }
-            "only consists of whitespace" in {
-
-              val echoRequest = NotAnEchoRequest(Some("          "))
-
-              val result = echoService.process(echoRequest)
-
-              result must beASuccess("The Echo Service says:           ")
-
-            }
-            "has several characters" in {
-
-              val echoRequest = NotAnEchoRequest(Some("Hello, world"))
-
-              val result = echoService.process(echoRequest)
-
-              result must beASuccess("The Echo Service says: Hello, world")
-
-            }
-          }
-        }
       }
 
     }
   }
-
-  private case class NotAnEchoRequest(text: Option[String]) extends BusinessServiceRequest
-
-  def beValid(expectedBusinessServiceRequest: BusinessServiceRequest): Matcher[echoService.ValidationResult] =
-    (validationResult: echoService.ValidationResult) =>
-      MatchResult(
-        validationResult == Valid(expectedBusinessServiceRequest),
-        s"We expected the validation result to be valid - returning the business service request [$expectedBusinessServiceRequest] - but it was actually [$validationResult].",
-        s"We didn't expect the validation result to be valid - returning the business service request [$expectedBusinessServiceRequest] - but it was."
-      )
-
-  def beInvalid(expectedErrorMessage: String): Matcher[echoService.ValidationResult] =
-    (validationResult: echoService.ValidationResult) =>
-      MatchResult(
-        validationResult == Invalid(Chain(TextIsNonEmptyCharacters(expectedErrorMessage))),
-        s"We expected the validation result to be invalid - with the error message [$expectedErrorMessage] - but it was actually [$validationResult].",
-        s"We didn't expect the validation result to be invalid - with the error message [$expectedErrorMessage] - but it was."
-      )
 
   def beASuccess(expectedMessage: String): Matcher[Either[BusinessServiceError, BusinessServiceReply]] =
     (processingResult: Either[BusinessServiceError, BusinessServiceReply]) =>

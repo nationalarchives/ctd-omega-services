@@ -19,8 +19,14 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.business.legalstatus
+package uk.gov.nationalarchives.omega.api.business.agents
 
-import uk.gov.nationalarchives.omega.api.business.BusinessServiceRequest
+import uk.gov.nationalarchives.omega.api.business.BusinessServiceError
+import uk.gov.nationalarchives.omega.api.common.ErrorCode
 
-case class LegalStatusRequest(text: Option[String] = None) extends BusinessServiceRequest
+case class ListAgentSummaryError(message: String) extends BusinessServiceError {
+
+  override def code: ErrorCode = ErrorCode.PROC002
+
+  override def description: String = "There was an error"
+}

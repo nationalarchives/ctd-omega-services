@@ -21,11 +21,11 @@
 
 package uk.gov.nationalarchives.omega.api.business
 
-import cats.data.ValidatedNec
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage.ValidationResult
+import uk.gov.nationalarchives.omega.api.messages.ValidatedLocalMessage
+import uk.gov.nationalarchives.omega.api.messages.request.RequestMessage
 
 trait BusinessRequestValidation {
 
-  type ValidationResult = ValidatedNec[BusinessRequestValidationError, BusinessServiceRequest]
-
-  def validateRequest(request: BusinessServiceRequest): ValidationResult
+  def validateRequest(validatedLocalMessage: ValidatedLocalMessage): ValidationResult[RequestMessage]
 }

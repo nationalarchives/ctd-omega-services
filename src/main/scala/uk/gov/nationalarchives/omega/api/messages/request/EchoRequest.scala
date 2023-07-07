@@ -19,16 +19,6 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.business.agents
+package uk.gov.nationalarchives.omega.api.messages.request
 
-import uk.gov.nationalarchives.omega.api.business.BusinessServiceError
-import uk.gov.nationalarchives.omega.api.common.ErrorCode
-
-trait AgentSummaryError extends BusinessServiceError
-
-case class AgentSummaryRequestError(message: String) extends AgentSummaryError {
-
-  override def code: ErrorCode = ErrorCode.PROC002
-
-  override def description: String = "There was an error"
-}
+case class EchoRequest(text: Option[String]) extends RequestMessage

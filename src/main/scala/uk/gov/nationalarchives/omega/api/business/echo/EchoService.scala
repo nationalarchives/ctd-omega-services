@@ -23,19 +23,29 @@ package uk.gov.nationalarchives.omega.api.business.echo
 
 import cats.data.{ NonEmptyChain, Validated }
 import uk.gov.nationalarchives.omega.api.business._
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{ InvalidMessagePayload, ValidationResult }
+import uk.gov.nationalarchives.omega.api.messages.ValidatedLocalMessage
+import uk.gov.nationalarchives.omega.api.messages.request.{ EchoRequest, RequestMessage }
+
+import scala.util.{ Failure, Success, Try }
 class EchoService extends BusinessService with BusinessRequestValidation {
 
-  override def validateRequest(request: BusinessServiceRequest): ValidationResult =
+  override def validateRequest(validatedLocalMessage: ValidatedLocalMessage): ValidationResult[RequestMessage] =
     Validated.cond(
-      request.text.nonEmpty,
-      request,
-      NonEmptyChain.one(TextIsNonEmptyCharacters("Echo Text cannot be empty."))
+      validatedLocalMessage.messageText.nonEmpty,
+      EchoRequest(Some(validatedLocalMessage.messageText)),
+      NonEmptyChain.one(InvalidMessagePayload(Some("Echo Text cannot be empty.")))
     )
 
-  override def process(request: BusinessServiceRequest): Either[BusinessServiceError, BusinessServiceReply] =
-    if (request.text.nonEmpty && request.text.get.contains("ERROR")) {
-      Left(EchoExplicitError(s"Explicit error: ${request.text.get}"))
-    } else {
-      Right(EchoReply(s"The Echo Service says: ${request.text.getOrElse("")}"))
+  override def process(requestMessage: RequestMessage): Either[BusinessServiceError, BusinessServiceReply] =
+    requestMessage match {
+      case EchoRequest(text) =>
+        if (text.nonEmpty && text.get.contains("ERROR")) {
+          Left(EchoExplicitError(s"Explicit error: ${text.get}"))
+        } else {
+          Right(EchoReply(s"The Echo Service says: ${text.getOrElse("")}"))
+        }
+      case _ => Left(EchoExplicitError(s"Unexpected message type"))
     }
+
 }

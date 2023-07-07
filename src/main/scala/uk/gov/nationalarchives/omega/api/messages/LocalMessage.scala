@@ -21,7 +21,8 @@
 
 package uk.gov.nationalarchives.omega.api.messages
 
-import cats.data.ValidatedNec
+import cats.Eq
+import cats.data.{ Validated, ValidatedNec }
 import cats.effect.IO
 import cats.syntax.all._
 import jms4s.config.QueueName
@@ -72,15 +73,15 @@ final case class LocalMessage(
   def validateOmgApplicationId: ValidationResult[String] =
     omgApplicationId match {
       case Some(applicationId) if patternForApplicationId.matches(applicationId) => applicationId.validNec
-      case Some(_)                                                               => InvalidApplicationID.invalidNec
-      case None                                                                  => MissingApplicationID.invalidNec
+      case Some(_) => Validated.invalidNec(InvalidApplicationID())
+      case None    => Validated.invalidNec(MissingApplicationID())
     }
 
   def validateOmgToken: ValidationResult[String] =
     omgToken match {
       case Some(token) if token.trim.nonEmpty => token.validNec
-      case Some(_)                            => InvalidAuthToken.invalidNec
-      case None                               => MissingAuthToken.invalidNec
+      case Some(_)                            => Validated.invalidNec(InvalidAuthToken())
+      case None                               => Validated.invalidNec(MissingAuthToken())
     }
 
   def validateOtherHeaders(
@@ -125,15 +126,15 @@ final case class LocalMessage(
   ): ValidationResult[String] =
     jmsMessageIdOpt match {
       case Some(jmsMessageId) if jmsMessageId.trim.nonEmpty => jmsMessageId.validNec
-      case Some(_)                                          => InvalidJMSMessageID.invalidNec
-      case None                                             => MissingJMSMessageID.invalidNec
+      case Some(_)                                          => Validated.invalidNec(InvalidJMSMessageID())
+      case None                                             => Validated.invalidNec(MissingJMSMessageID())
     }
 
   private def validateOmgMessageTypeId: ValidationResult[String] =
     omgMessageTypeId match {
       case Some(messageTypeId) if patternForServiceId.matches(messageTypeId) => messageTypeId.validNec
-      case None                                                              => MissingMessageTypeID.invalidNec
-      case _                                                                 => InvalidMessageTypeID.invalidNec
+      case None => Validated.invalidNec(MissingMessageTypeID())
+      case _    => Validated.invalidNec(InvalidMessageTypeID())
     }
 
   private def validateJmsTimestamp(
@@ -141,7 +142,7 @@ final case class LocalMessage(
   ): ValidationResult[Long] =
     jmsTimestampOpt match {
       case Some(jmsTimestamp) => jmsTimestamp.validNec
-      case None               => MissingJMSTimestamp.invalidNec
+      case None               => Validated.invalidNec(MissingJMSTimestamp())
     }
 
   private def validateOmgMessageFormat(
@@ -153,8 +154,8 @@ final case class LocalMessage(
     omgMessageFormatOpt match {
       case Some(omgMessageFormat) if acceptableMimeTypes.contains(normalise(omgMessageFormat)) =>
         normalise(omgMessageFormat).validNec
-      case Some(_) => InvalidMessageFormat.invalidNec
-      case None    => MissingMessageFormat.invalidNec
+      case Some(_) => Validated.invalidNec(InvalidMessageFormat())
+      case None    => Validated.invalidNec(MissingMessageFormat())
     }
   }
 
@@ -166,13 +167,13 @@ final case class LocalMessage(
       case (Some(omgReplyddress), Some(omgApplicationId))
           if patternForReplyAddress.matches(omgReplyddress) && omgReplyddress.startsWith(omgApplicationId) =>
         omgReplyddress.validNec
-      case (None, _) => MissingReplyAddress.invalidNec
-      case _         => InvalidReplyAddress.invalidNec
+      case (None, _) => Validated.invalidNec(MissingReplyAddress())
+      case _         => Validated.invalidNec(InvalidReplyAddress())
     }
 }
 object LocalMessage extends AppLogger {
 
-  type ValidationResult[A] = ValidatedNec[LocalMessageValidationError, A]
+  type ValidationResult[A] = ValidatedNec[MessageValidationError, A]
 
   val patternForApplicationId: Regex = "[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])".r
   val patternForReplyAddress: Regex = "[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])_([A-Za-z0-9_])+".r
@@ -204,20 +205,65 @@ object LocalMessage extends AppLogger {
       )
     }
 
-  sealed trait LocalMessageValidationError
+  sealed class MessageValidationError(val message: Option[String] = None, val cause: Option[Throwable] = None)
 
-  object MissingJMSMessageID extends LocalMessageValidationError
-  object InvalidJMSMessageID extends LocalMessageValidationError
-  object MissingMessageTypeID extends LocalMessageValidationError
-  object InvalidMessageTypeID extends LocalMessageValidationError
-  object MissingApplicationID extends LocalMessageValidationError
-  object InvalidApplicationID extends LocalMessageValidationError
-  object MissingJMSTimestamp extends LocalMessageValidationError
-  object MissingMessageFormat extends LocalMessageValidationError
-  object InvalidMessageFormat extends LocalMessageValidationError
-  object MissingAuthToken extends LocalMessageValidationError
-  object InvalidAuthToken extends LocalMessageValidationError
-  object MissingReplyAddress extends LocalMessageValidationError
-  object InvalidReplyAddress extends LocalMessageValidationError
+  implicit val eqError: Eq[MessageValidationError] = Eq.fromUniversalEquals
+
+  final case class MissingJMSMessageID(
+    override val message: Option[String] = None,
+    override val cause: Option[Throwable] = None
+  ) extends MessageValidationError(message, cause)
+  final case class InvalidJMSMessageID(
+    override val message: Option[String] = None,
+    override val cause: Option[Throwable] = None
+  ) extends MessageValidationError(message, cause)
+  final case class MissingMessageTypeID(
+    override val message: Option[String] = None,
+    override val cause: Option[Throwable] = None
+  ) extends MessageValidationError(message, cause)
+  final case class InvalidMessageTypeID(
+    override val message: Option[String] = None,
+    override val cause: Option[Throwable] = None
+  ) extends MessageValidationError(message, cause)
+  final case class MissingApplicationID(
+    override val message: Option[String] = None,
+    override val cause: Option[Throwable] = None
+  ) extends MessageValidationError(message, cause)
+  final case class InvalidApplicationID(
+    override val message: Option[String] = None,
+    override val cause: Option[Throwable] = None
+  ) extends MessageValidationError(message, cause)
+  final case class MissingJMSTimestamp(
+    override val message: Option[String] = None,
+    override val cause: Option[Throwable] = None
+  ) extends MessageValidationError(message, cause)
+  final case class MissingMessageFormat(
+    override val message: Option[String] = None,
+    override val cause: Option[Throwable] = None
+  ) extends MessageValidationError(message, cause)
+  final case class InvalidMessageFormat(
+    override val message: Option[String] = None,
+    override val cause: Option[Throwable] = None
+  ) extends MessageValidationError(message, cause)
+  final case class MissingAuthToken(
+    override val message: Option[String] = None,
+    override val cause: Option[Throwable] = None
+  ) extends MessageValidationError(message, cause)
+  final case class InvalidAuthToken(
+    override val message: Option[String] = None,
+    override val cause: Option[Throwable] = None
+  ) extends MessageValidationError(message, cause)
+  final case class MissingReplyAddress(
+    override val message: Option[String] = None,
+    override val cause: Option[Throwable] = None
+  ) extends MessageValidationError(message, cause)
+  final case class InvalidReplyAddress(
+    override val message: Option[String] = None,
+    override val cause: Option[Throwable] = None
+  ) extends MessageValidationError(message, cause)
+  final case class InvalidMessagePayload(
+    override val message: Option[String] = None,
+    override val cause: Option[Throwable] = None
+  ) extends MessageValidationError(message, cause)
 
 }

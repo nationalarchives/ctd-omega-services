@@ -19,16 +19,6 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.models
+package uk.gov.nationalarchives.omega.api.messages.request
 
-import io.circe.{ Encoder, Json }
-import org.apache.jena.ext.xerces.util.URI
-
-case class LegalStatus(identifier: URI, label: String)
-object LegalStatus {
-  implicit val encodeLegalStatus: Encoder[LegalStatus] = (legalStatus: LegalStatus) =>
-    Json.obj(
-      ("identifier", Json.fromString(legalStatus.identifier.toString)),
-      ("label", Json.fromString(legalStatus.label))
-    )
-}
+case class ListAssetLegalStatusSummary(text: Option[String] = None) extends RequestMessage

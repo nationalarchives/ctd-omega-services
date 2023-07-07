@@ -19,31 +19,16 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.models
+package uk.gov.nationalarchives.omega.api.messages.reply
 
 import io.circe.{ Encoder, Json }
-import io.circe.syntax._
+import org.apache.jena.ext.xerces.util.URI
 
-case class AgentDescription(
-  identifier: String,
-  label: String,
-  authorityFile: Boolean,
-  depository: Boolean,
-  versionTimestamp: String,
-  dateFrom: Option[String],
-  dateTo: Option[String],
-  previousDescription: Option[String] = None
-)
-object AgentDescription {
-  implicit val encodeAgentDescription: Encoder[AgentDescription] = (agentDescription: AgentDescription) =>
+case class LegalStatus(identifier: URI, label: String) extends ReplyMessage
+object LegalStatus {
+  implicit val encodeLegalStatus: Encoder[LegalStatus] = (legalStatus: LegalStatus) =>
     Json.obj(
-      ("identifier", agentDescription.identifier.asJson),
-      ("label", agentDescription.label.asJson),
-      ("authority-file", agentDescription.authorityFile.asJson),
-      ("depository", agentDescription.depository.asJson),
-      ("version-timestamp", agentDescription.versionTimestamp.asJson),
-      ("date-from", agentDescription.dateFrom.asJson),
-      ("date-to", agentDescription.dateTo.asJson),
-      ("previous-description", agentDescription.previousDescription.asJson)
+      ("identifier", Json.fromString(legalStatus.identifier.toString)),
+      ("label", Json.fromString(legalStatus.label))
     )
 }

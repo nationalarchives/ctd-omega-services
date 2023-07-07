@@ -29,7 +29,7 @@ import org.scalatest.TryValues._
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
-import uk.gov.nationalarchives.omega.api.models.LegalStatus
+import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
 
 import scala.util.{ Failure, Success }
 

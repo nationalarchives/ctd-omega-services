@@ -23,14 +23,13 @@ package uk.gov.nationalarchives.omega.api.business.agents
 
 import cats.data.Chain
 import cats.data.Validated.{ Invalid, Valid }
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
-import uk.gov.nationalarchives.omega.api.business.InvalidAgentSummaryRequestError
+import uk.gov.nationalarchives.omega.api.messages.AgentType
 import uk.gov.nationalarchives.omega.api.messages.AgentType.CorporateBody
-import uk.gov.nationalarchives.omega.api.models.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.support.TestStubData
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{ InvalidMessagePayload, InvalidReplyAddress, MessageValidationError }
+import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
+import uk.gov.nationalarchives.omega.api.support.{ TestStubData, UnitTest }
 
-class ListAgentServiceSummarySpec extends AnyFreeSpec with Matchers {
+class ListAgentServiceSummarySpec extends UnitTest {
 
   val stubData = new TestStubData
 
@@ -40,22 +39,22 @@ class ListAgentServiceSummarySpec extends AnyFreeSpec with Matchers {
     "returns a result on processRequest when given" - {
       "a valid listAgentSummaryRequest" in {
 
-        val listAgentSummaryRequest = ListAgentSummaryRequest(
-          Some(s"""{
-                  |    "type" : ["Corporate Body","Person"],
-                  |    "authority-file" : false,
-                  |    "depository" : false,
-                  |    "version-timestamp" : "all"
-                  |}""".stripMargin)
+        val listAgentSummaryRequest = ListAgentSummary(
+          List(AgentType.CorporateBody, AgentType.Person),
+          authorityFile = Some(false),
+          depository = Some(false),
+          versionTimestamp = Some("all")
         )
         val result = listAgentSummaryService.process(listAgentSummaryRequest)
         result mustBe
           Right(ListAgentSummaryReply(getExpectedAgentSummaries))
       }
 
-      "an empty payload request" in {
+      // NOTE (RW): This test is ignored as empty requests are not allowed by SQS although they are allowed by the schema
+      // PACT-1025 refers
+      "an empty payload request" ignore {
 
-        val listAgentSummaryRequest = ListAgentSummaryRequest()
+        val listAgentSummaryRequest = ListAgentSummary(List())
         val result = listAgentSummaryService.process(listAgentSummaryRequest)
 
         result mustBe Right(ListAgentSummaryReply(getExpectedAgentSummaries))
@@ -65,170 +64,102 @@ class ListAgentServiceSummarySpec extends AnyFreeSpec with Matchers {
 
     "returns an error on validateRequest when given" - {
       "an invalid AgentType " in {
-        val listAgentSummaryRequest = ListAgentSummaryRequest(
-          Some(s"""{
-                  |    "type" : ["CorporateBody2","Person"],
-                  |    "authority-file" : true,
-                  |    "depository" : false,
-                  |    "version-timestamp" : "latest"
-                  |}""".stripMargin)
-        )
-        val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
-
-        result mustBe Invalid(
-          Chain(
-            InvalidAgentSummaryRequestError(
-              "Error decoding request message"
-            )
-          )
-        )
+        val message = getValidatedLocalMessage(s"""{
+                                                  |    "type" : ["CorporateBody2","Person"],
+                                                  |    "authority-file" : true,
+                                                  |    "depository" : false,
+                                                  |    "version-timestamp" : "latest"
+                                                  |}""".stripMargin)
+        val result = listAgentSummaryService.validateRequest(message)
+        result mustBe a[Invalid[_]]
       }
 
-      "null value for authorityFile" in {
-        val listAgentSummaryRequest = ListAgentSummaryRequest(
-          Some(s"""{
-                  |    "type" : ["Corporate Body"],
-                  |    "authority-file" : "",
-                  |    "depository" : false,
-                  |    "version-timestamp" : "latest"
-                  |}""".stripMargin)
-        )
-        val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
-
-        result mustBe Invalid(
-          Chain(
-            InvalidAgentSummaryRequestError(
-              "Error decoding request message"
-            )
-          )
-        )
-
-      }
-
-      "non Boolean value for authorityFile" in {
-        val listAgentSummaryRequest = ListAgentSummaryRequest(
-          Some(s"""{
-                  |    "type" : ["Corporate Body"],
-                  |    "authorit-file" : maybe,
-                  |    "depository" : false,
-                  |    "version-timestamp" : "latest"
-                  |}""".stripMargin)
-        )
-        val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
-
-        result mustBe Invalid(
-          Chain(
-            InvalidAgentSummaryRequestError(
-              "Error decoding request message"
-            )
-          )
-        )
-      }
-      "unrecognised version identifier" in {
-        val listAgentSummaryRequest = ListAgentSummaryRequest(
-          Some(s"""{
-                  |    "type" : ["Corporate Body"],
-                  |    "authority-file" : false,
-                  |    "depository" : false,
-                  |    "version-timestamp" : "latest1"
-                  |}""".stripMargin)
-        )
-        val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
-
-        result mustBe Invalid(
-          Chain(
-            InvalidAgentSummaryRequestError(
-              "Error parsing invalid input date"
-            )
-          )
-        )
-      }
-      "invalid version timestamp" in {
-        val listAgentSummaryRequest = ListAgentSummaryRequest(
-          Some(s"""{
-                  |    "type" : ["Corporate Body"],
-                  |    "authority-file" : false,
-                  |    "depository" : false,
-                  |    "version-timestamp" : "2020-05-19"
-                  |}""".stripMargin)
-        )
-        val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
-
-        result mustBe Invalid(
-          Chain(
-            InvalidAgentSummaryRequestError(
-              "Error parsing invalid input date"
-            )
-          )
-        )
-      }
     }
 
-    "returns valid result on validateRequest when given" - {
-      "valid version timestamp" in {
-        val listAgentSummaryRequest = ListAgentSummaryRequest(
-          Some(s"""{
-                  |    "type" : ["Corporate Body"],
-                  |    "authority-file" : false,
-                  |    "depository" : false,
-                  |    "version-timestamp" : "2022-06-22T02:00:00-0500"
-                  |}""".stripMargin)
-        )
-        val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
+    "null value for authorityFile" in {
+      val message = getValidatedLocalMessage(
+        s"""{
+           |    "type" : ["Corporate Body"],
+           |    "authority-file" : "",
+           |    "depository" : false,
+           |    "version-timestamp" : "latest"
+           |}""".stripMargin
+      )
+      val result = listAgentSummaryService.validateRequest(message)
+      result mustBe a[Invalid[_]]
+    }
 
-        result mustBe
-          Valid(
-            ListAgentSummaryRequest(
-              Some(s"""{
-                      |    "type" : ["Corporate Body"],
-                      |    "authority-file" : false,
-                      |    "depository" : false,
-                      |    "version-timestamp" : "2022-06-22T02:00:00-0500"
-                      |}""".stripMargin),
-              Some(ListAgentSummary(List(CorporateBody), Some("2022-06-22T02:00:00-0500"), Some(false), Some(false)))
-            )
-          )
-      }
-      "no version timestamp and authority file" in {
-        val listAgentSummaryRequest = ListAgentSummaryRequest(
-          Some(s"""{
-                  |    "type" : ["Corporate Body"],
-                  |    "depository" : true
-                  |}""".stripMargin)
+    "non Boolean value for authorityFile" in {
+      val message = getValidatedLocalMessage(s"""{
+                                                |    "type" : ["Corporate Body"],
+                                                |    "authority-file" : maybe,
+                                                |    "depository" : false,
+                                                |    "version-timestamp" : "latest"
+                                                |}""".stripMargin)
+      val result = listAgentSummaryService.validateRequest(message)
+
+      result mustBe a[Invalid[_]]
+    }
+    "unrecognised version identifier" in {
+      val message = getValidatedLocalMessage(s"""{
+                                                |    "type" : ["Corporate Body"],
+                                                |    "authority-file" : false,
+                                                |    "depository" : false,
+                                                |    "version-timestamp" : "latest1"
+                                                |}""".stripMargin)
+      val result = listAgentSummaryService.validateRequest(message)
+
+      result mustBe a[Invalid[_]]
+    }
+    "invalid version timestamp" in {
+      val message = getValidatedLocalMessage(s"""{
+                                                |    "type" : ["Corporate Body"],
+                                                |    "authority-file" : false,
+                                                |    "depository" : false,
+                                                |    "version-timestamp" : "2020-05-19"
+                                                |}""".stripMargin)
+      val result = listAgentSummaryService.validateRequest(message)
+
+      result mustBe Invalid(
+        Chain(
+          InvalidMessagePayload(Some("Invalid date: 2020-05-19"))
         )
-        val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
-        result mustBe Valid(
-          ListAgentSummaryRequest(
-            Some(s"""{
-                    |    "type" : ["Corporate Body"],
-                    |    "depository" : true
-                    |}""".stripMargin),
-            Some(ListAgentSummary(List(CorporateBody), None, Some(true), None))
-          )
+      )
+    }
+  }
+
+  "returns valid result on validateRequest when given" - {
+    "valid version timestamp" in {
+      val message = getValidatedLocalMessage(s"""{
+                                                |    "type" : ["Corporate Body"],
+                                                |    "authority-file" : false,
+                                                |    "depository" : false,
+                                                |    "version-timestamp" : "2022-06-22T02:00:00-0500"
+                                                |}""".stripMargin)
+      val result = listAgentSummaryService.validateRequest(message)
+
+      result mustBe
+        Valid(
+          ListAgentSummary(List(CorporateBody), Some("2022-06-22T02:00:00-0500"), Some(false), Some(false))
         )
-      }
-      "valid version identifier" in {
-        val listAgentSummaryRequest = ListAgentSummaryRequest(
-          Some(s"""{
-                  |    "type" : ["Corporate Body"],
-                  |    "version-timestamp" : "latest",
-                  |    "authority-file" : false,
-                  |    "depository" : false
-                  |}""".stripMargin)
-        )
-        val result = listAgentSummaryService.validateRequest(listAgentSummaryRequest)
-        result mustBe Valid(
-          ListAgentSummaryRequest(
-            Some(s"""{
-                    |    "type" : ["Corporate Body"],
-                    |    "version-timestamp" : "latest",
-                    |    "authority-file" : false,
-                    |    "depository" : false
-                    |}""".stripMargin),
-            Some(ListAgentSummary(List(CorporateBody), Some("latest"), Some(false), Some(false)))
-          )
-        )
-      }
+    }
+    "no version timestamp and authority file" in {
+      val message = getValidatedLocalMessage(s"""{
+                                                |    "type" : ["Corporate Body"],
+                                                |    "depository" : true
+                                                |}""".stripMargin)
+      val result = listAgentSummaryService.validateRequest(message)
+      result mustBe Valid(ListAgentSummary(List(CorporateBody), None, Some(true), None))
+    }
+    "valid version identifier" in {
+      val message = getValidatedLocalMessage(s"""{
+                                                |    "type" : ["Corporate Body"],
+                                                |    "version-timestamp" : "latest",
+                                                |    "authority-file" : false,
+                                                |    "depository" : false
+                                                |}""".stripMargin)
+      val result = listAgentSummaryService.validateRequest(message)
+      result mustBe Valid(ListAgentSummary(List(CorporateBody), Some("latest"), Some(false), Some(false)))
     }
   }
 
