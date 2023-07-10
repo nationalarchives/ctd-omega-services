@@ -57,10 +57,10 @@ defaultContentType: application/json
 
 
 channels:
-  request.general:
+  PACS001_request:
     description: The queue on which general priority requests should be published
     publish:
-      operationId: request_general
+      operationId: PACS001_request
       description: Request general channel publish operations
       message:
         oneOf:
@@ -75,12 +75,12 @@ channels:
         destinationType: queue
         bindingVersion: 0.0.1
 
-  catalogue.editorial.web.application.instance.1:
+  PACE001_reply:
     description: >-
       The queue on which reply messages will be sent to instance 1 of the
       Catalogue Editorial Web Application
     subscribe:
-      operationId: catalogue_editorial_web_application_instance_1
+      operationId: PACE001_reply
       description: >-
         Reply channel operations for instance 1 of the Catalogue Editorial Web
         Application
