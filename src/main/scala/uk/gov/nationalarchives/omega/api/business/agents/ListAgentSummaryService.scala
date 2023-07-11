@@ -22,32 +22,31 @@
 package uk.gov.nationalarchives.omega.api.business.agents
 
 import cats.data.Validated
+import io.circe.generic.auto.exportEncoder
 import io.circe.parser.decode
 import io.circe.syntax.EncoderOps
 import uk.gov.nationalarchives.omega.api.business._
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{ InvalidMessagePayload, MessageValidationError, ValidationResult }
 import uk.gov.nationalarchives.omega.api.messages.request.{ ListAgentSummary, RequestMessage }
 import uk.gov.nationalarchives.omega.api.messages.{ StubData, ValidatedLocalMessage }
+import uk.gov.nationalarchives.omega.api.repository.AbstractRepository
 
 import java.text.SimpleDateFormat
 import java.util.Date
 import scala.util.{ Failure, Success, Try }
 
-class ListAgentSummaryService(val stubData: StubData) extends BusinessService with BusinessRequestValidation {
+class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRepository)
+    extends BusinessService with BusinessRequestValidation {
 
   override def process(
     requestMessage: RequestMessage
   ): Either[BusinessServiceError, BusinessServiceReply] =
     Try(requestMessage.asInstanceOf[ListAgentSummary]) match {
-      case Success(_) =>
-        Right(
-          ListAgentSummaryReply(
-            stubData
-              .getAgentSummaries()
-              .asJson
-              .toString()
-          )
-        )
+      case Success(listAgentSummary) =>
+        Try(getAgentSummaries(listAgentSummary)) match {
+          case Success(listAgentSummaries) => Right(ListAgentSummaryReply(listAgentSummaries.asJson.toString()))
+          case Failure(e)                  => Left(ListAgentSummaryError(e.getMessage))
+        }
       case Failure(exception) => Left(ListAgentSummaryError(exception.getMessage))
     }
 
@@ -86,5 +85,11 @@ class ListAgentSummaryService(val stubData: StubData) extends BusinessService wi
     else
       Try(dateFormatter.parse(trimmedDate)).toOption
   }
+
+  private def getAgentSummaries(listAgentSummary: ListAgentSummary) =
+    listAgentSummary.depository match {
+      case Some(true) => repository.getPlaceOfDepositSummaries
+      case _          => repository.getAgentSummaries
+    }
 
 }

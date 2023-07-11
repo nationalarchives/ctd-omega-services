@@ -31,7 +31,7 @@ import jms4s.{ JmsAcknowledgerConsumer, JmsProducer }
 import uk.gov.nationalarchives.omega.api.business.agents.ListAgentSummaryService
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.business.legalstatus.LegalStatusService
-import uk.gov.nationalarchives.omega.api.common.{ AppLogger, Version1UUID }
+import uk.gov.nationalarchives.omega.api.common.Version1UUID
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.connectors.{ JmsConnector, SparqlEndpointConnector }
 import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, LocalMessageStore, StubDataImpl }
@@ -153,7 +153,7 @@ class ApiService(val config: ServiceConfig) extends Stateful {
       localMessageStore,
       new EchoService(),
       new LegalStatusService(stubData, repository),
-      new ListAgentSummaryService(stubData)
+      new ListAgentSummaryService(stubData, repository)
     )
 
   private def doStop(): IO[ExitCode] =
