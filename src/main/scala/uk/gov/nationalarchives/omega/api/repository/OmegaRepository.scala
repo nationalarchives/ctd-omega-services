@@ -21,6 +21,7 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
+import org.apache.jena.query.QuerySolution
 import org.phenoscape.sparql.FromQuerySolution
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentSummary, LegalStatus }
@@ -50,4 +51,8 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
       result    <- sparqlConnector.execute(query, queryDecoder)
     } yield result
 
+  implicit object BooleanFromQuerySolution extends FromQuerySolution[Boolean] {
+    def fromQuerySolution(qs: QuerySolution, variablePath: String = ""): Try[Boolean] =
+      getLiteral(qs, variablePath).map(_.getBoolean)
+  }
 }
