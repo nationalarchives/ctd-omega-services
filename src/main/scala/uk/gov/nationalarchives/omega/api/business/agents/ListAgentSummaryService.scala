@@ -43,7 +43,7 @@ class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRe
   ): Either[BusinessServiceError, BusinessServiceReply] =
     Try(requestMessage.asInstanceOf[ListAgentSummary]) match {
       case Success(listAgentSummary) =>
-        Try(getAgentSummaries(listAgentSummary)) match {
+        getAgentSummaries(listAgentSummary) match {
           case Success(listAgentSummaries) => Right(ListAgentSummaryReply(listAgentSummaries.asJson.toString()))
           case Failure(e)                  => Left(ListAgentSummaryError(e.getMessage))
         }

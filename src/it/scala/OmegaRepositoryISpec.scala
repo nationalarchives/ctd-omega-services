@@ -34,4 +34,16 @@ class OmegaRepositoryISpec
       }
     }
   }
+
+  "Get List Agent summaries" - {
+
+    "must return a List of 24 AgentSummary items" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getAgentSummaries
+        result.success.get.length mustBe 24
+      }
+
+    }
+  }
 }

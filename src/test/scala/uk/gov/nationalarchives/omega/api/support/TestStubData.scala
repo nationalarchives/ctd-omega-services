@@ -32,7 +32,7 @@ class TestStubData extends StubData {
     LegalStatus(new URI("http://catalogue.nationalarchives.gov.uk/non-public-record"), "Non-Public Record")
   )
 
-  override def getAgentSummaries(): Seq[AgentSummary] = Seq(
+  override def getAgentSummaries(): List[AgentSummary] = List(
     AgentSummary(
       AgentType.Person,
       "48N",
