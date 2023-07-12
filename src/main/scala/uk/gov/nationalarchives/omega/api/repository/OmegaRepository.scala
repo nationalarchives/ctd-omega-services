@@ -35,6 +35,11 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
   private val getAgentSummariesSparqlResource = s"/$sparqlResourceDir/select-agent-summaries.rq"
   private val getPlaceOfDepositSummariesSparqlResource = s"/$sparqlResourceDir/select-place-of-deposit-summaries.rq"
 
+  implicit object BooleanFromQuerySolution extends FromQuerySolution[Boolean] {
+    def fromQuerySolution(qs: QuerySolution, variablePath: String = ""): Try[Boolean] =
+      getLiteral(qs, variablePath).map(_.getBoolean)
+  }
+
   override def getLegalStatusSummaries: Try[List[LegalStatus]] =
     processQuery[LegalStatus](getLegalStatusSummarySparqlResource, implicitly[FromQuerySolution[LegalStatus]])
 
@@ -51,8 +56,4 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
       result    <- sparqlConnector.execute(query, queryDecoder)
     } yield result
 
-  implicit object BooleanFromQuerySolution extends FromQuerySolution[Boolean] {
-    def fromQuerySolution(qs: QuerySolution, variablePath: String = ""): Try[Boolean] =
-      getLiteral(qs, variablePath).map(_.getBoolean)
-  }
 }
