@@ -29,7 +29,7 @@ case class AgentSummary(
   agentType: AgentType,
   identifier: String,
   currentDescription: String,
-  description: List[AgentDescription]
+  description: AgentDescription
 ) extends ReplyMessage
 object AgentSummary {
   implicit val encodeAgentSummary: Encoder[AgentSummary] = (agentSummary: AgentSummary) =>
@@ -47,9 +47,9 @@ object AgentSummary {
 case class AgentDescription(
   identifier: String,
   label: String,
-  authorityFile: Boolean,
-  depository: Boolean,
   versionTimestamp: String,
+  authorityFile: Option[Boolean],
+  depository: Option[Boolean],
   dateFrom: Option[String] = None,
   dateTo: Option[String] = None,
   previousDescription: Option[String] = None

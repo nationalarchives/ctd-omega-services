@@ -22,18 +22,18 @@
 package uk.gov.nationalarchives.omega.api.business.agents
 
 import cats.data.Validated
-import io.circe.generic.auto.exportEncoder
 import io.circe.parser.decode
 import io.circe.syntax.EncoderOps
 import uk.gov.nationalarchives.omega.api.business._
-import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{ InvalidMessagePayload, MessageValidationError, ValidationResult }
-import uk.gov.nationalarchives.omega.api.messages.request.{ ListAgentSummary, RequestMessage }
-import uk.gov.nationalarchives.omega.api.messages.{ StubData, ValidatedLocalMessage }
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{InvalidMessagePayload, MessageValidationError, ValidationResult}
+import uk.gov.nationalarchives.omega.api.messages.reply.AgentSummary
+import uk.gov.nationalarchives.omega.api.messages.request.{ListAgentSummary, RequestMessage}
+import uk.gov.nationalarchives.omega.api.messages.{StubData, ValidatedLocalMessage}
 import uk.gov.nationalarchives.omega.api.repository.AbstractRepository
 
 import java.text.SimpleDateFormat
 import java.util.Date
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRepository)
     extends BusinessService with BusinessRequestValidation {
@@ -43,10 +43,12 @@ class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRe
   ): Either[BusinessServiceError, BusinessServiceReply] =
     Try(requestMessage.asInstanceOf[ListAgentSummary]) match {
       case Success(listAgentSummary) =>
-        getAgentSummaries(listAgentSummary) match {
-          case Success(listAgentSummaries) => Right(ListAgentSummaryReply(listAgentSummaries.asJson.toString()))
-          case Failure(e)                  => Left(ListAgentSummaryError(e.getMessage))
-        }
+        Right(ListAgentSummaryReply(getAgentSummaries(listAgentSummary).asJson.toString())) //match {
+//          case Success(listAgentSummaries) =>
+//            Right(ListAgentSummaryReply(listAgentSummaries)
+//          case Failure(e)                  =>
+//            Left(ListAgentSummaryError(e.getMessage))
+        //}
       case Failure(exception) => Left(ListAgentSummaryError(exception.getMessage))
     }
 
@@ -86,10 +88,28 @@ class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRe
       Try(dateFormatter.parse(trimmedDate)).toOption
   }
 
-  private def getAgentSummaries(listAgentSummary: ListAgentSummary) =
+  private def getAgentSummaries(listAgentSummary: ListAgentSummary): List[AgentSummary] =
     listAgentSummary.depository match {
-      case Some(true) => repository.getPlaceOfDepositSummaries
-      case _          => repository.getAgentSummaries
+      case Some(true) => getPlaceOfDepositSummaries
+      case _          => getAgentEntities
     }
+
+  private def getPlaceOfDepositSummaries: List[AgentSummary] = {
+    repository.getPlaceOfDepositEntities match {
+      case Success(agentEntities) => agentEntities.flatMap { agentEntity =>
+        agentEntity.as[Option[AgentSummary]]
+      }
+      case _ => List.empty  // TODO (RW) log the error
+    }
+  }
+
+  private def getAgentEntities: List[AgentSummary] = {
+    repository.getAgentEntities match {
+      case Success(agentEntities) => agentEntities.flatMap { agentEntity =>
+        agentEntity.as[Option[AgentSummary]]
+      }
+      case _ => List.empty // TODO (RW) log the error
+    }
+  }
 
 }

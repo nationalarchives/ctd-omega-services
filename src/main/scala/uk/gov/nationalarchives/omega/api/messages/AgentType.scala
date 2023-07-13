@@ -22,7 +22,9 @@
 package uk.gov.nationalarchives.omega.api.messages
 
 import enumeratum.EnumEntry.CapitalWords
-import enumeratum.{ CirceEnum, Enum, EnumEntry }
+import enumeratum.{CirceEnum, Enum, EnumEntry}
+
+import scala.util.{Failure, Success, Try}
 
 sealed trait AgentType extends EnumEntry with CapitalWords
 
@@ -42,4 +44,16 @@ object AgentType extends Enum[AgentType] with CirceEnum[AgentType] {
 
   case object SoftwareAgent extends AgentType
 
+  def fromUriString(uriString: String): Try[AgentType] = uriString match {
+    case "http://cat.nationalarchives.gov.uk/corporate-body-concept" => Success(CorporateBody)
+    case "http://cat.nationalarchives.gov.uk/person-concept" => Success(Person)
+    case "http://cat.nationalarchives.gov.uk/collective-agent-concept" => Success(CollectiveAgent)
+    case "http://cat.nationalarchives.gov.uk/family-concept" => Success(Family)
+    case "http://cat.nationalarchives.gov.uk/hardware-agent-concept" => Success(HardwareAgent)
+    case "http://cat.nationalarchives.gov.uk/software-agent-concept" => Success(SoftwareAgent)
+    case unknown => Failure(UnknownAgentTypeException(s"Unknown agent type: $unknown"))
+  }
+
 }
+
+case class UnknownAgentTypeException(message: String) extends Exception(message)

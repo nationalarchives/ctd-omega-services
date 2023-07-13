@@ -70,17 +70,15 @@ class OmegaRepositorySpec extends AnyFreeSpec with Matchers with MockitoSugar {
               AgentType.Person,
               "3RX",
               "current description",
-              List(
                 AgentDescription(
                   "3RX",
                   "Abbot, Charles",
-                  false,
-                  false,
                   "2022-06-22T02:00:00-0500",
+                  None,
+                  None,
                   Some("1798"),
                   Some("1867")
                 )
-              )
             )
           )
         )
