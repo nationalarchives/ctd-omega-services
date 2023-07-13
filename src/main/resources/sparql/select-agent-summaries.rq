@@ -33,7 +33,12 @@ WHERE {
       		OPTIONAL {
         		?currentDescription foaf:title ?title .
       		}
-      BIND(COALESCE(CONCAT(?title," ",?givenName," ",?surname),CONCAT(?givenName," ",?surname),?surname) as ?label )
+      BIND(COALESCE(
+        CONCAT(?title," ",?givenName," ",?surname),
+        CONCAT(?givenName," ",?surname),
+        CONCAT(?title," ",?surname),
+        CONCAT(?title," ",?givenName),
+        ?surname, ?givenName, ?title) as ?label )
 	   }
     }
     OPTIONAL {
