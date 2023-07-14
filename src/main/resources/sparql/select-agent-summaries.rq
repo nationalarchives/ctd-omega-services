@@ -14,7 +14,7 @@ PREFIX prov: <http://www.w3.org/ns/prov#>
 SELECT DISTINCT ?identifier ?type ?currentDescription ?label ?dateFrom ?dateTo ?depository ?versionTimestamp ?previousDescription
 WHERE {
     ?identifier dct:type ?agentType .
-    
+
     VALUES (?agentType ?type ?dateFromProperty ?dateToProperty) {
     	(cat:corporate-body-concept "Corporate Body" rdaa:P50037 rdaa:P50038)
     	(cat:person-concept "Person" rdaa:P50120 rdaa:P50121)
@@ -26,10 +26,20 @@ WHERE {
 	    	?currentDescription rdaa:P50032 ?label .
 	    }
 	    UNION {
-	        ?currentDescription rdaa:P50292 ?givenName  .
-	        ?currentDescription rdaa:P50291 ?surname  .
-            BIND(CONCAT(?givenName," ",?surname) as ?label )
-	    }
+      		?currentDescription rdaa:P50291 ?surname  .
+      		OPTIONAL {
+    			?currentDescription rdaa:P50292 ?givenName .
+			}
+      		OPTIONAL {
+        		?currentDescription foaf:title ?title .
+      		}
+      BIND(COALESCE(
+        CONCAT(?title," ",?givenName," ",?surname),
+        CONCAT(?givenName," ",?surname),
+        CONCAT(?title," ",?surname),
+        CONCAT(?title," ",?givenName),
+        ?surname, ?givenName, ?title) as ?label )
+	   }
     }
     OPTIONAL {
     	?currentDescription ?dateFromProperty ?dateFromBNode .
