@@ -47,9 +47,9 @@ object AgentSummary {
 case class AgentDescription(
   identifier: String,
   label: String,
-  authorityFile: Boolean,
-  depository: Boolean,
   versionTimestamp: String,
+  authorityFile: Option[Boolean] = None,
+  depository: Option[Boolean] = None,
   dateFrom: Option[String] = None,
   dateTo: Option[String] = None,
   previousDescription: Option[String] = None

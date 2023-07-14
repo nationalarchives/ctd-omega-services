@@ -38,14 +38,32 @@ class TestStubData extends StubData {
       "48N",
       "current",
       List(
-        AgentDescription("48N", "Baden-Powell", false, false, "2022-06-22T02:00:00-0500", Some("1889"), Some("1977"))
+        AgentDescription(
+          "48N",
+          "Baden-Powell",
+          "2022-06-22T02:00:00-0500",
+          Some(false),
+          Some(false),
+          Some("1889"),
+          Some("1977")
+        )
       )
     ),
     AgentSummary(
       AgentType.Person,
       "46F",
       "current description",
-      List(AgentDescription("46F", "Fawkes, Guy", false, false, "2022-06-22T02:00:00-0500", Some("1570"), Some("1606")))
+      List(
+        AgentDescription(
+          "46F",
+          "Fawkes, Guy",
+          "2022-06-22T02:00:00-0500",
+          Some(false),
+          Some(false),
+          Some("1570"),
+          Some("1606")
+        )
+      )
     ),
     AgentSummary(
       AgentType.CorporateBody,
@@ -55,9 +73,9 @@ class TestStubData extends StubData {
         AgentDescription(
           "92W",
           "Joint Milk Quality Committee",
-          false,
-          false,
           "2022-06-22T02:00:00-0500",
+          Some(false),
+          Some(false),
           Some("1948"),
           Some("1948")
         )
@@ -67,7 +85,9 @@ class TestStubData extends StubData {
       AgentType.CorporateBody,
       "8R6",
       "current description",
-      List(AgentDescription("8R6", "Queen Anne's Bounty", false, false, "2022-06-22T02:00:00-0500", None, None))
+      List(
+        AgentDescription("8R6", "Queen Anne's Bounty", "2022-06-22T02:00:00-0500", Some(false), Some(false), None, None)
+      )
     )
   )
 }
