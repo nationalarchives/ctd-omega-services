@@ -29,8 +29,8 @@ import org.scalatest.TryValues._
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
-import uk.gov.nationalarchives.omega.api.messages.AgentType
-import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary, LegalStatus }
+import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
+import uk.gov.nationalarchives.omega.api.repository.model.AgentEntity
 
 import scala.util.{ Failure, Success, Try }
 
@@ -63,29 +63,23 @@ class OmegaRepositorySpec extends AnyFreeSpec with Matchers with MockitoSugar {
 
   "Get List Agent Summaries" - {
     "must return a Success with a list of one item" in {
-      when(mockConnector.execute[AgentSummary](any, any)).thenReturn(
+      when(mockConnector.execute[AgentEntity](any, any)).thenReturn(
         Try(
           List(
-            AgentSummary(
-              AgentType.Person,
-              "3RX",
-              "current description",
-              List(
-                AgentDescription(
-                  "3RX",
-                  "Abbot, Charles",
-                  false,
-                  false,
-                  "2022-06-22T02:00:00-0500",
-                  Some("1798"),
-                  Some("1867")
-                )
-              )
+            AgentEntity(
+              new URI("http://cat.nationalarchives.gov.uk/person-concept"),
+              new URI("http://cat.nationalarchives.gov.uk/agent.3LG"),
+              new URI("http://cat.nationalarchives.gov.uk/agent.3LG.1"),
+              "Edwin Hill",
+              "2023-01-25T14:18:41.668Z",
+              Some("1876"),
+              Some("1793"),
+              Some(false)
             )
           )
         )
       )
-      val result = repository.getAgentSummaries
+      val result = repository.getAgentEntities
       result.success.get.length mustBe 1
     }
 

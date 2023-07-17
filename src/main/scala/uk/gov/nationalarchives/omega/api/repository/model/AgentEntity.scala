@@ -22,7 +22,6 @@
 package uk.gov.nationalarchives.omega.api.repository.model
 
 import org.apache.jena.ext.xerces.util.URI
-import uk.gov.nationalarchives.omega.api.messages.AgentType
 import uk.gov.nationalarchives.omega.api.messages.AgentType.{ CollectiveAgent, CorporateBody, Family, HardwareAgent, Person, SoftwareAgent }
 import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary }
 
@@ -47,38 +46,37 @@ object AgentEntity {
 
   val cataloguePrefix = "http://cat.nationalarchives.gov.uk"
   implicit def agentMapper: AgentEntity => Option[AgentSummary] = (agentEntity: AgentEntity) =>
-    getAgentTypefromUri(agentEntity.agentType) match {
+    getAgentTypeFromUri(agentEntity.agentType) match {
       case Success(agentType) =>
         Some(
           AgentSummary(
             agentType,
             agentEntity.identifier.toString,
             agentEntity.currentDescription.toString,
-            List(
-              AgentDescription(
-                agentEntity.currentDescription.toString,
-                agentEntity.label,
-                agentEntity.versionTimestamp,
-                None,
-                agentEntity.depository,
-                agentEntity.dateFrom,
-                agentEntity.dateTo,
-                agentEntity.previousDescription
-              )
+            AgentDescription(
+              agentEntity.currentDescription.toString,
+              agentEntity.label,
+              agentEntity.versionTimestamp,
+              None,
+              agentEntity.depository,
+              agentEntity.dateFrom,
+              agentEntity.dateTo,
+              agentEntity.previousDescription
             )
           )
         )
       case _ => None // TODO (RW) log error here
     }
 
-  private def getAgentTypefromUri(agentTypeUri: URI) = agentTypeUri.toString match {
-    case s"$cataloguePrefix/corporate-body-concept"   => Success(CorporateBody)
-    case s"$cataloguePrefix/person-concept"           => Success(Person)
-    case s"$cataloguePrefix/collective-agent-concept" => Success(CollectiveAgent)
-    case s"$cataloguePrefix/family-concept"           => Success(Family)
-    case s"$cataloguePrefix/hardware-agent-concept"   => Success(HardwareAgent)
-    case s"$cataloguePrefix/software-agent-concept"   => Success(SoftwareAgent)
-    case unknown => Failure(new IllegalArgumentException(s"Unknown agent type: $unknown"))
-  }
+  private def getAgentTypeFromUri(agentTypeUri: URI) =
+    agentTypeUri.toString match {
+      case s"$cataloguePrefix/corporate-body-concept"   => Success(CorporateBody)
+      case s"$cataloguePrefix/person-concept"           => Success(Person)
+      case s"$cataloguePrefix/collective-agent-concept" => Success(CollectiveAgent)
+      case s"$cataloguePrefix/family-concept"           => Success(Family)
+      case s"$cataloguePrefix/hardware-agent-concept"   => Success(HardwareAgent)
+      case s"$cataloguePrefix/software-agent-concept"   => Success(SoftwareAgent)
+      case unknown => Failure(new IllegalArgumentException(s"Unknown agent type: $unknown"))
+    }
 
 }

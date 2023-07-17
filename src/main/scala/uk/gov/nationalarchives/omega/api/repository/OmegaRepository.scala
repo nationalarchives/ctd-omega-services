@@ -24,7 +24,8 @@ package uk.gov.nationalarchives.omega.api.repository
 import org.apache.jena.query.QuerySolution
 import org.phenoscape.sparql.FromQuerySolution
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
-import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentSummary, LegalStatus }
+import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
+import uk.gov.nationalarchives.omega.api.repository.model.AgentEntity
 
 import scala.util.Try
 
@@ -43,11 +44,11 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
   override def getLegalStatusSummaries: Try[List[LegalStatus]] =
     processQuery[LegalStatus](getLegalStatusSummarySparqlResource, implicitly[FromQuerySolution[LegalStatus]])
 
-  override def getAgentSummaries: Try[List[AgentSummary]] =
-    processQuery[AgentSummary](getAgentSummariesSparqlResource, implicitly[FromQuerySolution[AgentSummary]])
+  override def getAgentEntities: Try[List[AgentEntity]] =
+    processQuery[AgentEntity](getAgentSummariesSparqlResource, implicitly[FromQuerySolution[AgentEntity]])
 
-  override def getPlaceOfDepositSummaries: Try[List[AgentSummary]] =
-    processQuery[AgentSummary](getPlaceOfDepositSummariesSparqlResource, implicitly[FromQuerySolution[AgentSummary]])
+  override def getPlaceOfDepositEntities: Try[List[AgentEntity]] =
+    processQuery[AgentEntity](getPlaceOfDepositSummariesSparqlResource, implicitly[FromQuerySolution[AgentEntity]])
 
   def processQuery[A](queryResource: String, queryDecoder: FromQuerySolution[A]): Try[List[A]] =
     for {

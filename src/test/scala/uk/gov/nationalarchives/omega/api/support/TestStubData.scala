@@ -24,6 +24,9 @@ package uk.gov.nationalarchives.omega.api.support
 import uk.gov.nationalarchives.omega.api.messages.{ AgentType, StubData }
 import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary, LegalStatus }
+import uk.gov.nationalarchives.omega.api.repository.model.AgentEntity
+
+import scala.util.Try
 
 class TestStubData extends StubData {
 
@@ -37,56 +40,93 @@ class TestStubData extends StubData {
       AgentType.Person,
       "48N",
       "current",
-      List(
-        AgentDescription(
-          "48N",
-          "Baden-Powell",
-          "2022-06-22T02:00:00-0500",
-          Some(false),
-          Some(false),
-          Some("1889"),
-          Some("1977")
-        )
+      AgentDescription(
+        "48N",
+        "Baden-Powell",
+        "2022-06-22T02:00:00-0500",
+        Some(false),
+        Some(false),
+        Some("1889"),
+        Some("1977")
       )
     ),
     AgentSummary(
       AgentType.Person,
       "46F",
       "current description",
-      List(
-        AgentDescription(
-          "46F",
-          "Fawkes, Guy",
-          "2022-06-22T02:00:00-0500",
-          Some(false),
-          Some(false),
-          Some("1570"),
-          Some("1606")
-        )
+      AgentDescription(
+        "46F",
+        "Fawkes, Guy",
+        "2022-06-22T02:00:00-0500",
+        Some(false),
+        Some(false),
+        Some("1570"),
+        Some("1606")
       )
     ),
     AgentSummary(
       AgentType.CorporateBody,
       "92W",
       "current description",
-      List(
-        AgentDescription(
-          "92W",
-          "Joint Milk Quality Committee",
-          "2022-06-22T02:00:00-0500",
-          Some(false),
-          Some(false),
-          Some("1948"),
-          Some("1948")
-        )
+      AgentDescription(
+        "92W",
+        "Joint Milk Quality Committee",
+        "2022-06-22T02:00:00-0500",
+        Some(false),
+        Some(false),
+        Some("1948"),
+        Some("1948")
       )
     ),
     AgentSummary(
       AgentType.CorporateBody,
       "8R6",
       "current description",
-      List(
-        AgentDescription("8R6", "Queen Anne's Bounty", "2022-06-22T02:00:00-0500", Some(false), Some(false), None, None)
+      AgentDescription("8R6", "Queen Anne's Bounty", "2022-06-22T02:00:00-0500", Some(false), Some(false), None, None)
+    )
+  )
+
+  override def getAgentEntities(): Try[List[AgentEntity]] = Try(
+    List(
+      AgentEntity(
+        new URI("http://catalogue.nationalarchives.gov.uk/person-concept"),
+        new URI("http://catalogue.nationalarchives.gov.uk/person-concept/48N"),
+        new URI("http://catalogue.nationalarchives.gov.uk/person-concept/current"),
+        "Baden-Powell",
+        "2022-06-22T02:00:00-0500",
+        Some("1889"),
+        Some("1977"),
+        Some(false)
+      ),
+      AgentEntity(
+        new URI("http://catalogue.nationalarchives.gov.uk/person-concept"),
+        new URI("http://catalogue.nationalarchives.gov.uk/person-concept/46F"),
+        new URI("http://catalogue.nationalarchives.gov.uk/person-concept/current description"),
+        "Fawkes, Guy",
+        "2022-06-22T02:00:00-0500",
+        Some("1570"),
+        Some("1606"),
+        Some(false)
+      ),
+      AgentEntity(
+        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept"),
+        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept/92W"),
+        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept/current description"),
+        "Joint Milk Quality Committee",
+        "2022-06-22T02:00:00-0500",
+        Some("1948"),
+        Some("1948"),
+        Some(false)
+      ),
+      AgentEntity(
+        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept"),
+        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept/8R6"),
+        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept/current description"),
+        "Queen Anne's Bounty",
+        "2022-06-22T02:00:00-0500",
+        None,
+        None,
+        Some(false)
       )
     )
   )

@@ -22,7 +22,8 @@
 package uk.gov.nationalarchives.omega.api.repository
 
 import org.apache.jena.query.{ Query, QueryFactory, Syntax }
-import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentSummary, LegalStatus }
+import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
+import uk.gov.nationalarchives.omega.api.repository.model.AgentEntity
 
 import scala.io.Source
 import scala.util.{ Failure, Try, Using }
@@ -31,9 +32,9 @@ trait AbstractRepository {
 
   def getLegalStatusSummaries: Try[List[LegalStatus]]
 
-  def getAgentSummaries: Try[List[AgentSummary]]
+  def getAgentEntities: Try[List[AgentEntity]]
 
-  def getPlaceOfDepositSummaries: Try[List[AgentSummary]]
+  def getPlaceOfDepositEntities: Try[List[AgentEntity]]
 
   protected def getQueryText(queryResource: String): Try[String] =
     Using(Source.fromInputStream(getClass.getResourceAsStream(queryResource))) { resource =>

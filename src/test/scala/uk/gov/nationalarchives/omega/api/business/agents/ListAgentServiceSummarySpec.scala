@@ -27,7 +27,7 @@ import uk.gov.nationalarchives.omega.api.messages.AgentType
 import uk.gov.nationalarchives.omega.api.messages.AgentType.CorporateBody
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.InvalidMessagePayload
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.OmegaRepository
+import uk.gov.nationalarchives.omega.api.repository.{ AbstractRepository, OmegaRepository }
 import uk.gov.nationalarchives.omega.api.support.{ TestStubData, UnitTest }
 
 import scala.util.Try
@@ -35,7 +35,7 @@ import scala.util.Try
 class ListAgentServiceSummarySpec extends UnitTest {
 
   private val stubData = new TestStubData
-  private val mockRepository = mock[OmegaRepository]
+  private val mockRepository = mock[AbstractRepository]
 
   val listAgentSummaryService = new ListAgentSummaryService(stubData, mockRepository)
 
@@ -43,13 +43,13 @@ class ListAgentServiceSummarySpec extends UnitTest {
     "returns a result on processRequest when given" - {
       "a valid listAgentSummaryRequest" in {
 
+        when(mockRepository.getAgentEntities).thenReturn(stubData.getAgentEntities())
         val listAgentSummaryRequest = ListAgentSummary(
           List(AgentType.CorporateBody, AgentType.Person),
           authorityFile = Some(false),
           depository = Some(false),
           versionTimestamp = Some("all")
         )
-        when(mockRepository.getAgentSummaries).thenReturn(Try(stubData.getAgentSummaries()))
         val result = listAgentSummaryService.process(listAgentSummaryRequest)
         result mustBe
           Right(ListAgentSummaryReply(getExpectedAgentSummaries))
