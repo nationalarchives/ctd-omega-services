@@ -25,8 +25,6 @@ import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary, LegalStatus }
 import uk.gov.nationalarchives.omega.api.repository.model.AgentEntity
 
-import scala.util.Try
-
 class StubDataImpl extends StubData
 
 trait StubData {
@@ -1889,7 +1887,7 @@ trait StubData {
     )
   )
 
-  def getAgentEntities(): Try[List[AgentEntity]] = Try(
+  def getAgentEntities(): List[AgentEntity] =
     List(
       AgentEntity(
         new URI("http://catalogue.nationalarchives.gov.uk/person-concept"),
@@ -1932,5 +1930,18 @@ trait StubData {
         Some(false)
       )
     )
-  )
+
+  def getPlaceOfDepositEntities(): List[AgentEntity] =
+    List(
+      AgentEntity(
+        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept"),
+        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept/8R6"),
+        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept/current description"),
+        "Queen Anne's Bounty",
+        "2022-06-22T02:00:00-0500",
+        None,
+        None,
+        Some(false)
+      )
+    )
 }

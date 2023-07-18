@@ -27,7 +27,7 @@ import uk.gov.nationalarchives.omega.api.messages.AgentType
 import uk.gov.nationalarchives.omega.api.messages.AgentType.CorporateBody
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.InvalidMessagePayload
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.{ AbstractRepository, OmegaRepository }
+import uk.gov.nationalarchives.omega.api.repository.OmegaRepository
 import uk.gov.nationalarchives.omega.api.support.{ TestStubData, UnitTest }
 
 import scala.util.Try
@@ -35,24 +35,37 @@ import scala.util.Try
 class ListAgentServiceSummarySpec extends UnitTest {
 
   private val stubData = new TestStubData
-  private val mockRepository = mock[AbstractRepository]
-
-  val listAgentSummaryService = new ListAgentSummaryService(stubData, mockRepository)
+  private val mockRepository = mock[OmegaRepository]
+  private val listAgentSummaryService = new ListAgentSummaryService(stubData, mockRepository)
 
   "The ListAgentSummaryService" - {
     "returns a result on processRequest when given" - {
       "a valid listAgentSummaryRequest" in {
 
-        when(mockRepository.getAgentEntities).thenReturn(stubData.getAgentEntities())
+        when(mockRepository.getAgentEntities).thenReturn(Try(stubData.getAgentEntities()))
         val listAgentSummaryRequest = ListAgentSummary(
           List(AgentType.CorporateBody, AgentType.Person),
-          authorityFile = Some(false),
+          versionTimestamp = Some("all"),
           depository = Some(false),
-          versionTimestamp = Some("all")
+          authorityFile = Some(false)
         )
         val result = listAgentSummaryService.process(listAgentSummaryRequest)
         result mustBe
           Right(ListAgentSummaryReply(getExpectedAgentSummaries))
+      }
+
+      "a valid listAgentSummaryRequest for place of deposit" in {
+
+        when(mockRepository.getPlaceOfDepositEntities).thenReturn(Try(stubData.getPlaceOfDepositEntities()))
+        val listAgentSummaryRequest = ListAgentSummary(
+          List(AgentType.CorporateBody),
+          versionTimestamp = Some("all"),
+          depository = Some(true),
+          authorityFile = Some(false)
+        )
+        val result = listAgentSummaryService.process(listAgentSummaryRequest)
+        result mustBe
+          Right(ListAgentSummaryReply(getExpectedPlaceOfDepositSummaries))
       }
 
       // NOTE (RW): This test is ignored as empty requests are not allowed by SQS although they are allowed by the schema
@@ -171,65 +184,81 @@ class ListAgentServiceSummarySpec extends UnitTest {
   private def getExpectedAgentSummaries: String = s"""[
   {
     "type" : "Person",
-    "identifier" : "48N",
-    "current-description" : "current",
-    "description" : [
-      {
-        "identifier" : "48N",
-        "label" : "Baden-Powell",
-        "authority-file" : false,
-        "depository" : false,
-        "version-timestamp" : "2022-06-22T02:00:00-0500",
-        "date-from" : "1889",
-        "date-to" : "1977"
-      }
-    ]
+    "identifier" : "http://cat.nationalarchives.gov.uk/person-concept/agent.48N",
+    "current-description" : "http://cat.nationalarchives.gov.uk/person-concept/agent.48N.1",
+    "description" : {
+      "identifier" : "http://cat.nationalarchives.gov.uk/person-concept/agent.48N.1",
+      "label" : "Baden-Powell",
+      "depository" : false,
+      "version-timestamp" : "2022-06-22T02:00:00-0500",
+      "date-from" : "1889",
+      "date-to" : "1977"
+    }
   },
   {
     "type" : "Person",
-    "identifier" : "46F",
-    "current-description" : "current description",
-    "description" : [
-      {
-        "identifier" : "46F",
-        "label" : "Fawkes, Guy",
-        "authority-file" : false,
-        "depository" : false,
-        "version-timestamp" : "2022-06-22T02:00:00-0500",
-        "date-from" : "1570",
-        "date-to" : "1606"
-      }
-    ]
+    "identifier" : "http://cat.nationalarchives.gov.uk/person-concept/agent.46F",
+    "current-description" : "http://cat.nationalarchives.gov.uk/person-concept/agent.46F.1",
+    "description" : {
+      "identifier" : "http://cat.nationalarchives.gov.uk/person-concept/agent.46F.1",
+      "label" : "Fawkes, Guy",
+      "depository" : false,
+      "version-timestamp" : "2022-06-22T02:00:00-0500",
+      "date-from" : "1570",
+      "date-to" : "1606"
+    }
   },
   {
     "type" : "Corporate Body",
-    "identifier" : "92W",
-    "current-description" : "current description",
-    "description" : [
-      {
-        "identifier" : "92W",
-        "label" : "Joint Milk Quality Committee",
-        "authority-file" : false,
-        "depository" : false,
-        "version-timestamp" : "2022-06-22T02:00:00-0500",
-        "date-from" : "1948",
-        "date-to" : "1948"
-      }
-    ]
+    "identifier" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.92W",
+    "current-description" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.92W.1",
+    "description" : {
+      "identifier" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.92W.1",
+      "label" : "Joint Milk Quality Committee",
+      "depository" : false,
+      "version-timestamp" : "2022-06-22T02:00:00-0500",
+      "date-from" : "1948",
+      "date-to" : "1948"
+    }
   },
   {
     "type" : "Corporate Body",
-    "identifier" : "8R6",
-    "current-description" : "current description",
-    "description" : [
-      {
-        "identifier" : "8R6",
-        "label" : "Queen Anne's Bounty",
-        "authority-file" : false,
-        "depository" : false,
-        "version-timestamp" : "2022-06-22T02:00:00-0500"
-      }
-    ]
+    "identifier" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.8R6",
+    "current-description" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.8R6.1",
+    "description" : {
+      "identifier" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.8R6.1",
+      "label" : "Queen Anne's Bounty",
+      "depository" : false,
+      "version-timestamp" : "2022-06-22T02:00:00-0500"
+    }
+  },
+  {
+    "type" : "Corporate Body",
+    "identifier" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.S7",
+    "current-description" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.S7.1",
+    "description" : {
+      "identifier" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.S7.1",
+      "label" : "The National Archives, Kew",
+      "depository" : true,
+      "version-timestamp" : "2022-06-22T02:00:00-0500",
+      "date-from" : "2003"
+    }
   }
 ]""".stripMargin
+
+  private def getExpectedPlaceOfDepositSummaries: String = s"""[
+  {
+    "type" : "Corporate Body",
+    "identifier" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.S7",
+    "current-description" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.S7.1",
+    "description" : {
+      "identifier" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.S7.1",
+      "label" : "The National Archives, Kew",
+      "depository" : true,
+      "version-timestamp" : "2022-06-22T02:00:00-0500",
+      "date-from" : "2003"
+    }
+  }
+]""".stripMargin
+
 }

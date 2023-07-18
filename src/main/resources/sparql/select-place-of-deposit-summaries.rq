@@ -11,7 +11,7 @@ PREFIX time: <http://www.w3.org/2006/time#>
 PREFIX todo: <http://TODO/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 
-SELECT DISTINCT ?identifier ?type ?currentDescription ?label ?dateFrom ?dateTo ?depository ?versionTimestamp ?previousDescription
+SELECT DISTINCT ?identifier ?agentType ?currentDescription ?label ?dateFrom ?dateTo ?depository ?versionTimestamp ?previousDescription
 WHERE {
     ?identifier dct:type ?agentType .
 

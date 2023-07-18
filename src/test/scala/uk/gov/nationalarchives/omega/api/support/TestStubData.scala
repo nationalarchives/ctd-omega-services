@@ -26,8 +26,6 @@ import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary, LegalStatus }
 import uk.gov.nationalarchives.omega.api.repository.model.AgentEntity
 
-import scala.util.Try
-
 class TestStubData extends StubData {
 
   override def getLegalStatuses(): List[LegalStatus] = List(
@@ -86,12 +84,12 @@ class TestStubData extends StubData {
     )
   )
 
-  override def getAgentEntities(): Try[List[AgentEntity]] = Try(
+  override def getAgentEntities(): List[AgentEntity] =
     List(
       AgentEntity(
-        new URI("http://catalogue.nationalarchives.gov.uk/person-concept"),
-        new URI("http://catalogue.nationalarchives.gov.uk/person-concept/48N"),
-        new URI("http://catalogue.nationalarchives.gov.uk/person-concept/current"),
+        new URI("http://cat.nationalarchives.gov.uk/person-concept"),
+        new URI("http://cat.nationalarchives.gov.uk/person-concept/agent.48N"),
+        new URI("http://cat.nationalarchives.gov.uk/person-concept/agent.48N.1"),
         "Baden-Powell",
         "2022-06-22T02:00:00-0500",
         Some("1889"),
@@ -99,9 +97,9 @@ class TestStubData extends StubData {
         Some(false)
       ),
       AgentEntity(
-        new URI("http://catalogue.nationalarchives.gov.uk/person-concept"),
-        new URI("http://catalogue.nationalarchives.gov.uk/person-concept/46F"),
-        new URI("http://catalogue.nationalarchives.gov.uk/person-concept/current description"),
+        new URI("http://cat.nationalarchives.gov.uk/person-concept"),
+        new URI("http://cat.nationalarchives.gov.uk/person-concept/agent.46F"),
+        new URI("http://cat.nationalarchives.gov.uk/person-concept/agent.46F.1"),
         "Fawkes, Guy",
         "2022-06-22T02:00:00-0500",
         Some("1570"),
@@ -109,9 +107,9 @@ class TestStubData extends StubData {
         Some(false)
       ),
       AgentEntity(
-        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept"),
-        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept/92W"),
-        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept/current description"),
+        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
+        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.92W"),
+        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.92W.1"),
         "Joint Milk Quality Committee",
         "2022-06-22T02:00:00-0500",
         Some("1948"),
@@ -119,15 +117,24 @@ class TestStubData extends StubData {
         Some(false)
       ),
       AgentEntity(
-        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept"),
-        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept/8R6"),
-        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept/current description"),
+        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
+        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.8R6"),
+        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.8R6.1"),
         "Queen Anne's Bounty",
         "2022-06-22T02:00:00-0500",
         None,
         None,
         Some(false)
+      ),
+      AgentEntity(
+        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
+        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.S7"),
+        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.S7.1"),
+        "The National Archives, Kew",
+        "2022-06-22T02:00:00-0500",
+        Some("2003"),
+        None,
+        Some(true)
       )
     )
-  )
 }

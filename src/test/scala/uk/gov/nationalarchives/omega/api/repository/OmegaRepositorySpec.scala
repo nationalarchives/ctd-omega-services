@@ -83,5 +83,25 @@ class OmegaRepositorySpec extends AnyFreeSpec with Matchers with MockitoSugar {
       result.success.get.length mustBe 1
     }
 
+    "must return a Success with a place of deposit" in {
+      when(mockConnector.execute[AgentEntity](any, any)).thenReturn(
+        Try(
+          List(
+            AgentEntity(
+              new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
+              new URI("http://cat.nationalarchives.gov.uk/agent.S7"),
+              new URI("http://cat.nationalarchives.gov.uk/agent.S7"),
+              "The National Archives, Kew",
+              "2022-06-22T02:00:00-0500",
+              Some("2003"),
+              None,
+              Some(true)
+            )
+          )
+        )
+      )
+      val result = repository.getPlaceOfDepositEntities
+      result.success.get.length mustBe 1
+    }
   }
 }
