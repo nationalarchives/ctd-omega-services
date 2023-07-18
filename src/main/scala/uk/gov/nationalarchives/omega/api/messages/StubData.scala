@@ -1890,9 +1890,9 @@ trait StubData {
   def getAgentEntities(): List[AgentEntity] =
     List(
       AgentEntity(
-        new URI("http://catalogue.nationalarchives.gov.uk/person-concept"),
-        new URI("http://catalogue.nationalarchives.gov.uk/person-concept/48N"),
-        new URI("http://catalogue.nationalarchives.gov.uk/person-concept/current"),
+        new URI("http://cat.nationalarchives.gov.uk/person-concept"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.48N"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.48N.1"),
         "Baden-Powell",
         "2022-06-22T02:00:00-0500",
         Some("1889"),
@@ -1900,9 +1900,9 @@ trait StubData {
         Some(false)
       ),
       AgentEntity(
-        new URI("http://catalogue.nationalarchives.gov.uk/person-concept"),
-        new URI("http://catalogue.nationalarchives.gov.uk/person-concept/46F"),
-        new URI("http://catalogue.nationalarchives.gov.uk/person-concept/current description"),
+        new URI("http://cat.nationalarchives.gov.uk/person-concept"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.46F"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.46F.1"),
         "Fawkes, Guy",
         "2022-06-22T02:00:00-0500",
         Some("1570"),
@@ -1910,9 +1910,9 @@ trait StubData {
         Some(false)
       ),
       AgentEntity(
-        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept"),
-        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept/92W"),
-        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept/current description"),
+        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.92W"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.92W.1"),
         "Joint Milk Quality Committee",
         "2022-06-22T02:00:00-0500",
         Some("1948"),
@@ -1920,9 +1920,9 @@ trait StubData {
         Some(false)
       ),
       AgentEntity(
-        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept"),
-        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept/8R6"),
-        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept/current description"),
+        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.8R6"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.8R6.1"),
         "Queen Anne's Bounty",
         "2022-06-22T02:00:00-0500",
         None,
@@ -1934,9 +1934,9 @@ trait StubData {
   def getPlaceOfDepositEntities(): List[AgentEntity] =
     List(
       AgentEntity(
-        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept"),
-        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept/8R6"),
-        new URI("http://catalogue.nationalarchives.gov.uk/corporate-body-concept/current description"),
+        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
+        new URI("http://cat.nationalarchives.gov.uk/8R6"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.8R6.1"),
         "Queen Anne's Bounty",
         "2022-06-22T02:00:00-0500",
         None,

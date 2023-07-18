@@ -88,8 +88,8 @@ class TestStubData extends StubData {
     List(
       AgentEntity(
         new URI("http://cat.nationalarchives.gov.uk/person-concept"),
-        new URI("http://cat.nationalarchives.gov.uk/person-concept/agent.48N"),
-        new URI("http://cat.nationalarchives.gov.uk/person-concept/agent.48N.1"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.48N"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.48N.1"),
         "Baden-Powell",
         "2022-06-22T02:00:00-0500",
         Some("1889"),
@@ -98,8 +98,8 @@ class TestStubData extends StubData {
       ),
       AgentEntity(
         new URI("http://cat.nationalarchives.gov.uk/person-concept"),
-        new URI("http://cat.nationalarchives.gov.uk/person-concept/agent.46F"),
-        new URI("http://cat.nationalarchives.gov.uk/person-concept/agent.46F.1"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.46F"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.46F.1"),
         "Fawkes, Guy",
         "2022-06-22T02:00:00-0500",
         Some("1570"),
@@ -108,8 +108,8 @@ class TestStubData extends StubData {
       ),
       AgentEntity(
         new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
-        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.92W"),
-        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.92W.1"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.92W"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.92W.1"),
         "Joint Milk Quality Committee",
         "2022-06-22T02:00:00-0500",
         Some("1948"),
@@ -118,8 +118,8 @@ class TestStubData extends StubData {
       ),
       AgentEntity(
         new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
-        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.8R6"),
-        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.8R6.1"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.8R6"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.8R6.1"),
         "Queen Anne's Bounty",
         "2022-06-22T02:00:00-0500",
         None,
@@ -128,8 +128,8 @@ class TestStubData extends StubData {
       ),
       AgentEntity(
         new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
-        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.S7"),
-        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.S7.1"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.S7"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.S7.1"),
         "The National Archives, Kew",
         "2022-06-22T02:00:00-0500",
         Some("2003"),
@@ -137,4 +137,19 @@ class TestStubData extends StubData {
         Some(true)
       )
     )
+
+  override def getPlaceOfDepositEntities(): List[AgentEntity] =
+    List(
+      AgentEntity(
+        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.S7"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.S7.1"),
+        "The National Archives, Kew",
+        "2022-06-22T02:00:00-0500",
+        Some("2003"),
+        None,
+        Some(true)
+      )
+    )
+
 }

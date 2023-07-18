@@ -184,10 +184,10 @@ class ListAgentServiceSummarySpec extends UnitTest {
   private def getExpectedAgentSummaries: String = s"""[
   {
     "type" : "Person",
-    "identifier" : "http://cat.nationalarchives.gov.uk/person-concept/agent.48N",
-    "current-description" : "http://cat.nationalarchives.gov.uk/person-concept/agent.48N.1",
+    "identifier" : "http://cat.nationalarchives.gov.uk/agent.48N",
+    "current-description" : "http://cat.nationalarchives.gov.uk/agent.48N.1",
     "description" : {
-      "identifier" : "http://cat.nationalarchives.gov.uk/person-concept/agent.48N.1",
+      "identifier" : "http://cat.nationalarchives.gov.uk/agent.48N.1",
       "label" : "Baden-Powell",
       "depository" : false,
       "version-timestamp" : "2022-06-22T02:00:00-0500",
@@ -197,10 +197,10 @@ class ListAgentServiceSummarySpec extends UnitTest {
   },
   {
     "type" : "Person",
-    "identifier" : "http://cat.nationalarchives.gov.uk/person-concept/agent.46F",
-    "current-description" : "http://cat.nationalarchives.gov.uk/person-concept/agent.46F.1",
+    "identifier" : "http://cat.nationalarchives.gov.uk/agent.46F",
+    "current-description" : "http://cat.nationalarchives.gov.uk/agent.46F.1",
     "description" : {
-      "identifier" : "http://cat.nationalarchives.gov.uk/person-concept/agent.46F.1",
+      "identifier" : "http://cat.nationalarchives.gov.uk/agent.46F.1",
       "label" : "Fawkes, Guy",
       "depository" : false,
       "version-timestamp" : "2022-06-22T02:00:00-0500",
@@ -210,10 +210,10 @@ class ListAgentServiceSummarySpec extends UnitTest {
   },
   {
     "type" : "Corporate Body",
-    "identifier" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.92W",
-    "current-description" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.92W.1",
+    "identifier" : "http://cat.nationalarchives.gov.uk/agent.92W",
+    "current-description" : "http://cat.nationalarchives.gov.uk/agent.92W.1",
     "description" : {
-      "identifier" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.92W.1",
+      "identifier" : "http://cat.nationalarchives.gov.uk/agent.92W.1",
       "label" : "Joint Milk Quality Committee",
       "depository" : false,
       "version-timestamp" : "2022-06-22T02:00:00-0500",
@@ -223,10 +223,10 @@ class ListAgentServiceSummarySpec extends UnitTest {
   },
   {
     "type" : "Corporate Body",
-    "identifier" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.8R6",
-    "current-description" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.8R6.1",
+    "identifier" : "http://cat.nationalarchives.gov.uk/agent.8R6",
+    "current-description" : "http://cat.nationalarchives.gov.uk/agent.8R6.1",
     "description" : {
-      "identifier" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.8R6.1",
+      "identifier" : "http://cat.nationalarchives.gov.uk/agent.8R6.1",
       "label" : "Queen Anne's Bounty",
       "depository" : false,
       "version-timestamp" : "2022-06-22T02:00:00-0500"
@@ -234,10 +234,10 @@ class ListAgentServiceSummarySpec extends UnitTest {
   },
   {
     "type" : "Corporate Body",
-    "identifier" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.S7",
-    "current-description" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.S7.1",
+    "identifier" : "http://cat.nationalarchives.gov.uk/agent.S7",
+    "current-description" : "http://cat.nationalarchives.gov.uk/agent.S7.1",
     "description" : {
-      "identifier" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.S7.1",
+      "identifier" : "http://cat.nationalarchives.gov.uk/agent.S7.1",
       "label" : "The National Archives, Kew",
       "depository" : true,
       "version-timestamp" : "2022-06-22T02:00:00-0500",
@@ -249,10 +249,10 @@ class ListAgentServiceSummarySpec extends UnitTest {
   private def getExpectedPlaceOfDepositSummaries: String = s"""[
   {
     "type" : "Corporate Body",
-    "identifier" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.S7",
-    "current-description" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.S7.1",
+    "identifier" : "http://cat.nationalarchives.gov.uk/agent.S7",
+    "current-description" : "http://cat.nationalarchives.gov.uk/agent.S7.1",
     "description" : {
-      "identifier" : "http://cat.nationalarchives.gov.uk/corporate-body-concept/agent.S7.1",
+      "identifier" : "http://cat.nationalarchives.gov.uk/agent.S7.1",
       "label" : "The National Archives, Kew",
       "depository" : true,
       "version-timestamp" : "2022-06-22T02:00:00-0500",
