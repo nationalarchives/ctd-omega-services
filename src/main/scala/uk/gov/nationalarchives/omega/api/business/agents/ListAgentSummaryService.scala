@@ -44,10 +44,6 @@ class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRe
     Try(requestMessage.asInstanceOf[ListAgentSummary]) match {
       case Success(listAgentSummary) =>
         Right(ListAgentSummaryReply(getAgentSummaries(listAgentSummary).asJson.toString()))
-//        match {
-//          case Success(listAgentSummaries) => Right(ListAgentSummaryReply(listAgentSummaries.asJson.toString()))
-//          case Failure(e)                  => Left(ListAgentSummaryError(e.getMessage))
-//        }
       case Failure(exception) => Left(ListAgentSummaryError(exception.getMessage))
     }
 
