@@ -34,4 +34,24 @@ class OmegaRepositoryISpec
       }
     }
   }
+
+  "Get List Agent Entities" - {
+
+    "must return a List of 24 AgentEntity items" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getAgentEntities
+        result.success.get.length mustBe 24
+      }
+
+    }
+
+    "must return a List of 2 places of deposit AgentEntity items" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getPlaceOfDepositEntities
+        result.success.get.length mustBe 2
+      }
+    }
+  }
 }

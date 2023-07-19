@@ -30,15 +30,16 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
+import uk.gov.nationalarchives.omega.api.repository.model.AgentEntity
 
-import scala.util.{ Failure, Success }
+import scala.util.{ Failure, Success, Try }
 
 class OmegaRepositorySpec extends AnyFreeSpec with Matchers with MockitoSugar {
 
-  "Get Legal Status summaries" - {
+  val mockConnector = mock[SparqlEndpointConnector]
+  val repository = new OmegaRepository(mockConnector)
 
-    val mockConnector = mock[SparqlEndpointConnector]
-    val repository = new OmegaRepository(mockConnector)
+  "Get Legal Status summaries" - {
 
     "must return a Success with an empty list" in {
       when(mockConnector.execute[LegalStatus](any, any)).thenReturn(Success(List.empty))
@@ -60,4 +61,47 @@ class OmegaRepositorySpec extends AnyFreeSpec with Matchers with MockitoSugar {
     }
   }
 
+  "Get List Agent Summaries" - {
+    "must return a Success with a list of one item" in {
+      when(mockConnector.execute[AgentEntity](any, any)).thenReturn(
+        Try(
+          List(
+            AgentEntity(
+              new URI("http://cat.nationalarchives.gov.uk/person-concept"),
+              new URI("http://cat.nationalarchives.gov.uk/agent.3LG"),
+              new URI("http://cat.nationalarchives.gov.uk/agent.3LG.1"),
+              "Edwin Hill",
+              "2023-01-25T14:18:41.668Z",
+              Some("1876"),
+              Some("1793"),
+              Some(false)
+            )
+          )
+        )
+      )
+      val result = repository.getAgentEntities
+      result.success.get.length mustBe 1
+    }
+
+    "must return a Success with a place of deposit" in {
+      when(mockConnector.execute[AgentEntity](any, any)).thenReturn(
+        Try(
+          List(
+            AgentEntity(
+              new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
+              new URI("http://cat.nationalarchives.gov.uk/agent.S7"),
+              new URI("http://cat.nationalarchives.gov.uk/agent.S7"),
+              "The National Archives, Kew",
+              "2022-06-22T02:00:00-0500",
+              Some("2003"),
+              None,
+              Some(true)
+            )
+          )
+        )
+      )
+      val result = repository.getPlaceOfDepositEntities
+      result.success.get.length mustBe 1
+    }
+  }
 }

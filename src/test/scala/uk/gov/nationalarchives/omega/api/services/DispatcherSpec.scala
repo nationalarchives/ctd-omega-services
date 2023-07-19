@@ -56,7 +56,7 @@ class DispatcherSpec
   private val echoService = new EchoService()
   private val mockRepository = mock[OmegaRepository]
   private val legalStatusService = new LegalStatusService(new StubDataImpl, mockRepository)
-  private val listAgentSummaryService = new ListAgentSummaryService(new StubDataImpl)
+  private val listAgentSummaryService = new ListAgentSummaryService(new StubDataImpl, mockRepository)
   private lazy val dispatcher =
     new Dispatcher(testLocalProducer, localMessageStore, echoService, legalStatusService, listAgentSummaryService)
 

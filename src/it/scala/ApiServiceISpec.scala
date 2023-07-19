@@ -168,7 +168,7 @@ class ApiServiceISpec
                               |}""".stripMargin)
 
         sendMessage(f.session, f.producer, textMessageConfig)
-        assertReplyMessage(agentSummariesExpectedResult)
+        assertReplyMessage(agentPlaceOfDepositSummariesExpectedResult)
 
       }
 
@@ -360,6 +360,13 @@ class ApiServiceISpec
     }
   }
 
+  private def agentPlaceOfDepositSummariesExpectedResult = {
+    val summaries = Source.fromResource("expected-place-of-deposit-summaries.json").getLines().mkString
+    parse(summaries) match {
+      case Right(json) => json.printWith(Printer.spaces2)
+      case Left(_)     => ""
+    }
+  }
 }
 
 case class TextMessageConfig(
