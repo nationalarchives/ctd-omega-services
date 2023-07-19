@@ -25,7 +25,8 @@ import org.apache.jena.query.QuerySolution
 import org.phenoscape.sparql.FromQuerySolution
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
-import uk.gov.nationalarchives.omega.api.repository.model.AgentEntity
+import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
+import uk.gov.nationalarchives.omega.api.repository.model.{ AgentDescriptionEntity, AgentEntity, AgentSummaryEntity }
 
 import scala.util.Try
 
@@ -33,7 +34,9 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
 
   private val sparqlResourceDir = "sparql"
   private val getLegalStatusSummarySparqlResource = s"/$sparqlResourceDir/select-legal-status-summaries.rq"
-  private val getAgentSummariesSparqlResource = s"/$sparqlResourceDir/select-agent-summaries.rq"
+  private val selectAgentSummariesSparqlResource = s"/$sparqlResourceDir/select-agent-summaries.rq"
+  private val getAgentSummariesSparqlResource = s"s/$sparqlResourceDir/get-agent-summaries.rq"
+  private val getAgentDescriptionsSparqlResource = s"s/$sparqlResourceDir/get-agent-descriptions.rq"
   private val getPlaceOfDepositSummariesSparqlResource = s"/$sparqlResourceDir/select-place-of-deposit-summaries.rq"
 
   implicit object BooleanFromQuerySolution extends FromQuerySolution[Boolean] {
@@ -45,16 +48,46 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
     processQuery[LegalStatus](getLegalStatusSummarySparqlResource, implicitly[FromQuerySolution[LegalStatus]])
 
   override def getAgentEntities: Try[List[AgentEntity]] =
-    processQuery[AgentEntity](getAgentSummariesSparqlResource, implicitly[FromQuerySolution[AgentEntity]])
+    processQuery[AgentEntity](selectAgentSummariesSparqlResource, implicitly[FromQuerySolution[AgentEntity]])
+
+  override def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): Try[List[AgentSummaryEntity]] = {
+    val params = SparqlParams()
+    processParameterizedQuery[AgentSummaryEntity](
+      getAgentSummariesSparqlResource,
+      implicitly[FromQuerySolution[AgentSummaryEntity]],
+      params
+    )
+  }
+
+  override def getAgentDescriptionEntities: Try[List[AgentDescriptionEntity]] = {
+    val params = SparqlParams()
+    processParameterizedQuery[AgentDescriptionEntity](
+      getAgentDescriptionsSparqlResource,
+      implicitly[FromQuerySolution[AgentDescriptionEntity]],
+      params
+    )
+  }
 
   override def getPlaceOfDepositEntities: Try[List[AgentEntity]] =
     processQuery[AgentEntity](getPlaceOfDepositSummariesSparqlResource, implicitly[FromQuerySolution[AgentEntity]])
 
-  def processQuery[A](queryResource: String, queryDecoder: FromQuerySolution[A]): Try[List[A]] =
+  private def processQuery[A](queryResource: String, queryDecoder: FromQuerySolution[A]): Try[List[A]] =
     for {
       queryText <- getQueryText(queryResource)
       query     <- getQuery(queryText)
       result    <- sparqlConnector.execute(query, queryDecoder)
+    } yield result
+
+  private def processParameterizedQuery[A](
+    queryResource: String,
+    queryDecoder: FromQuerySolution[A],
+    params: SparqlParams
+  ): Try[List[A]] =
+    for {
+      queryText          <- getQueryText(queryResource)
+      parameterizedQuery <- parameterizeQuery(queryText, params)
+      query              <- Try(parameterizedQuery.asQuery())
+      result             <- sparqlConnector.execute(query, queryDecoder)
     } yield result
 
 }

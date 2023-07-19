@@ -1,0 +1,55 @@
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX premis: <http://www.loc.gov/premis/rdf/v3/>
+PREFIX rdac: <http://rdaregistry.info/Elements/c/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX cat: <http://cat.nationalarchives.gov.uk/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX ver: <http://purl.org/linked-data/version#>
+PREFIX rdaa: <http://rdaregistry.info/Elements/a/>
+PREFIX time: <http://www.w3.org/2006/time#>
+PREFIX todo: <http://TODO/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+
+SELECT DISTINCT ?descriptionId ?label ?dateFrom ?dateTo ?depository ?versionTimestamp ?previousDescription
+
+WHERE {
+    ?descriptionId prov:specializationOf ?conceptId .
+  	OPTIONAL {
+    	{
+	    	?descriptionId rdaa:P50032 ?label .
+	    }
+	    UNION {
+      		?descriptionId rdaa:P50291 ?surname  .
+      		OPTIONAL {
+    			?descriptionId rdaa:P50292 ?givenName .
+			}
+      		OPTIONAL {
+        		?descriptionId foaf:title ?title .
+      		}
+      		BIND(COALESCE(
+        		CONCAT(?title," ",?givenName," ",?surname),
+        		CONCAT(?givenName," ",?surname),
+        		CONCAT(?title," ",?surname),
+        		CONCAT(?title," ",?givenName),
+        		?surname, ?givenName, ?title) as ?label )
+	   	}
+    }
+  	OPTIONAL {
+    	?descriptionId ?dateFromProperty ?dateFromBNode .
+    	?dateFromBNode time:inXSDgYear ?dateFrom .
+    }
+  	OPTIONAL {
+    	?descriptionId ?dateToProperty ?dateToBNode .
+    	?dateToBNode time:inXSDgYear ?dateTo .
+  	}
+  	OPTIONAL {
+    	?descriptionId todo:is-place-of-deposit ?depository.
+  	}
+
+  	?descriptionId prov:generatedAtTime ?versionTimestamp .
+  	OPTIONAL {
+  		?descriptionId prov:wasRevisionOf ?previousDescription .
+  	}
+
+}
