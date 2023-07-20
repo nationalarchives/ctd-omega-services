@@ -21,10 +21,41 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
-import org.apache.jena.rdf.model.Resource
+import org.apache.jena.rdf.model.{Resource, ResourceFactory}
+import uk.gov.nationalarchives.omega.api.messages.AgentType
+import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
+import uk.gov.nationalarchives.omega.api.repository.model.AgentEntity.getUriFromAgentType
 
 case class SparqlParams(
   booleans: Map[String, Boolean] = Map.empty,
   uris: Map[String, String] = Map.empty,
   values: Map[String, List[Resource]] = Map.empty
 )
+object SparqlParams {
+  def from(listAgentSummary: ListAgentSummary): SparqlParams = {
+    val valuesMap = getValuesMap(listAgentSummary.agentType)
+    val uriMap = getUriMap(listAgentSummary)
+    val booleanMap = getBooleanMap(listAgentSummary)
+    SparqlParams(booleanMap,uriMap,valuesMap)
+  }
+
+  private def getValuesMap(agentTypes: List[AgentType]): Map[String, List[Resource]] = {
+    if(agentTypes.nonEmpty) {
+      val agentTypeUris = agentTypes.map(getUriFromAgentType)
+      val agentTypeResources = agentTypeUris.map(ResourceFactory.createResource)
+      Map("agentTypeValues" -> agentTypeResources)
+    } else {
+      Map.empty
+    }
+  }
+
+  def getUriMap(listAgentSummary: ListAgentSummary): Map[String, String] = {
+    //listAgentSummary.depository // todo:isplace of deposit
+    //listAgentSummary.authorityFile // dct:type + cat:authority-file]
+    Map.empty
+  }
+
+  private def getBooleanMap(listAgentSummary: ListAgentSummary): Map[String, Boolean] = {
+    Map.empty
+  }
+}

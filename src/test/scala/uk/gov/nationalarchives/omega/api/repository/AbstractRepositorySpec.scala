@@ -21,22 +21,31 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
+import org.mockito.MockitoSugar
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.model.{ AgentDescriptionEntity, AgentEntity, AgentSummaryEntity }
 
 import scala.util.Try
 
-trait AbstractRepository {
+class AbstractRepositorySpec extends AnyFreeSpec with Matchers with MockitoSugar {
 
-  def getLegalStatusSummaries: Try[List[LegalStatus]]
-
-  def getAgentEntities: Try[List[AgentEntity]]
-
-  def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): Try[List[AgentSummaryEntity]]
-
-  def getAgentDescriptionEntities: Try[List[AgentDescriptionEntity]]
-
-  def getPlaceOfDepositEntities: Try[List[AgentEntity]]
+//  "dasda" - {
+//    "dsadad" in {
+//      new AbstractRepository {
+//        override def getLegalStatusSummaries: Try[List[LegalStatus]] = ???
+//
+//        override def getAgentEntities: Try[List[AgentEntity]] = ???
+//
+//        override def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): Try[List[AgentSummaryEntity]] = ???
+//
+//        override def getAgentDescriptionEntities: Try[List[AgentDescriptionEntity]] = ???
+//
+//        override def getPlaceOfDepositEntities: Try[List[AgentEntity]] = ???
+//      }
+//    }
+//  }
 
 }

@@ -21,22 +21,11 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
-import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
-import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentDescriptionEntity, AgentEntity, AgentSummaryEntity }
+object BaseURL {
 
-import scala.util.Try
-
-trait AbstractRepository {
-
-  def getLegalStatusSummaries: Try[List[LegalStatus]]
-
-  def getAgentEntities: Try[List[AgentEntity]]
-
-  def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): Try[List[AgentSummaryEntity]]
-
-  def getAgentDescriptionEntities: Try[List[AgentDescriptionEntity]]
-
-  def getPlaceOfDepositEntities: Try[List[AgentEntity]]
+  val cat = "http://cat.nationalarchives.gov.uk"
+  val rdaa = "http://rdaregistry.info/Elements/a"
+  val dct = "http://purl.org/dc/terms"
+  val todo = "http://TODO"
 
 }
