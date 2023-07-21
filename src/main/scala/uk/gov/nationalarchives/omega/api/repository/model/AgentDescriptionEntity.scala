@@ -21,4 +21,32 @@
 
 package uk.gov.nationalarchives.omega.api.repository.model
 
-case class AgentDescriptionEntity()
+import org.apache.jena.ext.xerces.util.URI
+import uk.gov.nationalarchives.omega.api.messages.reply.AgentDescription
+
+case class AgentDescriptionEntity(
+  descriptionId: URI,
+  label: String,
+  versionTimestamp: String,
+  dateFrom: Option[String],
+  dateTo: Option[String],
+  depository: Option[Boolean],
+  previousDescription: Option[URI]
+) {
+
+  def as[T](f: AgentDescriptionEntity => T): T = f(this)
+
+}
+object AgentDescriptionEntity {
+  implicit def agentDescriptionMapper: AgentDescriptionEntity => AgentDescription =
+    (agentDescriptionEntity: AgentDescriptionEntity) =>
+      AgentDescription(
+        identifier = agentDescriptionEntity.descriptionId.toString,
+        label = agentDescriptionEntity.label,
+        versionTimestamp = agentDescriptionEntity.versionTimestamp,
+        depository = agentDescriptionEntity.depository,
+        dateFrom = agentDescriptionEntity.dateFrom,
+        dateTo = agentDescriptionEntity.dateTo,
+        previousDescription = agentDescriptionEntity.previousDescription.flatMap(uri => Some(uri.toString))
+      )
+}

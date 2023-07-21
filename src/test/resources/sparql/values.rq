@@ -12,8 +12,8 @@ PREFIX  prov: <http://www.w3.org/ns/prov#>
 PREFIX  foaf: <http://xmlns.com/foaf/0.1/>
 
 SELECT DISTINCT  ?identifier ?agentType ?currentVersion
-WHERE
-  { ?identifier  dct:type           ?agentType ;
-              ver:currentVersion    ?currentVersion .
+WHERE {
+    ?identifier dct:type            ?agentType ;
+                ver:currentVersion  ?currentVersion .
     VALUES (?agentType) { ?agentTypeValues }
-  }
+}

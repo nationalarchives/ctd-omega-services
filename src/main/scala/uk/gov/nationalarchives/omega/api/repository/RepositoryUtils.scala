@@ -21,8 +21,8 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
-import org.apache.jena.query.{ParameterizedSparqlString, Query, QueryFactory, Syntax}
-import org.apache.jena.rdf.model.{Resource, ResourceFactory}
+import org.apache.jena.query.{ ParameterizedSparqlString, Query, QueryFactory, Syntax }
+import org.apache.jena.rdf.model.{ Resource, ResourceFactory }
 import scoverage.Platform.Source
 import uk.gov.nationalarchives.omega.api.messages.AgentType
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
@@ -30,7 +30,7 @@ import uk.gov.nationalarchives.omega.api.repository.model.AgentTypeMapper
 
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters._
-import scala.util.{Failure, Try, Using}
+import scala.util.{ Failure, Try, Using }
 
 trait RepositoryUtils extends AgentTypeMapper {
 
@@ -50,9 +50,8 @@ trait RepositoryUtils extends AgentTypeMapper {
       query              <- Try(parameterizedQuery.asQuery(Syntax.syntaxSPARQL_11))
     } yield query
 
-  def createResource(baseUrl: String, localName: String): Resource = {
+  def createResource(baseUrl: String, localName: String): Resource =
     ResourceFactory.createResource(s"$baseUrl/$localName")
-  }
 
   def getAgentTypeValuesMap(agentTypes: List[AgentType]): Map[String, List[Resource]] = {
     val agentTypeUris = agentTypes.map(getUriFromAgentType)
@@ -60,15 +59,13 @@ trait RepositoryUtils extends AgentTypeMapper {
     Map("agentTypeValues" -> agentTypeResources)
   }
 
-  def getUriMap(listAgentSummary: ListAgentSummary): Map[String,String] = {
-    //listAgentSummary.depository // todo:isplace of deposit
-    //listAgentSummary.authorityFile // dct:type + cat:authority-file]
+  def getUriMap(listAgentSummary: ListAgentSummary): Map[String, String] =
+    // listAgentSummary.depository // todo:isplace of deposit
+    // listAgentSummary.authorityFile // dct:type + cat:authority-file]
     Map.empty
-  }
 
-  def getBooleanMap(listAgentSummary: ListAgentSummary): Map[String,Boolean] = {
+  def getBooleanMap(listAgentSummary: ListAgentSummary): Map[String, Boolean] =
     Map.empty
-  }
 
   private def getQuery(queryText: String): Try[Query] =
     Try(QueryFactory.create(queryText, Syntax.syntaxSPARQL_11)).recoverWith { case _: NullPointerException =>

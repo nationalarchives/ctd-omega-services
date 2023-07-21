@@ -89,21 +89,30 @@ class RepositoryUtilsSpec extends AnyFreeSpec with Matchers with MockitoSugar {
     "add values" in {
       val utils = new RepositoryUtils {}
       val queryResource = "/sparql/values.rq"
-      val queryParams = SparqlParams(values = Map("agentTypeValues" -> List(utils.createResource(BaseURL.cat,"person-concept"), utils.createResource(BaseURL.cat,"corporate-body-concept"))))
-      val result = utils.prepareParameterizedQuery(queryResource,queryParams)
+      val queryParams = SparqlParams(values =
+        Map(
+          "agentTypeValues" -> List(
+            utils.createResource(BaseURL.cat, "person-concept"),
+            utils.createResource(BaseURL.cat, "corporate-body-concept")
+          )
+        )
+      )
+      val result = utils.prepareParameterizedQuery(queryResource, queryParams)
       result.get mustEqual expectedSparqlWithValues
     }
     "add a boolean property" in {
       val utils = new RepositoryUtils {}
       val queryResource = "/sparql/properties.rq"
-      val queryParams = SparqlParams(booleans = Map("value" -> true),uris = Map("property" -> s"${BaseURL.todo}/is-place-of-deposit"))
+      val queryParams =
+        SparqlParams(booleans = Map("value" -> true), uris = Map("property" -> s"${BaseURL.todo}/is-place-of-deposit"))
       val result = utils.prepareParameterizedQuery(queryResource, queryParams)
       result.get mustEqual expectedSparqlWithBoolean
     }
     "add an object property" in {
       val utils = new RepositoryUtils {}
       val queryResource = "/sparql/properties.rq"
-      val queryParams = SparqlParams(uris = Map("property" -> s"${BaseURL.dct}/type", "value" -> s"${BaseURL.cat}/authority-file"))
+      val queryParams =
+        SparqlParams(uris = Map("property" -> s"${BaseURL.dct}/type", "value" -> s"${BaseURL.cat}/authority-file"))
       val result = utils.prepareParameterizedQuery(queryResource, queryParams)
       result.get mustEqual expectedSparqlWithObject
     }
@@ -112,14 +121,22 @@ class RepositoryUtilsSpec extends AnyFreeSpec with Matchers with MockitoSugar {
       val queryResource = "/sparql/properties-and-values.rq"
       val queryParams = SparqlParams(
         booleans = Map("value1" -> true),
-        uris = Map("property1" -> s"${BaseURL.todo}/is-place-of-deposit","property2" -> s"${BaseURL.dct}/type", "value2" -> s"${BaseURL.cat}/authority-file"),
-        values = Map("agentTypeValues" -> List(utils.createResource(BaseURL.cat,"person-concept"), utils.createResource(BaseURL.cat,"corporate-body-concept"))))
+        uris = Map(
+          "property1" -> s"${BaseURL.todo}/is-place-of-deposit",
+          "property2" -> s"${BaseURL.dct}/type",
+          "value2"    -> s"${BaseURL.cat}/authority-file"
+        ),
+        values = Map(
+          "agentTypeValues" -> List(
+            utils.createResource(BaseURL.cat, "person-concept"),
+            utils.createResource(BaseURL.cat, "corporate-body-concept")
+          )
+        )
+      )
       val result = utils.prepareParameterizedQuery(queryResource, queryParams)
       result.get mustEqual expectedSparqlWithPropertiesAndValues
 
     }
   }
-
-
 
 }

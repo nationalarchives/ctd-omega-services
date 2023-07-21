@@ -32,7 +32,7 @@ import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
 import uk.gov.nationalarchives.omega.api.repository.model.AgentEntity
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
 class OmegaRepositorySpec extends AnyFreeSpec with Matchers with MockitoSugar {
 

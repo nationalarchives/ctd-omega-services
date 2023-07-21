@@ -83,6 +83,7 @@ class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRe
       Try(dateFormatter.parse(trimmedDate)).toOption
   }
 
+  // TODO (RW) once the repository understands the ListAgentSummary this method will be redundant
   private def getAgentSummaries(listAgentSummary: ListAgentSummary): List[AgentSummary] =
     listAgentSummary.depository match {
       case Some(true) => getPlaceOfDepositSummaries
@@ -105,6 +106,22 @@ class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRe
           agentEntity.as[Option[AgentSummary]]
         }
       case _ => List.empty // TODO (RW) log the error
+    }
+
+  private def getTheAgentSummary(listAgentSummary: ListAgentSummary): List[AgentSummary] =
+    listAgentSummary.versionTimestamp match {
+      case None | Some("latest") => ???
+      // 1. get the agent summary (repository.getAgentSummaryEntities)
+      // 2. get the latest agent description (repository.getAgentDescriptionEntities)
+      // 3. add the agent description in a list to the agent summary agentSummaryEntities.as[AgentSummary]
+      case Some("all") => ???
+      // 1. get the agent summary
+      // 2. get all the agent descriptions
+      // 3. add the agent descriptions in a list to the agent summary
+      case Some(date) => ???
+      // 1. get the agent summary
+      // 2. get the agent description valid on the date given
+      // 3. add the agent description in a list to the agent summary
     }
 
 }

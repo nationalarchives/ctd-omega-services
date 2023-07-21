@@ -21,19 +21,18 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
-import org.apache.jena.query.{Query, QuerySolution}
-import org.apache.jena.rdf.model.{Resource, ResourceFactory}
+import org.apache.jena.query.{ Query, QuerySolution }
+import org.apache.jena.rdf.model.{ Resource, ResourceFactory }
 import org.phenoscape.sparql.FromQuerySolution
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.messages.AgentType
 import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{AgentDescriptionEntity, AgentEntity, AgentSummaryEntity, AgentTypeMapper}
+import uk.gov.nationalarchives.omega.api.repository.model.{ AgentDescriptionEntity, AgentEntity, AgentSummaryEntity, AgentTypeMapper }
 
 import scala.util.Try
 
-class OmegaRepository(sparqlConnector: SparqlEndpointConnector)
-    extends AbstractRepository with RepositoryUtils {
+class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends AbstractRepository with RepositoryUtils {
 
   private val sparqlResourceDir = "sparql"
   private val getLegalStatusSummarySparqlResource = s"/$sparqlResourceDir/select-legal-status-summaries.rq"

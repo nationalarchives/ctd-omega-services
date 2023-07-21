@@ -21,4 +21,29 @@
 
 package uk.gov.nationalarchives.omega.api.repository.model
 
-case class AgentSummaryEntity()
+import org.apache.jena.ext.xerces.util.URI
+import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary }
+
+import scala.util.Success
+
+case class AgentSummaryEntity(identifier: URI, agentType: URI, currentVersion: URI) {
+  def as[T](f: AgentSummaryEntity => T): T = f(this)
+}
+object AgentSummaryEntity extends AgentTypeMapper {
+
+  implicit def agentSummaryMapper: AgentSummaryEntity => Option[AgentSummary] =
+    (agentSummaryEntity: AgentSummaryEntity) =>
+      getAgentTypeFromUri(agentSummaryEntity.agentType) match {
+        case Success(agentType) =>
+          Some(
+            AgentSummary(
+              agentType,
+              agentSummaryEntity.identifier.toString,
+              agentSummaryEntity.currentVersion.toString,
+              AgentDescription("", "", "")
+            )
+          ) // TODO (RW) this should be a list
+        case _ => None // TODO (RW) log error here
+      }
+
+}
