@@ -21,7 +21,9 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentEntity, LegalStatusEntity }
+import org.apache.jena.ext.xerces.util.URI
+import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
+import uk.gov.nationalarchives.omega.api.repository.model.{ AgentDescriptionEntity, AgentSummaryEntity, LegalStatusEntity }
 
 import scala.util.Try
 
@@ -29,8 +31,11 @@ trait AbstractRepository {
 
   def getLegalStatusEntities: Try[List[LegalStatusEntity]]
 
-  def getAgentEntities: Try[List[AgentEntity]]
+  def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): Try[List[AgentSummaryEntity]]
 
-  def getPlaceOfDepositEntities: Try[List[AgentEntity]]
+  def getAgentDescriptionEntities(
+    listAgentSummary: ListAgentSummary,
+    agentConceptUri: URI
+  ): Try[List[AgentDescriptionEntity]]
 
 }

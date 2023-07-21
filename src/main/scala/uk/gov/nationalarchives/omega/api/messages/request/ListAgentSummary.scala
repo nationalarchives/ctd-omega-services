@@ -21,9 +21,11 @@
 
 package uk.gov.nationalarchives.omega.api.messages.request
 
+import cats.data.NonEmptyList
 import io.circe.syntax._
 import io.circe.{ Decoder, Encoder, Json }
 import uk.gov.nationalarchives.omega.api.messages.AgentType
+import uk.gov.nationalarchives.omega.api.messages.AgentType._
 
 case class ListAgentSummary(
   agentTypes: Option[List[AgentType]] = None,

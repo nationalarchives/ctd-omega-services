@@ -21,9 +21,9 @@
 
 package uk.gov.nationalarchives.omega.api.models
 
+import io.circe.parser.decode
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import io.circe.parser.decode
 import uk.gov.nationalarchives.omega.api.messages.AgentType.{ CorporateBody, Person }
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 

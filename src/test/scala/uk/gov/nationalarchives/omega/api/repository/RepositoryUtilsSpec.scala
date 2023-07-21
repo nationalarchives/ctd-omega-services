@@ -60,6 +60,17 @@ class RepositoryUtilsSpec extends UnitTest {
           ?currentVersion todo:is-place-of-deposit  true .
         }""").toQuery
 
+  val expectedSparqlWithExtension: Query =
+    (sparqlPrefix +
+      sparql"""
+        SELECT DISTINCT ?identifier ?agentType ?currentVersion
+        WHERE {
+          ?identifier     dct:type                  ?agentType ;
+                          ver:currentVersion        ?currentVersion .
+          ?currentVersion ?predicateParam           ?objectParam .
+        }
+        ORDER BY DESC(?identifier)""").toQuery
+
   val expectedSparqlWithObject: Query =
     (sparqlPrefix +
       sparql"""
@@ -95,7 +106,7 @@ class RepositoryUtilsSpec extends UnitTest {
           )
         )
       )
-      val result = utils.prepareParameterizedQuery(queryResource, queryParams)
+      val result = utils.prepareParameterizedQuery(queryResource, queryParams, extendQuery = false)
       result.get mustEqual expectedSparqlWithValues
     }
     "add a boolean property" in {
@@ -106,8 +117,16 @@ class RepositoryUtilsSpec extends UnitTest {
           booleans = Map("objectParam" -> true),
           uris = Map("predicateParam" -> s"${BaseURL.todo}/is-place-of-deposit")
         )
-      val result = utils.prepareParameterizedQuery(queryResource, queryParams)
+      val result = utils.prepareParameterizedQuery(queryResource, queryParams, extendQuery = false)
       result.get mustEqual expectedSparqlWithBoolean
+    }
+    "add a query extension" in {
+      val utils = new RepositoryUtils {}
+      val queryResource = "/sparql/properties.rq"
+      val queryParams =
+        SparqlParams(queryExtension = Some("ORDER BY DESC(?identifier)"))
+      val result = utils.prepareParameterizedQuery(queryResource, queryParams, extendQuery = true)
+      result.get mustEqual expectedSparqlWithExtension
     }
     "add an object property" in {
       val utils = new RepositoryUtils {}
@@ -116,7 +135,8 @@ class RepositoryUtilsSpec extends UnitTest {
         SparqlParams(uris =
           Map("predicateParam" -> s"${BaseURL.dct}/type", "objectParam" -> s"${BaseURL.cat}/authority-file")
         )
-      val result = utils.prepareParameterizedQuery(queryResource, queryParams)
+      val result = utils.prepareParameterizedQuery(queryResource, queryParams, extendQuery = false)
+      SparqlParams(uris = Map("property" -> s"${BaseURL.dct}/type", "value" -> s"${BaseURL.cat}/authority-file"))
       result.get mustEqual expectedSparqlWithObject
     }
     "add multiple params and values" in {
@@ -136,7 +156,7 @@ class RepositoryUtilsSpec extends UnitTest {
           )
         )
       )
-      val result = utils.prepareParameterizedQuery(queryResource, queryParams)
+      val result = utils.prepareParameterizedQuery(queryResource, queryParams, extendQuery = false)
       result.get mustEqual expectedSparqlWithPropertiesAndValues
 
     }

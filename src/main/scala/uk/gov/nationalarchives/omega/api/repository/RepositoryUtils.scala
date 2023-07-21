@@ -21,12 +21,13 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
+import org.apache.jena.datatypes.xsd.impl.XSDDateTimeType
 import org.apache.jena.query.{ ParameterizedSparqlString, Query, QueryFactory, Syntax }
 import org.apache.jena.rdf.model.{ Resource, ResourceFactory }
-import scoverage.Platform.Source
 import uk.gov.nationalarchives.omega.api.repository.model.AgentTypeMapper
 
 import scala.annotation.tailrec
+import scala.io.Source
 import scala.jdk.CollectionConverters._
 import scala.util.{ Failure, Try, Using }
 
@@ -40,16 +41,25 @@ trait RepositoryUtils extends AgentTypeMapper {
 
   def prepareParameterizedQuery(
     queryResource: String,
-    params: SparqlParams
+    params: SparqlParams,
+    extendQuery: Boolean
   ): Try[Query] =
     for {
       queryText          <- getQueryText(queryResource)
-      parameterizedQuery <- parameterizeQuery(queryText, params)
+      extendedQuery      <- setQueryExtension(queryText, params, extendQuery)
+      parameterizedQuery <- parameterizeQuery(extendedQuery, params)
       query              <- Try(parameterizedQuery.asQuery(Syntax.syntaxSPARQL_11))
     } yield query
 
   def createResource(baseUrl: String, localName: String): Resource =
     ResourceFactory.createResource(s"$baseUrl/$localName")
+
+  private def setQueryExtension(query: String, sparqlParams: SparqlParams, extendQuery: Boolean): Try[String] =
+    if (extendQuery) {
+      Try(query + sparqlParams.queryExtension.getOrElse(""))
+    } else {
+      Try(query)
+    }
 
   private def getQuery(queryText: String): Try[Query] =
     Try(QueryFactory.create(queryText, Syntax.syntaxSPARQL_11)).recoverWith { case _: NullPointerException =>
@@ -66,7 +76,8 @@ trait RepositoryUtils extends AgentTypeMapper {
       queryText_1 <- Try(setBooleanParams(queryText_0, params.booleans))
       queryText_2 <- Try(setResourceParams(queryText_1, params.uris))
       queryText_3 <- Try(setValueParams(queryText_2, params.values))
-    } yield new ParameterizedSparqlString(queryText_3)
+      queryText_4 <- Try(setXSDDateTimeParams(queryText_3, params.dateTimes))
+    } yield new ParameterizedSparqlString(queryText_4)
 
   private def setBooleanParams(queryText: String, booleans: Map[String, Boolean]): String = {
 
@@ -81,6 +92,21 @@ trait RepositoryUtils extends AgentTypeMapper {
       }
 
     setParams(booleans, queryText)
+  }
+
+  private def setXSDDateTimeParams(queryText: String, dateTimes: Map[String, String]): String = {
+
+    @tailrec
+    def setParams(dates: Map[String, String], query: String): String =
+      dates match {
+        case m: Map[String, String] if m.isEmpty => query
+        case param =>
+          val pss = new ParameterizedSparqlString(query)
+          pss.setLiteral(param.head._1, param.head._2, new XSDDateTimeType("dateTime"))
+          setParams(dates.tail, pss.toString)
+      }
+
+    setParams(dateTimes, queryText)
   }
 
   private def setResourceParams(queryText: String, resources: Map[String, String]): String = {

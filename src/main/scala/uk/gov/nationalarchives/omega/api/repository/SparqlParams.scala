@@ -77,7 +77,9 @@ object SparqlParams extends AgentTypeMapper {
   private def getDateTimeMap(listAgentSummary: ListAgentSummary): Map[String, String] =
     listAgentSummary.versionTimestamp match {
       case Some("all") | Some("latest") | None => Map.empty
-      case Some(dateTimeValue) =>
+      case Some(dateTimeValue)                 =>
+        // TODO(RW) we should attempt to parse this date to ensure it is valid (see PACT-1087)
         Map("generatedAtParam" -> dateTimeValue)
     }
+
 }
