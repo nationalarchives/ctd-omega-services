@@ -22,10 +22,9 @@
 package uk.gov.nationalarchives.omega.api.repository.model
 
 import org.apache.jena.ext.xerces.util.URI
-import uk.gov.nationalarchives.omega.api.messages.AgentType.{ CollectiveAgent, CorporateBody, Family, HardwareAgent, Person, SoftwareAgent }
 import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary }
 
-import scala.util.{ Failure, Success }
+import scala.util.Success
 
 case class AgentEntity(
   agentType: URI,
@@ -42,7 +41,7 @@ case class AgentEntity(
 
 }
 
-object AgentEntity {
+object AgentEntity extends AgentTypeMapper {
 
   val cataloguePrefix = "http://cat.nationalarchives.gov.uk"
   implicit def agentMapper: AgentEntity => Option[AgentSummary] = (agentEntity: AgentEntity) =>
@@ -66,17 +65,6 @@ object AgentEntity {
           )
         )
       case _ => None // TODO (RW) log error here
-    }
-
-  private def getAgentTypeFromUri(agentTypeUri: URI) =
-    agentTypeUri.toString match {
-      case s"$cataloguePrefix/corporate-body-concept"   => Success(CorporateBody)
-      case s"$cataloguePrefix/person-concept"           => Success(Person)
-      case s"$cataloguePrefix/collective-agent-concept" => Success(CollectiveAgent)
-      case s"$cataloguePrefix/family-concept"           => Success(Family)
-      case s"$cataloguePrefix/hardware-agent-concept"   => Success(HardwareAgent)
-      case s"$cataloguePrefix/software-agent-concept"   => Success(SoftwareAgent)
-      case unknown => Failure(new IllegalArgumentException(s"Unknown agent type: $unknown"))
     }
 
 }

@@ -19,22 +19,16 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.repository
+package uk.gov.nationalarchives.omega.api.repository.model
 
-import org.apache.jena.query.{ Query, QueryFactory, Syntax }
-import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
-import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentDescriptionEntity, AgentEntity, AgentSummaryEntity }
+import org.apache.jena.ext.xerces.util.URI
 
-import scala.io.Source
-import scala.util.{ Failure, Try, Using }
-
-trait AbstractRepository {
-
-  def getLegalStatusSummaries: Try[List[LegalStatus]]
-
-  def getAgentEntities: Try[List[AgentEntity]]
-
-  def getPlaceOfDepositEntities: Try[List[AgentEntity]]
-
-}
+case class AgentDescriptionEntity(
+  descriptionId: URI,
+  label: String,
+  versionTimestamp: String,
+  dateFrom: Option[String],
+  dateTo: Option[String],
+  depository: Option[Boolean],
+  previousDescription: Option[URI]
+)

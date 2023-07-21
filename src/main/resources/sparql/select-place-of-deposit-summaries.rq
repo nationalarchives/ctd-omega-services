@@ -32,11 +32,13 @@ WHERE {
 	    }
     }
     OPTIONAL {
-    	?currentDescription rdaa:P50037/time:inXSDgYear ?dateFrom .
+        ?currentDescription rdaa:P50037|rdaa:P50121 ?dateFromBNode .
+    	?dateFromBNode time:inXSDgYear ?dateFrom .
     }
-  	OPTIONAL {
-    	?currentDescription rdaa:P50038/time:inXSDgYear ?dateTo .
-  	}
+    OPTIONAL {
+        ?currentDescription rdaa:P50038|rdaa:P50120 ?dateToBNode .
+        ?dateToBNode time:inXSDgYear ?dateTo .
+    }
 
     ?currentDescription todo:is-place-of-deposit ?depository .
 

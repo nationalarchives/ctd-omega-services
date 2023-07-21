@@ -21,20 +21,11 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
-import org.apache.jena.query.{ Query, QueryFactory, Syntax }
-import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
-import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentDescriptionEntity, AgentEntity, AgentSummaryEntity }
+object BaseURL {
 
-import scala.io.Source
-import scala.util.{ Failure, Try, Using }
-
-trait AbstractRepository {
-
-  def getLegalStatusSummaries: Try[List[LegalStatus]]
-
-  def getAgentEntities: Try[List[AgentEntity]]
-
-  def getPlaceOfDepositEntities: Try[List[AgentEntity]]
+  val cat = "http://cat.nationalarchives.gov.uk"
+  val rdaa = "http://rdaregistry.info/Elements/a"
+  val dct = "http://purl.org/dc/terms"
+  val todo = "http://TODO"
 
 }
