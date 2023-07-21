@@ -90,7 +90,7 @@ cat:agent.TXR  a              rdac:C10005 , foaf:Organization , premis:Organizat
 cat:agent.HHC  a              rdac:C10005 , foaf:Organization , premis:Organization ;
         dct:identifier        "agent.HHC" ;
         dct:type              cat:corporate-body-concept ;
-        ver:currentVersion    cat:agent.HHC.1 ;
+        ver:currentVersion    cat:agent.HHC.2 ;
         prov:generatedAtTime  "2023-01-25T14:14:47.534Z"^^xsd:dateTime ;
         prov:wasAttributedTo  cat:agent.S7 .
 

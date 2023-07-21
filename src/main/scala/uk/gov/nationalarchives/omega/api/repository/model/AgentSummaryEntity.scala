@@ -19,29 +19,31 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.repository
+package uk.gov.nationalarchives.omega.api.repository.model
 
-import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
-import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentDescriptionEntity, AgentEntity, AgentSummaryEntity }
+import org.apache.jena.ext.xerces.util.URI
+import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary }
 
-import scala.util.Try
+import scala.util.Success
 
-trait AbstractRepository {
+case class AgentSummaryEntity(identifier: URI, agentType: URI, currentVersion: URI) {
+  def as[T](implicit f: AgentSummaryEntity => T): T = f(this)
+}
+object AgentSummaryEntity extends AgentTypeMapper {
 
-  def getLegalStatusSummaries: Try[List[LegalStatus]]
-
-  def getAgentEntities: Try[List[AgentEntity]]
-
-  def getPlaceOfDepositEntities: Try[List[AgentEntity]]
-
-  // TODO(RW) this function will be used by PACT-1079
-  def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): Try[List[AgentSummaryEntity]]
-
-  // TODO(RW) this function will be used by PACT-1079
-  def getAgentDescriptionEntities(
-    listAgentSummary: ListAgentSummary,
-    agentSummary: AgentSummaryEntity
-  ): Try[List[AgentDescriptionEntity]]
+  implicit def agentSummaryMapper: AgentSummaryEntity => Option[AgentSummary] =
+    (agentSummaryEntity: AgentSummaryEntity) =>
+      getAgentTypeFromUri(agentSummaryEntity.agentType) match {
+        case Success(agentType) =>
+          Some(
+            AgentSummary(
+              agentType,
+              agentSummaryEntity.identifier.toString,
+              agentSummaryEntity.currentVersion.toString,
+              List.empty[AgentDescription]
+            )
+          )
+        case _ => None // TODO (RW) log error here
+      }
 
 }

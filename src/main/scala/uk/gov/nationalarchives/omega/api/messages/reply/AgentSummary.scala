@@ -29,7 +29,7 @@ case class AgentSummary(
   agentType: AgentType,
   identifier: String,
   currentDescription: String,
-  description: AgentDescription
+  descriptions: List[AgentDescription]
 ) extends ReplyMessage
 object AgentSummary {
   implicit val encodeAgentSummary: Encoder[AgentSummary] = (agentSummary: AgentSummary) =>
@@ -38,7 +38,7 @@ object AgentSummary {
         ("type", Json.fromString(agentSummary.agentType.entryName)),
         ("identifier", Json.fromString(agentSummary.identifier)),
         ("current-description", Json.fromString(agentSummary.currentDescription)),
-        ("description", agentSummary.description.asJson)
+        ("description", agentSummary.descriptions.asJson)
       )
       .deepDropNullValues
 

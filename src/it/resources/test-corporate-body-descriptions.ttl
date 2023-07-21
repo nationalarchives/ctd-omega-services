@@ -77,17 +77,6 @@ cat:agent.63V.1  a                foaf:Organization , premis:Organization , rdac
                                     schema:value       "corporate_body.12725"
                                   ] .
 
-
-
-
-
-
-
-
-
-
-
-
 cat:agent.8KY.1  a                premis:Organization , rdac:C10005 , foaf:Organization ;
         todo:is-place-of-deposit  false ;
         dct:created               "2000-09-25T09:57:28.427Z"^^xsd:dateTime ;
@@ -275,5 +264,28 @@ cat:agent.HHC.1  a                rdac:C10005 , premis:Organization , foaf:Organ
         schema:identifier         [ a                  schema:identifier ;
                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
                                     schema:value       "corporate_body.6086"
+                                  ] .
+
+cat:agent.HHC.2  a                rdac:C10005 , premis:Organization , foaf:Organization ;
+                 todo:is-place-of-deposit  false ;
+                 dct:created               "2000-09-25T09:57:28.427Z"^^xsd:dateTime ;
+                 dct:identifier            "agent.HHC.1" ;
+                 dct:type                  cat:corporate-body-description ;
+                 rdaa:P50032               "Cabinet, Radio & Cable Board" ;
+                 rdaa:P50037               [ a                rdac:C10010 , time:Instant ;
+                                             rdat:P70045      "c" ;
+                                             time:inXSDgYear  "1946"^^xsd:gYear
+                                  ] ;
+                 rdaa:P50038               [ a                rdac:C10010 , time:Instant ;
+                                             time:inXSDgYear  "1951"^^xsd:gYear
+                                  ] ;
+                 rdau:P61160               cat:soi-approved-complete ;
+                 prov:generatedAtTime      "2023-07-25T17:30:00.000Z"^^xsd:dateTime ;
+                 prov:specializationOf     cat:agent.HHC ;
+                 prov:wasAttributedTo      cat:agent.S7 ;
+                 prov:wasRevisionOf        cat:agent.HHC.1 ;
+                 schema:identifier         [ a                  schema:identifier ;
+                                             schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                             schema:value       "corporate_body.6086"
                                   ] .
 

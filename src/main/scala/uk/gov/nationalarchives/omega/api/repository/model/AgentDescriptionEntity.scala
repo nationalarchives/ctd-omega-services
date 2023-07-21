@@ -19,29 +19,34 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.repository
+package uk.gov.nationalarchives.omega.api.repository.model
 
-import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
-import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentDescriptionEntity, AgentEntity, AgentSummaryEntity }
+import org.apache.jena.ext.xerces.util.URI
+import uk.gov.nationalarchives.omega.api.messages.reply.AgentDescription
 
-import scala.util.Try
+case class AgentDescriptionEntity(
+  descriptionId: URI,
+  label: String,
+  versionTimestamp: String,
+  dateFrom: Option[String],
+  dateTo: Option[String],
+  depository: Option[Boolean],
+  previousDescription: Option[URI]
+) {
 
-trait AbstractRepository {
+  def as[T](implicit f: AgentDescriptionEntity => T): T = f(this)
 
-  def getLegalStatusSummaries: Try[List[LegalStatus]]
-
-  def getAgentEntities: Try[List[AgentEntity]]
-
-  def getPlaceOfDepositEntities: Try[List[AgentEntity]]
-
-  // TODO(RW) this function will be used by PACT-1079
-  def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): Try[List[AgentSummaryEntity]]
-
-  // TODO(RW) this function will be used by PACT-1079
-  def getAgentDescriptionEntities(
-    listAgentSummary: ListAgentSummary,
-    agentSummary: AgentSummaryEntity
-  ): Try[List[AgentDescriptionEntity]]
-
+}
+object AgentDescriptionEntity {
+  implicit def agentDescriptionMapper: AgentDescriptionEntity => AgentDescription =
+    (agentDescriptionEntity: AgentDescriptionEntity) =>
+      AgentDescription(
+        identifier = agentDescriptionEntity.descriptionId.toString,
+        label = agentDescriptionEntity.label,
+        versionTimestamp = agentDescriptionEntity.versionTimestamp,
+        depository = agentDescriptionEntity.depository,
+        dateFrom = agentDescriptionEntity.dateFrom,
+        dateTo = agentDescriptionEntity.dateTo,
+        previousDescription = agentDescriptionEntity.previousDescription.flatMap(uri => Some(uri.toString))
+      )
 }

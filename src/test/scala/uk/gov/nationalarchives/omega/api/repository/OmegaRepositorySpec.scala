@@ -29,15 +29,18 @@ import org.scalatest.TryValues._
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
+import uk.gov.nationalarchives.omega.api.messages.AgentType
+import uk.gov.nationalarchives.omega.api.messages.AgentType.{ CorporateBody, Person }
 import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
+import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.model.AgentEntity
 
 import scala.util.{ Failure, Success, Try }
 
 class OmegaRepositorySpec extends AnyFreeSpec with Matchers with MockitoSugar {
 
-  val mockConnector = mock[SparqlEndpointConnector]
-  val repository = new OmegaRepository(mockConnector)
+  private val mockConnector = mock[SparqlEndpointConnector]
+  private val repository = new OmegaRepository(mockConnector)
 
   "Get Legal Status summaries" - {
 
@@ -102,6 +105,30 @@ class OmegaRepositorySpec extends AnyFreeSpec with Matchers with MockitoSugar {
       )
       val result = repository.getPlaceOfDepositEntities
       result.success.get.length mustBe 1
+    }
+  }
+
+  "Get Agent Summary Entities" - {
+    "must return a Success with a list of one item" in {
+      when(mockConnector.execute[AgentEntity](any, any)).thenReturn(
+        Try(
+          List(
+            AgentEntity(
+              new URI("http://cat.nationalarchives.gov.uk/person-concept"),
+              new URI("http://cat.nationalarchives.gov.uk/agent.3LG"),
+              new URI("http://cat.nationalarchives.gov.uk/agent.3LG.1"),
+              "Edwin Hill",
+              "2023-01-25T14:18:41.668Z",
+              Some("1876"),
+              Some("1793"),
+              Some(false)
+            )
+          )
+        )
+      )
+      val result = repository.getAgentSummaryEntities(ListAgentSummary(List(CorporateBody), depository = Some(true)))
+      result.success.get.length mustBe 1
+
     }
   }
 }
