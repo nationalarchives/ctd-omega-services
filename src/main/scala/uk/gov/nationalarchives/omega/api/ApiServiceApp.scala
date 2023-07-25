@@ -21,28 +21,35 @@
 
 package uk.gov.nationalarchives.omega.api
 
+import cats.effect.std.Supervisor
 import cats.effect.{ ExitCode, IO, IOApp }
 import pureconfig.ConfigSource
 import pureconfig.generic.auto._
 import uk.gov.nationalarchives.omega.api.common.AppLogger
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
-import uk.gov.nationalarchives.omega.api.services.ApiService
+import uk.gov.nationalarchives.omega.api.services.{ ApiService, InvalidStateException }
 
 object ApiServiceApp extends IOApp with AppLogger {
 
   val applicationId = "PACS001"
+  private val invalidStateExitCode = 99
 
   override def run(args: List[String]): IO[ExitCode] = {
     val serviceConfig = ConfigSource.default.loadOrThrow[ServiceConfig]
     val apiService = new ApiService(serviceConfig)
-
-    // install a shutdown hook on the API Service so that when the App receives SIGTERM it stops gracefully
-    sys.ShutdownHookThread {
-      apiService.stop()
+    val apiServiceSuspended = apiService.startSuspended
+    Supervisor[IO](await = true).use { supervisor =>
+      for {
+        fiber   <- supervisor.supervise(apiServiceSuspended)
+        outcome <- fiber.join
+      } yield outcome.fold(ExitCode.Success, getErrorExitCode, _ => ExitCode.Success)
     }
-
-    // start the API Service
-    apiService.start
   }
+
+  private def getErrorExitCode(throwable: Throwable) =
+    throwable match {
+      case _: InvalidStateException => ExitCode(invalidStateExitCode)
+      case _                        => ExitCode.Error
+    }
 
 }

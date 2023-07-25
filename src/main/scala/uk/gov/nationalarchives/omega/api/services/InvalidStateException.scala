@@ -21,23 +21,4 @@
 
 package uk.gov.nationalarchives.omega.api.services
 
-import cats.effect.IO
-import uk.gov.nationalarchives.omega.api.common.AppLogger
-import uk.gov.nationalarchives.omega.api.services.ServiceState.Stopped
-
-import java.util.concurrent.atomic.AtomicReference
-
-trait Stateful extends AppLogger {
-
-  private val state = new AtomicReference[ServiceState](Stopped)
-
-  def switchState(from: ServiceState, to: ServiceState): IO[Boolean] =
-    IO.blocking {
-      val switched = state.compareAndSet(from, to)
-      if (!switched) {
-        logger.error(s"Unable to switch ${this.getClass.getSimpleName} state from: $from, to: $to.")
-      }
-      switched
-    }
-
-}
+case class InvalidStateException() extends Exception

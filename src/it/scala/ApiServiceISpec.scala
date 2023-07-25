@@ -3,6 +3,7 @@ import cats.effect.testing.scalatest.AsyncIOSpec
 import cats.effect.{ IO, Ref }
 import io.circe._
 import io.circe.parser._
+import jms4s.JmsAutoAcknowledgerConsumer
 import jms4s.JmsAutoAcknowledgerConsumer.AutoAckAction
 import jms4s.config.QueueName
 import jms4s.jms.JmsMessage
@@ -11,7 +12,6 @@ import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP }
 import org.scalatest.concurrent.{ Eventually, IntegrationPatience }
 import org.scalatest.freespec.FixtureAsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.time.{ Second, Seconds, Span }
 import org.scalatest.{ Assertion, BeforeAndAfterAll, BeforeAndAfterEach, FutureOutcome }
 import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ INVA002, INVA003, INVA005, INVA006, MISS002, MISS003, MISS005, MISS006 }
 import uk.gov.nationalarchives.omega.api.common.{ AppLogger, ErrorCode }
@@ -20,7 +20,6 @@ import uk.gov.nationalarchives.omega.api.messages.{ MessageProperties, OutgoingM
 import uk.gov.nationalarchives.omega.api.services.ApiService
 
 import javax.jms.{ Connection, MessageProducer, Session, TextMessage }
-import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import scala.io.Source
 
@@ -28,32 +27,19 @@ class ApiServiceISpec
     extends FixtureAsyncFreeSpec with AsyncIOSpec with Matchers with Eventually with IntegrationPatience with AppLogger
     with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  /** Note: Now that we have multiple scenarios, we see that we cannot run more than one at a time, likely because there
-    * is contention with the JMS consumer.
-    *
-    * As such, the only way for the scenarios to pass (currently) is to run them individuals - and even then you'll
-    * regularly see a failure.
-    *
-    * I think the whole approach to the reply message assertion needs to be improved.
-    */
-  implicit override val patienceConfig: PatienceConfig =
-    PatienceConfig(timeout = scaled(Span(60, Seconds)), interval = scaled(Span(1, Second)))
-
   private val requestQueueName = "PACS001_request"
   private val replyQueueName = "PACE001_reply"
   private val sqsHostName = "localhost"
   private val sqsPort = 9324
 
-  private val apiService = new ApiService(
-    ServiceConfig(
-      tempMessageDir = "temp",
-      maxConsumers = 1,
-      maxProducers = 1,
-      maxDispatchers = 1,
-      maxLocalQueueSize = 1,
-      requestQueue = requestQueueName,
-      sparqlEndpoint = "http://localhost:8080/rdf4j-server/repositories/PACT"
-    )
+  private val serviceConfig = ServiceConfig(
+    tempMessageDir = "temp",
+    maxConsumers = 1,
+    maxProducers = 1,
+    maxDispatchers = 1,
+    maxLocalQueueSize = 1,
+    requestQueue = requestQueueName,
+    sparqlEndpoint = "http://localhost:8080/rdf4j-server/repositories/PACT"
   )
 
   private val replyMessageText: Ref[IO, Option[String]] = Ref[IO].of(Option.empty[String]).unsafeRunSync()
@@ -69,19 +55,21 @@ class ApiServiceISpec
     )
   )
 
-  case class ProducerAndSession(producer: MessageProducer, session: Session)
+  case class ApiServiceFixture(
+    producer: MessageProducer,
+    session: Session,
+    apiService: ApiService,
+    comsumerRes: Resource[IO, JmsAutoAcknowledgerConsumer[IO]]
+  )
 
-  override type FixtureParam = ProducerAndSession
+  override type FixtureParam = ApiServiceFixture
 
   override def withFixture(test: OneArgAsyncTest): FutureOutcome = {
     val sqsTestConnector = SqsConnector(s"http://$sqsHostName:$sqsPort")
     val sqsTestConnection: Connection = sqsTestConnector.getConnection
     val session: Session = sqsTestConnection.createSession(false, Session.AUTO_ACKNOWLEDGE)
     val producer: MessageProducer = session.createProducer(session.createQueue(requestQueueName))
-    super.withFixture(test.toNoArgAsyncTest(ProducerAndSession(producer, session)))
-  }
-
-  override def beforeAll(): Unit = {
+    val apiService = new ApiService(serviceConfig)
     val consumerRes = for {
       client <- jmsClient
       consumer <-
@@ -93,13 +81,11 @@ class ApiServiceISpec
              } yield AutoAckAction.noOp
            })
     } yield consumer
-    consumerRes.useForever.unsafeToFuture()
-    apiService.start.unsafeToFuture()
-    BulkLoadData.createRepository().unsafeRunSync()
+    super.withFixture(test.toNoArgAsyncTest(ApiServiceFixture(producer, session, apiService, consumerRes)))
   }
 
-  override def afterAll(): Unit =
-    Await.result(apiService.stop().unsafeToFuture(), 1.minute)
+  override def beforeAll(): Unit =
+    BulkLoadData.createRepository().unsafeRunSync()
 
   override def afterEach(): Unit = {
     replyMessageText.set(Option.empty[String]).unsafeRunSync()
@@ -107,23 +93,36 @@ class ApiServiceISpec
     messageTypeId.set(Option.empty[String]).unsafeRunSync()
   }
 
+  /** Each test has the same sequence of events:-
+    *   1. Start the JMS consumer resource (to listen for message replies) 2. Start the API service 3. Send a test
+    *      message 4. Assert the reply message is as expected 5. Shutdown the API service 6. Shutdown the JMS consumer
+    *      resource
+    */
+
   "The Message API" - {
 
     "returns an echo message when all fields are valid" in { f =>
       val textMessageConfig = generateValidMessageConfig().copy(contents = "Hello World!")
-
-      sendMessage(f.session, f.producer, textMessageConfig)
-
-      assertReplyMessage("The Echo Service says: Hello World!")
-
+      val serviceIO = f.apiService.startSuspended
+      val res = for {
+        consumerFiber   <- f.comsumerRes.start
+        apiServiceFiber <- Resource.liftK(serviceIO.start)
+        _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
+        result          <- Resource.liftK(assertReplyMessage("The Echo Service says: Hello World!"))
+        _               <- Resource.eval(apiServiceFiber.cancel)
+        _               <- consumerFiber.cancel
+      } yield result
+      res.use(assert => IO.pure(assert))
     }
 
     "returns legal statuses message when given a valid message type" in { f =>
       val textMessageConfig = generateValidMessageConfig().copy(messageTypeId = Some("OSLISALS001"))
-
-      sendMessage(f.session, f.producer, textMessageConfig)
-
-      assertReplyMessage(s"""[
+      val serviceIO = f.apiService.startSuspended
+      val res = for {
+        consumerFiber   <- f.comsumerRes.start
+        apiServiceFiber <- Resource.liftK(serviceIO.start)
+        _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
+        result <- Resource.liftK(assertReplyMessage(s"""[
   {
     "identifier" : "http://catalogue.nationalarchives.gov.uk/public-record",
     "label" : "Public Record"
@@ -144,146 +143,236 @@ class ApiServiceISpec
     "identifier" : "http://catalogue.nationalarchives.gov.uk/non-record-material",
     "label" : "Non-Record Material"
   }
-]""".stripMargin)
+]""".stripMargin))
+        _ <- Resource.eval(apiServiceFiber.cancel)
+        _ <- consumerFiber.cancel
+      } yield result
+      res.use(assert => IO.pure(assert))
+    }
+  }
 
+  "returns agent summaries message when the given ListAgentSummaryRequest has" - {
+    " multiple agent types" in { f =>
+      val textMessageConfig = generateValidMessageConfig()
+        .copy(messageTypeId = Some("OSLISAGT001"))
+        .copy(contents = s"""{
+                            |    "type" : ["Corporate Body", "Person"]
+                            |}""".stripMargin)
+      val serviceIO = f.apiService.startSuspended
+      val res = for {
+        consumerFiber   <- f.comsumerRes.start
+        apiServiceFiber <- Resource.liftK(serviceIO.start)
+        _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
+        result          <- Resource.liftK(assertReplyMessage(agentSummariesExpectedResult))
+        _               <- Resource.eval(apiServiceFiber.cancel)
+        _               <- consumerFiber.cancel
+      } yield result
+      res.use(assert => IO.pure(assert))
+    }
+    " an agent type and the depository" in { f =>
+      val textMessageConfig = generateValidMessageConfig()
+        .copy(messageTypeId = Some("OSLISAGT001"))
+        .copy(contents = s"""{
+                            |    "type" : ["Corporate Body"],
+                            |    "depository" : true
+                            |}""".stripMargin)
+      val serviceIO = f.apiService.startSuspended
+      val res = for {
+        consumerFiber   <- f.comsumerRes.start
+        apiServiceFiber <- Resource.liftK(serviceIO.start)
+        _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
+        result          <- Resource.liftK(assertReplyMessage(agentPlaceOfDepositSummariesExpectedResult))
+        _               <- Resource.eval(apiServiceFiber.cancel)
+        _               <- consumerFiber.cancel
+      } yield result
+      res.use(assert => IO.pure(assert))
     }
 
-    "returns agent summaries message when the given ListAgentSummaryRequest has" - {
-      " multiple agent types" in { f =>
-        val textMessageConfig = generateValidMessageConfig()
-          .copy(messageTypeId = Some("OSLISAGT001"))
-          .copy(contents = s"""{
-                              |    "type" : ["Corporate Body", "Person"]
-                              |}""".stripMargin)
-        sendMessage(f.session, f.producer, textMessageConfig)
-        assertReplyMessage(agentSummariesExpectedResult)
+    // TODO Since it's not possible to send an empty message in SQS the empty payload cannot be tested and
+    // TODO this test is ignored as it fails on decode of spaces.
 
-      }
-      " an agent type and the depository" in { f =>
-        val textMessageConfig = generateValidMessageConfig()
-          .copy(messageTypeId = Some("OSLISAGT001"))
-          .copy(contents = s"""{
-                              |    "type" : ["Corporate Body"],
-                              |    "depository" : true
-                              |}""".stripMargin)
-
-        sendMessage(f.session, f.producer, textMessageConfig)
-        assertReplyMessage(agentPlaceOfDepositSummariesExpectedResult)
-
-      }
-
-      // TODO Since it's not possible to send an empty message in SQS the empty payload cannot be tested and
-      // TODO this test is ignored as it fails on decode of spaces.
-
-      " an empty payload (with padding)" ignore { f =>
-        val textMessageConfig = generateValidMessageConfig()
-          .copy(contents = " ")
-          .copy(messageTypeId = Some("OSLISAGT001"))
-
-        sendMessage(f.session, f.producer, textMessageConfig)
-        assertReplyMessage(agentSummariesExpectedResult)
-
-      }
+    " an empty payload (with padding)" ignore { f =>
+      val textMessageConfig = generateValidMessageConfig()
+        .copy(contents = " ")
+        .copy(messageTypeId = Some("OSLISAGT001"))
+      val serviceIO = f.apiService.startSuspended
+      val res = for {
+        consumerFiber   <- f.comsumerRes.start
+        apiServiceFiber <- Resource.liftK(serviceIO.start)
+        _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
+        result          <- Resource.liftK(assertReplyMessage(agentSummariesExpectedResult))
+        _               <- Resource.eval(apiServiceFiber.cancel)
+        _               <- consumerFiber.cancel
+      } yield result
+      res.use(assert => IO.pure(assert))
     }
-    "returns an echo message when the message body is" - {
-      "empty (with padding)" in { f =>
-        val textMessageConfig = generateValidMessageConfig().copy(contents = " ")
-
-        sendMessage(f.session, f.producer, textMessageConfig)
-
-        assertReplyMessage("The Echo Service says:  ")
-      }
+  }
+  "returns an echo message when the message body is" - {
+    "empty (with padding)" in { f =>
+      val textMessageConfig = generateValidMessageConfig().copy(contents = " ")
+      val serviceIO = f.apiService.startSuspended
+      val res = for {
+        consumerFiber   <- f.comsumerRes.start
+        apiServiceFiber <- Resource.liftK(serviceIO.start)
+        _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
+        result          <- Resource.liftK(assertReplyMessage("The Echo Service says:  "))
+        _               <- Resource.eval(apiServiceFiber.cancel)
+        _               <- consumerFiber.cancel
+      } yield result
+      res.use(assert => IO.pure(assert))
     }
+  }
 
-    "returns an error message when" - {
-      "the OMGMessageTypeID (aka SID)" - {
-        "isn't provided" in { f =>
-          val textMessageConfig = generateValidMessageConfig().copy(messageTypeId = None)
-
-          sendMessage(f.session, f.producer, textMessageConfig)
-
-          assertReplyMessage(getExpectedJsonErrors(Map(MISS002 -> "Missing OMGMessageTypeID"))) *>
-            assertMessageType(OutgoingMessageType.InvalidMessageFormatError.entryName)
-
-        }
-
-        "is unrecognised" in { f =>
-          val textMessageConfig = generateValidMessageConfig().copy(messageTypeId = Some("OSGESXXX100"))
-
-          sendMessage(f.session, f.producer, textMessageConfig)
-
-          assertReplyMessage(getExpectedJsonErrors(Map(INVA002 -> "Invalid OMGMessageTypeID"))) *>
-            assertMessageType(OutgoingMessageType.UnrecognisedMessageTypeError.entryName)
-
-        }
-
-      }
-      "the OMGApplicationID" - {
-        "isn't provided" in { f =>
-          val textMessageConfig = generateValidMessageConfig().copy(applicationId = None)
-
-          sendMessage(f.session, f.producer, textMessageConfig)
-
-          assertReplyMessage(
-            getExpectedJsonErrors(Map(MISS003 -> "Missing OMGApplicationID"))
-          ) *>
-            assertMessageType(OutgoingMessageType.InvalidApplicationError.entryName)
-
-        }
-
-        "isn't valid" in { f =>
-          val textMessageConfig = generateValidMessageConfig().copy(applicationId = Some("ABC001"))
-
-          sendMessage(f.session, f.producer, textMessageConfig)
-
-          assertReplyMessage(
-            getExpectedJsonErrors(Map(INVA003 -> "Invalid OMGApplicationID"))
-          ) *>
-            assertMessageType(OutgoingMessageType.InvalidApplicationError.entryName)
-        }
-
-      }
-    }
-    "the OMGMessageFormat" - {
+  "returns an error message when" - {
+    "the OMGMessageTypeID (aka SID)" - {
       "isn't provided" in { f =>
-        val textMessageConfig = generateValidMessageConfig().copy(messageFormat = None)
-
-        sendMessage(f.session, f.producer, textMessageConfig)
-
-        assertReplyMessage(getExpectedJsonErrors(Map(MISS005 -> "Missing OMGMessageFormat"))) *>
-          assertMessageType(OutgoingMessageType.InvalidMessageFormatError.entryName)
-
+        val textMessageConfig = generateValidMessageConfig().copy(messageTypeId = None)
+        val serviceIO = f.apiService.startSuspended
+        val res = for {
+          consumerFiber   <- f.comsumerRes.start
+          apiServiceFiber <- Resource.liftK(serviceIO.start)
+          _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
+          result <- Resource.liftK(
+                      assertReplyMessage(
+                        getExpectedJsonErrors(Map(MISS002 -> "Missing OMGMessageTypeID"))
+                      ) *> assertMessageType(OutgoingMessageType.InvalidMessageFormatError.entryName)
+                    )
+          _ <- Resource.eval(apiServiceFiber.cancel)
+          _ <- consumerFiber.cancel
+        } yield result
+        res.use(assert => IO.pure(assert))
       }
-      "isn't valid" in { f =>
-        val textMessageConfig = generateValidMessageConfig().copy(messageFormat = Some("text/plain"))
 
-        sendMessage(f.session, f.producer, textMessageConfig)
-
-        assertReplyMessage(getExpectedJsonErrors(Map(INVA005 -> "Invalid OMGMessageFormat"))) *>
-          assertMessageType(OutgoingMessageType.InvalidMessageFormatError.entryName)
-
+      "is unrecognised" in { f =>
+        val textMessageConfig = generateValidMessageConfig().copy(messageTypeId = Some("OSGESXXX100"))
+        val serviceIO = f.apiService.startSuspended
+        val res = for {
+          consumerFiber   <- f.comsumerRes.start
+          apiServiceFiber <- Resource.liftK(serviceIO.start)
+          _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
+          result <- Resource.liftK(
+                      assertReplyMessage(
+                        getExpectedJsonErrors(Map(INVA002 -> "Invalid OMGMessageTypeID"))
+                      ) *> assertMessageType(OutgoingMessageType.UnrecognisedMessageTypeError.entryName)
+                    )
+          _ <- Resource.eval(apiServiceFiber.cancel)
+          _ <- consumerFiber.cancel
+        } yield result
+        res.use(assert => IO.pure(assert))
       }
+
     }
-    "the OMGToken" - {
+    "the OMGApplicationID" - {
       "isn't provided" in { f =>
-        val textMessageConfig = generateValidMessageConfig().copy(token = None)
-
-        sendMessage(f.session, f.producer, textMessageConfig)
-
-        assertReplyMessage(getExpectedJsonErrors(Map(MISS006 -> "Missing OMGToken"))) *>
-          assertMessageType(OutgoingMessageType.InvalidMessageFormatError.entryName)
-
+        val textMessageConfig = generateValidMessageConfig().copy(applicationId = None)
+        val serviceIO = f.apiService.startSuspended
+        val res = for {
+          consumerFiber   <- f.comsumerRes.start
+          apiServiceFiber <- Resource.liftK(serviceIO.start)
+          _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
+          result <- Resource.liftK(
+                      assertReplyMessage(
+                        getExpectedJsonErrors(Map(MISS003 -> "Missing OMGApplicationID"))
+                      ) *> assertMessageType(OutgoingMessageType.InvalidApplicationError.entryName)
+                    )
+          _ <- Resource.eval(apiServiceFiber.cancel)
+          _ <- consumerFiber.cancel
+        } yield result
+        res.use(assert => IO.pure(assert))
       }
+
       "isn't valid" in { f =>
-        val textMessageConfig = generateValidMessageConfig().copy(token = Some(" "))
-
-        sendMessage(f.session, f.producer, textMessageConfig)
-
-        assertReplyMessage(getExpectedJsonErrors(Map(INVA006 -> "Invalid OMGToken"))) *>
-          assertMessageType(OutgoingMessageType.AuthenticationError.entryName)
+        val textMessageConfig = generateValidMessageConfig().copy(applicationId = Some("ABC001"))
+        val serviceIO = f.apiService.startSuspended
+        val res = for {
+          consumerFiber   <- f.comsumerRes.start
+          apiServiceFiber <- Resource.liftK(serviceIO.start)
+          _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
+          result <- Resource.liftK(
+                      assertReplyMessage(
+                        getExpectedJsonErrors(Map(INVA003 -> "Invalid OMGApplicationID"))
+                      ) *> assertMessageType(OutgoingMessageType.InvalidApplicationError.entryName)
+                    )
+          _ <- Resource.eval(apiServiceFiber.cancel)
+          _ <- consumerFiber.cancel
+        } yield result
+        res.use(assert => IO.pure(assert))
       }
-    }
 
+    }
+  }
+  "the OMGMessageFormat" - {
+    "isn't provided" in { f =>
+      val textMessageConfig = generateValidMessageConfig().copy(messageFormat = None)
+      val serviceIO = f.apiService.startSuspended
+      val res = for {
+        consumerFiber   <- f.comsumerRes.start
+        apiServiceFiber <- Resource.liftK(serviceIO.start)
+        _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
+        result <- Resource.liftK(
+                    assertReplyMessage(
+                      getExpectedJsonErrors(Map(MISS005 -> "Missing OMGMessageFormat"))
+                    ) *> assertMessageType(OutgoingMessageType.InvalidMessageFormatError.entryName)
+                  )
+        _ <- Resource.eval(apiServiceFiber.cancel)
+        _ <- consumerFiber.cancel
+      } yield result
+      res.use(assert => IO.pure(assert))
+    }
+    "isn't valid" in { f =>
+      val textMessageConfig = generateValidMessageConfig().copy(messageFormat = Some("text/plain"))
+      val serviceIO = f.apiService.startSuspended
+      val res = for {
+        consumerFiber   <- f.comsumerRes.start
+        apiServiceFiber <- Resource.liftK(serviceIO.start)
+        _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
+        result <-
+          Resource.liftK(
+            assertReplyMessage(getExpectedJsonErrors(Map(INVA005 -> "Invalid OMGMessageFormat"))) *> assertMessageType(
+              OutgoingMessageType.InvalidMessageFormatError.entryName
+            )
+          )
+        _ <- Resource.eval(apiServiceFiber.cancel)
+        _ <- consumerFiber.cancel
+      } yield result
+      res.use(assert => IO.pure(assert))
+    }
+  }
+  "the OMGToken" - {
+    "isn't provided" in { f =>
+      val textMessageConfig = generateValidMessageConfig().copy(token = None)
+      val serviceIO = f.apiService.startSuspended
+      val res = for {
+        consumerFiber   <- f.comsumerRes.start
+        apiServiceFiber <- Resource.liftK(serviceIO.start)
+        _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
+        result <- Resource.liftK(
+                    assertReplyMessage(getExpectedJsonErrors(Map(MISS006 -> "Missing OMGToken"))) *> assertMessageType(
+                      OutgoingMessageType.InvalidMessageFormatError.entryName
+                    )
+                  )
+        _ <- Resource.eval(apiServiceFiber.cancel)
+        _ <- consumerFiber.cancel
+      } yield result
+      res.use(assert => IO.pure(assert))
+    }
+    "isn't valid" in { f =>
+      val textMessageConfig = generateValidMessageConfig().copy(token = Some(" "))
+      val serviceIO = f.apiService.startSuspended
+      val res = for {
+        consumerFiber   <- f.comsumerRes.start
+        apiServiceFiber <- Resource.liftK(serviceIO.start)
+        _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
+        result <- Resource.liftK(
+                    assertReplyMessage(getExpectedJsonErrors(Map(INVA006 -> "Invalid OMGToken"))) *> assertMessageType(
+                      OutgoingMessageType.AuthenticationError.entryName
+                    )
+                  )
+        _ <- Resource.eval(apiServiceFiber.cancel)
+        _ <- consumerFiber.cancel
+      } yield result
+      res.use(assert => IO.pure(assert))
+    }
   }
 
   private def generateValidMessageConfig(): TextMessageConfig =
@@ -349,8 +438,8 @@ class ApiServiceISpec
       messageTypeId.get.asserting(_ mustBe Some(expectedMessageType))
     }
 
-  private def sendMessage(session: Session, producer: MessageProducer, textMessageConfig: TextMessageConfig): Unit =
-    producer.send(asTextMessage(session, textMessageConfig))
+  private def sendMessage(session: Session, producer: MessageProducer, textMessageConfig: TextMessageConfig): IO[Unit] =
+    IO.blocking(producer.send(asTextMessage(session, textMessageConfig)))
 
   private def agentSummariesExpectedResult = {
     val summaries = Source.fromResource("expected-agent-summaries.json").getLines().mkString
