@@ -1,4 +1,3 @@
-import cats.effect
 import cats.effect.kernel.Resource
 import cats.effect.testing.scalatest.AsyncIOSpec
 import cats.effect.{ IO, Ref }
@@ -11,7 +10,7 @@ import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP }
 import org.apache.commons.lang3.SerializationUtils
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.concurrent.{ Eventually, IntegrationPatience }
-import org.scalatest.freespec.{ AsyncFreeSpec, FixtureAsyncFreeSpec }
+import org.scalatest.freespec.FixtureAsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.time.{ Millis, Seconds, Span }
 import org.scalatest.{ Assertion, BeforeAndAfterAll, BeforeAndAfterEach, FutureOutcome }
@@ -24,7 +23,6 @@ import uk.gov.nationalarchives.omega.api.services.ApiService
 
 import java.nio.file._
 import java.util.UUID
-import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 import scala.util.{ Failure, Success, Try }
 

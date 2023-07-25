@@ -93,14 +93,10 @@ class ApiServiceISpec
     messageTypeId.set(Option.empty[String]).unsafeRunSync()
   }
 
-  /**
-    * Each test has the same sequence of events:-
-    * 1. Start the JMS consumer resource (to listen for message replies)
-    * 2. Start the API service
-    * 3. Send a test message
-    * 4. Assert the reply message is as expected
-    * 5. Shutdown the API service
-    * 6. Shutdown the JMS consumer resource
+  /** Each test has the same sequence of events:-
+    *   1. Start the JMS consumer resource (to listen for message replies) 2. Start the API service 3. Send a test
+    *      message 4. Assert the reply message is as expected 5. Shutdown the API service 6. Shutdown the JMS consumer
+    *      resource
     */
 
   "The Message API" - {
