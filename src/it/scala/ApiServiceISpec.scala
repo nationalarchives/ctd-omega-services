@@ -124,23 +124,23 @@ class ApiServiceISpec
         _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
         result <- Resource.liftK(assertReplyMessage(s"""[
   {
-    "identifier" : "http://catalogue.nationalarchives.gov.uk/public-record",
+    "identifier" : "http://cat.nationalarchives.gov.uk/public-record",
     "label" : "Public Record"
   },
   {
-    "identifier" : "http://catalogue.nationalarchives.gov.uk/non-public-record",
+    "identifier" : "http://cat.nationalarchives.gov.uk/non-public-record",
     "label" : "Non-Public Record"
   },
   {
-    "identifier" : "http://catalogue.nationalarchives.gov.uk/public-record-unless-otherwise-stated",
+    "identifier" : "http://cat.nationalarchives.gov.uk/public-record-unless-otherwise-stated",
     "label" : "Public Record (unless otherwise stated)"
   },
   {
-    "identifier" : "http://catalogue.nationalarchives.gov.uk/welsh-public-record",
+    "identifier" : "http://cat.nationalarchives.gov.uk/welsh-public-record",
     "label" : "Welsh Public Record"
   },
   {
-    "identifier" : "http://catalogue.nationalarchives.gov.uk/non-record-material",
+    "identifier" : "http://cat.nationalarchives.gov.uk/non-record-material",
     "label" : "Non-Record Material"
   }
 ]""".stripMargin))
