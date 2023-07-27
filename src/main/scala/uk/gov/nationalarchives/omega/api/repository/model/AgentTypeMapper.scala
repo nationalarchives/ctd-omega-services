@@ -52,4 +52,7 @@ trait AgentTypeMapper {
       case SoftwareAgent   => s"$cataloguePrefix/software-agent-concept"
     }
 
+  def getAllAgentTypes: List[AgentType] =
+    List(Person, Family, CorporateBody, CollectiveAgent, HardwareAgent, SoftwareAgent)
+
 }

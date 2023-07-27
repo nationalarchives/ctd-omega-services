@@ -8,6 +8,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.time.{ Second, Seconds, Span }
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
+import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.OmegaRepository
 
 class OmegaRepositoryISpec
@@ -40,7 +41,7 @@ class OmegaRepositoryISpec
     "must return a List of 24 AgentEntity items" in {
       when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
       eventually {
-        val result = repository.getAgentEntities
+        val result = repository.getAgentSummaryEntities(ListAgentSummary())
         result.success.get.length mustBe 24
       }
 
@@ -49,7 +50,7 @@ class OmegaRepositoryISpec
     "must return a List of 2 places of deposit AgentEntity items" in {
       when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
       eventually {
-        val result = repository.getPlaceOfDepositEntities
+        val result = repository.getAgentSummaryEntities(ListAgentSummary(depository = Some(true)))
         result.success.get.length mustBe 2
       }
     }

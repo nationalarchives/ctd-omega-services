@@ -26,7 +26,7 @@ import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, Agen
 
 import scala.util.Success
 
-case class AgentSummaryEntity(identifier: URI, agentType: URI, currentVersion: URI) {
+case class AgentSummaryEntity(conceptId: URI, agentType: URI, currentVersionId: URI) {
   def as[T](implicit f: AgentSummaryEntity => T): T = f(this)
 }
 object AgentSummaryEntity extends AgentTypeMapper {
@@ -38,8 +38,8 @@ object AgentSummaryEntity extends AgentTypeMapper {
           Some(
             AgentSummary(
               agentType,
-              agentSummaryEntity.identifier.toString,
-              agentSummaryEntity.currentVersion.toString,
+              agentSummaryEntity.conceptId.toString,
+              agentSummaryEntity.currentVersionId.toString,
               List.empty[AgentDescription]
             )
           )

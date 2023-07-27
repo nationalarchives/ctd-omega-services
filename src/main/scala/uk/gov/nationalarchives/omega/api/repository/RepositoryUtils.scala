@@ -21,6 +21,7 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
+import cats.data.NonEmptyList
 import org.apache.jena.datatypes.xsd.impl.XSDDateTimeType
 import org.apache.jena.query.{ ParameterizedSparqlString, Query, QueryFactory, Syntax }
 import org.apache.jena.rdf.model.{ Resource, ResourceFactory }

@@ -23,7 +23,7 @@ package uk.gov.nationalarchives.omega.api.repository
 
 import org.apache.jena.rdf.model.{ Resource, ResourceFactory }
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.AgentEntity.getUriFromAgentType
+import uk.gov.nationalarchives.omega.api.repository.model.AgentTypeMapper
 
 case class SparqlParams(
   booleans: Map[String, Boolean] = Map.empty,
@@ -32,7 +32,7 @@ case class SparqlParams(
   values: Map[String, List[Resource]] = Map.empty,
   queryExtension: Option[String] = None
 )
-object SparqlParams {
+object SparqlParams extends AgentTypeMapper {
   def from(listAgentSummary: ListAgentSummary): SparqlParams = {
     val valuesMap = getValuesMap(listAgentSummary)
     val uriMap = getUriMap(listAgentSummary)
@@ -42,14 +42,11 @@ object SparqlParams {
     SparqlParams(booleanMap, uriMap, dateTimeMap, valuesMap, queryExtension)
   }
 
-  private def getValuesMap(listAgentSummary: ListAgentSummary): Map[String, List[Resource]] =
-    if (listAgentSummary.agentTypes.nonEmpty) {
-      val agentTypeUris = listAgentSummary.agentTypes.map(getUriFromAgentType)
-      val agentTypeResources = agentTypeUris.map(ResourceFactory.createResource)
-      Map("agentTypeValues" -> agentTypeResources)
-    } else {
-      Map.empty
-    }
+  private def getValuesMap(listAgentSummary: ListAgentSummary): Map[String, List[Resource]] = {
+    val agentTypeUris = listAgentSummary.agentTypes.getOrElse(getAllAgentTypes).map(getUriFromAgentType)
+    val agentTypeResources = agentTypeUris.map(ResourceFactory.createResource)
+    Map("agentTypeValues" -> agentTypeResources)
+  }
 
   private def getQueryExtension(versionTimestamp: Option[String]): Option[String] =
     versionTimestamp match {

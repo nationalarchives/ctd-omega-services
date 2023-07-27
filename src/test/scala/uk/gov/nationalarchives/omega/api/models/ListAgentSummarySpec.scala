@@ -21,6 +21,7 @@
 
 package uk.gov.nationalarchives.omega.api.models
 
+import cats.data.NonEmptyList
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import io.circe.parser.decode
@@ -36,7 +37,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
            |    "type" : ["Corporate Body","Person"]
            |}""".stripMargin
       decode[ListAgentSummary](agentRequest) mustBe Right(value =
-        ListAgentSummary(agentTypes = List(CorporateBody, Person), None, None, None)
+        ListAgentSummary(agentTypes = Some(List(CorporateBody, Person)), None, None, None)
       )
     }
     "must decode a request with depository" in {
@@ -48,7 +49,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
           |}
           |""".stripMargin
       decode[ListAgentSummary](agentRequest) mustBe Right(value =
-        ListAgentSummary(agentTypes = List(CorporateBody), None, depository = Some(true), None)
+        ListAgentSummary(agentTypes = Some(List(CorporateBody)), None, depository = Some(true), None)
       )
     }
   }

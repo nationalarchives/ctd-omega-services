@@ -21,6 +21,7 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
+import cats.data.NonEmptyList
 import org.apache.jena.query.Query
 import org.mockito.MockitoSugar
 import org.phenoscape.sparql.SPARQLInterpolation.SPARQLStringContext

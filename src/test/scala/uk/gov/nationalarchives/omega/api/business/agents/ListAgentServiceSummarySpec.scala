@@ -23,8 +23,7 @@ package uk.gov.nationalarchives.omega.api.business.agents
 
 import cats.data.Chain
 import cats.data.Validated.{ Invalid, Valid }
-import uk.gov.nationalarchives.omega.api.messages.AgentType
-import uk.gov.nationalarchives.omega.api.messages.AgentType.CorporateBody
+import uk.gov.nationalarchives.omega.api.messages.AgentType.{ CorporateBody, Person }
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.InvalidMessagePayload
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.TestRepository
@@ -41,7 +40,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
       "a valid listAgentSummaryRequest" in {
 
         val listAgentSummaryRequest = ListAgentSummary(
-          List(AgentType.CorporateBody, AgentType.Person),
+          Some(List(CorporateBody, Person)),
           versionTimestamp = Some("all"),
           depository = Some(false),
           authorityFile = Some(false)
@@ -54,7 +53,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
       "a valid listAgentSummaryRequest for place of deposit" in {
 
         val listAgentSummaryRequest = ListAgentSummary(
-          List(AgentType.CorporateBody),
+          Some(List(CorporateBody)),
           versionTimestamp = Some("all"),
           depository = Some(true),
           authorityFile = Some(false)
@@ -68,7 +67,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
       // PACT-1025 refers
       "an empty payload request" ignore {
 
-        val listAgentSummaryRequest = ListAgentSummary(List())
+        val listAgentSummaryRequest = ListAgentSummary()
         val result = listAgentSummaryService.process(listAgentSummaryRequest)
 
         result mustBe Right(ListAgentSummaryReply(getExpectedAgentSummaries))
@@ -154,7 +153,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
 
       result mustBe
         Valid(
-          ListAgentSummary(List(CorporateBody), Some("2022-06-22T02:00:00-0500"), Some(false), Some(false))
+          ListAgentSummary(Some(List(CorporateBody)), Some("2022-06-22T02:00:00-0500"), Some(false), Some(false))
         )
     }
     "no version timestamp and authority file" in {
@@ -163,7 +162,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
                                                 |    "depository" : true
                                                 |}""".stripMargin)
       val result = listAgentSummaryService.validateRequest(message)
-      result mustBe Valid(ListAgentSummary(List(CorporateBody), None, Some(true), None))
+      result mustBe Valid(ListAgentSummary(Some(List(CorporateBody)), None, Some(true), None))
     }
     "valid version identifier" in {
       val message = getValidatedLocalMessage(s"""{
@@ -173,7 +172,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
                                                 |    "depository" : false
                                                 |}""".stripMargin)
       val result = listAgentSummaryService.validateRequest(message)
-      result mustBe Valid(ListAgentSummary(List(CorporateBody), Some("latest"), Some(false), Some(false)))
+      result mustBe Valid(ListAgentSummary(Some(List(CorporateBody)), Some("latest"), Some(false), Some(false)))
     }
   }
 

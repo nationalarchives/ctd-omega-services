@@ -76,7 +76,7 @@ class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRe
           )
       }
     } else {
-      Validated.valid(ListAgentSummary(List.empty))
+      Validated.valid(ListAgentSummary())
     }
 
   private def validateDate(dateStr: String): Option[Date] = {
@@ -120,7 +120,7 @@ class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRe
     listAgentSummary: ListAgentSummary
   ): Try[List[AgentDescription]] =
     for {
-      agentDescriptionEntities <- repository.getAgentDescriptionEntities(listAgentSummary, agentSummaryEntity)
+      agentDescriptionEntities <- repository.getAgentDescriptionEntities(listAgentSummary, agentSummaryEntity.conceptId)
       agentDescriptions <-
         Try(agentDescriptionEntities.map(agentDescriptionEntity => agentDescriptionEntity.as[AgentDescription]))
     } yield agentDescriptions

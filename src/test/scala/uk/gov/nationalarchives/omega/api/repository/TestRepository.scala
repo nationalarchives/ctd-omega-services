@@ -23,16 +23,16 @@ package uk.gov.nationalarchives.omega.api.repository
 import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentDescriptionEntity, AgentEntity, AgentSummaryEntity }
+import uk.gov.nationalarchives.omega.api.repository.model.{ AgentDescriptionEntity, AgentSummaryEntity }
 
 import scala.util.Try
 
 class TestRepository extends AbstractRepository {
   override def getLegalStatusSummaries: Try[List[LegalStatus]] = Try(List())
 
-  override def getAgentEntities: Try[List[AgentEntity]] = Try(List())
+  // override def getAgentEntities: Try[List[AgentEntity]] = Try(List())
 
-  override def getPlaceOfDepositEntities: Try[List[AgentEntity]] = Try(List())
+  // override def getPlaceOfDepositEntities: Try[List[AgentEntity]] = Try(List())
 
   override def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): Try[List[AgentSummaryEntity]] =
     if (listAgentSummary.depository.getOrElse(false)) {
@@ -79,9 +79,9 @@ class TestRepository extends AbstractRepository {
 
   override def getAgentDescriptionEntities(
     listAgentSummary: ListAgentSummary,
-    agentSummary: AgentSummaryEntity
+    agentConceptUri: URI
   ): Try[List[AgentDescriptionEntity]] =
-    agentSummary.identifier.toString match {
+    agentConceptUri.toString match {
       case "http://cat.nationalarchives.gov.uk/agent.48N" =>
         Try(
           List(

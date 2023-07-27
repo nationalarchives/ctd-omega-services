@@ -21,12 +21,14 @@
 
 package uk.gov.nationalarchives.omega.api.messages.request
 
+import cats.data.NonEmptyList
 import io.circe.syntax._
 import io.circe.{ Decoder, Encoder, Json }
 import uk.gov.nationalarchives.omega.api.messages.AgentType
+import uk.gov.nationalarchives.omega.api.messages.AgentType._
 
 case class ListAgentSummary(
-  agentTypes: List[AgentType],
+  agentTypes: Option[List[AgentType]] = None,
   versionTimestamp: Option[String] = None,
   depository: Option[Boolean] = None,
   authorityFile: Option[Boolean] = None
@@ -45,7 +47,7 @@ object ListAgentSummary {
 
   implicit val decodeListAgentSummary: Decoder[ListAgentSummary] = json =>
     for {
-      agentType     <- json.get[List[AgentType]]("type")
+      agentType     <- json.get[Option[List[AgentType]]]("type")
       depository    <- json.get[Option[Boolean]]("depository")
       authorityFile <- json.get[Option[Boolean]]("authority-file")
       version       <- json.get[Option[String]]("version-timestamp")

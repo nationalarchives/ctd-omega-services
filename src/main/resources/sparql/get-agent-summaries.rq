@@ -11,12 +11,12 @@ PREFIX time: <http://www.w3.org/2006/time#>
 PREFIX todo: <http://TODO/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 
-SELECT DISTINCT ?identifier ?agentType ?currentVersion
+SELECT DISTINCT ?conceptId ?agentType ?currentVersionId
 
 WHERE {
-    ?identifier     dct:type            ?agentType ;
-    			    ver:currentVersion  ?currentVersion .
-    ?currentVersion $p1                 ?o1 ;
+    ?conceptId          dct:type            ?agentType ;
+    			        ver:currentVersion  ?currentVersionId .
+    ?currentVersionId   $p1                 ?o1 ;
                     ?p2                 ?o2
   	VALUES (?agentType) {?agentTypeValues}
 }
