@@ -4,7 +4,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix dct: <http://purl.org/dc/terms/> .
 @prefix premis: <http://www.loc.gov/premis/rdf/v3/> .
-@prefix cat: <http://catalogue.nationalarchives.gov.uk/> .
+@prefix cat: <http://cat.nationalarchives.gov.uk/> .
 
 cat:omegaVocabulary rdf:type skos:ConceptScheme;
   dct:title "Project Omega Vocabularly" ;

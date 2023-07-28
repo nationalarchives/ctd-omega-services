@@ -48,7 +48,7 @@ class OmegaRepositorySpec extends AnyFreeSpec with Matchers with MockitoSugar {
     }
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[LegalStatus](any, any)).thenReturn(
-        Success(List(LegalStatus(new URI("http://catalogue.nationalarchives.gov.uk/public-record"), "Public Record")))
+        Success(List(LegalStatus(new URI("http://cat.nationalarchives.gov.uk/public-record"), "Public Record")))
       )
       val result = repository.getLegalStatusSummaries
       result.success.get.length mustBe 1
