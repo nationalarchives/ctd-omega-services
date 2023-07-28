@@ -46,11 +46,11 @@ class LegalStatusServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar
 
         result mustBe Right(LegalStatusReply(s"""[
   {
-    "identifier" : "http://catalogue.nationalarchives.gov.uk/public-record",
+    "identifier" : "http://cat.nationalarchives.gov.uk/public-record",
     "label" : "Public Record"
   },
   {
-    "identifier" : "http://catalogue.nationalarchives.gov.uk/non-public-record",
+    "identifier" : "http://cat.nationalarchives.gov.uk/non-public-record",
     "label" : "Non-Public Record"
   }
 ]""".stripMargin))
