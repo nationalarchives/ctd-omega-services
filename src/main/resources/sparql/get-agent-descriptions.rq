@@ -14,7 +14,7 @@ PREFIX prov: <http://www.w3.org/ns/prov#>
 SELECT DISTINCT ?descriptionId ?label ?dateFrom ?dateTo ?depository ?versionTimestamp ?previousDescription
 
 WHERE {
-    ?descriptionId prov:specializationOf ?conceptId .
+    ?descriptionId prov:specializationOf ?conceptUriParam .
   	OPTIONAL {
     	{
 	    	?descriptionId rdaa:P50032 ?label .

@@ -32,9 +32,9 @@ import scala.util.Try
 class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends AbstractRepository with RepositoryUtils {
 
   private val sparqlResourceDir = "sparql"
-  private val getLegalStatusSummarySparqlResource = s"/$sparqlResourceDir/select-legal-status-summaries.rq"
+  private val selectLegalStatusSummarySparqlResource = s"/$sparqlResourceDir/select-legal-status-summaries.rq"
   private val selectAgentSummariesSparqlResource = s"/$sparqlResourceDir/select-agent-summaries.rq"
-  private val getPlaceOfDepositSummariesSparqlResource = s"/$sparqlResourceDir/select-place-of-deposit-summaries.rq"
+  private val selectPlaceOfDepositSummariesSparqlResource = s"/$sparqlResourceDir/select-place-of-deposit-summaries.rq"
 
   implicit object BooleanFromQuerySolution extends FromQuerySolution[Boolean] {
     def fromQuerySolution(qs: QuerySolution, variablePath: String = ""): Try[Boolean] =
@@ -43,7 +43,7 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
 
   override def getLegalStatusSummaries: Try[List[LegalStatus]] =
     for {
-      query  <- prepareQuery(getLegalStatusSummarySparqlResource)
+      query  <- prepareQuery(selectLegalStatusSummarySparqlResource)
       result <- executeQuery(query, implicitly[FromQuerySolution[LegalStatus]])
     } yield result
 
@@ -55,7 +55,7 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
 
   override def getPlaceOfDepositEntities: Try[List[AgentEntity]] =
     for {
-      query  <- prepareQuery(getPlaceOfDepositSummariesSparqlResource)
+      query  <- prepareQuery(selectPlaceOfDepositSummariesSparqlResource)
       result <- executeQuery(query, implicitly[FromQuerySolution[AgentEntity]])
     } yield result
 

@@ -15,7 +15,7 @@ SELECT DISTINCT  ?identifier ?agentType ?currentVersion
 WHERE {
     ?identifier     dct:type            ?agentType ;
                     ver:currentVersion  ?currentVersion .
-    ?currentVersion ?property1          ?value1 ;
-                    ?property2          ?value2 .
-    VALUES (?agentType) { ?agentTypeValues }
+    ?currentVersion ?predicateParam1    ?objectParam1 ;
+                    ?predicateParam2    ?objectParam2 .
+    VALUES (?agentType) { ?agentTypeValuesParam }
 }

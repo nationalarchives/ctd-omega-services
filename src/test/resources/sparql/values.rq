@@ -15,5 +15,5 @@ SELECT DISTINCT  ?identifier ?agentType ?currentVersion
 WHERE {
     ?identifier dct:type            ?agentType ;
                 ver:currentVersion  ?currentVersion .
-    VALUES (?agentType) { ?agentTypeValues }
+    VALUES (?agentType) { ?agentTypeValuesParam }
 }

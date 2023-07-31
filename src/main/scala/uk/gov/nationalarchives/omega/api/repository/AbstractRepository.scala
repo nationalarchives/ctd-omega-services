@@ -21,13 +21,10 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
-import org.apache.jena.query.{ Query, QueryFactory, Syntax }
 import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
-import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentDescriptionEntity, AgentEntity, AgentSummaryEntity }
+import uk.gov.nationalarchives.omega.api.repository.model.AgentEntity
 
-import scala.io.Source
-import scala.util.{ Failure, Try, Using }
+import scala.util.Try
 
 trait AbstractRepository {
 

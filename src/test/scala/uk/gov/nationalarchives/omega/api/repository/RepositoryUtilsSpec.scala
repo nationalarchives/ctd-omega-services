@@ -22,12 +22,10 @@
 package uk.gov.nationalarchives.omega.api.repository
 
 import org.apache.jena.query.Query
-import org.mockito.MockitoSugar
 import org.phenoscape.sparql.SPARQLInterpolation.SPARQLStringContext
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
+import uk.gov.nationalarchives.omega.api.support.UnitTest
 
-class RepositoryUtilsSpec extends AnyFreeSpec with Matchers with MockitoSugar {
+class RepositoryUtilsSpec extends UnitTest {
 
   val sparqlPrefix =
     sparql"""
@@ -91,7 +89,7 @@ class RepositoryUtilsSpec extends AnyFreeSpec with Matchers with MockitoSugar {
       val queryResource = "/sparql/values.rq"
       val queryParams = SparqlParams(values =
         Map(
-          "agentTypeValues" -> List(
+          "agentTypeValuesParam" -> List(
             utils.createResource(BaseURL.cat, "person-concept"),
             utils.createResource(BaseURL.cat, "corporate-body-concept")
           )
@@ -104,7 +102,10 @@ class RepositoryUtilsSpec extends AnyFreeSpec with Matchers with MockitoSugar {
       val utils = new RepositoryUtils {}
       val queryResource = "/sparql/properties.rq"
       val queryParams =
-        SparqlParams(booleans = Map("value" -> true), uris = Map("property" -> s"${BaseURL.todo}/is-place-of-deposit"))
+        SparqlParams(
+          booleans = Map("objectParam" -> true),
+          uris = Map("predicateParam" -> s"${BaseURL.todo}/is-place-of-deposit")
+        )
       val result = utils.prepareParameterizedQuery(queryResource, queryParams)
       result.get mustEqual expectedSparqlWithBoolean
     }
@@ -112,7 +113,9 @@ class RepositoryUtilsSpec extends AnyFreeSpec with Matchers with MockitoSugar {
       val utils = new RepositoryUtils {}
       val queryResource = "/sparql/properties.rq"
       val queryParams =
-        SparqlParams(uris = Map("property" -> s"${BaseURL.dct}/type", "value" -> s"${BaseURL.cat}/authority-file"))
+        SparqlParams(uris =
+          Map("predicateParam" -> s"${BaseURL.dct}/type", "objectParam" -> s"${BaseURL.cat}/authority-file")
+        )
       val result = utils.prepareParameterizedQuery(queryResource, queryParams)
       result.get mustEqual expectedSparqlWithObject
     }
@@ -120,14 +123,14 @@ class RepositoryUtilsSpec extends AnyFreeSpec with Matchers with MockitoSugar {
       val utils = new RepositoryUtils {}
       val queryResource = "/sparql/properties-and-values.rq"
       val queryParams = SparqlParams(
-        booleans = Map("value1" -> true),
+        booleans = Map("objectParam1" -> true),
         uris = Map(
-          "property1" -> s"${BaseURL.todo}/is-place-of-deposit",
-          "property2" -> s"${BaseURL.dct}/type",
-          "value2"    -> s"${BaseURL.cat}/authority-file"
+          "predicateParam1" -> s"${BaseURL.todo}/is-place-of-deposit",
+          "predicateParam2" -> s"${BaseURL.dct}/type",
+          "objectParam2"    -> s"${BaseURL.cat}/authority-file"
         ),
         values = Map(
-          "agentTypeValues" -> List(
+          "agentTypeValuesParam" -> List(
             utils.createResource(BaseURL.cat, "person-concept"),
             utils.createResource(BaseURL.cat, "corporate-body-concept")
           )

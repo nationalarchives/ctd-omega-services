@@ -45,31 +45,32 @@ object SparqlParams extends AgentTypeMapper {
   private def getValuesMap(listAgentSummary: ListAgentSummary): Map[String, List[Resource]] = {
     val agentTypeUris = listAgentSummary.agentTypes.getOrElse(getAllAgentTypes).map(getUriFromAgentType)
     val agentTypeResources = agentTypeUris.map(ResourceFactory.createResource)
-    Map("agentTypeValues" -> agentTypeResources)
+    Map("agentTypeValuesParam" -> agentTypeResources)
   }
 
   private def getQueryExtension(listAgentSummary: ListAgentSummary): Option[String] =
     listAgentSummary.versionTimestamp match {
-      case Some("latest") | None => Some("ORDER BY DESC(?generatedAt) LIMIT 1")
-      case Some("all")           => Some("ORDER BY DESC(?generatedAt)")
+      case Some("latest") | None => Some("ORDER BY DESC(?generatedAtParam) LIMIT 1")
+      case Some("all")           => Some("ORDER BY DESC(?generatedAtParam)")
       case _                     => None
     }
 
   private def getUriMap(listAgentSummary: ListAgentSummary): Map[String, String] = {
     val map1 = listAgentSummary.depository match {
-      case Some(true) => Map("p1" -> s"${BaseURL.todo}/is-place-of-deposit")
+      case Some(true) => Map("predicateParam1" -> s"${BaseURL.todo}/is-place-of-deposit")
       case _          => Map.empty[String, String]
     }
     val map2 = listAgentSummary.authorityFile match {
-      case Some(true) => Map("p2" -> s"${BaseURL.dct}/type", "o2" -> s"${BaseURL.cat}/authority-file")
-      case _          => Map.empty[String, String]
+      case Some(true) =>
+        Map("predicateParam2" -> s"${BaseURL.dct}/type", "objectParam2" -> s"${BaseURL.cat}/authority-file")
+      case _ => Map.empty[String, String]
     }
     map1 ++ map2
   }
 
   private def getBooleanMap(listAgentSummary: ListAgentSummary): Map[String, Boolean] =
     listAgentSummary.depository match {
-      case Some(true) => Map("o1" -> true)
+      case Some(true) => Map("objectParam1" -> true)
       case _          => Map.empty
     }
 
@@ -77,6 +78,6 @@ object SparqlParams extends AgentTypeMapper {
     listAgentSummary.versionTimestamp match {
       case Some("all") | Some("latest") | None => Map.empty
       case Some(dateTimeValue) =>
-        Map("generatedAt" -> dateTimeValue)
+        Map("generatedAtParam" -> dateTimeValue)
     }
 }
