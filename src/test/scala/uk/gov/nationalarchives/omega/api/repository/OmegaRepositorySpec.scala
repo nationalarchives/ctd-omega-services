@@ -43,20 +43,20 @@ class OmegaRepositorySpec extends AnyFreeSpec with Matchers with MockitoSugar {
 
     "must return a Success with an empty list" in {
       when(mockConnector.execute[LegalStatus](any, any)).thenReturn(Success(List.empty))
-      val result = repository.getLegalStatusSummaries
+      val result = repository.getLegalStatusEntities
       result.success.get.length mustBe 0
     }
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[LegalStatus](any, any)).thenReturn(
         Success(List(LegalStatus(new URI("http://cat.nationalarchives.gov.uk/public-record"), "Public Record")))
       )
-      val result = repository.getLegalStatusSummaries
+      val result = repository.getLegalStatusEntities
       result.success.get.length mustBe 1
     }
     "must return a Failure with an exception" in {
       val errorMessage = "There was a problem"
       when(mockConnector.execute[LegalStatus](any, any)).thenReturn(Failure(new QueryException(errorMessage)))
-      val result = repository.getLegalStatusSummaries
+      val result = repository.getLegalStatusEntities
       result.failure.exception.getMessage must equal(errorMessage)
     }
   }

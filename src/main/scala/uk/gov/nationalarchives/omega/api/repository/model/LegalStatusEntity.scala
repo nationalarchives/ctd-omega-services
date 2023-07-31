@@ -19,30 +19,17 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.repository
+package uk.gov.nationalarchives.omega.api.repository.model
 
-import org.apache.jena.query.{ Query, QueryFactory, Syntax }
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentEntity, LegalStatusEntity }
+import org.apache.jena.ext.xerces.util.URI
+import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
 
-import scala.io.Source
-import scala.util.{ Failure, Try, Using }
+case class LegalStatusEntity(identifier: URI, label: String) {
+  def as[T](implicit f: LegalStatusEntity => T): T = f(this)
 
-trait AbstractRepository {
+}
 
-  def getLegalStatusEntities: Try[List[LegalStatusEntity]]
-
-  def getAgentEntities: Try[List[AgentEntity]]
-
-  def getPlaceOfDepositEntities: Try[List[AgentEntity]]
-
-  protected def getQueryText(queryResource: String): Try[String] =
-    Using(Source.fromInputStream(getClass.getResourceAsStream(queryResource))) { resource =>
-      resource.getLines().mkString("\n")
-    }
-
-  protected def getQuery(queryText: String): Try[Query] =
-    Try(QueryFactory.create(queryText, Syntax.syntaxSPARQL_11)).recoverWith { case _: NullPointerException =>
-      Failure(new IllegalArgumentException(s"Unable to read query from text: $queryText"))
-    }
-
+object LegalStatusEntity {
+  implicit def legalStatusMapper: LegalStatusEntity => Option[LegalStatus] = (legalStatusEntity: LegalStatusEntity) =>
+    Some(LegalStatus(legalStatusEntity.identifier, legalStatusEntity.label))
 }

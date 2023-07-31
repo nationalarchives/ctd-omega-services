@@ -24,8 +24,7 @@ package uk.gov.nationalarchives.omega.api.repository
 import org.apache.jena.query.QuerySolution
 import org.phenoscape.sparql.FromQuerySolution
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
-import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
-import uk.gov.nationalarchives.omega.api.repository.model.AgentEntity
+import uk.gov.nationalarchives.omega.api.repository.model.{ AgentEntity, LegalStatusEntity }
 
 import scala.util.Try
 
@@ -41,8 +40,11 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
       getLiteral(qs, variablePath).map(_.getBoolean)
   }
 
-  override def getLegalStatusSummaries: Try[List[LegalStatus]] =
-    processQuery[LegalStatus](getLegalStatusSummarySparqlResource, implicitly[FromQuerySolution[LegalStatus]])
+  override def getLegalStatusEntities: Try[List[LegalStatusEntity]] =
+    processQuery[LegalStatusEntity](
+      getLegalStatusSummarySparqlResource,
+      implicitly[FromQuerySolution[LegalStatusEntity]]
+    )
 
   override def getAgentEntities: Try[List[AgentEntity]] =
     processQuery[AgentEntity](getAgentSummariesSparqlResource, implicitly[FromQuerySolution[AgentEntity]])

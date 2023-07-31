@@ -29,7 +29,7 @@ class OmegaRepositoryISpec
     "must return a Success with 5 legal status items" in {
       when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
       eventually {
-        val result = repository.getLegalStatusSummaries
+        val result = repository.getLegalStatusEntities
         result.success.get.length mustBe 5
       }
     }
