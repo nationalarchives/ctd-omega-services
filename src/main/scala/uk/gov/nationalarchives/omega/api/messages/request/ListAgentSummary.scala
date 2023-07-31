@@ -26,7 +26,7 @@ import io.circe.{ Decoder, Encoder, Json }
 import uk.gov.nationalarchives.omega.api.messages.AgentType
 
 case class ListAgentSummary(
-  agentType: List[AgentType],
+  agentTypes: Option[List[AgentType]] = None,
   versionTimestamp: Option[String] = None,
   depository: Option[Boolean] = None,
   authorityFile: Option[Boolean] = None
@@ -36,7 +36,7 @@ object ListAgentSummary {
   implicit val encodeListAgentSummary: Encoder[ListAgentSummary] = (listAgentSummary: ListAgentSummary) =>
     Json
       .obj(
-        ("type", listAgentSummary.agentType.asJson),
+        ("type", listAgentSummary.agentTypes.asJson),
         ("depository", listAgentSummary.depository.asJson),
         ("authority-file", listAgentSummary.authorityFile.asJson),
         ("version-timestamp", listAgentSummary.versionTimestamp.asJson)
@@ -45,7 +45,7 @@ object ListAgentSummary {
 
   implicit val decodeListAgentSummary: Decoder[ListAgentSummary] = json =>
     for {
-      agentType     <- json.get[List[AgentType]]("type")
+      agentType     <- json.get[Option[List[AgentType]]]("type")
       depository    <- json.get[Option[Boolean]]("depository")
       authorityFile <- json.get[Option[Boolean]]("authority-file")
       version       <- json.get[Option[String]]("version-timestamp")

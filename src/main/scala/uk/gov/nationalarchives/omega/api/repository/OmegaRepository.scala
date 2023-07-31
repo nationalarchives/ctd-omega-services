@@ -21,19 +21,19 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
-import org.apache.jena.query.QuerySolution
+import org.apache.jena.query.{ Query, QuerySolution }
 import org.phenoscape.sparql.FromQuerySolution
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.repository.model.{ AgentEntity, LegalStatusEntity }
 
 import scala.util.Try
 
-class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends AbstractRepository {
+class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends AbstractRepository with RepositoryUtils {
 
   private val sparqlResourceDir = "sparql"
-  private val getLegalStatusSummarySparqlResource = s"/$sparqlResourceDir/select-legal-status-summaries.rq"
-  private val getAgentSummariesSparqlResource = s"/$sparqlResourceDir/select-agent-summaries.rq"
-  private val getPlaceOfDepositSummariesSparqlResource = s"/$sparqlResourceDir/select-place-of-deposit-summaries.rq"
+  private val selectLegalStatusSummarySparqlResource = s"/$sparqlResourceDir/select-legal-status-summaries.rq"
+  private val selectAgentSummariesSparqlResource = s"/$sparqlResourceDir/select-agent-summaries.rq"
+  private val selectPlaceOfDepositSummariesSparqlResource = s"/$sparqlResourceDir/select-place-of-deposit-summaries.rq"
 
   implicit object BooleanFromQuerySolution extends FromQuerySolution[Boolean] {
     def fromQuerySolution(qs: QuerySolution, variablePath: String = ""): Try[Boolean] =
@@ -41,22 +41,24 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
   }
 
   override def getLegalStatusEntities: Try[List[LegalStatusEntity]] =
-    processQuery[LegalStatusEntity](
-      getLegalStatusSummarySparqlResource,
-      implicitly[FromQuerySolution[LegalStatusEntity]]
-    )
+    for {
+      query  <- prepareQuery(selectLegalStatusSummarySparqlResource)
+      result <- executeQuery(query, implicitly[FromQuerySolution[LegalStatusEntity]])
+    } yield result
 
   override def getAgentEntities: Try[List[AgentEntity]] =
-    processQuery[AgentEntity](getAgentSummariesSparqlResource, implicitly[FromQuerySolution[AgentEntity]])
+    for {
+      query  <- prepareQuery(selectAgentSummariesSparqlResource)
+      result <- executeQuery(query, implicitly[FromQuerySolution[AgentEntity]])
+    } yield result
 
   override def getPlaceOfDepositEntities: Try[List[AgentEntity]] =
-    processQuery[AgentEntity](getPlaceOfDepositSummariesSparqlResource, implicitly[FromQuerySolution[AgentEntity]])
-
-  def processQuery[A](queryResource: String, queryDecoder: FromQuerySolution[A]): Try[List[A]] =
     for {
-      queryText <- getQueryText(queryResource)
-      query     <- getQuery(queryText)
-      result    <- sparqlConnector.execute(query, queryDecoder)
+      query  <- prepareQuery(selectPlaceOfDepositSummariesSparqlResource)
+      result <- executeQuery(query, implicitly[FromQuerySolution[AgentEntity]])
     } yield result
+
+  private def executeQuery[A](query: Query, queryDecoder: FromQuerySolution[A]): Try[List[A]] =
+    sparqlConnector.execute(query, queryDecoder)
 
 }

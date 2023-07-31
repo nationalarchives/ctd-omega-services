@@ -71,7 +71,7 @@ class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRe
       }
 
     } else {
-      Validated.valid(ListAgentSummary(List.empty))
+      Validated.valid(ListAgentSummary())
     }
 
   private def validateDate(dateStr: String): Option[Date] = {

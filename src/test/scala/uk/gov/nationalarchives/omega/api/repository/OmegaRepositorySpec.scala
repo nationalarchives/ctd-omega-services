@@ -24,17 +24,15 @@ package uk.gov.nationalarchives.omega.api.repository
 import org.apache.jena.ext.xerces.util.URI
 import org.apache.jena.query.QueryException
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar
 import org.scalatest.TryValues._
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
 import uk.gov.nationalarchives.omega.api.repository.model.AgentEntity
+import uk.gov.nationalarchives.omega.api.support.UnitTest
 
 import scala.util.{ Failure, Success, Try }
 
-class OmegaRepositorySpec extends AnyFreeSpec with Matchers with MockitoSugar {
+class OmegaRepositorySpec extends UnitTest {
 
   val mockConnector = mock[SparqlEndpointConnector]
   val repository = new OmegaRepository(mockConnector)

@@ -159,8 +159,8 @@
       "identifier" : "http://cat.nationalarchives.gov.uk/agent.4N6.1",
       "label" : "Sir Paul Dukes",
       "version-timestamp" : "2023-01-25T14:18:41.93Z",
-      "date-from" : "1967",
-      "date-to" : "1889"
+      "date-from" : "1889",
+      "date-to" : "1967"
     }
   },
   {
@@ -171,8 +171,8 @@
       "identifier" : "http://cat.nationalarchives.gov.uk/agent.2YK.1",
       "label" : "Edward Gibson",
       "version-timestamp" : "2023-01-25T14:18:41.146Z",
-      "date-from" : "1913",
-      "date-to" : "1837"
+      "date-from" : "1837",
+      "date-to" : "1913"
     }
   },
   {
@@ -183,8 +183,8 @@
       "identifier" : "http://cat.nationalarchives.gov.uk/agent.4W4.1",
       "label" : "Edward Allan Morris",
       "version-timestamp" : "2023-01-25T14:18:41.932Z",
-      "date-from" : "1997",
-      "date-to" : "1910"
+      "date-from" : "1910",
+      "date-to" : "1997"
     }
   },
   {
@@ -205,8 +205,8 @@
       "identifier" : "http://cat.nationalarchives.gov.uk/agent.FJ.1",
       "label" : "Sir Edward Richard George Heath",
       "version-timestamp" : "2023-01-25T14:18:40.778Z",
-      "date-from" : "2005",
-      "date-to" : "1916"
+      "date-from" : "1916",
+      "date-to" : "2005"
     }
   },
   {
@@ -217,8 +217,8 @@
       "identifier" : "http://cat.nationalarchives.gov.uk/agent.5Q.1",
       "label" : "Frederick William Mulley",
       "version-timestamp" : "2023-01-25T14:18:41.921Z",
-      "date-from" : "1995",
-      "date-to" : "1918"
+      "date-from" : "1918",
+      "date-to" : "1995"
     }
   },
   {
@@ -239,8 +239,8 @@
       "identifier" : "http://cat.nationalarchives.gov.uk/agent.2R1.1",
       "label" : "Charles Francis Joseph Dormer",
       "version-timestamp" : "2023-01-25T14:18:40.917Z",
-      "date-from" : "1979",
-      "date-to" : "1883"
+      "date-from" : "1883",
+      "date-to" : "1979"
     }
   },
   {
@@ -251,8 +251,8 @@
       "identifier" : "http://cat.nationalarchives.gov.uk/agent.4NX.1",
       "label" : "Geoffrey Vernon Brooke Herford",
       "version-timestamp" : "2023-01-25T14:18:41.93Z",
-      "date-from" : "2000",
-      "date-to" : "1905"
+      "date-from" : "1905",
+      "date-to" : "2000"
     }
   },
   {
@@ -263,8 +263,8 @@
       "identifier" : "http://cat.nationalarchives.gov.uk/agent.3LG.1",
       "label" : "Edwin Hill",
       "version-timestamp" : "2023-01-25T14:18:41.668Z",
-      "date-from" : "1876",
-      "date-to" : "1793"
+      "date-from" : "1793",
+      "date-to" : "1876"
     }
   },
   {
@@ -275,7 +275,7 @@
       "identifier" : "http://cat.nationalarchives.gov.uk/agent.4X7.1",
       "label" : "Sir John Frank Charles Kingman",
       "version-timestamp" : "2023-01-25T14:18:41.932Z",
-      "date-to" : "1939"
+      "date-from" : "1939"
     }
   },
   {

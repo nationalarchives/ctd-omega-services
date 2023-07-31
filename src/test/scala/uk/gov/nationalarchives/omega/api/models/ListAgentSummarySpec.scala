@@ -36,7 +36,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
            |    "type" : ["Corporate Body","Person"]
            |}""".stripMargin
       decode[ListAgentSummary](agentRequest) mustBe Right(value =
-        ListAgentSummary(agentType = List(CorporateBody, Person), None, None, None)
+        ListAgentSummary(agentTypes = Some(List(CorporateBody, Person)), None, None, None)
       )
     }
     "must decode a request with depository" in {
@@ -48,7 +48,7 @@ class ListAgentSummarySpec extends AnyFreeSpec with Matchers {
           |}
           |""".stripMargin
       decode[ListAgentSummary](agentRequest) mustBe Right(value =
-        ListAgentSummary(agentType = List(CorporateBody), None, depository = Some(true), None)
+        ListAgentSummary(agentTypes = Some(List(CorporateBody)), None, depository = Some(true), None)
       )
     }
   }
