@@ -17,7 +17,7 @@ WHERE {
 
     VALUES (?agentType ?type ?dateFromProperty ?dateToProperty) {
     	(cat:corporate-body-concept "Corporate Body" rdaa:P50037 rdaa:P50038)
-    	(cat:person-concept "Person" rdaa:P50120 rdaa:P50121)
+    	(cat:person-concept "Person" rdaa:P50121 rdaa:P50120)
   	}
 
     ?identifier ver:currentVersion ?currentDescription .

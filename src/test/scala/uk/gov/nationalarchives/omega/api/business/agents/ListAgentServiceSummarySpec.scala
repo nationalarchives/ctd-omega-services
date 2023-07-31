@@ -44,7 +44,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
 
         when(mockRepository.getAgentEntities).thenReturn(Try(stubData.getAgentEntities()))
         val listAgentSummaryRequest = ListAgentSummary(
-          List(AgentType.CorporateBody, AgentType.Person),
+          Some(List(AgentType.CorporateBody, AgentType.Person)),
           versionTimestamp = Some("all"),
           depository = Some(false),
           authorityFile = Some(false)
@@ -58,7 +58,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
 
         when(mockRepository.getPlaceOfDepositEntities).thenReturn(Try(stubData.getPlaceOfDepositEntities()))
         val listAgentSummaryRequest = ListAgentSummary(
-          List(AgentType.CorporateBody),
+          Some(List(AgentType.CorporateBody)),
           versionTimestamp = Some("all"),
           depository = Some(true),
           authorityFile = Some(false)
@@ -72,7 +72,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
       // PACT-1025 refers
       "an empty payload request" ignore {
 
-        val listAgentSummaryRequest = ListAgentSummary(List())
+        val listAgentSummaryRequest = ListAgentSummary()
         val result = listAgentSummaryService.process(listAgentSummaryRequest)
 
         result mustBe Right(ListAgentSummaryReply(getExpectedAgentSummaries))
@@ -158,7 +158,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
 
       result mustBe
         Valid(
-          ListAgentSummary(List(CorporateBody), Some("2022-06-22T02:00:00-0500"), Some(false), Some(false))
+          ListAgentSummary(Some(List(CorporateBody)), Some("2022-06-22T02:00:00-0500"), Some(false), Some(false))
         )
     }
     "no version timestamp and authority file" in {
@@ -167,7 +167,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
                                                 |    "depository" : true
                                                 |}""".stripMargin)
       val result = listAgentSummaryService.validateRequest(message)
-      result mustBe Valid(ListAgentSummary(List(CorporateBody), None, Some(true), None))
+      result mustBe Valid(ListAgentSummary(Some(List(CorporateBody)), None, Some(true), None))
     }
     "valid version identifier" in {
       val message = getValidatedLocalMessage(s"""{
@@ -177,7 +177,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
                                                 |    "depository" : false
                                                 |}""".stripMargin)
       val result = listAgentSummaryService.validateRequest(message)
-      result mustBe Valid(ListAgentSummary(List(CorporateBody), Some("latest"), Some(false), Some(false)))
+      result mustBe Valid(ListAgentSummary(Some(List(CorporateBody)), Some("latest"), Some(false), Some(false)))
     }
   }
 
