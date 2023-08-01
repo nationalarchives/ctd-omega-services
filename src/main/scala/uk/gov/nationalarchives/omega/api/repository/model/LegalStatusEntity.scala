@@ -19,18 +19,17 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.repository
+package uk.gov.nationalarchives.omega.api.repository.model
 
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentEntity, LegalStatusEntity }
+import org.apache.jena.ext.xerces.util.URI
+import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
 
-import scala.util.Try
+case class LegalStatusEntity(identifier: URI, label: String) {
+  def as[T](implicit f: LegalStatusEntity => T): T = f(this)
 
-trait AbstractRepository {
+}
 
-  def getLegalStatusEntities: Try[List[LegalStatusEntity]]
-
-  def getAgentEntities: Try[List[AgentEntity]]
-
-  def getPlaceOfDepositEntities: Try[List[AgentEntity]]
-
+object LegalStatusEntity {
+  implicit def legalStatusMapper: LegalStatusEntity => Option[LegalStatus] = (legalStatusEntity: LegalStatusEntity) =>
+    Some(LegalStatus(legalStatusEntity.identifier, legalStatusEntity.label))
 }

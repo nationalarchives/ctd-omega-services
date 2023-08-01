@@ -24,14 +24,9 @@ package uk.gov.nationalarchives.omega.api.support
 import uk.gov.nationalarchives.omega.api.messages.{ AgentType, StubData }
 import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary, LegalStatus }
-import uk.gov.nationalarchives.omega.api.repository.model.AgentEntity
+import uk.gov.nationalarchives.omega.api.repository.model.{ AgentEntity, LegalStatusEntity }
 
 class TestStubData extends StubData {
-
-  override def getLegalStatuses(): List[LegalStatus] = List(
-    LegalStatus(new URI("http://cat.nationalarchives.gov.uk/public-record"), "Public Record"),
-    LegalStatus(new URI("http://cat.nationalarchives.gov.uk/non-public-record"), "Non-Public Record")
-  )
 
   override def getAgentSummaries(): List[AgentSummary] = List(
     AgentSummary(
@@ -151,5 +146,16 @@ class TestStubData extends StubData {
         Some(true)
       )
     )
+
+  override def getLegalStatusEntities(): List[LegalStatusEntity] = List(
+    LegalStatusEntity(new URI("http://cat.nationalarchives.gov.uk/public-record"), "Public Record"),
+    LegalStatusEntity(new URI("http://cat.nationalarchives.gov.uk/non-public-record"), "Non-Public Record"),
+    LegalStatusEntity(
+      new URI("http://cat.nationalarchives.gov.uk/public-record-unless-otherwise-stated"),
+      "Public Record (unless otherwise stated)"
+    ),
+    LegalStatusEntity(new URI("http://cat.nationalarchives.gov.uk/welsh-public-record"), "Welsh Public Record"),
+    LegalStatusEntity(new URI("http://cat.nationalarchives.gov.uk/non-record-material"), "Non-Record Material")
+  )
 
 }
