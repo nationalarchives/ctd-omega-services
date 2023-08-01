@@ -19,31 +19,6 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.repository.model
+package uk.gov.nationalarchives.omega.api.common
 
-import org.apache.jena.ext.xerces.util.URI
-import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary }
-
-import scala.util.Success
-
-case class AgentSummaryEntity(conceptId: URI, agentType: URI, currentVersionId: URI) {
-  def as[T](implicit f: AgentSummaryEntity => T): T = f(this)
-}
-object AgentSummaryEntity extends AgentTypeMapper {
-
-  implicit def agentSummaryMapper: AgentSummaryEntity => Option[AgentSummary] =
-    (agentSummaryEntity: AgentSummaryEntity) =>
-      getAgentTypeFromUri(agentSummaryEntity.agentType) match {
-        case Success(agentType) =>
-          Some(
-            AgentSummary(
-              agentType,
-              agentSummaryEntity.conceptId.toString,
-              agentSummaryEntity.currentVersionId.toString,
-              List.empty[AgentDescription]
-            )
-          )
-        case _ => None // TODO (RW) log error here (see PACT-1071)
-      }
-
-}
+case class ServiceException(message: String) extends Exception(message)

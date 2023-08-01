@@ -26,15 +26,17 @@ import cats.implicits._
 import io.circe.parser.decode
 import io.circe.syntax.EncoderOps
 import uk.gov.nationalarchives.omega.api.business._
+import uk.gov.nationalarchives.omega.api.common.ServiceException
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{ InvalidMessagePayload, MessageValidationError, ValidationResult }
 import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary }
 import uk.gov.nationalarchives.omega.api.messages.request.{ ListAgentSummary, RequestMessage }
 import uk.gov.nationalarchives.omega.api.messages.{ StubData, ValidatedLocalMessage }
 import uk.gov.nationalarchives.omega.api.repository.AbstractRepository
-import uk.gov.nationalarchives.omega.api.repository.model.AgentSummaryEntity
+import uk.gov.nationalarchives.omega.api.repository.model.AgentConceptEntity
 
 import java.text.SimpleDateFormat
 import java.util.Date
+import javax.xml.crypto.dsig.TransformException
 import scala.util.{ Failure, Success, Try }
 
 class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRepository)
@@ -101,7 +103,7 @@ class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRe
     Try(agentSummary.copy(descriptions = agentDescriptions))
 
   private def convertAgentSummaryEntities(
-    agentSummaryEntities: List[AgentSummaryEntity],
+    agentSummaryEntities: List[AgentConceptEntity],
     listAgentSummary: ListAgentSummary
   ): Try[List[AgentSummary]] =
     agentSummaryEntities.map { agentSummaryEntity =>
@@ -111,12 +113,12 @@ class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRe
             agentDescriptions            <- getAgentDescriptions(agentSummaryEntity, listAgentSummary)
             agentSummaryWithDescriptions <- combineSummaryAndDescriptions(agentSummary, agentDescriptions)
           } yield agentSummaryWithDescriptions
-        case _ => Failure(new Exception("")) // TODO(RW) what exception to use here?
+        case _ => Failure(ServiceException("Failed to transform AgentSummaryEntity to AgentSummary"))
       }
     }.sequence
 
   private def getAgentDescriptions(
-    agentSummaryEntity: AgentSummaryEntity,
+    agentSummaryEntity: AgentConceptEntity,
     listAgentSummary: ListAgentSummary
   ): Try[List[AgentDescription]] =
     for {

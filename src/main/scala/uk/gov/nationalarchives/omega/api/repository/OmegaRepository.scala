@@ -26,7 +26,7 @@ import org.apache.jena.query.{ Query, QuerySolution }
 import org.phenoscape.sparql.FromQuerySolution
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentDescriptionEntity, AgentSummaryEntity, LegalStatusEntity }
+import uk.gov.nationalarchives.omega.api.repository.model.{ AgentConceptEntity, AgentDescriptionEntity, LegalStatusEntity }
 
 import scala.util.Try
 
@@ -48,20 +48,19 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
       result <- executeQuery(query, implicitly[FromQuerySolution[LegalStatusEntity]])
     } yield result
 
-  override def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): Try[List[AgentSummaryEntity]] = {
-    val params = SparqlParams.from(listAgentSummary)
+  override def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): Try[List[AgentConceptEntity]] =
     for {
-      query <- prepareParameterizedQuery(getAgentSummariesSparqlResource, params, extendQuery = false)
-      res   <- executeQuery(query, implicitly[FromQuerySolution[AgentSummaryEntity]])
-    } yield res
-  }
+      params <- SparqlParams.from(listAgentSummary)
+      query  <- prepareParameterizedQuery(getAgentSummariesSparqlResource, params, extendQuery = false)
+      result <- executeQuery(query, implicitly[FromQuerySolution[AgentConceptEntity]])
+    } yield result
 
   override def getAgentDescriptionEntities(
     listAgentSummary: ListAgentSummary,
     agentConceptUri: URI
-  ): Try[List[AgentDescriptionEntity]] = {
-    val params = SparqlParams.from(listAgentSummary)
+  ): Try[List[AgentDescriptionEntity]] =
     for {
+      params <- SparqlParams.from(listAgentSummary)
       query <- prepareParameterizedQuery(
                  getAgentDescriptionsSparqlResource,
                  params.copy(uris = params.uris ++ Map("conceptIdParam" -> agentConceptUri.toString)),
@@ -69,7 +68,6 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
                )
       result <- executeQuery(query, implicitly[FromQuerySolution[AgentDescriptionEntity]])
     } yield result
-  }
 
   private def executeQuery[A](query: Query, queryDecoder: FromQuerySolution[A]): Try[List[A]] =
     sparqlConnector.execute(query, queryDecoder)

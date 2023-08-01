@@ -24,7 +24,7 @@ package uk.gov.nationalarchives.omega.api.support
 import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary }
 import uk.gov.nationalarchives.omega.api.messages.{ AgentType, StubData }
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentDescriptionEntity, AgentSummaryEntity, LegalStatusEntity }
+import uk.gov.nationalarchives.omega.api.repository.model.{ AgentConceptEntity, AgentDescriptionEntity, LegalStatusEntity }
 
 class TestStubData extends StubData {
 
@@ -87,29 +87,29 @@ class TestStubData extends StubData {
     )
   )
 
-  override def getAgentSummaryEntities: List[AgentSummaryEntity] =
+  override def getAgentSummaryEntities: List[AgentConceptEntity] =
     List(
-      AgentSummaryEntity(
+      AgentConceptEntity(
         new URI("http://cat.nationalarchives.gov.uk/agent.48N"),
         new URI("http://cat.nationalarchives.gov.uk/person-concept"),
         new URI("http://cat.nationalarchives.gov.uk/agent.48N.1")
       ),
-      AgentSummaryEntity(
+      AgentConceptEntity(
         new URI("http://cat.nationalarchives.gov.uk/agent.46F"),
         new URI("http://cat.nationalarchives.gov.uk/person-concept"),
         new URI("http://cat.nationalarchives.gov.uk/agent.46F.1")
       ),
-      AgentSummaryEntity(
+      AgentConceptEntity(
         new URI("http://cat.nationalarchives.gov.uk/agent.92W"),
         new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
         new URI("http://cat.nationalarchives.gov.uk/agent.92W.1")
       ),
-      AgentSummaryEntity(
+      AgentConceptEntity(
         new URI("http://cat.nationalarchives.gov.uk/agent.8R6"),
         new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
         new URI("http://cat.nationalarchives.gov.uk/agent.8R6.1")
       ),
-      AgentSummaryEntity(
+      AgentConceptEntity(
         new URI("http://cat.nationalarchives.gov.uk/agent.S7"),
         new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
         new URI("http://cat.nationalarchives.gov.uk/agent.S7.1")

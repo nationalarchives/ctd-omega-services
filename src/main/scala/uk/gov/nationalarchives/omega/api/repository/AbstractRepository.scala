@@ -23,16 +23,39 @@ package uk.gov.nationalarchives.omega.api.repository
 
 import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentDescriptionEntity, AgentSummaryEntity, LegalStatusEntity }
+import uk.gov.nationalarchives.omega.api.repository.model.{ AgentConceptEntity, AgentDescriptionEntity, LegalStatusEntity }
 
 import scala.util.Try
 
+/** The AbstractRepository defines the method signatures require for interacting with the data repository and is
+  * agnostic as to the type of repository being used. Specific implementations will be required for different repository
+  * types. For example, the production repository may be a triplestore but a test implementation may just contain some
+  * hard-coded implementation or read data from the file system.
+  */
 trait AbstractRepository {
 
+  /** Retrieve all of the legal statuses from the repository
+    * @return
+    *   a Success with a list of LegalStatusEntity objects or an error
+    */
   def getLegalStatusEntities: Try[List[LegalStatusEntity]]
 
-  def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): Try[List[AgentSummaryEntity]]
+  /** Retrieve the agent concepts from the repository based on the given request
+    * @param listAgentSummary
+    *   the agent summary request
+    * @return
+    *   a Success with a list of AgentConceptEntity objects or an error
+    */
+  def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): Try[List[AgentConceptEntity]]
 
+  /** Retrieve the agent descriptions for the given concept URI based on the given request
+    * @param listAgentSummary
+    *   the agent summary request
+    * @param agentConceptUri
+    *   the agent concept URI
+    * @return
+    *   a Success with a list of AgentDescriptionEntity objects or an error
+    */
   def getAgentDescriptionEntities(
     listAgentSummary: ListAgentSummary,
     agentConceptUri: URI

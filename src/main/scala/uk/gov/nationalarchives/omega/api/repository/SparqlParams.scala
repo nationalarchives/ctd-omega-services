@@ -25,22 +25,29 @@ import org.apache.jena.rdf.model.{ Resource, ResourceFactory }
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.model.AgentTypeMapper
 
+import java.text.SimpleDateFormat
+import java.util.GregorianCalendar
+import javax.xml.datatype.{ DatatypeFactory, XMLGregorianCalendar }
+import scala.util.Try
+
 case class SparqlParams(
   booleans: Map[String, Boolean] = Map.empty,
   uris: Map[String, String] = Map.empty,
-  dateTimes: Map[String, String] = Map.empty,
+  dateTimes: Map[String, XMLGregorianCalendar] = Map.empty,
   values: Map[String, List[Resource]] = Map.empty,
   queryExtension: Option[String] = None
 )
 object SparqlParams extends AgentTypeMapper {
-  def from(listAgentSummary: ListAgentSummary): SparqlParams = {
-    val valuesMap = getValuesMap(listAgentSummary)
-    val uriMap = getUriMap(listAgentSummary)
-    val booleanMap = getBooleanMap(listAgentSummary)
-    val dateTimeMap = getDateTimeMap(listAgentSummary)
-    val queryExtension = getQueryExtension(listAgentSummary)
-    SparqlParams(booleanMap, uriMap, dateTimeMap, valuesMap, queryExtension)
-  }
+
+  val iso8601DateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
+  def from(listAgentSummary: ListAgentSummary): Try[SparqlParams] =
+    for {
+      valuesMap      <- Try(getValuesMap(listAgentSummary))
+      uriMap         <- Try(getUriMap(listAgentSummary))
+      booleanMap     <- Try(getBooleanMap(listAgentSummary))
+      dateTimeMap    <- getDateTimeMap(listAgentSummary)
+      queryExtension <- Try(getQueryExtension(listAgentSummary))
+    } yield SparqlParams(booleanMap, uriMap, dateTimeMap, valuesMap, queryExtension)
 
   private def getValuesMap(listAgentSummary: ListAgentSummary): Map[String, List[Resource]] = {
     val agentTypeUris = listAgentSummary.agentTypes.getOrElse(getAllAgentTypes).map(getUriFromAgentType)
@@ -74,12 +81,15 @@ object SparqlParams extends AgentTypeMapper {
       case _          => Map.empty
     }
 
-  private def getDateTimeMap(listAgentSummary: ListAgentSummary): Map[String, String] =
+  private def getDateTimeMap(listAgentSummary: ListAgentSummary): Try[Map[String, XMLGregorianCalendar]] = Try {
     listAgentSummary.versionTimestamp match {
       case Some("all") | Some("latest") | None => Map.empty
-      case Some(dateTimeValue)                 =>
-        // TODO(RW) we should attempt to parse this date to ensure it is valid (see PACT-1087)
-        Map("generatedAtParam" -> dateTimeValue)
+      case Some(dateTimeValue) =>
+        val date = iso8601DateTimeFormat.parse(dateTimeValue)
+        val calendar = new GregorianCalendar()
+        calendar.setTime(date)
+        Map("generatedAtParam" -> DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar))
     }
+  }
 
 }

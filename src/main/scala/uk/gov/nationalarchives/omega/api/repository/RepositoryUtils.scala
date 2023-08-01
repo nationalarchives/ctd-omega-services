@@ -26,19 +26,37 @@ import org.apache.jena.query.{ ParameterizedSparqlString, Query, QueryFactory, S
 import org.apache.jena.rdf.model.{ Resource, ResourceFactory }
 import uk.gov.nationalarchives.omega.api.repository.model.AgentTypeMapper
 
+import javax.xml.datatype.XMLGregorianCalendar
 import scala.annotation.tailrec
 import scala.io.Source
 import scala.jdk.CollectionConverters._
 import scala.util.{ Failure, Try, Using }
 
+/** Some helper methods for working with an RDF triplestore */
 trait RepositoryUtils extends AgentTypeMapper {
 
+  /** Attempts to read a SPARQL query from the given file path
+    * @param queryResource
+    *   the path to the SPARQL query resource to use
+    * @return
+    *   a Success with the parsed Query object or an error
+    */
   def prepareQuery(queryResource: String): Try[Query] =
     for {
       queryText <- getQueryText(queryResource)
       query     <- getQuery(queryText)
     } yield query
 
+  /** Attempts to read a SPARQL query from the given file path and parameterize it with the given parameters.
+    * @param queryResource
+    *   the path of the SPARQL query resource to use
+    * @param params
+    *   the parameters to apply to the SPARQL query
+    * @param extendQuery
+    *   Boolean to indicate whether to apply any query extension in the params
+    * @return
+    *   a Success with the parsed and parameterized Query object or an error
+    */
   def prepareParameterizedQuery(
     queryResource: String,
     params: SparqlParams,
@@ -51,6 +69,14 @@ trait RepositoryUtils extends AgentTypeMapper {
       query              <- Try(parameterizedQuery.asQuery(Syntax.syntaxSPARQL_11))
     } yield query
 
+  /** Convenience method to create a Jena Resource from a given base URL and local name
+    * @param baseUrl
+    *   the base URL to use
+    * @param localName
+    *   the local name to use
+    * @return
+    *   the created Resource object
+    */
   def createResource(baseUrl: String, localName: String): Resource =
     ResourceFactory.createResource(s"$baseUrl/$localName")
 
@@ -94,15 +120,15 @@ trait RepositoryUtils extends AgentTypeMapper {
     setParams(booleans, queryText)
   }
 
-  private def setXSDDateTimeParams(queryText: String, dateTimes: Map[String, String]): String = {
+  private def setXSDDateTimeParams(queryText: String, dateTimes: Map[String, XMLGregorianCalendar]): String = {
 
     @tailrec
-    def setParams(dates: Map[String, String], query: String): String =
+    def setParams(dates: Map[String, XMLGregorianCalendar], query: String): String =
       dates match {
-        case m: Map[String, String] if m.isEmpty => query
+        case m: Map[String, XMLGregorianCalendar] if m.isEmpty => query
         case param =>
           val pss = new ParameterizedSparqlString(query)
-          pss.setLiteral(param.head._1, param.head._2, new XSDDateTimeType("dateTime"))
+          pss.setLiteral(param.head._1, param.head._2.toXMLFormat, new XSDDateTimeType("dateTime"))
           setParams(dates.tail, pss.toString)
       }
 

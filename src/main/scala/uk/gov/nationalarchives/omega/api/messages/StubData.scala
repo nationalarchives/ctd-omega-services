@@ -23,7 +23,7 @@ package uk.gov.nationalarchives.omega.api.messages
 
 import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary }
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentDescriptionEntity, AgentSummaryEntity, LegalStatusEntity }
+import uk.gov.nationalarchives.omega.api.repository.model.{ AgentConceptEntity, AgentDescriptionEntity, LegalStatusEntity }
 
 class StubDataImpl extends StubData
 
@@ -2151,9 +2151,9 @@ trait StubData {
     )
   )
 
-  def getAgentSummaryEntities: List[AgentSummaryEntity] =
+  def getAgentSummaryEntities: List[AgentConceptEntity] =
     List(
-      AgentSummaryEntity(
+      AgentConceptEntity(
         new URI("http://cat.nationalarchives.gov.uk/8R6"),
         new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
         new URI("http://cat.nationalarchives.gov.uk/agent.8R6.1")

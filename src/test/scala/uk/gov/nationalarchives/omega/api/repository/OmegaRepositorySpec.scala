@@ -29,7 +29,7 @@ import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.messages.AgentType.{ CorporateBody, Person }
 import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentDescriptionEntity, AgentSummaryEntity }
+import uk.gov.nationalarchives.omega.api.repository.model.{ AgentConceptEntity, AgentDescriptionEntity }
 import uk.gov.nationalarchives.omega.api.support.UnitTest
 
 import scala.util.{ Failure, Success, Try }
@@ -64,10 +64,10 @@ class OmegaRepositorySpec extends UnitTest {
   "Get Agent Summary Entities" - {
 
     "must return a Success with a list of one item" in {
-      when(mockConnector.execute[AgentSummaryEntity](any, any)).thenReturn(
+      when(mockConnector.execute[AgentConceptEntity](any, any)).thenReturn(
         Try(
           List(
-            AgentSummaryEntity(
+            AgentConceptEntity(
               new URI("http://cat.nationalarchives.gov.uk/agent.3LG"),
               new URI("http://cat.nationalarchives.gov.uk/person-concept"),
               new URI("http://cat.nationalarchives.gov.uk/agent.3LG.1")
@@ -80,15 +80,15 @@ class OmegaRepositorySpec extends UnitTest {
     }
 
     "must return a Success with a list of two items" in {
-      when(mockConnector.execute[AgentSummaryEntity](any, any)).thenReturn(
+      when(mockConnector.execute[AgentConceptEntity](any, any)).thenReturn(
         Try(
           List(
-            AgentSummaryEntity(
+            AgentConceptEntity(
               new URI("http://cat.nationalarchives.gov.uk/agent.3LG"),
               new URI("http://cat.nationalarchives.gov.uk/person-concept"),
               new URI("http://cat.nationalarchives.gov.uk/agent.3LG.1")
             ),
-            AgentSummaryEntity(
+            AgentConceptEntity(
               new URI("http://cat.nationalarchives.gov.uk/agent.S7"),
               new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
               new URI("http://cat.nationalarchives.gov.uk/agent.S7.1")
@@ -100,10 +100,10 @@ class OmegaRepositorySpec extends UnitTest {
       result.success.get.length mustBe 2
     }
     "must return a Success with a place of deposit" in {
-      when(mockConnector.execute[AgentSummaryEntity](any, any)).thenReturn(
+      when(mockConnector.execute[AgentConceptEntity](any, any)).thenReturn(
         Try(
           List(
-            AgentSummaryEntity(
+            AgentConceptEntity(
               new URI("http://cat.nationalarchives.gov.uk/agent.S7"),
               new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
               new URI("http://cat.nationalarchives.gov.uk/agent.S7.1")
@@ -117,10 +117,10 @@ class OmegaRepositorySpec extends UnitTest {
     }
   }
   "must return a Success with a list of one item" in {
-    when(mockConnector.execute[AgentSummaryEntity](any, any)).thenReturn(
+    when(mockConnector.execute[AgentConceptEntity](any, any)).thenReturn(
       Try(
         List(
-          AgentSummaryEntity(
+          AgentConceptEntity(
             new URI("http://cat.nationalarchives.gov.uk/agent.3LG"),
             new URI("http://cat.nationalarchives.gov.uk/person-concept"),
             new URI("http://cat.nationalarchives.gov.uk/agent.3LG.1")
