@@ -28,11 +28,6 @@ import uk.gov.nationalarchives.omega.api.repository.model.{ AgentEntity, LegalSt
 
 class TestStubData extends StubData {
 
-  override def getLegalStatuses(): List[LegalStatus] = List(
-    LegalStatus(new URI("http://cat.nationalarchives.gov.uk/public-record"), "Public Record"),
-    LegalStatus(new URI("http://cat.nationalarchives.gov.uk/non-public-record"), "Non-Public Record")
-  )
-
   override def getAgentSummaries(): List[AgentSummary] = List(
     AgentSummary(
       AgentType.Person,

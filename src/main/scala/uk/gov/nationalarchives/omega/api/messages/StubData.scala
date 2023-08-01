@@ -22,25 +22,14 @@
 package uk.gov.nationalarchives.omega.api.messages
 
 import org.apache.jena.ext.xerces.util.URI
-import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary, LegalStatus }
+import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary }
 import uk.gov.nationalarchives.omega.api.repository.model.{ AgentEntity, LegalStatusEntity }
 
 class StubDataImpl extends StubData
 
 trait StubData {
 
-  def getLegalStatuses(): Seq[LegalStatus] = Seq(
-    LegalStatus(new URI("http://cat.nationalarchives.gov.uk/public-record"), "Public Record"),
-    LegalStatus(new URI("http://cat.nationalarchives.gov.uk/non-public-record"), "Non-Public Record"),
-    LegalStatus(
-      new URI("http://cat.nationalarchives.gov.uk/public-record-unless-otherwise-stated"),
-      "Public Record (unless otherwise stated)"
-    ),
-    LegalStatus(new URI("http://cat.nationalarchives.gov.uk/welsh-public-record"), "Welsh Public Record"),
-    LegalStatus(new URI("http://cat.nationalarchives.gov.uk/non-record-material"), "Non-Record Material")
-  )
-
-  def getLegalStatusEntities(): Seq[LegalStatusEntity] = Seq(
+  def getLegalStatusEntities: Seq[LegalStatusEntity] = Seq(
     LegalStatusEntity(new URI("http://cat.nationalarchives.gov.uk/public-record"), "Public Record"),
     LegalStatusEntity(new URI("http://cat.nationalarchives.gov.uk/non-public-record"), "Non-Public Record"),
     LegalStatusEntity(
@@ -51,7 +40,7 @@ trait StubData {
     LegalStatusEntity(new URI("http://cat.nationalarchives.gov.uk/non-record-material"), "Non-Record Material")
   )
 
-  def getAgentSummaries(): Seq[AgentSummary] = Seq(
+  def getAgentSummaries: Seq[AgentSummary] = Seq(
     AgentSummary(
       AgentType.Person,
       "3RX",
@@ -1898,7 +1887,7 @@ trait StubData {
     )
   )
 
-  def getAgentEntities(): List[AgentEntity] =
+  def getAgentEntities: List[AgentEntity] =
     List(
       AgentEntity(
         new URI("http://cat.nationalarchives.gov.uk/person-concept"),
@@ -1942,7 +1931,7 @@ trait StubData {
       )
     )
 
-  def getPlaceOfDepositEntities(): List[AgentEntity] =
+  def getPlaceOfDepositEntities: List[AgentEntity] =
     List(
       AgentEntity(
         new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
