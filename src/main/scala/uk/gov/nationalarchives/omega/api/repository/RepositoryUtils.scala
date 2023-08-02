@@ -21,35 +21,71 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
+import org.apache.jena.datatypes.xsd.impl.XSDDateTimeType
 import org.apache.jena.query.{ ParameterizedSparqlString, Query, QueryFactory, Syntax }
 import org.apache.jena.rdf.model.{ Resource, ResourceFactory }
-import scoverage.Platform.Source
 import uk.gov.nationalarchives.omega.api.repository.model.AgentTypeMapper
 
+import javax.xml.datatype.XMLGregorianCalendar
 import scala.annotation.tailrec
+import scala.io.Source
 import scala.jdk.CollectionConverters._
 import scala.util.{ Failure, Try, Using }
 
+/** Some helper methods for working with an RDF triplestore */
 trait RepositoryUtils extends AgentTypeMapper {
 
+  /** Attempts to read a SPARQL query from the given file path
+    * @param queryResource
+    *   the path to the SPARQL query resource to use
+    * @return
+    *   a Success with the parsed Query object or an error
+    */
   def prepareQuery(queryResource: String): Try[Query] =
     for {
       queryText <- getQueryText(queryResource)
       query     <- getQuery(queryText)
     } yield query
 
+  /** Attempts to read a SPARQL query from the given file path and parameterize it with the given parameters.
+    * @param queryResource
+    *   the path of the SPARQL query resource to use
+    * @param params
+    *   the parameters to apply to the SPARQL query
+    * @param extendQuery
+    *   Boolean to indicate whether to apply any query extension in the params
+    * @return
+    *   a Success with the parsed and parameterized Query object or an error
+    */
   def prepareParameterizedQuery(
     queryResource: String,
-    params: SparqlParams
+    params: SparqlParams,
+    extendQuery: Boolean
   ): Try[Query] =
     for {
       queryText          <- getQueryText(queryResource)
-      parameterizedQuery <- parameterizeQuery(queryText, params)
+      extendedQuery      <- setQueryExtension(queryText, params, extendQuery)
+      parameterizedQuery <- parameterizeQuery(extendedQuery, params)
       query              <- Try(parameterizedQuery.asQuery(Syntax.syntaxSPARQL_11))
     } yield query
 
+  /** Convenience method to create a Jena Resource from a given base URL and local name
+    * @param baseUrl
+    *   the base URL to use
+    * @param localName
+    *   the local name to use
+    * @return
+    *   the created Resource object
+    */
   def createResource(baseUrl: String, localName: String): Resource =
     ResourceFactory.createResource(s"$baseUrl/$localName")
+
+  private def setQueryExtension(query: String, sparqlParams: SparqlParams, extendQuery: Boolean): Try[String] =
+    if (extendQuery) {
+      Try(query + sparqlParams.queryExtension.getOrElse(""))
+    } else {
+      Try(query)
+    }
 
   private def getQuery(queryText: String): Try[Query] =
     Try(QueryFactory.create(queryText, Syntax.syntaxSPARQL_11)).recoverWith { case _: NullPointerException =>
@@ -66,7 +102,8 @@ trait RepositoryUtils extends AgentTypeMapper {
       queryText_1 <- Try(setBooleanParams(queryText_0, params.booleans))
       queryText_2 <- Try(setResourceParams(queryText_1, params.uris))
       queryText_3 <- Try(setValueParams(queryText_2, params.values))
-    } yield new ParameterizedSparqlString(queryText_3)
+      queryText_4 <- Try(setXSDDateTimeParams(queryText_3, params.dateTimes))
+    } yield new ParameterizedSparqlString(queryText_4)
 
   private def setBooleanParams(queryText: String, booleans: Map[String, Boolean]): String = {
 
@@ -81,6 +118,21 @@ trait RepositoryUtils extends AgentTypeMapper {
       }
 
     setParams(booleans, queryText)
+  }
+
+  private def setXSDDateTimeParams(queryText: String, dateTimes: Map[String, XMLGregorianCalendar]): String = {
+
+    @tailrec
+    def setParams(dates: Map[String, XMLGregorianCalendar], query: String): String =
+      dates match {
+        case m: Map[String, XMLGregorianCalendar] if m.isEmpty => query
+        case param =>
+          val pss = new ParameterizedSparqlString(query)
+          pss.setLiteral(param.head._1, param.head._2.toXMLFormat, new XSDDateTimeType("dateTime"))
+          setParams(dates.tail, pss.toString)
+      }
+
+    setParams(dateTimes, queryText)
   }
 
   private def setResourceParams(queryText: String, resources: Map[String, String]): String = {

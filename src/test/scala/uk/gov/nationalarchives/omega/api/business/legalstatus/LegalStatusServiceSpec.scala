@@ -40,7 +40,7 @@ class LegalStatusServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar
     "when receives" - {
       "a valid LegalStatusRequest" in {
         val legalStatusRequest = ListAssetLegalStatusSummary()
-        when(mockRepository.getLegalStatusEntities).thenReturn(Success(stubData.getLegalStatusEntities()))
+        when(mockRepository.getLegalStatusEntities).thenReturn(Success(stubData.getLegalStatusEntities))
 
         val result = legalStatusService.process(legalStatusRequest)
 

@@ -19,8 +19,6 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.repository.model
+package uk.gov.nationalarchives.omega.api.common
 
-import org.apache.jena.ext.xerces.util.URI
-
-case class AgentSummaryEntity(identifier: URI, agentType: URI, currentVersion: URI)
+case class ServiceException(message: String) extends Exception(message)

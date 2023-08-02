@@ -28,42 +28,72 @@ import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.model.AgentTypeMapper
 import uk.gov.nationalarchives.omega.api.support.UnitTest
 
+import java.util.GregorianCalendar
+import javax.xml.datatype.{ DatatypeFactory, XMLGregorianCalendar }
+import scala.util.Success
+
 class SparqlParamsSpec extends UnitTest with AgentTypeMapper {
 
   "SparqlParams must contain" - {
     "all agent type values and a query extension when ListAgentSummary is empty" in {
       val result = SparqlParams.from(ListAgentSummary())
-      result mustEqual SparqlParams(
-        values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
-        queryExtension = Some("ORDER BY DESC(?generatedAtParam) LIMIT 1")
+      result mustEqual Success(
+        SparqlParams(
+          values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
+          queryExtension = Some("ORDER BY DESC(?generatedAtParam) LIMIT 1")
+        )
       )
     }
     "specific agent type values and a query extension when ListAgentSummary specifies agent types" in {
       val result = SparqlParams.from(ListAgentSummary(agentTypes = Some(List(CorporateBody, Person))))
-      result mustEqual SparqlParams(
-        values = Map("agentTypeValuesParam" -> getAgentTypeResources(List(CorporateBody, Person))),
-        queryExtension = Some("ORDER BY DESC(?generatedAtParam) LIMIT 1")
+      result mustEqual Success(
+        SparqlParams(
+          values = Map("agentTypeValuesParam" -> getAgentTypeResources(List(CorporateBody, Person))),
+          queryExtension = Some("ORDER BY DESC(?generatedAtParam) LIMIT 1")
+        )
       )
     }
     "all agent type values and a boolean when ListAgentSummary specifies depository" in {
       val result = SparqlParams.from(ListAgentSummary(depository = Some(true)))
-      result mustEqual SparqlParams(
-        booleans = Map("objectParam1" -> true),
-        uris = Map("predicateParam1" -> "http://TODO/is-place-of-deposit"),
-        values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
-        queryExtension = Some("ORDER BY DESC(?generatedAtParam) LIMIT 1")
+      result mustEqual Success(
+        SparqlParams(
+          booleans = Map("objectParam1" -> true),
+          uris = Map("predicateParam1" -> "http://TODO/is-place-of-deposit"),
+          values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
+          queryExtension = Some("ORDER BY DESC(?generatedAtParam) LIMIT 1")
+        )
       )
     }
-    "all agent type values no limit on query extension when ListAgentSummary specifies version timestamp 'all'" in {
+    "all agent type values and no limit on query extension when ListAgentSummary specifies version timestamp 'all'" in {
       val result = SparqlParams.from(ListAgentSummary(versionTimestamp = Some("all")))
-      result mustEqual SparqlParams(
-        values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
-        queryExtension = Some("ORDER BY DESC(?generatedAtParam)")
+      result mustEqual Success(
+        SparqlParams(
+          values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
+          queryExtension = Some("ORDER BY DESC(?generatedAtParam)")
+        )
+      )
+    }
+    "all agent type values and no query extension when ListAgentSummary specifies a version timestamp date" in {
+      val timestamp = "2023-01-25T14:14:49.601Z"
+      val result = SparqlParams.from(ListAgentSummary(versionTimestamp = Some(timestamp)))
+      result mustEqual Success(
+        SparqlParams(
+          dateTimes = Map("generatedAtParam" -> getGregorianDateTime(timestamp)),
+          values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
+          queryExtension = None
+        )
       )
     }
   }
 
   private def getAgentTypeResources(agentTypes: List[AgentType]): List[Resource] =
     agentTypes.map(agentType => ResourceFactory.createResource(getUriFromAgentType(agentType)))
+
+  private def getGregorianDateTime(dateTimeValue: String): XMLGregorianCalendar = {
+    val date = SparqlParams.iso8601DateTimeFormat.parse(dateTimeValue)
+    val calendar = new GregorianCalendar()
+    calendar.setTime(date)
+    DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar)
+  }
 
 }

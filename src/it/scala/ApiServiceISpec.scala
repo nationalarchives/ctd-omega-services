@@ -163,7 +163,25 @@ class ApiServiceISpec
         consumerFiber   <- f.comsumerRes.start
         apiServiceFiber <- Resource.liftK(serviceIO.start)
         _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
-        result          <- Resource.liftK(assertReplyMessage(agentSummariesExpectedResult))
+        result          <- Resource.liftK(assertReplyMessage(agentSummariesExpectedLatest))
+        _               <- Resource.eval(apiServiceFiber.cancel)
+        _               <- consumerFiber.cancel
+      } yield result
+      res.use(assert => IO.pure(assert))
+    }
+    " multiple agent types and all versions" in { f =>
+      val textMessageConfig = generateValidMessageConfig()
+        .copy(messageTypeId = Some("OSLISAGT001"))
+        .copy(contents = s"""{
+                            |    "type" : ["Corporate Body", "Person"],
+                            |    "version-timestamp" : "all"
+                            |}""".stripMargin)
+      val serviceIO = f.apiService.startSuspended
+      val res = for {
+        consumerFiber   <- f.comsumerRes.start
+        apiServiceFiber <- Resource.liftK(serviceIO.start)
+        _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
+        result          <- Resource.liftK(assertReplyMessage(agentSummariesExpectedAll))
         _               <- Resource.eval(apiServiceFiber.cancel)
         _               <- consumerFiber.cancel
       } yield result
@@ -200,7 +218,7 @@ class ApiServiceISpec
         consumerFiber   <- f.comsumerRes.start
         apiServiceFiber <- Resource.liftK(serviceIO.start)
         _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
-        result          <- Resource.liftK(assertReplyMessage(agentSummariesExpectedResult))
+        result          <- Resource.liftK(assertReplyMessage(agentSummariesExpectedLatest))
         _               <- Resource.eval(apiServiceFiber.cancel)
         _               <- consumerFiber.cancel
       } yield result
@@ -441,8 +459,16 @@ class ApiServiceISpec
   private def sendMessage(session: Session, producer: MessageProducer, textMessageConfig: TextMessageConfig): IO[Unit] =
     IO.blocking(producer.send(asTextMessage(session, textMessageConfig)))
 
-  private def agentSummariesExpectedResult = {
-    val summaries = Source.fromResource("expected-agent-summaries.json").getLines().mkString
+  private def agentSummariesExpectedLatest = {
+    val summaries = Source.fromResource("expected-agent-summaries-latest.json").getLines().mkString
+    parse(summaries) match {
+      case Right(json) => json.printWith(Printer.spaces2)
+      case Left(_)     => ""
+    }
+  }
+
+  private def agentSummariesExpectedAll = {
+    val summaries = Source.fromResource("expected-agent-summaries-all.json").getLines().mkString
     parse(summaries) match {
       case Right(json) => json.printWith(Printer.spaces2)
       case Left(_)     => ""

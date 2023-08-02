@@ -26,45 +26,24 @@ import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, Agen
 
 import scala.util.Success
 
-case class AgentEntity(
-  agentType: URI,
-  identifier: URI,
-  currentDescription: URI,
-  label: String,
-  versionTimestamp: String,
-  dateFrom: Option[String] = None,
-  dateTo: Option[String] = None,
-  depository: Option[Boolean] = None,
-  previousDescription: Option[String] = None
-) {
-  def as[T](implicit f: AgentEntity => T): T = f(this)
-
+case class AgentConceptEntity(conceptId: URI, agentType: URI, currentVersionId: URI) {
+  def as[T](implicit f: AgentConceptEntity => T): T = f(this)
 }
+object AgentConceptEntity extends AgentTypeMapper {
 
-object AgentEntity extends AgentTypeMapper {
-
-  val cataloguePrefix = "http://cat.nationalarchives.gov.uk"
-  implicit def agentMapper: AgentEntity => Option[AgentSummary] = (agentEntity: AgentEntity) =>
-    getAgentTypeFromUri(agentEntity.agentType) match {
-      case Success(agentType) =>
-        Some(
-          AgentSummary(
-            agentType,
-            agentEntity.identifier.toString,
-            agentEntity.currentDescription.toString,
-            AgentDescription(
-              agentEntity.currentDescription.toString,
-              agentEntity.label,
-              agentEntity.versionTimestamp,
-              None,
-              agentEntity.depository,
-              agentEntity.dateFrom,
-              agentEntity.dateTo,
-              agentEntity.previousDescription
+  implicit def agentSummaryMapper: AgentConceptEntity => Option[AgentSummary] =
+    (agentSummaryEntity: AgentConceptEntity) =>
+      getAgentTypeFromUri(agentSummaryEntity.agentType) match {
+        case Success(agentType) =>
+          Some(
+            AgentSummary(
+              agentType,
+              agentSummaryEntity.conceptId.toString,
+              agentSummaryEntity.currentVersionId.toString,
+              List.empty[AgentDescription]
             )
           )
-        )
-      case _ => None // TODO (RW) log error here
-    }
+        case _ => None // TODO (RW) log error here (see PACT-1071)
+      }
 
 }

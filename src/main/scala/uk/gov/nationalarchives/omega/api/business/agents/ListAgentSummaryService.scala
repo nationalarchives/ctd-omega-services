@@ -22,17 +22,21 @@
 package uk.gov.nationalarchives.omega.api.business.agents
 
 import cats.data.Validated
+import cats.implicits._
 import io.circe.parser.decode
 import io.circe.syntax.EncoderOps
 import uk.gov.nationalarchives.omega.api.business._
+import uk.gov.nationalarchives.omega.api.common.ServiceException
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{ InvalidMessagePayload, MessageValidationError, ValidationResult }
-import uk.gov.nationalarchives.omega.api.messages.reply.AgentSummary
+import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary }
 import uk.gov.nationalarchives.omega.api.messages.request.{ ListAgentSummary, RequestMessage }
 import uk.gov.nationalarchives.omega.api.messages.{ StubData, ValidatedLocalMessage }
 import uk.gov.nationalarchives.omega.api.repository.AbstractRepository
+import uk.gov.nationalarchives.omega.api.repository.model.AgentConceptEntity
 
 import java.text.SimpleDateFormat
 import java.util.Date
+import javax.xml.crypto.dsig.TransformException
 import scala.util.{ Failure, Success, Try }
 
 class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRepository)
@@ -40,12 +44,16 @@ class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRe
 
   override def process(
     requestMessage: RequestMessage
-  ): Either[BusinessServiceError, BusinessServiceReply] =
-    Try(requestMessage.asInstanceOf[ListAgentSummary]) match {
-      case Success(listAgentSummary) =>
-        Right(ListAgentSummaryReply(getAgentSummaries(listAgentSummary).asJson.toString()))
+  ): Either[BusinessServiceError, BusinessServiceReply] = {
+    val summaries = for {
+      listAgentSummary <- Try(requestMessage.asInstanceOf[ListAgentSummary])
+      agentSummaries   <- getAgentSummaries(listAgentSummary)
+    } yield agentSummaries
+    summaries match {
+      case Success(sums)      => Right(ListAgentSummaryReply(sums.asJson.toString()))
       case Failure(exception) => Left(ListAgentSummaryError(exception.getMessage))
     }
+  }
 
   override def validateRequest(validatedLocalMessage: ValidatedLocalMessage): ValidationResult[RequestMessage] =
     if (validatedLocalMessage.messageText.nonEmpty) {
@@ -69,7 +77,6 @@ class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRe
             InvalidMessagePayload(cause = Some(error))
           )
       }
-
     } else {
       Validated.valid(ListAgentSummary())
     }
@@ -83,28 +90,41 @@ class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRe
       Try(dateFormatter.parse(trimmedDate)).toOption
   }
 
-  private def getAgentSummaries(listAgentSummary: ListAgentSummary): List[AgentSummary] =
-    listAgentSummary.depository match {
-      case Some(true) => getPlaceOfDepositSummaries
-      case _          => getAgentEntities
-    }
+  private def getAgentSummaries(listAgentSummary: ListAgentSummary): Try[List[AgentSummary]] =
+    for {
+      agentEntities  <- repository.getAgentSummaryEntities(listAgentSummary.copy(versionTimestamp = None))
+      agentSummaries <- convertAgentSummaryEntities(agentEntities, listAgentSummary)
+    } yield agentSummaries
 
-  private def getPlaceOfDepositSummaries: List[AgentSummary] =
-    repository.getPlaceOfDepositEntities match {
-      case Success(agentEntities) =>
-        agentEntities.flatMap { agentEntity =>
-          agentEntity.as[Option[AgentSummary]]
-        }
-      case _ => List.empty // TODO (RW) log the error
-    }
+  private def combineSummaryAndDescriptions(
+    agentSummary: AgentSummary,
+    agentDescriptions: List[AgentDescription]
+  ): Try[AgentSummary] =
+    Try(agentSummary.copy(descriptions = agentDescriptions))
 
-  private def getAgentEntities: List[AgentSummary] =
-    repository.getAgentEntities match {
-      case Success(agentEntities) =>
-        agentEntities.flatMap { agentEntity =>
-          agentEntity.as[Option[AgentSummary]]
-        }
-      case _ => List.empty // TODO (RW) log the error
-    }
+  private def convertAgentSummaryEntities(
+    agentSummaryEntities: List[AgentConceptEntity],
+    listAgentSummary: ListAgentSummary
+  ): Try[List[AgentSummary]] =
+    agentSummaryEntities.map { agentSummaryEntity =>
+      agentSummaryEntity.as[Option[AgentSummary]] match {
+        case Some(agentSummary) =>
+          for {
+            agentDescriptions            <- getAgentDescriptions(agentSummaryEntity, listAgentSummary)
+            agentSummaryWithDescriptions <- combineSummaryAndDescriptions(agentSummary, agentDescriptions)
+          } yield agentSummaryWithDescriptions
+        case _ => Failure(ServiceException("Failed to transform AgentSummaryEntity to AgentSummary"))
+      }
+    }.sequence
+
+  private def getAgentDescriptions(
+    agentSummaryEntity: AgentConceptEntity,
+    listAgentSummary: ListAgentSummary
+  ): Try[List[AgentDescription]] =
+    for {
+      agentDescriptionEntities <- repository.getAgentDescriptionEntities(listAgentSummary, agentSummaryEntity.conceptId)
+      agentDescriptions <-
+        Try(agentDescriptionEntities.map(agentDescriptionEntity => agentDescriptionEntity.as[AgentDescription]))
+    } yield agentDescriptions
 
 }

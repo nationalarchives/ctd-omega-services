@@ -21,133 +21,104 @@
 
 package uk.gov.nationalarchives.omega.api.support
 
-import uk.gov.nationalarchives.omega.api.messages.{ AgentType, StubData }
 import org.apache.jena.ext.xerces.util.URI
-import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary, LegalStatus }
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentEntity, LegalStatusEntity }
+import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary }
+import uk.gov.nationalarchives.omega.api.messages.{ AgentType, StubData }
+import uk.gov.nationalarchives.omega.api.repository.model.{ AgentConceptEntity, AgentDescriptionEntity, LegalStatusEntity }
 
 class TestStubData extends StubData {
 
-  override def getAgentSummaries(): List[AgentSummary] = List(
+  override def getAgentSummaries: Seq[AgentSummary] = List(
     AgentSummary(
       AgentType.Person,
       "48N",
       "current",
-      AgentDescription(
-        "48N",
-        "Baden-Powell",
-        "2022-06-22T02:00:00-0500",
-        Some(false),
-        Some(false),
-        Some("1889"),
-        Some("1977")
+      List(
+        AgentDescription(
+          "48N",
+          "Baden-Powell",
+          "2022-06-22T02:00:00-0500",
+          Some(false),
+          Some(false),
+          Some("1889"),
+          Some("1977")
+        )
       )
     ),
     AgentSummary(
       AgentType.Person,
       "46F",
       "current description",
-      AgentDescription(
-        "46F",
-        "Fawkes, Guy",
-        "2022-06-22T02:00:00-0500",
-        Some(false),
-        Some(false),
-        Some("1570"),
-        Some("1606")
+      List(
+        AgentDescription(
+          "46F",
+          "Fawkes, Guy",
+          "2022-06-22T02:00:00-0500",
+          Some(false),
+          Some(false),
+          Some("1570"),
+          Some("1606")
+        )
       )
     ),
     AgentSummary(
       AgentType.CorporateBody,
       "92W",
       "current description",
-      AgentDescription(
-        "92W",
-        "Joint Milk Quality Committee",
-        "2022-06-22T02:00:00-0500",
-        Some(false),
-        Some(false),
-        Some("1948"),
-        Some("1948")
+      List(
+        AgentDescription(
+          "92W",
+          "Joint Milk Quality Committee",
+          "2022-06-22T02:00:00-0500",
+          Some(false),
+          Some(false),
+          Some("1948"),
+          Some("1948")
+        )
       )
     ),
     AgentSummary(
       AgentType.CorporateBody,
       "8R6",
       "current description",
-      AgentDescription("8R6", "Queen Anne's Bounty", "2022-06-22T02:00:00-0500", Some(false), Some(false), None, None)
+      List(
+        AgentDescription("8R6", "Queen Anne's Bounty", "2022-06-22T02:00:00-0500", Some(false), Some(false), None, None)
+      )
     )
   )
 
-  override def getAgentEntities(): List[AgentEntity] =
+  override def getAgentSummaryEntities: List[AgentConceptEntity] =
     List(
-      AgentEntity(
-        new URI("http://cat.nationalarchives.gov.uk/person-concept"),
+      AgentConceptEntity(
         new URI("http://cat.nationalarchives.gov.uk/agent.48N"),
-        new URI("http://cat.nationalarchives.gov.uk/agent.48N.1"),
-        "Baden-Powell",
-        "2022-06-22T02:00:00-0500",
-        Some("1889"),
-        Some("1977"),
-        Some(false)
-      ),
-      AgentEntity(
         new URI("http://cat.nationalarchives.gov.uk/person-concept"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.48N.1")
+      ),
+      AgentConceptEntity(
         new URI("http://cat.nationalarchives.gov.uk/agent.46F"),
-        new URI("http://cat.nationalarchives.gov.uk/agent.46F.1"),
-        "Fawkes, Guy",
-        "2022-06-22T02:00:00-0500",
-        Some("1570"),
-        Some("1606"),
-        Some(false)
+        new URI("http://cat.nationalarchives.gov.uk/person-concept"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.46F.1")
       ),
-      AgentEntity(
-        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
+      AgentConceptEntity(
         new URI("http://cat.nationalarchives.gov.uk/agent.92W"),
-        new URI("http://cat.nationalarchives.gov.uk/agent.92W.1"),
-        "Joint Milk Quality Committee",
-        "2022-06-22T02:00:00-0500",
-        Some("1948"),
-        Some("1948"),
-        Some(false)
-      ),
-      AgentEntity(
         new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.92W.1")
+      ),
+      AgentConceptEntity(
         new URI("http://cat.nationalarchives.gov.uk/agent.8R6"),
-        new URI("http://cat.nationalarchives.gov.uk/agent.8R6.1"),
-        "Queen Anne's Bounty",
-        "2022-06-22T02:00:00-0500",
-        None,
-        None,
-        Some(false)
+        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.8R6.1")
       ),
-      AgentEntity(
-        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
+      AgentConceptEntity(
         new URI("http://cat.nationalarchives.gov.uk/agent.S7"),
-        new URI("http://cat.nationalarchives.gov.uk/agent.S7.1"),
-        "The National Archives, Kew",
-        "2022-06-22T02:00:00-0500",
-        Some("2003"),
-        None,
-        Some(true)
+        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
+        new URI("http://cat.nationalarchives.gov.uk/agent.S7.1")
       )
     )
 
-  override def getPlaceOfDepositEntities(): List[AgentEntity] =
-    List(
-      AgentEntity(
-        new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
-        new URI("http://cat.nationalarchives.gov.uk/agent.S7"),
-        new URI("http://cat.nationalarchives.gov.uk/agent.S7.1"),
-        "The National Archives, Kew",
-        "2022-06-22T02:00:00-0500",
-        Some("2003"),
-        None,
-        Some(true)
-      )
-    )
+  override def getAgentDescriptionEntities: List[AgentDescriptionEntity] = List()
 
-  override def getLegalStatusEntities(): List[LegalStatusEntity] = List(
+  override def getLegalStatusEntities: List[LegalStatusEntity] = List(
     LegalStatusEntity(new URI("http://cat.nationalarchives.gov.uk/public-record"), "Public Record"),
     LegalStatusEntity(new URI("http://cat.nationalarchives.gov.uk/non-public-record"), "Non-Public Record"),
     LegalStatusEntity(
