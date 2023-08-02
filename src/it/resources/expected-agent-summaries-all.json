@@ -169,7 +169,7 @@
         "identifier" : "http://cat.nationalarchives.gov.uk/agent.HHC.2",
         "label" : "Cabinet, Radio & Cable Board",
         "depository" : false,
-        "version-timestamp" : "2023-07-25T17:30:00.000Z",
+        "version-timestamp" : "2023-07-25T17:30:00Z",
         "date-from" : "1946",
         "date-to" : "1951",
         "previous-description" : "http://cat.nationalarchives.gov.uk/agent.HHC.1"

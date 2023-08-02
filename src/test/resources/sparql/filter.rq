@@ -14,7 +14,8 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 SELECT DISTINCT  ?identifier ?agentType ?currentVersion
 WHERE {
-    ?identifier dct:type            ?agentType ;
-                ver:currentVersion  ?currentVersion .
-    VALUES (?agentType) { ?agentTypeValuesParam }
+    ?identifier     dct:type            ?agentType ;
+                    ver:currentVersion  ?currentVersion .
+    ?currentVersion prov:generatedAtTime ?versionTimestamp .
+    ?filterParam
 }

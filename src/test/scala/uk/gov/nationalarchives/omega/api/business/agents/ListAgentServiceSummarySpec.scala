@@ -147,13 +147,13 @@ class ListAgentServiceSummarySpec extends UnitTest {
                                                 |    "type" : ["Corporate Body"],
                                                 |    "authority-file" : false,
                                                 |    "depository" : false,
-                                                |    "version-timestamp" : "2022-06-22T02:00:00-0500"
+                                                |    "version-timestamp" : "2022-06-22T02:00-05:00"
                                                 |}""".stripMargin)
       val result = listAgentSummaryService.validateRequest(message)
 
       result mustBe
         Valid(
-          ListAgentSummary(Some(List(CorporateBody)), Some("2022-06-22T02:00:00-0500"), Some(false), Some(false))
+          ListAgentSummary(Some(List(CorporateBody)), Some("2022-06-22T02:00-05:00"), Some(false), Some(false))
         )
     }
     "no version timestamp and authority file" in {
@@ -186,7 +186,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
         "identifier" : "http://cat.nationalarchives.gov.uk/agent.48N.1",
         "label" : "Baden-Powell",
         "depository" : false,
-        "version-timestamp" : "2022-06-22T02:00:00-0500",
+        "version-timestamp" : "2022-06-22T02:00:00-05:00",
         "date-from" : "1889",
         "date-to" : "1977"
       }
@@ -201,7 +201,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
         "identifier" : "http://cat.nationalarchives.gov.uk/agent.46F.1",
         "label" : "Fawkes, Guy",
         "depository" : false,
-        "version-timestamp" : "2022-06-22T02:00:00-0500",
+        "version-timestamp" : "2022-06-22T02:00:00-05:00",
         "date-from" : "1570",
         "date-to" : "1606"
       }
@@ -216,7 +216,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
         "identifier" : "http://cat.nationalarchives.gov.uk/agent.92W.1",
         "label" : "Joint Milk Quality Committee",
         "depository" : false,
-        "version-timestamp" : "2022-06-22T02:00:00-0500",
+        "version-timestamp" : "2022-06-22T02:00:00-05:00",
         "date-from" : "1948",
         "date-to" : "1948"
       }
@@ -231,7 +231,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
         "identifier" : "http://cat.nationalarchives.gov.uk/agent.8R6.1",
         "label" : "Queen Anne's Bounty",
         "depository" : false,
-        "version-timestamp" : "2022-06-22T02:00:00-0500"
+        "version-timestamp" : "2022-06-22T02:00:00-05:00"
       }
     ]
   },
@@ -244,7 +244,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
         "identifier" : "http://cat.nationalarchives.gov.uk/agent.S7.1",
         "label" : "The National Archives, Kew",
         "depository" : true,
-        "version-timestamp" : "2022-06-22T02:00:00-0500",
+        "version-timestamp" : "2022-06-22T02:00:00-05:00",
         "date-from" : "2003"
       }
     ]
@@ -261,7 +261,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
         "identifier" : "http://cat.nationalarchives.gov.uk/agent.S7.1",
         "label" : "The National Archives, Kew",
         "depository" : true,
-        "version-timestamp" : "2022-06-22T02:00:00-0500",
+        "version-timestamp" : "2022-06-22T02:00:00-05:00",
         "date-from" : "2003"
       }
     ]

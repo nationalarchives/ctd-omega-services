@@ -68,7 +68,7 @@ class OmegaRepositoryISpec
         result.success.get.head.identifier mustBe "http://cat.nationalarchives.gov.uk/agent.HHC.2"
       }
     }
-    "must return a List containing the HHC.2 agent" in {
+    "must return a List containing the latest HHC agent (HH2)" in {
       when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
       eventually {
         val result = repository.getAgentDescriptionEntities(
@@ -79,7 +79,7 @@ class OmegaRepositoryISpec
         result.success.get.head.identifier mustBe "http://cat.nationalarchives.gov.uk/agent.HHC.2"
       }
     }
-    "must return a List with two items" in {
+    "must return a List with both HHC agent descriptions" in {
       when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
       eventually {
         val result = repository.getAgentDescriptionEntities(
@@ -89,14 +89,34 @@ class OmegaRepositoryISpec
         result.success.get.length mustBe 2
       }
     }
-    "must return a List containing the HHC.1 agent" in {
+    "must return a List containing with all HHC agents created from a date onwards (0)" in {
       when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
       eventually {
         val result = repository.getAgentDescriptionEntities(
-          ListAgentSummary(versionTimestamp = Some("2023-01-25T14:14:47.534Z")),
+          ListAgentSummary(versionTimestamp = Some("2023-08-01T00:00:00.000Z")),
           new URI("http://cat.nationalarchives.gov.uk/agent.HHC")
         )
-        result.success.get.head.identifier mustBe "http://cat.nationalarchives.gov.uk/agent.HHC.1"
+        result.success.get mustEqual List.empty
+      }
+    }
+    "must return a List containing with all HHC agents created from a date onwards (1)" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getAgentDescriptionEntities(
+          ListAgentSummary(versionTimestamp = Some("2023-07-01T00:00:00.000Z")),
+          new URI("http://cat.nationalarchives.gov.uk/agent.HHC")
+        )
+        result.success.get.head.identifier mustBe "http://cat.nationalarchives.gov.uk/agent.HHC.2"
+      }
+    }
+    "must return a List containing with all HHC agents created from a date onwards (2)" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getAgentDescriptionEntities(
+          ListAgentSummary(versionTimestamp = Some("2023-01-01T00:00:00.000Z")),
+          new URI("http://cat.nationalarchives.gov.uk/agent.HHC")
+        )
+        result.success.get.length mustBe 2
       }
     }
   }

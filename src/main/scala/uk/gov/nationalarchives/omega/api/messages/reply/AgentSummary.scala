@@ -25,6 +25,8 @@ import io.circe.syntax._
 import io.circe.{ Encoder, Json }
 import uk.gov.nationalarchives.omega.api.messages.AgentType
 
+import java.time.ZonedDateTime
+
 case class AgentSummary(
   agentType: AgentType,
   identifier: String,
@@ -47,7 +49,7 @@ object AgentSummary {
 case class AgentDescription(
   identifier: String,
   label: String,
-  versionTimestamp: String,
+  versionTimestamp: ZonedDateTime,
   authorityFile: Option[Boolean] = None,
   depository: Option[Boolean] = None,
   dateFrom: Option[String] = None,

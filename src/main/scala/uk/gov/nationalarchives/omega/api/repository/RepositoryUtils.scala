@@ -103,7 +103,8 @@ trait RepositoryUtils extends AgentTypeMapper {
       queryText_2 <- Try(setResourceParams(queryText_1, params.uris))
       queryText_3 <- Try(setValueParams(queryText_2, params.values))
       queryText_4 <- Try(setXSDDateTimeParams(queryText_3, params.dateTimes))
-    } yield new ParameterizedSparqlString(queryText_4)
+      queryText_5 <- Try(setFilterParams(queryText_4, params.filters))
+    } yield new ParameterizedSparqlString(queryText_5)
 
   private def setBooleanParams(queryText: String, booleans: Map[String, Boolean]): String = {
 
@@ -150,7 +151,7 @@ trait RepositoryUtils extends AgentTypeMapper {
     setParams(resources, queryText)
   }
 
-  private def setValueParams(queryText: String, values: Map[String, List[Resource]]) = {
+  private def setValueParams(queryText: String, values: Map[String, List[Resource]]): String = {
 
     @tailrec
     def setParams(resMap: Map[String, List[Resource]], query: String): String =
@@ -163,6 +164,21 @@ trait RepositoryUtils extends AgentTypeMapper {
       }
 
     setParams(values, queryText)
+  }
+
+  private def setFilterParams(queryText: String, values: Map[String, String]): String = {
+
+    @tailrec
+    def setParams(resMap: Map[String, String], query: String): String =
+      resMap match {
+        case m: Map[String, String] if m.isEmpty => query
+        case param =>
+          val queryWithFilter = query.replace(s"?${param.head._1}", param.head._2)
+          setParams(resMap.tail, queryWithFilter)
+      }
+
+    setParams(values, queryText)
+
   }
 
 }

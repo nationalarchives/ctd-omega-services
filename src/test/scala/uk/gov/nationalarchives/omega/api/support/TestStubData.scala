@@ -26,6 +26,8 @@ import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, Agen
 import uk.gov.nationalarchives.omega.api.messages.{ AgentType, StubData }
 import uk.gov.nationalarchives.omega.api.repository.model.{ AgentConceptEntity, AgentDescriptionEntity, LegalStatusEntity }
 
+import java.time.ZonedDateTime
+
 class TestStubData extends StubData {
 
   override def getAgentSummaries: Seq[AgentSummary] = List(
@@ -37,7 +39,7 @@ class TestStubData extends StubData {
         AgentDescription(
           "48N",
           "Baden-Powell",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-0500"),
           Some(false),
           Some(false),
           Some("1889"),
@@ -53,7 +55,7 @@ class TestStubData extends StubData {
         AgentDescription(
           "46F",
           "Fawkes, Guy",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-0500"),
           Some(false),
           Some(false),
           Some("1570"),
@@ -69,7 +71,7 @@ class TestStubData extends StubData {
         AgentDescription(
           "92W",
           "Joint Milk Quality Committee",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-0500"),
           Some(false),
           Some(false),
           Some("1948"),
@@ -82,7 +84,15 @@ class TestStubData extends StubData {
       "8R6",
       "current description",
       List(
-        AgentDescription("8R6", "Queen Anne's Bounty", "2022-06-22T02:00:00-0500", Some(false), Some(false), None, None)
+        AgentDescription(
+          "8R6",
+          "Queen Anne's Bounty",
+          ZonedDateTime.parse("2022-06-22T02:00:00-0500"),
+          Some(false),
+          Some(false),
+          None,
+          None
+        )
       )
     )
   )

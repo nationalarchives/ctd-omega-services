@@ -32,6 +32,7 @@ import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.model.{ AgentConceptEntity, AgentDescriptionEntity }
 import uk.gov.nationalarchives.omega.api.support.UnitTest
 
+import java.time.ZonedDateTime
 import scala.util.{ Failure, Success, Try }
 
 class OmegaRepositorySpec extends UnitTest {
@@ -139,7 +140,7 @@ class OmegaRepositorySpec extends UnitTest {
             AgentDescriptionEntity(
               new URI("http://cat.nationalarchives.gov.uk/agent.3LG.1"),
               "Edwin Hill",
-              "2023-01-25T14:18:41.668Z",
+              ZonedDateTime.parse("2023-01-25T14:18:41.668Z"),
               Some("1793"),
               Some("1876"),
               depository = Some(false),
@@ -161,7 +162,7 @@ class OmegaRepositorySpec extends UnitTest {
             AgentDescriptionEntity(
               new URI("http://cat.nationalarchives.gov.uk/agent.3LG.2"),
               "Edmond Hill",
-              "2023-07-27T12:45:00.000Z",
+              ZonedDateTime.parse("2023-07-27T12:45:00.000Z"),
               Some("1793"),
               Some("1876"),
               depository = Some(false),
@@ -170,7 +171,7 @@ class OmegaRepositorySpec extends UnitTest {
             AgentDescriptionEntity(
               new URI("http://cat.nationalarchives.gov.uk/agent.3LG.1"),
               "Edwin Hill",
-              "2023-01-25T14:18:41.668Z",
+              ZonedDateTime.parse("2023-01-25T14:18:41.668Z"),
               Some("1793"),
               Some("1876"),
               depository = Some(false),

@@ -24,10 +24,12 @@ package uk.gov.nationalarchives.omega.api.repository.model
 import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.messages.reply.AgentDescription
 
+import java.time.ZonedDateTime
+
 case class AgentDescriptionEntity(
   descriptionId: URI,
   label: String,
-  versionTimestamp: String,
+  versionTimestamp: ZonedDateTime,
   dateFrom: Option[String],
   dateTo: Option[String],
   depository: Option[Boolean],
