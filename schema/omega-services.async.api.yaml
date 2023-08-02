@@ -57,10 +57,10 @@ defaultContentType: application/json
 
 
 channels:
-  request.general:
+  PACS001_REQUEST001:
     description: The queue on which general priority requests should be published
     publish:
-      operationId: request_general
+      operationId: PACS001_REQUEST001
       description: Request general channel publish operations
       message:
         oneOf:
@@ -75,12 +75,12 @@ channels:
         destinationType: queue
         bindingVersion: 0.0.1
 
-  catalogue.editorial.web.application.instance.1:
+  PACE001_REPLY001:
     description: >-
       The queue on which reply messages will be sent to instance 1 of the
       Catalogue Editorial Web Application
     subscribe:
-      operationId: catalogue_editorial_web_application_instance_1
+      operationId: PACE001_REPLY001
       description: >-
         Reply channel operations for instance 1 of the Catalogue Editorial Web
         Application
@@ -115,7 +115,7 @@ components:
   #     in: user
   #     description: Bearer Authentication Token should be provided in the OMGToken header.
 
-  # TODO(AR) TTL - some messages from some applications (e.g. ctd-omega-editorial-frontend) will be time sensitive, and if the TTL has expired by time we come to process the message we could just discard it. We should record these stats somewhere so that we can understand the SLA of processed vs. disacrded messages
+  # TODO(AR) TTL - some messages from some applications (e.g. ctd-omega-editorial-frontend) will be time sensitive, and if the TTL has expired by time we come to process the message we could just discard it. We should record these stats somewhere so that we can understand the SLA of processed vs. discarded messages
 
 
   messages:
@@ -316,9 +316,9 @@ components:
       name: InvalidMessageFormatError
       title: Invalid Message Format Error
       description: >-
-        An error occured during early stage parsing/recognition of the message.
+        An error occurred during early stage parsing/recognition of the message.
         This includes extracting and validating the presence of required message
-        headers and that they meet their excpected data types, extracting the
+        headers and that they meet their expected data types, extracting the
         body as text and validating that its format (NOT content) is correct
         (i.e. that it is valid JSON/XML/RDF/Binary etc.)
       traits:
@@ -400,7 +400,7 @@ components:
       name: ProcessingError
       title: Processing Error
       description: >-
-        The received message was valid, but the system was unable complete the
+        The received message was valid, but the system was unable to complete the
         processing of a message.
       traits:
         - $ref: '#/components/messageTraits/JMSMessage'
@@ -529,8 +529,8 @@ components:
             type: string
             pattern: '[A-Z]{4}([1-9][0-9][0-9]|0[1-9][0-9]|00[1-9])_([A-Za-z0-9_])+'
             examples:
-              - 'PACE001_REPLY_1'
-              - 'OMGR002_REPLY'
+              - 'PACE001_REPLY001'
+              - 'PACE002_REPLY001'
   schemas:
 
     LegalStatusSummary:
@@ -554,7 +554,7 @@ components:
     DescriptionOfConcept:
       type: object
       required:
-        - defintion
+        - definition
       properties:
         definition:
           $ref: '#/components/schemas/GeneralDescription'
@@ -573,13 +573,13 @@ components:
           description: Limits the list to one-or-more types of Agent. If omitted, all types of agents are included in the list.
         authority-file:
           $ref: '#/components/schemas/AuthorityFile'
-          description: Limits the list of Agent(s) to only those that are (or are not) also Authority Files. If omitted both authorative and non-authorative Agents are included in the list.
+          description: Limits the list of Agent(s) to only those that are (or are not) also Authority Files. If omitted both authoritative and non-authoritative Agents are included in the list.
         depository:
           $ref: '#/components/schemas/Depository'
           description: Limits the list of Agent(s) to only those that are (or are not) also a depository. If omitted both depository and non-depository Agents are included in the list.
         version-timestamp:
           $ref: '#/components/schemas/VersionTimestamp'
-          description: Limits the list of Agent(s) to only those that have a version timestamp that is greated than or equal to this timestamp.
+          description: Limits the list of Agent(s) to only those that have a version timestamp that is greater than or equal to this timestamp.
           default: latest
 
     AgentSummary:
@@ -657,8 +657,8 @@ components:
     AgentDescriptionProperties:
       type: object
       properties:
-        ### TODO (AR) finish this bit
-        honourific-title:
+        ### TODO (AR) finish this bit
+        honorific-title:
           type: array
           items:
             type: string
@@ -678,7 +678,7 @@ components:
           type: array
           items:
             type: string
-        prefererred-name:
+        preferred-name:
           type: array
           items:
             type: string
@@ -696,11 +696,11 @@ components:
                 type: boolean
               agent:
                 $ref: '#/components/schemas/GeneralIdentifier'
-        predecesor:
+        predecessor:
           type: array
           items:
             $ref: '#/components/schemas/GeneralIdentifier'
-        sucessor:
+        successor:
           type: array
           items:
             $ref: '#/components/schemas/GeneralIdentifier'
@@ -716,7 +716,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GeneralIdentifier'
-        assoociated-place:
+        associated-place:
           type: array
           items:
             $ref: '#/components/schemas/GeneralIdentifier'
