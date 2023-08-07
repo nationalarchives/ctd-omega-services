@@ -26,7 +26,7 @@ import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.model.AgentTypeMapper
 
 import java.time.ZonedDateTime
-import java.util.{ Date, GregorianCalendar }
+import java.util.GregorianCalendar
 import javax.xml.datatype.{ DatatypeFactory, XMLGregorianCalendar }
 import scala.util.Try
 
@@ -87,8 +87,7 @@ object SparqlParams extends AgentTypeMapper {
       case Some("all") | Some("latest") | None => Map.empty
       case Some(dateTimeValue) =>
         val date = ZonedDateTime.parse(dateTimeValue)
-        val calendar = new GregorianCalendar()
-        calendar.setTime(Date.from(date.toInstant))
+        val calendar = GregorianCalendar.from(date)
         Map("generatedAtParam" -> DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar))
     }
   }
