@@ -209,6 +209,42 @@ components:
           identifier:
             $ref: '#/components/schemas/GeneralIdentifier'
 
+    GetRecordSummary:
+      messageId: OSGESREC001
+      name: GetRecordSummary
+      title: Get Record Summary
+      description: Get a summary description of a Record
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/OMGMessage'
+        - $ref: '#/components/messageTraits/OMGRequest'
+        - $ref: '#/components/messageTraits/OMGAuthentication'
+      payload:
+        type: object
+        required:
+          - identifier
+        properties:
+          identifier:
+            $ref: '#/components/schemas/GeneralIdentifier'
+
+    GetRecordFull:
+      messageId: OSGEFREC001
+      name: GetRecordFull
+      title: Get Record
+      description: Get a full description of a Record
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/OMGMessage'
+        - $ref: '#/components/messageTraits/OMGRequest'
+        - $ref: '#/components/messageTraits/OMGAuthentication'
+      payload:
+        type: object
+        required:
+          - identifier
+        properties:
+          identifier:
+            $ref: '#/components/schemas/GeneralIdentifier'
+
 
   ## Data Messages (may also be used as Service Reply Messages)
 
@@ -293,6 +329,30 @@ components:
         - $ref: '#/components/messageTraits/OMGMessage'
       payload:
         $ref: '#/components/schemas/AgentFull'
+
+    RecordSummary:
+      messageId: ODENSREC001
+      name: RecordSummary
+      title: Record Summary
+      description: Summary description of a Record
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/JMSReply'
+        - $ref: '#/components/messageTraits/OMGMessage'
+      payload:
+        $ref: '#/components/schemas/RecordSummary'
+
+    RecordFull:
+      messageId: ODENFREC001
+      name: RecordFull
+      title: Record Full
+      description: Full description of a Record
+      traits:
+        - $ref: '#/components/messageTraits/JMSMessage'
+        - $ref: '#/components/messageTraits/JMSReply'
+        - $ref: '#/components/messageTraits/OMGMessage'
+      payload:
+        $ref: '#/components/schemas/RecordFull'
 
   ## Error Messages
     GeneralError:
@@ -636,9 +696,9 @@ components:
         label:
           $ref: '#/components/schemas/GeneralLabel'
         date-from:
-          $ref: '#/components/schemas/ISODate'
+          $ref: '#/components/schemas/ISODateWithTZ'
         date-to:
-          $ref: '#/components/schemas/ISODate'
+          $ref: '#/components/schemas/ISODateWithTZ'
         authority-file:
           $ref: '#/components/schemas/AuthorityFile'
         depository:
@@ -742,9 +802,9 @@ components:
             type: object
             properties:
               date-from:
-                $ref: '#/components/schemas/ISODate'
+                $ref: '#/components/schemas/ISODateWithTZ'
               date-to:
-                $ref: '#/components/schemas/ISODate'
+                $ref: '#/components/schemas/ISODateWithTZ'
               note:
                 type: string
         note:
@@ -777,6 +837,195 @@ components:
       type: boolean
       description: true to indicate that this Agent is also considered an Authority File, false otherwise
 
+    RecordSummary:
+      type: object
+      required:
+        - identifier
+        - type
+        - creator
+        - current-description
+        - description
+      properties:
+        identifier:
+          $ref: '#/components/schemas/GeneralIdentifier'
+        type:
+          $ref: '#/components/schemas/RecordType'
+        creator:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeneralIdentifier'
+          description: the identifier of the Creating Body of the Record concept, i.e. a URI to an Agent
+        current-description:
+          $ref: '#/components/schemas/GeneralIdentifier'
+          description: the identifier of the current description of the Record concept
+        description:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecordDescriptionSummary'
+
+    RecordFull:
+      type: object
+      required:
+        - identifier
+        - type
+        - creator
+        - current-description
+        - description
+      properties:
+        identifier:
+          $ref: '#/components/schemas/GeneralIdentifier'
+        type:
+          $ref: '#/components/schemas/RecordType'
+        creator:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeneralIdentifier'
+          description: the identifier of the Creating Body of the Record concept, i.e. a URI to an Agent
+        current-description:
+          $ref: '#/components/schemas/GeneralIdentifier'
+          description: the identifier of the current description of the Record concept
+        description:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecordDescriptionFull'
+
+    RecordDescriptionSummary:
+      type: object
+      required:
+        - identifier
+        - label
+        - abstract
+        - access-rights
+        - is-part-of
+        - version-timestamp
+      properties:
+        identifier:
+          $ref: '#/components/schemas/GeneralIdentifier'
+        label:
+          $ref: '#/components/schemas/GeneralLabel'
+        abstract:
+          $ref: '#/components/schemas/GeneralDescription'
+        access-rights:
+          $ref: '#/components/schemas/GeneralIdentifier'
+          description: the identifier of the Rights Statement for the Record description
+        is-part-of:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeneralIdentifier'
+          description: Links to the parent of which this is part of
+        previous-sibling:
+          $ref: '#/components/schemas/GeneralIdentifier'
+          description: Links to the previous sibling. Used when there is an order of resources to be applied across siblings
+        version-timestamp:
+          $ref: '#/components/schemas/VersionTimestamp'
+        previous-description:
+          $ref: '#/components/schemas/GeneralIdentifier'
+
+    RecordDescriptionFull:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/RecordDescriptionSummary'
+        - $ref: '#/components/schemas/RecordDescriptionProperties'
+
+    RecordDescriptionProperties:
+      type: object
+      properties:
+        secondary-identifier:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeneralTypedIdentifier'
+        asset-legal-status:
+          $ref: '#/components/schemas/LegalStatusSummary'
+        legacy-tna-cs13-record-type:
+          $ref: '#/components/schemas/LegacyTNACS13RecordType'
+        designation-of-edition:
+          type: string
+          description: Description identifying an edition to which a record (e.g. Map) belongs.
+        created:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/TemporalInstant'
+            - $ref: '#/components/schemas/TemporalInterval'
+          description: The period of time or instant during which the record itself was created
+        covering:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/TemporalInstant'
+            - $ref: '#/components/schemas/TemporalInterval'
+          description: The period of time or instant that the subject matter of the record spans
+        archivists-note:
+          $ref: '#/components/schemas/GeneralDatedDescription'
+          description: An archivists note about the record
+        source-of-acquisition:
+          $ref: '#/components/schemas/GeneralIdentifier'
+          description: The URI of an agent
+        custodial-history:
+          type: string
+        adminstrative-biographical-background:
+          type: string
+        accumulation:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/TemporalInstant'
+            - $ref: '#/components/schemas/TemporalInterval'
+          description: The period of time or instant during which the record was accumulated
+        appraisal:
+          type: string
+        accrualPolicy:
+          $ref: '#/components/schemas/GeneralIdentifier'
+          description: The URI of the accrual policy of the record
+        layout:
+          type: string
+          description: Additional textual information adding context around the arrangement/layout of the record
+        publication-note:
+          $ref: '#/components/schemas/GeneralDatedDescription'
+          description: A note about the publication of the record
+        referenced-by:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeneralLabelledIdentifier'
+          description: Links to other resource which reference this record
+        related-to:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeneralLabelledIdentifier'
+          description: Links to related material
+        separated-from:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeneralLabelledIdentifier'
+          description: Links to separated material
+        subject:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeneralIdentifier'
+          description: Links to subjects. Typically these are URI of Agent, Person, or Location entities. They may also be URI of terms from a controlled vocabulary
+
+    RecordTypes:
+      type: array
+      items:
+        $ref: '#/components/schemas/RecordType'
+      description: One or more types of Record
+
+    RecordType:
+      type: string
+      enum:
+        - Physical
+        - Digitised
+        - Born Digital
+        - Hybrid
+        # TODO(AR) more to come here later?
+        # - Redacted
+        # - Surrogate
+      description: A type of Record
+
+    LegacyTNACS13RecordType:
+      type: string
+      enum:
+        - Piece
+        - Item
+      description: The legacy TNA-CS13 type of the Record
+
     VersionTimestamp:
       oneOf:
         - type: string
@@ -795,6 +1044,27 @@ components:
       name: Label
       description: A label for any general Object
 
+    GeneralLabelledIdentifier:
+      type: object
+      name: Labelled Identifier
+      description: A labelled identifier for any general Object
+      properties:
+        identifier:
+          $ref: '#/components/schemas/GeneralIdentifier'
+        label:
+          $ref: '#/components/schemas/GeneralLabel'
+
+    GeneralTypedIdentifier:
+      type: object
+      name: Typed Identifier
+      description: A typed identifier for any general Object
+      properties:
+        identifier:
+          $ref: '#/components/schemas/GeneralIdentifier'
+        type:
+          $ref: '#/components/schemas/GeneralIdentifier'
+          description: A URI indicating the identifier scheme used by the identifier
+
     GeneralDescription:
       type: string
       name: Description
@@ -808,13 +1078,96 @@ components:
         description:
           $ref: '#/components/schemas/GeneralDescription'
         date:
-          $ref: '#/components/schemas/ISODate'
+          $ref: '#/components/schemas/ISODateWithTZ'
+
+    TemporalInstant:
+      type: object
+      name: Temporal Instant
+      description: A point in Time
+      required:
+        - description
+        - instant
+      properties:
+        description:
+          $ref: '#/components/schemas/GeneralDescription'
+        instant:
+          oneOf:
+            - $ref: '#/components/schemas/ISOYearWithTZ'
+            - $ref: '#/components/schemas/ISOYearMonthWithTZ'
+            - $ref: '#/components/schemas/ISODateWithTZ'
+            - $ref: '#/components/schemas/ISODateTimeWithTZ'
+
+    TemporalInterval:
+      type: object
+      name: Temporal Interval
+      description: An interval of Time
+      required:
+        - description
+        - starts
+        - finishes
+      properties:
+        description:
+          $ref: '#/components/schemas/GeneralDescription'
+        date-from:
+          oneOf:
+            - $ref: '#/components/schemas/ISOYearWithTZ'
+            - $ref: '#/components/schemas/ISOYearMonthWithTZ'
+            - $ref: '#/components/schemas/ISODateWithTZ'
+            - $ref: '#/components/schemas/ISODateTimeWithTZ'
+        date-to:
+          oneOf:
+            - $ref: '#/components/schemas/ISOYearWithTZ'
+            - $ref: '#/components/schemas/ISOYearMonthWithTZ'
+            - $ref: '#/components/schemas/ISODateWithTZ'
+            - $ref: '#/components/schemas/ISODateTimeWithTZ'
+
+    ISOYear:
+      type: string
+      pattern: "([1-9][0-9]{3,}|0[0-9]{3})(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?"
+      name: ISO Year
+      description: A year string formatted according to ISO 8601
+
+    ISOYearWithTZ:
+      type: string
+      pattern: "([1-9][0-9]{3,}|0[0-9]{3})(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))"
+      name: ISO Year with mandatory Time Zone
+      description: A year string with a Time Zone formatted according to ISO 8601
+
+    ISOYearMonth:
+      type: string
+      pattern: "([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?"
+      name: ISO Year and Month
+      description: A year and month string formatted according to ISO 8601
+
+    ISOYearMonthWithTZ:
+      type: string
+      pattern: "([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))"
+      name: ISO Year and Month with mandatory Time Zone
+      description: A year and month string with a Time Zone formatted according to ISO 8601
 
     ISODate:
       type: string
-      format: date
+      pattern: "([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?"
       name: ISO date
       description: A date string formatted according to ISO 8601
+
+    ISODateWithTZ:
+      type: string
+      pattern: "([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))"
+      name: ISO Date with mandatory Time Zone
+      description: A date string with a Time Zone formatted according to ISO 8601
+
+    ISODateTime:
+      type: string
+      pattern: "([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]+)?|(24:00:00(\\.0+)?))(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?"
+      name: ISO Date and Time
+      description: A date and time string formatted according to ISO 8601
+
+    ISODateTimeWithTZ:
+      type: string
+      pattern: "([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]+)?|(24:00:00(\\.0+)?))(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))"
+      name: ISO Date and Time with mandatory Time Zone
+      description: A date and time string with a Time Zone formatted according to ISO 8601
 
     ErrorMessage:
       type: object
