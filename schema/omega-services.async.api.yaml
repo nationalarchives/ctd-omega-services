@@ -803,7 +803,7 @@ components:
         note:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/GeneralDescription'
 
     AgentTypes:
       type: array
