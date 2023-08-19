@@ -993,8 +993,10 @@ components:
         subject:
           type: array
           items:
-            $ref: '#/components/schemas/GeneralIdentifier'
-          description: Links to subjects. Typically these are URI of Agent, Person, or Location entities. They may also be URI of terms from a controlled vocabulary
+            oneOf:
+              - $ref: '#/components/schemas/GeneralIdentifier'
+              - $ref: '#/components/schemas/GeneralLabelledIdentifier'
+          description: Links to subjects. Typically these are URI of Agent, Person, or Location entities with an optional description. They may also be URI of terms from a controlled vocabulary.
 
     RecordTypes:
       type: array
