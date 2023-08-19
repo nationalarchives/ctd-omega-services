@@ -1041,6 +1041,9 @@ components:
       type: object
       name: Labelled Identifier
       description: A labelled identifier for any general Object
+      required:
+        - identifier
+        - label
       properties:
         identifier:
           $ref: '#/components/schemas/GeneralIdentifier'
@@ -1051,6 +1054,9 @@ components:
       type: object
       name: Typed Identifier
       description: A typed identifier for any general Object
+      required:
+        - identifier
+        - type
       properties:
         identifier:
           $ref: '#/components/schemas/GeneralIdentifier'
@@ -1067,6 +1073,9 @@ components:
       type: object
       name: Dated Description
       description: A dated description for any general Object
+      required:
+        - description
+        - date
       properties:
         description:
           $ref: '#/components/schemas/GeneralDescription'
