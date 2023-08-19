@@ -949,7 +949,7 @@ components:
             - $ref: '#/components/schemas/DescribedTemporalInterval'
           description: The period of time or instant that the subject matter of the record spans
         archivists-note:
-          $ref: '#/components/schemas/GeneralDatedDescription'
+          $ref: '#/components/schemas/GeneralDescription'
           description: An archivists note about the record
         source-of-acquisition:
           $ref: '#/components/schemas/GeneralIdentifier'
@@ -973,7 +973,7 @@ components:
           type: string
           description: Additional textual information adding context around the arrangement/layout of the record
         publication-note:
-          $ref: '#/components/schemas/GeneralDatedDescription'
+          $ref: '#/components/schemas/GeneralDescription'
           description: A note about the publication of the record
         referenced-by:
           type: array
