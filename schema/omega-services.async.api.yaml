@@ -899,7 +899,9 @@ components:
         abstract:
           $ref: '#/components/schemas/GeneralDescription'
         access-rights:
-          $ref: '#/components/schemas/GeneralIdentifier'
+          type: array
+          items:
+            $ref: '#/components/schemas/GeneralIdentifier'
           description: the identifier of the Rights Statement for the Record description
         is-part-of:
           type: array
