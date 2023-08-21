@@ -894,6 +894,10 @@ components:
       properties:
         identifier:
           $ref: '#/components/schemas/GeneralIdentifier'
+        secondary-identifier:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeneralTypedIdentifier'
         label:
           $ref: '#/components/schemas/GeneralLabel'
         abstract:
@@ -925,10 +929,6 @@ components:
     RecordDescriptionProperties:
       type: object
       properties:
-        secondary-identifier:
-          type: array
-          items:
-            $ref: '#/components/schemas/GeneralTypedIdentifier'
         asset-legal-status:
           $ref: '#/components/schemas/LegalStatusSummary'
         legacy-tna-cs13-record-type:
