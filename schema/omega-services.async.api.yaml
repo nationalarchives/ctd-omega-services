@@ -1100,7 +1100,7 @@ components:
           $ref: '#/components/schemas/TemporalInstant'
 
     DescribedTemporalInterval:
-    type: object
+      type: object
       name: Described Temporal Interval
       description: Descripion of a Temporal Interval
       required:
