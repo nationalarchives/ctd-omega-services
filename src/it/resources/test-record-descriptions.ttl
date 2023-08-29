@@ -1,0 +1,653 @@
+@prefix premis: <http://www.loc.gov/premis/rdf/v3/> .
+@prefix schema: <https://schema.org/> .
+@prefix ver:   <http://purl.org/linked-data/version#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix edm:   <http://www.europeana.eu/schemas/edm/> .
+@prefix rst:   <http://id.loc.gov/vocabulary/preservation/relationshipSubType/> .
+@prefix rdau:  <http://rdaregistry.info/Elements/u/> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix cat:   <http://cat.nationalarchives.gov.uk/> .
+@prefix time:  <http://www.w3.org/2006/time#> .
+@prefix odrl:  <http://www.w3.org/ns/odrl/2/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix iso639-2: <http://id.loc.gov/vocabulary/iso639-2/> .
+
+cat:COAL.2022.N373.P.1
+    a                              premis:IntellectualEntity ;
+    cat:classicCatalogueReference  "COAL 80/2052/9" ;
+    cat:created                    [ a                  time:ProperInterval ;
+                                     dct:description    "1963" ;
+                                     time:hasBeginning  [ a               time:Instant ;
+                                                          time:inXSDDate  "1963-01-01Z"^^xsd:date
+                                                        ] ;
+                                     time:hasEnd        [ a               time:Instant ;
+                                                          time:inXSDDate  "1963-12-31Z"^^xsd:date
+                                                        ]
+                                   ] ;
+    cat:formerReferenceFromDepartment
+                                   "S3024-S3034" ;
+    rst:isp                        cat:recordset.COAL.2022.2834 ;
+    dct:abstract                   "<scopecontent><p>Coal News albums 1963. Collection of contact prints of photographs taken by Deryk Wills. Photographs depicting: Banwen, Glamorgan. Banwen Miners Hunt. </p></scopecontent>"^^rdf:XMLLiteral ;
+    dct:accessRights               [ a                  cat:AccessConditions ;
+                                     cat:closureCode    30 ;
+                                     cat:closureStatus  "O" ;
+                                     cat:closureType    "N"
+                                   ] ;
+    dct:accessRights               [ a               dct:RightsStatement ;
+                                     odrl:hasPolicy  cat:policy.Open_Description , cat:policy.Normal_Closure_before_FOI_Act_30_years_from_1963-12-31
+                                   ] ;
+    dct:creator                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:identifier                 "COAL.2022.N373.P.1" ;
+    dct:language                   iso639-2:eng ;
+    dct:provenance                 [ a                dct:ProvenanceStatement ;
+                                     dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24 ;
+                                     dct:type         cat:immediate-source-of-acquisition
+                                   ] ;
+    dct:subject                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:type                       cat:item , cat:record-description ;
+    edm:isNextInSequence           cat:COAL.2022.N3HQ.P.1 ;
+    premis:note                    "[Grid reference: N/A]" ;
+    premis:rightsStatus            [ a                premis:RightsStatus ;
+                                     premis:basis     cat:public-record
+                                   ] ;
+    prov:generatedAtTime           "2022-12-05T20:37:33.071Z"^^xsd:dateTime ;
+    prov:specializationOf          cat:COAL.2022.N373.P ;
+    prov:wasAttributedTo           cat:agent.S7 ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                     schema:value       "tbl_item.-6843809"
+                                   ] ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.iaid> ;
+                                     schema:value       "C12085388"
+                                   ] .
+
+cat:COAL.2022.N36R.P.1
+    a                              premis:IntellectualEntity ;
+    cat:classicCatalogueReference  "COAL 80/2055/22" ;
+    cat:created                    [ a                  time:ProperInterval ;
+                                     dct:description    "[1964 October]" ;
+                                     time:hasBeginning  [ a               time:Instant ;
+                                                          time:inXSDDate  "1964-09-30Z"^^xsd:date
+                                                        ] ;
+                                     time:hasEnd        [ a               time:Instant ;
+                                                          time:inXSDDate  "1964-10-31Z"^^xsd:date
+                                                        ]
+                                   ] ;
+    rst:isp                        cat:recordset.COAL.2022.2831 ;
+    dct:abstract                   "<scopecontent><p>Coal News. Model II storage unit for photograph negatives (strips of 4). Photograph negatives Nos. T3060-T3102. </p></scopecontent>"^^rdf:XMLLiteral ;
+    dct:accessRights               [ a               dct:RightsStatement ;
+                                     odrl:hasPolicy  cat:policy.Open_Description , cat:policy.Normal_Closure_before_FOI_Act_30_years_from_1964-10-31
+                                   ] ;
+    dct:accessRights               [ a                  cat:AccessConditions ;
+                                     cat:closureCode    30 ;
+                                     cat:closureStatus  "O" ;
+                                     cat:closureType    "N"
+                                   ] ;
+    dct:creator                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:identifier                 "COAL.2022.N36R.P.1" ;
+    dct:language                   iso639-2:eng ;
+    dct:provenance                 [ a                dct:ProvenanceStatement ;
+                                     dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24 ;
+                                     dct:type         cat:immediate-source-of-acquisition
+                                   ] ;
+    dct:subject                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:type                       cat:item , cat:record-description ;
+    edm:isNextInSequence           cat:COAL.2022.N361.P.1 ;
+    premis:note                    "[Grid reference: N/A]" ;
+    premis:rightsStatus            [ a                premis:RightsStatus ;
+                                     premis:basis     cat:public-record
+                                   ] ;
+    prov:generatedAtTime           "2022-12-05T20:37:31.28Z"^^xsd:dateTime ;
+    prov:specializationOf          cat:COAL.2022.N36R.P ;
+    prov:wasAttributedTo           cat:agent.S7 ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.iaid> ;
+                                     schema:value       "C12085493"
+                                   ] ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                     schema:value       "tbl_item.-6843914"
+                                   ] .
+
+cat:COAL.2022.N25L.P.1
+    a                              premis:IntellectualEntity ;
+    cat:classicCatalogueReference  "COAL 80/2061/134" ;
+    cat:created                    [ a                  time:ProperInterval ;
+                                     dct:description    "[1970]" ;
+                                     time:hasBeginning  [ a               time:Instant ;
+                                                          time:inXSDDate  "1969-12-31Z"^^xsd:date
+                                                        ] ;
+                                     time:hasEnd        [ a               time:Instant ;
+                                                          time:inXSDDate  "1970-12-30Z"^^xsd:date
+                                                        ]
+                                   ] ;
+    cat:formerReferenceFromDepartment
+                                   "134" ;
+    rst:isp                        cat:recordset.COAL.2022.282S ;
+    dct:abstract                   "<scopecontent><p>Measham, Leicestershire: Measham colliery. Photograph wanting. </p></scopecontent>"^^rdf:XMLLiteral ;
+    dct:accessRights               [ a                  cat:AccessConditions ;
+                                     cat:closureCode    30 ;
+                                     cat:closureStatus  "O" ;
+                                     cat:closureType    "N"
+                                   ] ;
+    dct:accessRights               [ a               dct:RightsStatement ;
+                                     odrl:hasPolicy  cat:policy.Open_Description , cat:policy.Normal_Closure_before_FOI_Act_30_years_from_1970-12-31
+                                   ] ;
+    dct:creator                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:identifier                 "COAL.2022.N25L.P.1" ;
+    dct:language                   iso639-2:eng ;
+    dct:provenance                 [ a                dct:ProvenanceStatement ;
+                                     dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24 ;
+                                     dct:type         cat:immediate-source-of-acquisition
+                                   ] ;
+    dct:subject                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:type                       cat:record-description , cat:item ;
+    edm:isNextInSequence           cat:COAL.2022.N2KW.P.1 ;
+    premis:note                    "[Grid references: OSGB36: SK 345 117; WGS84: 52.701530, -1.489384]. WGS84 interpolated from OSGB36." ;
+    premis:rightsStatus            [ a                premis:RightsStatus ;
+                                     premis:basis     cat:public-record
+                                   ] ;
+    prov:generatedAtTime           "2022-12-05T20:37:32.064Z"^^xsd:dateTime ;
+    prov:specializationOf          cat:COAL.2022.N25L.P ;
+    prov:wasAttributedTo           cat:agent.S7 ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                     schema:value       "tbl_item.-6844381"
+                                   ] ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.iaid> ;
+                                     schema:value       "C12085960"
+                                   ] .
+
+cat:COAL.2022.N2LS.P.1
+    a                              premis:IntellectualEntity ;
+    cat:classicCatalogueReference  "COAL 80/2060/29" ;
+    cat:created                    [ a                  time:ProperInterval ;
+                                     dct:description    "1956" ;
+                                     time:hasBeginning  [ a               time:Instant ;
+                                                          time:inXSDDate  "1956-01-01Z"^^xsd:date
+                                                        ] ;
+                                     time:hasEnd        [ a               time:Instant ;
+                                                          time:inXSDDate  "1956-12-31Z"^^xsd:date
+                                                        ]
+                                   ] ;
+    cat:formerReferenceFromDepartment
+                                   "29" ;
+    rst:isp                        cat:recordset.COAL.2022.282T ;
+    dct:abstract                   "<scopecontent><p>Silverwood colliery, Ravenfield, Yorkshire. Photograph depicting: West Pit headgear at Silverwood colliery. </p></scopecontent>"^^rdf:XMLLiteral ;
+    dct:accessRights               [ a                  cat:AccessConditions ;
+                                     cat:closureCode    30 ;
+                                     cat:closureStatus  "O" ;
+                                     cat:closureType    "N"
+                                   ] ;
+    dct:accessRights               [ a               dct:RightsStatement ;
+                                     odrl:hasPolicy  cat:policy.Open_Description , cat:policy.Normal_Closure_before_FOI_Act_30_years_from_1956-12-31
+                                   ] ;
+    dct:creator                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:identifier                 "COAL.2022.N2LS.P.1" ;
+    dct:language                   iso639-2:eng ;
+    dct:provenance                 [ a                dct:ProvenanceStatement ;
+                                     dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24 ;
+                                     dct:type         cat:immediate-source-of-acquisition
+                                   ] ;
+    dct:subject                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:type                       cat:record-description , cat:item ;
+    edm:isNextInSequence           cat:COAL.2022.N29W.P.1 ;
+    premis:note                    "[Grid references: OSGB36: SK 485 952; WGS84: 53.451070, -1.269600]. WGS84 interpolated from OSGB36." ;
+    premis:rightsStatus            [ a                premis:RightsStatus ;
+                                     premis:basis     cat:public-record
+                                   ] ;
+    prov:generatedAtTime           "2022-12-05T20:37:32.502Z"^^xsd:dateTime ;
+    prov:specializationOf          cat:COAL.2022.N2LS.P ;
+    prov:wasAttributedTo           cat:agent.S7 ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                     schema:value       "tbl_item.-6844204"
+                                   ] ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.iaid> ;
+                                     schema:value       "C12085783"
+                                   ] .
+
+cat:COAL.2022.N2V3.P.1
+    a                              premis:IntellectualEntity ;
+    cat:classicCatalogueReference  "COAL 80/2059/98" ;
+    cat:created                    [ a                time:Instant ;
+                                     dct:description  "1976 September 30" ;
+                                     time:inXSDDate   "1976-09-29Z"^^xsd:date
+                                   ] ;
+    cat:formerReferenceFromDepartment
+                                   "98" ;
+    rst:isp                        cat:recordset.COAL.2022.282V ;
+    dct:abstract                   "<scopecontent><p>Markham Main colliery, South Yorkshire. Photograph depicting: No 2 steam winding machine at Markham Main colliery. </p></scopecontent>"^^rdf:XMLLiteral ;
+    dct:accessRights               [ a                  cat:AccessConditions ;
+                                     cat:closureCode    30 ;
+                                     cat:closureStatus  "O" ;
+                                     cat:closureType    "N"
+                                   ] ;
+    dct:accessRights               [ a               dct:RightsStatement ;
+                                     odrl:hasPolicy  cat:policy.Open_Description , cat:policy.Normal_Closure_before_FOI_Act_30_years
+                                   ] ;
+    dct:creator                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:identifier                 "COAL.2022.N2V3.P.1" ;
+    dct:language                   iso639-2:eng ;
+    dct:provenance                 [ a                dct:ProvenanceStatement ;
+                                     dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24 ;
+                                     dct:type         cat:immediate-source-of-acquisition
+                                   ] ;
+    dct:subject                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:type                       cat:item , cat:record-description ;
+    edm:isNextInSequence           cat:COAL.2022.N223.P.1 ;
+    premis:note                    "[Grid references: OSGB36: SE 631 047; WGS84: 53.534912, -1.047845]. WGS84 interpolated from OSGB36." ;
+    premis:rightsStatus            [ a                premis:RightsStatus ;
+                                     premis:basis     cat:public-record
+                                   ] ;
+    prov:generatedAtTime           "2022-12-05T20:37:31.576Z"^^xsd:dateTime ;
+    prov:specializationOf          cat:COAL.2022.N2V3.P ;
+    prov:wasAttributedTo           cat:agent.S7 ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.iaid> ;
+                                     schema:value       "C12085730"
+                                   ] ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                     schema:value       "tbl_item.-6844151"
+                                   ] .
+
+cat:COAL.2022.N3G6.P.1
+    a                              premis:IntellectualEntity ;
+    cat:classicCatalogueReference  "COAL 80/2059/51" ;
+    cat:created                    [ a                time:Instant ;
+                                     dct:description  "1976 May 3" ;
+                                     time:inXSDDate   "1976-05-02Z"^^xsd:date
+                                   ] ;
+    cat:formerReferenceFromDepartment
+                                   "51" ;
+    rst:isp                        cat:recordset.COAL.2022.282V ;
+    dct:abstract                   "<scopecontent><p>Markham Main colliery, South Yorkshire. Photograph depicting: roadway with 21's unit drivage at Markham Main colliery. </p></scopecontent>"^^rdf:XMLLiteral ;
+    dct:accessRights               [ a               dct:RightsStatement ;
+                                     odrl:hasPolicy  cat:policy.Open_Description , cat:policy.Normal_Closure_before_FOI_Act_30_years
+                                   ] ;
+    dct:accessRights               [ a                  cat:AccessConditions ;
+                                     cat:closureCode    30 ;
+                                     cat:closureStatus  "O" ;
+                                     cat:closureType    "N"
+                                   ] ;
+    dct:creator                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:identifier                 "COAL.2022.N3G6.P.1" ;
+    dct:language                   iso639-2:eng ;
+    dct:provenance                 [ a                dct:ProvenanceStatement ;
+                                     dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24 ;
+                                     dct:type         cat:immediate-source-of-acquisition
+                                   ] ;
+    dct:subject                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:type                       cat:item , cat:record-description ;
+    edm:isNextInSequence           cat:COAL.2022.N2V9.P.1 ;
+    premis:note                    "[Grid references: OSGB36: SE 631 047; WGS84: 53.534912, -1.047845]. WGS84 interpolated from OSGB36." ;
+    premis:rightsStatus            [ a                premis:RightsStatus ;
+                                     premis:basis     cat:public-record
+                                   ] ;
+    prov:generatedAtTime           "2022-12-05T20:37:31.097Z"^^xsd:dateTime ;
+    prov:specializationOf          cat:COAL.2022.N3G6.P ;
+    prov:wasAttributedTo           cat:agent.S7 ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.iaid> ;
+                                     schema:value       "C12085683"
+                                   ] ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                     schema:value       "tbl_item.-6844104"
+                                   ] .
+
+cat:COAL.2022.N38C.P.1
+    a                              premis:IntellectualEntity ;
+    cat:classicCatalogueReference  "COAL 80/2049/26" ;
+    cat:created                    [ a                  time:ProperInterval ;
+                                     dct:description    "[1963]" ;
+                                     time:hasBeginning  [ a               time:Instant ;
+                                                          time:inXSDDate  "1963-01-01Z"^^xsd:date
+                                                        ] ;
+                                     time:hasEnd        [ a               time:Instant ;
+                                                          time:inXSDDate  "1963-12-31Z"^^xsd:date
+                                                        ]
+                                   ] ;
+    rst:isp                        cat:recordset.COAL.2022.2837 ;
+    dct:abstract                   "<scopecontent><p>Coal News. Model II storage unit for photograph negatives (strips of 4). Photograph negatives Nos. S1102-S1142. </p></scopecontent>"^^rdf:XMLLiteral ;
+    dct:accessRights               [ a               dct:RightsStatement ;
+                                     odrl:hasPolicy  cat:policy.Open_Description , cat:policy.Normal_Closure_before_FOI_Act_30_years_from_1963-12-31
+                                   ] ;
+    dct:accessRights               [ a                  cat:AccessConditions ;
+                                     cat:closureCode    30 ;
+                                     cat:closureStatus  "O" ;
+                                     cat:closureType    "N"
+                                   ] ;
+    dct:creator                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:identifier                 "COAL.2022.N38C.P.1" ;
+    dct:language                   iso639-2:eng ;
+    dct:provenance                 [ a                dct:ProvenanceStatement ;
+                                     dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24 ;
+                                     dct:type         cat:immediate-source-of-acquisition
+                                   ] ;
+    dct:subject                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:type                       cat:item , cat:record-description ;
+    edm:isNextInSequence           cat:COAL.2022.N3J2.P.1 ;
+    premis:note                    "[Grid reference: N/A]" ;
+    premis:rightsStatus            [ a                premis:RightsStatus ;
+                                     premis:basis     cat:public-record
+                                   ] ;
+    prov:generatedAtTime           "2022-12-05T20:37:33.102Z"^^xsd:dateTime ;
+    prov:specializationOf          cat:COAL.2022.N38C.P ;
+    prov:wasAttributedTo           cat:agent.S7 ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                     schema:value       "tbl_item.-6843737"
+                                   ] ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.iaid> ;
+                                     schema:value       "C12085316"
+                                   ] .
+
+cat:COAL.2022.N2WC.P.1
+    a                              premis:IntellectualEntity ;
+    cat:classicCatalogueReference  "COAL 80/2055/3" ;
+    cat:created                    [ a                  time:ProperInterval ;
+                                     dct:description    "1964 Aug" ;
+                                     time:hasBeginning  [ a               time:Instant ;
+                                                          time:inXSDDate  "1964-07-31Z"^^xsd:date
+                                                        ] ;
+                                     time:hasEnd        [ a               time:Instant ;
+                                                          time:inXSDDate  "1964-08-30Z"^^xsd:date
+                                                        ]
+                                   ] ;
+    rst:isp                        cat:recordset.COAL.2022.2831 ;
+    dct:abstract                   "<scopecontent><p>Coal News. Model II storage unit for photograph negatives (strips of 4). Photograph negatives Nos. T2235-T2278. </p></scopecontent>"^^rdf:XMLLiteral ;
+    dct:accessRights               [ a               dct:RightsStatement ;
+                                     odrl:hasPolicy  cat:policy.Open_Description , cat:policy.Normal_Closure_before_FOI_Act_30_years_from_1964-08-31
+                                   ] ;
+    dct:accessRights               [ a                  cat:AccessConditions ;
+                                     cat:closureCode    30 ;
+                                     cat:closureStatus  "O" ;
+                                     cat:closureType    "N"
+                                   ] ;
+    dct:creator                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:identifier                 "COAL.2022.N2WC.P.1" ;
+    dct:language                   iso639-2:eng ;
+    dct:provenance                 [ a                dct:ProvenanceStatement ;
+                                     dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24 ;
+                                     dct:type         cat:immediate-source-of-acquisition
+                                   ] ;
+    dct:subject                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:type                       cat:item , cat:record-description ;
+    edm:isNextInSequence           cat:COAL.2022.N23C.P.1 ;
+    premis:note                    "[Grid reference: N/A]" ;
+    premis:rightsStatus            [ a                premis:RightsStatus ;
+                                     premis:basis     cat:public-record
+                                   ] ;
+    prov:generatedAtTime           "2022-12-05T20:37:31.673Z"^^xsd:dateTime ;
+    prov:specializationOf          cat:COAL.2022.N2WC.P ;
+    prov:wasAttributedTo           cat:agent.S7 ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.iaid> ;
+                                     schema:value       "C12085474"
+                                   ] ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                     schema:value       "tbl_item.-6843895"
+                                   ] .
+
+cat:COAL.2022.N3HF.P.1
+    a                              premis:IntellectualEntity ;
+    cat:classicCatalogueReference  "COAL 80/2053/22" ;
+    cat:created                    [ a                  time:ProperInterval ;
+                                     dct:description    "1964 Apr" ;
+                                     time:hasBeginning  [ a               time:Instant ;
+                                                          time:inXSDDate  "1964-03-31Z"^^xsd:date
+                                                        ] ;
+                                     time:hasEnd        [ a               time:Instant ;
+                                                          time:inXSDDate  "1964-04-29Z"^^xsd:date
+                                                        ]
+                                   ] ;
+    rst:isp                        cat:recordset.COAL.2022.2833 ;
+    dct:abstract                   "<scopecontent><p>Coal News. Model II storage unit for photograph negatives (strips of 4). Photograph negatives Nos. T880-T919. </p></scopecontent>"^^rdf:XMLLiteral ;
+    dct:accessRights               [ a               dct:RightsStatement ;
+                                     odrl:hasPolicy  cat:policy.Open_Description , cat:policy.Normal_Closure_before_FOI_Act_30_years_from_1964-04-30
+                                   ] ;
+    dct:accessRights               [ a                  cat:AccessConditions ;
+                                     cat:closureCode    30 ;
+                                     cat:closureStatus  "O" ;
+                                     cat:closureType    "N"
+                                   ] ;
+    dct:creator                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:identifier                 "COAL.2022.N3HF.P.1" ;
+    dct:language                   iso639-2:eng ;
+    dct:provenance                 [ a                dct:ProvenanceStatement ;
+                                     dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24 ;
+                                     dct:type         cat:immediate-source-of-acquisition
+                                   ] ;
+    dct:subject                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:type                       cat:item , cat:record-description ;
+    edm:isNextInSequence           cat:COAL.2022.N2WW.P.1 ;
+    premis:note                    "[Grid reference: N/A]" ;
+    premis:rightsStatus            [ a                premis:RightsStatus ;
+                                     premis:basis     cat:public-record
+                                   ] ;
+    prov:generatedAtTime           "2022-12-05T20:37:31.13Z"^^xsd:dateTime ;
+    prov:specializationOf          cat:COAL.2022.N3HF.P ;
+    prov:wasAttributedTo           cat:agent.S7 ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.iaid> ;
+                                     schema:value       "C12085443"
+                                   ] ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                     schema:value       "tbl_item.-6843864"
+                                   ] .
+
+cat:COAL.2022.N39S.P.1
+    a                              premis:IntellectualEntity ;
+    cat:classicCatalogueReference  "COAL 80/2031/93" ;
+    cat:created                    [ a                time:Instant ;
+                                     dct:description  "1951 August 21" ;
+                                     time:inXSDDate   "1951-08-20Z"^^xsd:date
+                                   ] ;
+    cat:formerReferenceFromDepartment
+                                   "91" ;
+    rst:isp                        cat:recordset.COAL.2022.283L ;
+    dct:abstract                   "<scopecontent><p>Gorseinon, Glamorgan. Photograph depicting: tram circuit with sidings at Mountain Colliery (steam). </p></scopecontent>"^^rdf:XMLLiteral ;
+    dct:accessRights               [ a               dct:RightsStatement ;
+                                     odrl:hasPolicy  cat:policy.Open_Description , cat:policy.Normal_Closure_before_FOI_Act_30_years
+                                   ] ;
+    dct:accessRights               [ a                  cat:AccessConditions ;
+                                     cat:closureCode    30 ;
+                                     cat:closureStatus  "O" ;
+                                     cat:closureType    "N"
+                                   ] ;
+    dct:creator                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:identifier                 "COAL.2022.N39S.P.1" ;
+    dct:language                   iso639-2:eng ;
+    dct:provenance                 [ a                dct:ProvenanceStatement ;
+                                     dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24 ;
+                                     dct:type         cat:immediate-source-of-acquisition
+                                   ] ;
+    dct:subject                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:type                       cat:item , cat:record-description ;
+    edm:isNextInSequence           cat:COAL.2022.N3JR.P.1 ;
+    premis:note                    "[Grid references: OSGB36: SS 585 985; WGS84: 51.666971, -4.046312]. WGS84 interpolated from OSGB36." ;
+    premis:rightsStatus            [ a                premis:RightsStatus ;
+                                     premis:basis     cat:public-record
+                                   ] ;
+    prov:generatedAtTime           "2022-12-05T20:37:33.163Z"^^xsd:dateTime ;
+    prov:specializationOf          cat:COAL.2022.N39S.P ;
+    prov:wasAttributedTo           cat:agent.S7 ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                     schema:value       "tbl_item.-6843601"
+                                   ] ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.iaid> ;
+                                     schema:value       "C12085180"
+                                   ] .
+
+cat:COAL.2022.N2YF.P.1
+    a                              premis:IntellectualEntity ;
+    cat:classicCatalogueReference  "COAL 80/2061/106" ;
+    cat:created                    [ a                  time:ProperInterval ;
+                                     dct:description    "[1970]" ;
+                                     time:hasBeginning  [ a               time:Instant ;
+                                                          time:inXSDDate  "1969-12-31Z"^^xsd:date
+                                                        ] ;
+                                     time:hasEnd        [ a               time:Instant ;
+                                                          time:inXSDDate  "1970-12-30Z"^^xsd:date
+                                                        ]
+                                   ] ;
+    cat:formerReferenceFromDepartment
+                                   "106" ;
+    rst:isp                        cat:recordset.COAL.2022.282S ;
+    dct:abstract                   "<scopecontent><p>Measham, Leicestershire: Measham colliery. Photograph wanting. </p></scopecontent>"^^rdf:XMLLiteral ;
+    dct:accessRights               [ a                  cat:AccessConditions ;
+                                     cat:closureCode    30 ;
+                                     cat:closureStatus  "O" ;
+                                     cat:closureType    "N"
+                                   ] ;
+    dct:accessRights               [ a               dct:RightsStatement ;
+                                     odrl:hasPolicy  cat:policy.Open_Description , cat:policy.Normal_Closure_before_FOI_Act_30_years_from_1970-12-31
+                                   ] ;
+    dct:creator                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:identifier                 "COAL.2022.N2YF.P.1" ;
+    dct:language                   iso639-2:eng ;
+    dct:provenance                 [ a                dct:ProvenanceStatement ;
+                                     dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24 ;
+                                     dct:type         cat:immediate-source-of-acquisition
+                                   ] ;
+    dct:subject                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:type                       cat:record-description , cat:item ;
+    edm:isNextInSequence           cat:COAL.2022.N3CY.P.1 ;
+    premis:note                    "[Grid references: OSGB36: SK 345 117; WGS84: 52.701530, -1.489384]. WGS84 interpolated from OSGB36." ;
+    premis:rightsStatus            [ a                premis:RightsStatus ;
+                                     premis:basis     cat:public-record
+                                   ] ;
+    prov:generatedAtTime           "2022-12-05T20:37:32.964Z"^^xsd:dateTime ;
+    prov:specializationOf          cat:COAL.2022.N2YF.P ;
+    prov:wasAttributedTo           cat:agent.S7 ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                     schema:value       "tbl_item.-6844353"
+                                   ] ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.iaid> ;
+                                     schema:value       "C12085932"
+                                   ] .
+
+cat:COAL.2022.N315.P.1
+    a                              premis:IntellectualEntity ;
+    cat:classicCatalogueReference  "COAL 80/2061/74" ;
+    cat:created                    [ a                time:Instant ;
+                                     dct:description  "1957 May 6" ;
+                                     time:inXSDDate   "1957-05-05Z"^^xsd:date
+                                   ] ;
+    cat:formerReferenceFromDepartment
+                                   "74" ;
+    rst:isp                        cat:recordset.COAL.2022.282S ;
+    dct:abstract                   "<scopecontent><p>Measham colliery, Measham, Ashby de la Zouch, Leicestershire. Photograph depicting: forklift truck carrying supplies tub filled with stone dust at Measham colliery. </p></scopecontent>"^^rdf:XMLLiteral ;
+    dct:accessRights               [ a               dct:RightsStatement ;
+                                     odrl:hasPolicy  cat:policy.Open_Description , cat:policy.Normal_Closure_before_FOI_Act_30_years
+                                   ] ;
+    dct:accessRights               [ a                  cat:AccessConditions ;
+                                     cat:closureCode    30 ;
+                                     cat:closureStatus  "O" ;
+                                     cat:closureType    "N"
+                                   ] ;
+    dct:creator                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:identifier                 "COAL.2022.N315.P.1" ;
+    dct:language                   iso639-2:eng ;
+    dct:provenance                 [ a                dct:ProvenanceStatement ;
+                                     dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24 ;
+                                     dct:type         cat:immediate-source-of-acquisition
+                                   ] ;
+    dct:subject                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:type                       cat:record-description , cat:item ;
+    edm:isNextInSequence           cat:COAL.2022.N3F4.P.1 ;
+    premis:note                    "[Grid references: OSGB36: SK 345 117; WGS84: 52.701530, -1.489384]. WGS84 interpolated from OSGB36." ;
+    premis:rightsStatus            [ a                premis:RightsStatus ;
+                                     premis:basis     cat:public-record
+                                   ] ;
+    prov:generatedAtTime           "2022-12-05T20:37:32.968Z"^^xsd:dateTime ;
+    prov:specializationOf          cat:COAL.2022.N315.P ;
+    prov:wasAttributedTo           cat:agent.S7 ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.iaid> ;
+                                     schema:value       "C12085900"
+                                   ] ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                     schema:value       "tbl_item.-6844321"
+                                   ] .
+
+
+
+
+
+

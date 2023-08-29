@@ -1,0 +1,153 @@
+@prefix premis: <http://www.loc.gov/premis/rdf/v3/> .
+@prefix ver:   <http://purl.org/linked-data/version#> .
+@prefix rdau:  <http://rdaregistry.info/Elements/u/> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix cat:   <http://cat.nationalarchives.gov.uk/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+
+cat:COAL.2022.N373.P  a       premis:IntellectualEntity ;
+                      dct:creator           [ dct:description  "from 1965" ;
+                                              dct:subject      cat:agent.24
+                              ] ;
+                      dct:dateAccepted      "2022-12-05T20:37:28.667Z"^^xsd:dateTime ;
+                      dct:format            <http://www.nationalarchives.gov.uk/ont.physical-record> ;
+                      dct:identifier        "COAL.2022.N373.P" ;
+                      dct:type              cat:record-concept ;
+                      ver:currentVersion    cat:COAL.2022.N373.P.1 ;
+                      prov:generatedAtTime  "2022-12-05T20:37:33.071Z"^^xsd:dateTime ;
+                      prov:wasAttributedTo  cat:agent.S7 .
+
+cat:COAL.2022.N36R.P  a       premis:IntellectualEntity ;
+                      dct:creator           [ dct:description  "from 1965" ;
+                                              dct:subject      cat:agent.24
+                              ] ;
+                      dct:dateAccepted      "2022-12-05T20:37:28.667Z"^^xsd:dateTime ;
+                      dct:format            <http://www.nationalarchives.gov.uk/ont.physical-record> ;
+                      dct:identifier        "COAL.2022.N36R.P" ;
+                      dct:type              cat:record-concept ;
+                      ver:currentVersion    cat:COAL.2022.N36R.P.1 ;
+                      prov:generatedAtTime  "2022-12-05T20:37:31.28Z"^^xsd:dateTime ;
+                      prov:wasAttributedTo  cat:agent.S7 .
+
+cat:COAL.2022.N25L.P  a       premis:IntellectualEntity ;
+                      dct:creator           [ dct:description  "from 1965" ;
+                                              dct:subject      cat:agent.24
+                              ] ;
+                      dct:dateAccepted      "2022-12-05T20:37:28.667Z"^^xsd:dateTime ;
+                      dct:format            <http://www.nationalarchives.gov.uk/ont.physical-record> ;
+                      dct:identifier        "COAL.2022.N25L.P" ;
+                      dct:type              cat:record-concept ;
+                      ver:currentVersion    cat:COAL.2022.N25L.P.1 ;
+                      prov:generatedAtTime  "2022-12-05T20:37:32.064Z"^^xsd:dateTime ;
+                      prov:wasAttributedTo  cat:agent.S7 .
+
+cat:COAL.2022.N2LS.P  a       premis:IntellectualEntity ;
+                      dct:creator           [ dct:description  "from 1965" ;
+                                              dct:subject      cat:agent.24
+                              ] ;
+                      dct:dateAccepted      "2022-12-05T20:37:28.667Z"^^xsd:dateTime ;
+                      dct:format            <http://www.nationalarchives.gov.uk/ont.physical-record> ;
+                      dct:identifier        "COAL.2022.N2LS.P" ;
+                      dct:type              cat:record-concept ;
+                      ver:currentVersion    cat:COAL.2022.N2LS.P.1 ;
+                      prov:generatedAtTime  "2022-12-05T20:37:32.502Z"^^xsd:dateTime ;
+                      prov:wasAttributedTo  cat:agent.S7 .
+
+cat:COAL.2022.N2V3.P  a       premis:IntellectualEntity ;
+                      dct:creator           [ dct:description  "from 1965" ;
+                                              dct:subject      cat:agent.24
+                              ] ;
+                      dct:dateAccepted      "2022-12-05T20:37:28.667Z"^^xsd:dateTime ;
+                      dct:format            <http://www.nationalarchives.gov.uk/ont.physical-record> ;
+                      dct:identifier        "COAL.2022.N2V3.P" ;
+                      dct:type              cat:record-concept ;
+                      ver:currentVersion    cat:COAL.2022.N2V3.P.1 ;
+                      prov:generatedAtTime  "2022-12-05T20:37:31.576Z"^^xsd:dateTime ;
+                      prov:wasAttributedTo  cat:agent.S7 .
+
+cat:COAL.2022.N3G6.P  a       premis:IntellectualEntity ;
+                      dct:creator           [ dct:description  "from 1965" ;
+                                              dct:subject      cat:agent.24
+                              ] ;
+                      dct:dateAccepted      "2022-12-05T20:37:28.667Z"^^xsd:dateTime ;
+                      dct:format            <http://www.nationalarchives.gov.uk/ont.physical-record> ;
+                      dct:identifier        "COAL.2022.N3G6.P" ;
+                      dct:type              cat:record-concept ;
+                      ver:currentVersion    cat:COAL.2022.N3G6.P.1 ;
+                      prov:generatedAtTime  "2022-12-05T20:37:31.097Z"^^xsd:dateTime ;
+                      prov:wasAttributedTo  cat:agent.S7 .
+
+cat:COAL.2022.N38C.P  a       premis:IntellectualEntity ;
+                      dct:creator           [ dct:description  "from 1965" ;
+                                              dct:subject      cat:agent.24
+                              ] ;
+                      dct:dateAccepted      "2022-12-05T20:37:28.667Z"^^xsd:dateTime ;
+                      dct:format            <http://www.nationalarchives.gov.uk/ont.physical-record> ;
+                      dct:identifier        "COAL.2022.N38C.P" ;
+                      dct:type              cat:record-concept ;
+                      ver:currentVersion    cat:COAL.2022.N38C.P.1 ;
+                      prov:generatedAtTime  "2022-12-05T20:37:33.102Z"^^xsd:dateTime ;
+                      prov:wasAttributedTo  cat:agent.S7 .
+
+cat:COAL.2022.N2WC.P  a       premis:IntellectualEntity ;
+                      dct:creator           [ dct:description  "from 1965" ;
+                                              dct:subject      cat:agent.24
+                              ] ;
+                      dct:dateAccepted      "2022-12-05T20:37:28.667Z"^^xsd:dateTime ;
+                      dct:format            <http://www.nationalarchives.gov.uk/ont.physical-record> ;
+                      dct:identifier        "COAL.2022.N2WC.P" ;
+                      dct:type              cat:record-concept ;
+                      ver:currentVersion    cat:COAL.2022.N2WC.P.1 ;
+                      prov:generatedAtTime  "2022-12-05T20:37:31.673Z"^^xsd:dateTime ;
+                      prov:wasAttributedTo  cat:agent.S7 .
+
+cat:COAL.2022.N3HF.P  a       premis:IntellectualEntity ;
+                      dct:creator           [ dct:description  "from 1965" ;
+                                              dct:subject      cat:agent.24
+                              ] ;
+                      dct:dateAccepted      "2022-12-05T20:37:28.667Z"^^xsd:dateTime ;
+                      dct:format            <http://www.nationalarchives.gov.uk/ont.physical-record> ;
+                      dct:identifier        "COAL.2022.N3HF.P" ;
+                      dct:type              cat:record-concept ;
+                      ver:currentVersion    cat:COAL.2022.N3HF.P.1 ;
+                      prov:generatedAtTime  "2022-12-05T20:37:31.13Z"^^xsd:dateTime ;
+                      prov:wasAttributedTo  cat:agent.S7 .
+
+cat:COAL.2022.N39S.P  a       premis:IntellectualEntity ;
+                      dct:creator           [ dct:description  "from 1965" ;
+                                              dct:subject      cat:agent.24
+                              ] ;
+                      dct:dateAccepted      "2022-12-05T20:37:28.667Z"^^xsd:dateTime ;
+                      dct:format            <http://www.nationalarchives.gov.uk/ont.physical-record> ;
+                      dct:identifier        "COAL.2022.N39S.P" ;
+                      dct:type              cat:record-concept ;
+                      ver:currentVersion    cat:COAL.2022.N39S.P.1 ;
+                      prov:generatedAtTime  "2022-12-05T20:37:33.163Z"^^xsd:dateTime ;
+                      prov:wasAttributedTo  cat:agent.S7 .
+
+cat:COAL.2022.N2Y4.P  a       premis:IntellectualEntity ;
+                      dct:creator           [ dct:description  "from 1965" ;
+                                              dct:subject      cat:agent.24
+                              ] ;
+                      dct:dateAccepted      "2022-12-05T20:37:28.667Z"^^xsd:dateTime ;
+                      dct:format            <http://www.nationalarchives.gov.uk/ont.physical-record> ;
+                      dct:identifier        "COAL.2022.N2Y4.P" ;
+                      dct:type              cat:record-concept ;
+                      ver:currentVersion    cat:COAL.2022.N2Y4.P.1 ;
+                      prov:generatedAtTime  "2022-12-05T20:37:31.709Z"^^xsd:dateTime ;
+                      prov:wasAttributedTo  cat:agent.S7 .
+
+cat:COAL.2022.N315.P  a       premis:IntellectualEntity ;
+                      dct:creator           [ dct:description  "from 1965" ;
+                                              dct:subject      cat:agent.24
+                              ] ;
+                      dct:dateAccepted      "2022-12-05T20:37:28.667Z"^^xsd:dateTime ;
+                      dct:format            <http://www.nationalarchives.gov.uk/ont.physical-record> ;
+                      dct:identifier        "COAL.2022.N315.P" ;
+                      dct:type              cat:record-concept ;
+                      ver:currentVersion    cat:COAL.2022.N315.P.1 ;
+                      prov:generatedAtTime  "2022-12-05T20:37:32.968Z"^^xsd:dateTime ;
+                      prov:wasAttributedTo  cat:agent.S7 .
