@@ -120,6 +120,9 @@ cat:COAL.2022.N39S.P  a       premis:IntellectualEntity ;
                       dct:creator           [ dct:description  "from 1965" ;
                                               dct:subject      cat:agent.24
                               ] ;
+                      dct:creator [ dct:description "from 1967" ;
+                                    dct:subject cat:agent.2R1
+                                  ] ;
                       dct:dateAccepted      "2022-12-05T20:37:28.667Z"^^xsd:dateTime ;
                       dct:format            <http://www.nationalarchives.gov.uk/ont.physical-record> ;
                       dct:identifier        "COAL.2022.N39S.P" ;

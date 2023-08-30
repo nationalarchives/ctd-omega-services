@@ -1,0 +1,6 @@
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX cat: <http://cat.nationalarchives.gov.uk/>
+
+SELECT ?secondaryIdentifier
+WHERE { ?descriptionId dct:type cat:record-description ;
+                       cat:classicCatalogueReference ?secondaryIdentifier . }

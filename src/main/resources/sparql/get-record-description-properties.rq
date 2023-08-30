@@ -1,0 +1,20 @@
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX cat: <http://cat.nationalarchives.gov.uk/>
+PREFIX odrl: <http://www.w3.org/ns/odrl/2/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX premis: <http://www.loc.gov/premis/rdf/v3/>
+PREFIX rdau: <http://rdaregistry.info/Elements/u/>
+
+SELECT ?assetLegalStatus ?designationOfEdition ?createdType ?archivistsNote ?sourceOfAcquisition ?custodialHistory
+WHERE { ?descriptionId dct:type cat:record-description ;
+                       premis:rightsStatus ?rightsStatus ;
+                       cat:created/rdf:type ?createdType .
+        ?rightsStatus rdf:type premis:RightsStatus ;
+                      premis:basis ?assetLegalStatus .
+        OPTIONAL { ?descriptionId rdau:P60365 ?designationOfEdition . }
+        OPTIONAL { ?descriptionId premis:note ?archivistsNote . }
+        OPTIONAL { ?descriptionId dct:provenance/dct:type cat:immediate-source-of-acquisition ;
+                                  dct:provenance/dct:subject ?sourceOfAcquisition . }
+        OPTIONAL { ?descriptionId dct:provenance/dct:type cat:custodial-history ;
+                                  dct:provenance/dct:description ?custodialHistory . }
+      }

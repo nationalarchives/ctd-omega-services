@@ -14,7 +14,7 @@
 @prefix prov:  <http://www.w3.org/ns/prov#> .
 @prefix iso639-2: <http://id.loc.gov/vocabulary/iso639-2/> .
 
-cat:COAL.2022.N373.P.1
+cat:COAL.2022.N373.P.2
     a                              premis:IntellectualEntity ;
     cat:classicCatalogueReference  "COAL 80/2052/9" ;
     cat:created                    [ a                  time:ProperInterval ;
@@ -30,6 +30,62 @@ cat:COAL.2022.N373.P.1
                                    "S3024-S3034" ;
     rst:isp                        cat:recordset.COAL.2022.2834 ;
     dct:abstract                   "<scopecontent><p>Coal News albums 1963. Collection of contact prints of photographs taken by Deryk Wills. Photographs depicting: Banwen, Glamorgan. Banwen Miners Hunt. </p></scopecontent>"^^rdf:XMLLiteral ;
+    dct:accessRights               [ a                  cat:AccessConditions ;
+                                     cat:closureCode    30 ;
+                                     cat:closureStatus  "O" ;
+                                     cat:closureType    "N"
+                                   ] ;
+    dct:accessRights               [ a               dct:RightsStatement ;
+                                     odrl:hasPolicy  cat:policy.Open_Description , cat:policy.Normal_Closure_before_FOI_Act_30_years_from_1963-12-31
+                                   ] ;
+    dct:creator                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:identifier                 "COAL.2022.N373.P.1" ;
+    dct:language                   iso639-2:eng ;
+    dct:provenance                 [ a                dct:ProvenanceStatement ;
+                                     dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24 ;
+                                     dct:type         cat:immediate-source-of-acquisition
+                                   ] ;
+    dct:subject                    [ dct:description  "from 1965" ;
+                                     dct:subject      cat:agent.24
+                                   ] ;
+    dct:type                       cat:item , cat:record-description ;
+    edm:isNextInSequence           cat:COAL.2022.N3HQ.P.1 ;
+    premis:note                    "[Grid reference: N/A]" ;
+    premis:rightsStatus            [ a                premis:RightsStatus ;
+                                     premis:basis     cat:public-record
+                                   ] ;
+    prov:generatedAtTime           "2023-08-30T12:10:00.000Z"^^xsd:dateTime ;
+    prov:specializationOf          cat:COAL.2022.N373.P ;
+    prov:wasAttributedTo           cat:agent.S7 ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.ildb-pk> ;
+                                     schema:value       "tbl_item.-6843809"
+                                   ] ;
+    schema:identifier              [ a                  schema:identifier ;
+                                     schema:propertyID  <http://www.nationalarchives.gov.uk/ont.iaid> ;
+                                     schema:value       "C12085388"
+                                   ] ;
+    prov:wasRevisionOf             cat:COAL.2022.N373.P.1 .
+
+cat:COAL.2022.N373.P.1
+    a                              premis:IntellectualEntity ;
+    cat:classicCatalogueReference  "COAL 80/2052/9" ;
+    cat:created                    [ a                  time:ProperInterval ;
+                                     dct:description    "1963" ;
+                                     time:hasBeginning  [ a               time:Instant ;
+                                                          time:inXSDDate  "1963-01-01Z"^^xsd:date
+                                                        ] ;
+                                     time:hasEnd        [ a               time:Instant ;
+                                                          time:inXSDDate  "1963-12-31Z"^^xsd:date
+                                                        ]
+                                   ] ;
+    cat:formerReferenceFromDepartment
+                                   "S3024-S3034" ;
+    rst:isp                        cat:recordset.COAL.2022.2834 ;
+    dct:abstract                   "<scopecontent><p>Coal News albums 1963. Collection of contact prints of photographs taken by Derick Wills. Photographs depicting: Banwen, Glamorgan. Banwen Miners Hunt. </p></scopecontent>"^^rdf:XMLLiteral ;
     dct:accessRights               [ a                  cat:AccessConditions ;
                                      cat:closureCode    30 ;
                                      cat:closureStatus  "O" ;
