@@ -1,0 +1,326 @@
+@prefix bf: <http://id.loc.gov/ontologies/bibframe/> .
+@prefix cc: <http://creativecommons.org/ns#> .
+@prefix cs: <http://purl.org/vocab/changeset/schema#> .
+@prefix ri: <http://id.loc.gov/ontologies/RecordInfo#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix bflc: <http://id.loc.gov/ontologies/bflc/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xhtml: <http://www.w3.org/1999/xhtml> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix madsrdf: <http://www.loc.gov/mads/rdf/v1#> .
+@base <http://www.w3.org/2002/07/owl#> .
+
+[ rdf:type owl:Ontology
+ ] .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://id.loc.gov/ontologies/RecordInfo#recordChangeDate
+ri:recordChangeDate rdf:type owl:AnnotationProperty .
+
+
+###  http://id.loc.gov/ontologies/RecordInfo#recordContentSource
+ri:recordContentSource rdf:type owl:AnnotationProperty .
+
+
+###  http://id.loc.gov/ontologies/RecordInfo#recordStatus
+ri:recordStatus rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/vocab/changeset/schema#changeReason
+cs:changeReason rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/vocab/changeset/schema#createdDate
+cs:createdDate rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/vocab/changeset/schema#creatorName
+cs:creatorName rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/vocab/changeset/schema#subjectOfChange
+cs:subjectOfChange rdf:type owl:AnnotationProperty .
+
+
+###  http://www.loc.gov/mads/rdf/v1#adminMetadata
+madsrdf:adminMetadata rdf:type owl:AnnotationProperty .
+
+
+###  http://www.loc.gov/mads/rdf/v1#authoritativeLabel
+madsrdf:authoritativeLabel rdf:type owl:AnnotationProperty .
+
+
+###  http://www.loc.gov/mads/rdf/v1#hasBroaderAuthority
+madsrdf:hasBroaderAuthority rdf:type owl:AnnotationProperty .
+
+
+###  http://www.loc.gov/mads/rdf/v1#hasMADSSchemeMember
+madsrdf:hasMADSSchemeMember rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2004/02/skos/core#broader
+skos:broader rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2004/02/skos/core#changeNote
+skos:changeNote rdf:type owl:AnnotationProperty .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://id.loc.gov/ontologies/RecordInfo#RecordInfo
+ri:RecordInfo rdf:type owl:Class .
+
+
+###  http://purl.org/vocab/changeset/schema#ChangeSet
+cs:ChangeSet rdf:type owl:Class .
+
+
+###  http://www.loc.gov/mads/rdf/v1#Authority
+madsrdf:Authority rdf:type owl:Class .
+
+
+###  http://www.loc.gov/mads/rdf/v1#MADSScheme
+madsrdf:MADSScheme rdf:type owl:Class .
+
+
+###  http://www.w3.org/2004/02/skos/core#ConceptScheme
+skos:ConceptScheme rdf:type owl:Class .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType> rdf:type owl:NamedIndividual ,
+                                                                         madsrdf:MADSScheme ,
+                                                                         skos:ConceptScheme ;
+                                                                madsrdf:adminMetadata [ rdf:type ri:RecordInfo ;
+                                                                                        ri:recordChangeDate "2012-08-01T00:00:01"^^xsd:dateTime ;
+                                                                                        ri:recordContentSource <file:/home/rkw/Downloads/dlc> ;
+                                                                                        ri:recordStatus "new"^^xsd:string
+                                                                                      ] ,
+                                                                                      [ rdf:type ri:RecordInfo ;
+                                                                                        ri:recordChangeDate "2018-09-24T00:00:01"^^xsd:dateTime ;
+                                                                                        ri:recordContentSource <file:/home/rkw/Downloads/dlc> ;
+                                                                                        ri:recordStatus "modified"^^xsd:string
+                                                                                      ] ;
+                                                                madsrdf:hasBroaderAuthority <http://id.loc.gov/vocabulary/preservation/relationshipType> ;
+                                                                madsrdf:hasMADSSchemeMember <http://id.loc.gov/vocabulary/preservation/relationshipSubType/cmf> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/cmt> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/doc> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/dpe> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/emu> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/enf> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/ent> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/gen> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/hsi> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/hsp> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/hsr> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/hss> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/icw> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/idc> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/idp> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/iem> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/inc> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/irq> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/isi> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/iso> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/isp> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/isr> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/iss> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/rep> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/req> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/spe> ,
+                                                                                            <http://id.loc.gov/vocabulary/preservation/relationshipSubType/sup> ;
+                                                                rdfs:comment "A specific characterization of the nature of the relationship between this object and one or more other objects."^^rdf:XMLLiteral ;
+                                                                rdfs:label "Relationship Subtype"@en ;
+                                                                skos:broader <http://id.loc.gov/vocabulary/preservation/relationshipType> ;
+                                                                skos:changeNote [ rdf:type cs:ChangeSet ;
+                                                                                  cs:changeReason "new"^^xsd:string ;
+                                                                                  cs:createdDate "2012-08-01T00:00:01"^^xsd:dateTime ;
+                                                                                  cs:creatorName <file:/home/rkw/Downloads/dlc> ;
+                                                                                  cs:subjectOfChange <http://id.loc.gov/vocabulary/preservation/relationshipSubType>
+                                                                                ] ,
+                                                                                [ rdf:type cs:ChangeSet ;
+                                                                                  cs:changeReason "modified"^^xsd:string ;
+                                                                                  cs:createdDate "2018-09-24T00:00:01"^^xsd:dateTime ;
+                                                                                  cs:creatorName <file:/home/rkw/Downloads/dlc> ;
+                                                                                  cs:subjectOfChange <http://id.loc.gov/vocabulary/preservation/relationshipSubType>
+                                                                                ] .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/cmf
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/cmf> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "compressed from" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/cmt
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/cmt> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "compressed to" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/doc
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/doc> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "documents" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/dpe
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/dpe> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "deploys" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/emu
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/emu> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "emulates" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/enf
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/enf> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "encrypted from" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/ent
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/ent> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "encrypted to" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/gen
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/gen> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "generalizes" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/hsi
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/hsi> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "has Sibling" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/hsp
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/hsp> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "has Part" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/hsr
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/hsr> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "has Root" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/hss
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/hss> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "has Source" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/icw
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/icw> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "is Compatible With" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/idc
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/idc> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "is Documented In" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/idp
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/idp> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "is Deployed On" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/iem
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/iem> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "is Emulated By" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/inc
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/inc> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "includes" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/irq
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/irq> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "is Required By" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/isi
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/isi> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "is Included In" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/iso
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/iso> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "is Source Of" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/isp
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/isp> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "is Part Of" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/isr
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/isr> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "is Represented By" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/iss
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/iss> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "is Superseded By" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/rep
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/rep> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "represents" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/req
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/req> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "requires" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/spe
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/spe> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "specializes" .
+
+
+###  http://id.loc.gov/vocabulary/preservation/relationshipSubType/sup
+<http://id.loc.gov/vocabulary/preservation/relationshipSubType/sup> rdf:type owl:NamedIndividual ,
+                                                                             madsrdf:Authority ;
+                                                                    madsrdf:authoritativeLabel "supersedes" .
+
+
+###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi

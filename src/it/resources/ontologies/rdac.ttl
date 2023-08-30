@@ -1,0 +1,1125 @@
+@prefix : <http://rdaregistry.info/Elements/c/> .
+@prefix cc: <http://creativecommons.org/ns#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix reg: <http://metadataregistry.org/uri/profile/regap/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix rdakit: <http://metadataregistry.org/uri/profile/rdakit/> .
+@base <http://rdaregistry.info/Elements/c/> .
+
+<http://rdaregistry.info/Elements/c/> rdf:type owl:Ontology ;
+                                       cc:licence <https://creativecommons.org/licenses/by/4.0/deed.en_US> ;
+                                       dc:contributor "RSC Technical Working Group" ;
+                                       dc:creator "RDA Steering Committee" ;
+                                       dc:description "Classes that represent the RDA entities, including RDA Entity, Work, Expression, Manifestation, Item, Agent, Collective Agent, Person, Family, Corporate Body, Nomen, Place, and Timespan."@en ;
+                                       dc:issued "2014-01-18"^^xsd:date ;
+                                       dc:modified "2022-11-17"^^xsd:date ;
+                                       dc:publisher "ALA Digital Reference" ;
+                                       dc:rights "Copyright © 2020 American Library Association, Canadian Federation of Library Associations, and CILIP: Chartered Institute of Library and Information Professionals"@en ;
+                                       dc:title "RDA Classes"@en ,
+                                                "RDA-luokat"@fi ;
+                                       dc:type <http://rdaregistry.info/termList/RDALinkedDataWork/1003> ;
+                                       vann:preferredNamespacePrefix "rdac" ;
+                                       owl:versionInfo "v5.0.9" ;
+                                       skos:note "LRM-entiteetteihin perustuvista RDA-entiteeteistä johdetut luokat."@fi .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://creativecommons.org/ns#licence
+cc:licence rdf:type owl:AnnotationProperty .
+
+
+###  http://metadataregistry.org/uri/profile/rdakit/instructionNumber
+rdakit:instructionNumber rdf:type owl:AnnotationProperty .
+
+
+###  http://metadataregistry.org/uri/profile/rdakit/toolkitDefinition
+rdakit:toolkitDefinition rdf:type owl:AnnotationProperty .
+
+
+###  http://metadataregistry.org/uri/profile/rdakit/toolkitLabel
+rdakit:toolkitLabel rdf:type owl:AnnotationProperty .
+
+
+###  http://metadataregistry.org/uri/profile/regap/lexicalAlias
+reg:lexicalAlias rdf:type owl:AnnotationProperty .
+
+
+###  http://metadataregistry.org/uri/profile/regap/status
+reg:status rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/contributor
+dc:contributor rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/creator
+dc:creator rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/description
+dc:description rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/issued
+dc:issued rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/modified
+dc:modified rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/publisher
+dc:publisher rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/rights
+dc:rights rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/title
+dc:title rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/type
+dc:type rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/vocab/vann/preferredNamespacePrefix
+vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2004/02/skos/core#altLabel
+skos:altLabel rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2004/02/skos/core#definition
+skos:definition rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2004/02/skos/core#note
+skos:note rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2004/02/skos/core#prefLabel
+skos:prefLabel rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2004/02/skos/core#scopeNote
+skos:scopeNote rdf:type owl:AnnotationProperty .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://rdaregistry.info/Elements/c/C10001
+:C10001 rdf:type owl:Class ;
+        rdfs:subClassOf :C10013 ;
+        rdakit:instructionNumber "5.1.2" ;
+        rdakit:toolkitDefinition "A distinct intellectual or artistic creation, that is, the intellectual or artistic content."@en ,
+                                 "Atšķirīgs intelektuālas vai mākslinieciskas jaunrades veikums (FRBR)"@lv ,
+                                 "Creació intel·lectual o artística distinta, és a dir, el contingut intel·lectual o artístic."@ca ,
+                                 "Creazione intellettuale o artistica distinta, cioè il contenuto artistico o intellettuale."@it ,
+                                 "Création intellectuelle ou artistique déterminée, c’est-à-dire le contenu intellectuel ou artistique."@fr ,
+                                 "Een onderscheidbare intellectuele of artistieke creatie, dit wil zeggen, de intellectuele of artistieke content."@nl ,
+                                 "Eine individuelle intellektuelle oder künstlerische Schöpfung, das heißt der intellektuelle oder künstlerische Inhalt."@de ,
+                                 "Et distinkt intellektuell eller kunstnerisk arbeid (dvs. det intellektuelle eller kunstneriske innholdet)."@no ,
+                                 "Itsenäinen tiedollinen tai taiteellinen luomus eli tiedollinen tai taiteellinen sisältö."@fi ,
+                                 "Một sáng tạo nghệ thuật hoặc trí tuệ riêng biệt, nghĩa là, nội dung nghệ thuật hoặc trí tuệ."@vi ,
+                                 "Piiritletud intellektuaalne või kunstilooming, s.o intellektuaalne või kunstiline sisu."@et ,
+                                 "Selvstændig intellektuel eller kunstnerisk frembringelse, fx det intellektuelle eller kunstneriske indhold."@da ,
+                                 "Una creación intelectual o artística distintiva, i.e., el contenido intelectual o artístico."@es ,
+                                 "Önálló szellemi vagy művészi alkotás, azaz a szellemi vagy művészi tartalom."@hu ,
+                                 "Μια διακριτή διανοητική/πνευματική ή καλλιτεχνική δημιουργία, δηλαδή το πνευματικό ή καλλιτεχνικό περιεχόμενο."@el ,
+                                 "ابداع فكري أو فني متميز، وما يمثل المحتوى الفكري أو الفني ."@ar ;
+        rdakit:toolkitLabel "Mű"@hu ,
+                            "Obra"@ca ,
+                            "Obra"@es ,
+                            "Teos"@et ,
+                            "Teos"@fi ,
+                            "Verk"@no ,
+                            "Verk"@sv ,
+                            "Værk"@da ,
+                            "Werk"@de ,
+                            "Werk"@nl ,
+                            "Work"@en ,
+                            "darbs"@lv ,
+                            "opera"@it ,
+                            "tác phẩm"@vi ,
+                            "Œuvre"@fr ,
+                            "έργο"@el ,
+                            "عمل"@ar ;
+        reg:lexicalAlias :Work.en ;
+        reg:status <http://metadataregistry.org/uri/RegStatus/1001> ;
+        rdfs:isDefinedBy <http://rdaregistry.info/Elements/c/> ;
+        rdfs:label "Obra"@es ,
+                   "Verk"@sv ,
+                   "Werk"@de ,
+                   "darbs"@lv ,
+                   "mű"@hu ,
+                   "obra"@ca ,
+                   "opera"@it ,
+                   "teos"@et ,
+                   "teos"@fi ,
+                   "tác phẩm"@vi ,
+                   "verk"@no ,
+                   "værk"@da ,
+                   "werk"@nl ,
+                   "work"@en ,
+                   "œuvre"@fr ,
+                   "έργο"@el ,
+                   "عمل"@ar ;
+        skos:definition "A distinct intellectual or artistic creation, that is, the intellectual or artistic content."@en ,
+                        "Atšķirīgs intelektuālas vai mākslinieciskas jaunrades veikums (FRBR)."@lv ,
+                        "Creació intel·lectual o artística distinta, és a dir, el contingut intel·lectual o artístic."@ca ,
+                        "Creazione intellettuale o artistica distinta, cioè il contenuto artistico o intellettuale."@it ,
+                        "Création intellectuelle ou artistique déterminée, c’est-à-dire le contenu intellectuel ou artistique."@fr ,
+                        "Een onderscheidbare intellectuele of artistieke creatie, dit wil zeggen, de intellectuele of artistieke content."@nl ,
+                        "Eine individuelle intellektuelle oder künstlerische Schöpfung, das heißt der intellektuelle oder künstlerische Inhalt."@de ,
+                        "Et distinkt intellektuell eller kunstnerisk arbeid (dvs. det intellektuelle eller kunstneriske innholdet)."@no ,
+                        "Itsenäinen tiedollinen tai taiteellinen luomus eli tiedollinen tai taiteellinen sisältö."@fi ,
+                        "Một sáng tạo nghệ thuật hoặc trí tuệ riêng biệt, nghĩa là, nội dung nghệ thuật hoặc trí tuệ."@vi ,
+                        "Piiritletud intellektuaalne või kunstilooming, s.o intellektuaalne või kunstiline sisu."@et ,
+                        "Selvstændig intellektuel eller kunstnerisk frembringelse, fx det intellektuelle eller kunstneriske indhold."@da ,
+                        "Una creación intelectual o artística distintiva, i.e., el contenido intelectual o artístico."@es ,
+                        "Önálló szellemi vagy művészi alkotás, azaz a szellemi vagy művészi tartalom."@hu ,
+                        "Μια διακριτή διανοητική/πνευματική ή καλλιτεχνική δημιουργία, δηλαδή το πνευματικό ή καλλιτεχνικό περιεχόμενο."@el ,
+                        "ابداع فكري أو فني متميز، وما يمثل محتوى فكري أو فني ."@ar .
+
+
+###  http://rdaregistry.info/Elements/c/C10002
+:C10002 rdf:type owl:Class ;
+        rdfs:subClassOf :C10013 ;
+        rdakit:toolkitDefinition "An entity who is capable of deliberate actions, of being granted rights, and of being held accountable for its actions."@en ,
+                                 "Een entiteit die in staat is om doelbewust te handelen, rechten verleend te krijgen en verantwoordelijk te worden gehouden voor diens handelen."@nl ,
+                                 "Egy személy,  család vagy testület."@hu ,
+                                 "Eine Entität, die in der Lage ist, bewusst zu handeln, Rechte zu erhalten und für Handlungen zur Rechenschaft gezogen zu werden."@de ,
+                                 "En person, familie eller korporasjon."@no ,
+                                 "Entiteetti, joka kykenee tarkoituksellisiin toimintoihin, jolle voidaan myöntää oikeuksia ja joka on vastuussa toimistaan."@fi ,
+                                 "Entitet, der er i stand til bevidste handlinger, tildeles rettigheder og kan stå til ansvar for sine handlinger."@da ,
+                                 "Entité qui est à même d’agir de son propre chef, de se voir accorder des droits et d’être tenue pour responsable de ses actions."@fr ,
+                                 "Một cá nhân, gia đình, hoặc tập thể."@vi ,
+                                 "Persona, divas vai vairākas personas, kas spēj darboties kā vienība."@lv ,
+                                 "Persona, família o entitat corporativa."@ca ,
+                                 "Una persona, famiglia o ente."@it ,
+                                 "Una persona, familia, o entidad corporativa."@es ,
+                                 "Üks isik või mitu isikut, kes on võimelised tegutsema üksusena."@et ,
+                                 "Ένα φυσικό πρόσωπο, οικογένεια ή συλλογικό όργανο."@el ,
+                                 "كيان قادر على القيام بأفعال متعمدة، وأن يحصل على حقوق، ويخضع للمساءلة عن أفعاله."@ar ;
+        rdakit:toolkitLabel "Actor"@nl ,
+                            "Agent"@ca ,
+                            "Agent"@da ,
+                            "Agent"@en ,
+                            "Agent"@fr ,
+                            "Agent"@no ,
+                            "Agente"@es ,
+                            "Akteur"@de ,
+                            "Tegija"@et ,
+                            "Toimija"@fi ,
+                            "agente"@it ,
+                            "aģents"@lv ,
+                            "tác nhân"@vi ,
+                            "Ágens"@hu ,
+                            "φορέας"@el ,
+                            "وكيل"@ar ;
+        reg:lexicalAlias :Agent.en ;
+        reg:status <http://metadataregistry.org/uri/RegStatus/1001> ;
+        rdfs:isDefinedBy <http://rdaregistry.info/Elements/c/> ;
+        rdfs:label "Agente"@es ,
+                   "Akteur"@de ,
+                   "actor"@nl ,
+                   "agent"@ca ,
+                   "agent"@da ,
+                   "agent"@en ,
+                   "agent"@fr ,
+                   "agent"@no ,
+                   "agente"@it ,
+                   "aģents"@lv ,
+                   "tegija"@et ,
+                   "toimija"@fi ,
+                   "tác nhân"@vi ,
+                   "ágens"@hu ,
+                   "φορέας"@el ,
+                   "وكيل"@ar ;
+        skos:definition "An entity who is capable of deliberate actions, of being granted rights, and of being held accountable for its actions."@en ,
+                        "Een entiteit die in staat is om doelbewust te handelen, rechten verleend te krijgen en verantwoordelijk te worden gehouden voor diens handelen."@nl ,
+                        "Egy személy,  család vagy testület."@hu ,
+                        "Eine Entität, die in der Lage ist, bewusst zu handeln, Rechte zu erhalten und für Handlungen zur Rechenschaft gezogen zu werden."@de ,
+                        "En person, familie eller korporasjon."@no ,
+                        "Entiteetti, joka kykenee tarkoituksellisiin toimintoihin, jolle voidaan myöntää oikeuksia ja joka on vastuussa toimistaan."@fi ,
+                        "Entitet, der er i stand til bevidste handlinger, tildeles rettigheder og kan stå til ansvar for sine handlinger."@da ,
+                        "Entité qui est à même d’agir de son propre chef, de se voir accorder des droits et d’être tenue pour responsable de ses actions."@fr ,
+                        "Một cá nhân, gia đình, hoặc tập thể."@vi ,
+                        "Persona, divas vai vairākas personas, kas spēj darboties kā vienība."@lv ,
+                        "Persona, família o entitat corporativa."@ca ,
+                        "Una persona, famiglia o ente."@it ,
+                        "Una persona, familia, o entidad corporativa."@es ,
+                        "Üks isik või mitu isikut, kes on võimelised tegutsema üksusena."@et ,
+                        "Ένα φυσικό πρόσωπο, οικογένεια ή συλλογικό όργανο."@el ,
+                        "كيان قادر على القيام بأفعال متعمدة، وأن يحصل على حقوق، ويخضع للمساءلة عن أفعاله."@ar ;
+        skos:scopeNote "Agent omfatter en kollektiv agent og en person."@da ,
+                       "An agent includes a collective agent and a person."@en ,
+                       "Aģenti ir grupas un personas."@lv ,
+                       "Darunter fallen gemeinschaftliche Akteure und Personen."@de ,
+                       "Een actor omvat een collectieve actor en een persoon."@nl ,
+                       "Toimija kattaa yhteistoimijan ja henkilön."@fi ,
+                       "Un agent comprend un agent collectif et une personne."@fr ,
+                       "وكيل تشمل وكيلا جماعيا وشخصا"@ar .
+
+
+###  http://rdaregistry.info/Elements/c/C10003
+:C10003 rdf:type owl:Class ;
+        rdfs:subClassOf :C10013 ;
+        rdakit:instructionNumber "1.1.5" ;
+        rdakit:toolkitDefinition "A single exemplar or instance of a manifestation."@en ,
+                                 "Een enkel exemplaar of instantie van een manifestatie."@nl ,
+                                 "Egy megjelenési forma egyetlen példánya vagy előfordulása."@hu ,
+                                 "Ein einzelnes Exemplar oder ein Beispiel einer Manifestation."@de ,
+                                 "En enkelt forekomst av en manifestasjon."@no ,
+                                 "Enkelt forekomst af en manifestation."@da ,
+                                 "Exemplar sol o ocurrència d’una manifestació."@ca ,
+                                 "Instance ou exemplaire isolé d’une manifestation."@fr ,
+                                 "Manifestaation yksittäinen toteutuma tai tapaus."@fi ,
+                                 "Manifestācijas atsevišķs eksemplārs vai instance."@lv ,
+                                 "Một mẫu hoặc trường hợp đơn lẻ của biểu thị."@vi ,
+                                 "Singolo esemplare o istanza di una manifestazione."@it ,
+                                 "Un ejemplar individual o una instancia de una manifestación."@es ,
+                                 "Üksikobjekt või kehastuse üksikjuht."@et ,
+                                 "Ένα μεμονωμένο παράδειγμα ή στιγμιότυπο μιας εκδήλωσης."@el ,
+                                 "نموذج مفرد أو مثال لتجسيدة."@ar ;
+        rdakit:toolkitLabel "Eksemplar"@da ,
+                            "Eksemplar"@et ,
+                            "Eksemplar"@no ,
+                            "Exemplar"@de ,
+                            "Exemplar"@sv ,
+                            "Item"@en ,
+                            "Item"@fr ,
+                            "Item"@nl ,
+                            "Kappale"@fi ,
+                            "Példány"@hu ,
+                            "bản"@vi ,
+                            "item"@it ,
+                            "vienība"@lv ,
+                            "Ítem"@ca ,
+                            "Ítem"@es ,
+                            "αντίτυπο"@el ,
+                            "مفردة"@ar ;
+        reg:lexicalAlias :Item.en ;
+        reg:status <http://metadataregistry.org/uri/RegStatus/1001> ;
+        rdfs:isDefinedBy <http://rdaregistry.info/Elements/c/> ;
+        rdfs:label "Exemplar"@de ,
+                   "Exemplar"@sv ,
+                   "bản"@vi ,
+                   "eksemplar"@da ,
+                   "eksemplar"@et ,
+                   "eksemplar"@no ,
+                   "item"@en ,
+                   "item"@fr ,
+                   "item"@it ,
+                   "item"@nl ,
+                   "kappale"@fi ,
+                   "példány"@hu ,
+                   "vienība"@lv ,
+                   "Ítem"@es ,
+                   "ítem"@ca ,
+                   "αντίτυπο"@el ,
+                   "مفردة"@ar ;
+        skos:definition "A single exemplar or instance of a manifestation."@en ,
+                        "Een enkel exemplaar of instantie van een manifestatie."@nl ,
+                        "Egy megjelenési forma egyetlen példánya vagy előfordulása."@hu ,
+                        "Ein einzelnes Exemplar oder ein Beispiel einer Manifestation."@de ,
+                        "En enkelt forekomst av en manifestasjon."@no ,
+                        "Enkelt forekomst af en manifestation."@da ,
+                        "Exemplar sol o ocurrència d’una manifestació."@ca ,
+                        "Instance ou exemplaire isolé d’une manifestation."@fr ,
+                        "Manifestaation yksittäinen toteutuma tai tapaus."@fi ,
+                        "Manifestācijas atsevišķs eksemplārs vai instance."@lv ,
+                        "Một mẫu hoặc trường hợp đơn lẻ của biểu thị."@vi ,
+                        "Singolo esemplare o istanza di una manifestazione."@it ,
+                        "Un ejemplar individual o una instancia de una manifestación."@es ,
+                        "Üksikobjekt või kehastuse üksikjuht."@et ,
+                        "Ένα μεμονωμένο παράδειγμα ή στιγμιότυπο μιας εκδήλωσης."@el ,
+                        "نموذج مفرد أو مثال لتجسيدة."@ar .
+
+
+###  http://rdaregistry.info/Elements/c/C10004
+:C10004 rdf:type owl:Class ;
+        rdfs:subClassOf :C10002 ;
+        rdakit:instructionNumber "8.1.2" ;
+        rdakit:toolkitDefinition "Agent qui est un être humain individuel qui vit ou est réputé avoir vécu."@fr ,
+                                 "Agent som er et individuelt menneske, som lever eller antages at have levet."@da ,
+                                 "An agent who is an individual human being who lives or is assumed to have lived."@en ,
+                                 "Cilvēks, kurš dzīvo vai tiek pieņemts, ka viņš ir dzīvojis."@lv ,
+                                 "Een actor die is een individueel mens die leeft of waarvan aangenomen wordt dat deze geleefd heeft."@nl ,
+                                 "Egyedi emberi lény, aki él, vagy vélhetően létezett."@hu ,
+                                 "Ein Akteur, bei dem es sich um ein individuelles menschliches Wesen handelt, das lebt oder von dem man annimmt, dass es gelebt hat."@de ,
+                                 "Et menneskelig individ som lever eller som antas å ha levd."@no ,
+                                 "Individuaalne inimene, kes elab või on oletamisi kunagi elanud."@et ,
+                                 "Individuo o identità stabilita da un individuo (da solo o in collaborazione con altri individui)."@it ,
+                                 "Một cá thể hoặc một nhận dạng được tạo ra bởi một cá thể, hoặc một mình hoặc kết hợp với một hoặc nhiều hơn cá thể khác."@vi ,
+                                 "Toimija, joka on ihmisyksilö, joka on elossa tai jonka oletetaan olleen elossa."@fi ,
+                                 "Un individuo o una identidad establecida por un individuo, ya sea solo o en colaboración con uno o más individuos."@es ,
+                                 "Ésser humà individual que viu o se suposa que ha viscut. "@ca ,
+                                 "Ένα πρόσωπο ή ταυτότητα καθιερωμένη από πρόσωπο είτε μόνο του είτε σε συνεργασία με ένα ή περισσότερα πρόσωπα."@el ,
+                                 "وكيل هو إنسان فرد يعيش أو يُفترض أنه قد عاش"@ar ;
+        rdakit:toolkitLabel "Henkilö"@fi ,
+                            "Isik"@et ,
+                            "Person"@da ,
+                            "Person"@de ,
+                            "Person"@en ,
+                            "Person"@no ,
+                            "Person"@sv ,
+                            "Persona"@ca ,
+                            "Persona"@es ,
+                            "Personne"@fr ,
+                            "Persoon"@nl ,
+                            "Személy"@hu ,
+                            "cá nhân"@vi ,
+                            "persona"@it ,
+                            "persona"@lv ,
+                            "φυσικό πρόσωπο"@el ,
+                            "شخص"@ar ;
+        reg:lexicalAlias :Person.en ;
+        reg:status <http://metadataregistry.org/uri/RegStatus/1001> ;
+        rdfs:isDefinedBy <http://rdaregistry.info/Elements/c/> ;
+        rdfs:label "Person"@de ,
+                   "Person"@sv ,
+                   "Persona"@es ,
+                   "cá nhân"@vi ,
+                   "henkilö"@fi ,
+                   "isik"@et ,
+                   "person"@da ,
+                   "person"@en ,
+                   "person"@no ,
+                   "persona"@ca ,
+                   "persona"@it ,
+                   "persona"@lv ,
+                   "personne"@fr ,
+                   "persoon"@nl ,
+                   "személy"@hu ,
+                   "φυσικό πρόσωπο"@el ,
+                   "شخص"@ar ;
+        skos:definition "Agent qui est un être humain individuel qui vit ou est réputé avoir vécu."@fr ,
+                        "Agent som er et individuelt menneske, som lever eller antages at have levet."@da ,
+                        "An agent who is an individual human being who lives or is assumed to have lived."@en ,
+                        "Cilvēks, kurš dzīvo vai tiek pieņemts, ka viņš ir dzīvojis."@lv ,
+                        "Een actor die is een individueel mens die leeft of waarvan aangenomen wordt dat deze geleefd heeft."@nl ,
+                        "Egyedi emberi lény, aki él, vagy vélhetően létezett."@hu ,
+                        "Ein Akteur, bei dem es sich um ein individuelles menschliches Wesen handelt, das lebt oder von dem man annimmt, dass es gelebt hat."@de ,
+                        "Et menneskelig individ som lever eller som antas å ha levd."@no ,
+                        "Individuaalne inimene, kes elab või on oletamisi kunagi elanud."@et ,
+                        "Individuo o identità stabilita da un individuo (da solo o in collaborazione con altri individui)."@it ,
+                        "Một cá thể hoặc một nhận dạng được tạo ra bởi một cá thể, hoặc một mình hoặc kết hợp với một hoặc nhiều hơn cá thể khác."@vi ,
+                        "Toimija, joka on ihmisyksilö, joka on elossa tai jonka oletetaan olleen elossa."@fi ,
+                        "Un individuo o una identidad establecida por un individuo, ya sea solo o en colaboración con uno o más individuos."@es ,
+                        "Ésser humà individual que viu o se suposa que ha viscut. "@ca ,
+                        "Ένα πρόσωπο ή ταυτότητα καθιερωμένη από πρόσωπο είτε μόνο του είτε σε συνεργασία με ένα ή περισσότερα πρόσωπα."@el ,
+                        "وكيل هو إنسان فرد يعيش أو يُفترض أنه قد عاش."@ar .
+
+
+###  http://rdaregistry.info/Elements/c/C10005
+:C10005 rdf:type owl:Class ;
+        rdfs:subClassOf :C10011 ;
+        rdakit:instructionNumber "8.1.2" ;
+        rdakit:toolkitDefinition "A collective agent who is composed of persons who are organized for a common purpose or activity."@en ,
+                                 "Agent collectif qui est composé de personnes organisées dans un but commun ou pour une activité commune."@fr ,
+                                 "Een collectieve actor die bestaat uit personen die georganiseerd zijn voor een gezamenlijk doel of activiteit."@nl ,
+                                 "Egy szervezet vagy személyek és/vagy szervezetek csoportja, amelyet egy adott névvel azonosítanak és amely egységként cselekszik vagy cselekedhet."@hu ,
+                                 "Ein gemeinschaftlicher Akteur, der sich aus Personen zusammensetzt, die für einen gemeinsamen Zweck oder eine gemeinsame Tätigkeit organisiert sind."@de ,
+                                 "En organisasjon eller gruppe av personer og/eller organisasjoner som har et bestemt navn og som opptrer eller kan opptre som en enhet."@no ,
+                                 "Kollektiv agent, som er sammensat af personer, som er organiseret for et fælles formål."@da ,
+                                 "Một tổ chức hoặc nhóm cá nhân và/hoặc các tổ chức được nhận dạng bằng tên cụ thể và hoạt động, hoặc có thể hoạt động, như một đơn vị."@vi ,
+                                 "Organisatsioon või isikute või organisatsioonide rühm, millel on identifitseeriv nimi ja mis on võimeline tegutsema üksusena."@et ,
+                                 "Organització o grup de persones o d’organitzacions que s’identifica amb un nom concret i que actua, o pot actuar, com una unitat."@ca ,
+                                 "Organizzazione o gruppo di persone e/o organizzazioni identificato da un particolare nome, che agisce, o può agire, come un'unità."@it ,
+                                 "Organizācija vai personu grupa, kas identificējama pēc īpaša nosaukuma un kas darbojas vai var darboties kā patstāvīga vienība. (ISBD)"@lv ,
+                                 "Una organización o grupo de personas y/o organizaciones que se identifica mediante un nombre particular y que actúa o puede actuar, como una unidad."@es ,
+                                 "Yhteistoimija, joka muodostuu henkilöistä, jotka ovat järjestäytyneet yhteistä päämäärää tai toimintaa varten."@fi ,
+                                 "Ένας οργανισμός ή ομάδα προσώπων ή/και οργανισμών, η οποία ταυτίζεται από ένα συγκεκριμένο όνομα, το οποίο δρα ή μπορεί να δρα ως ομάδα."@el ,
+                                 "وكيل جماعي يتألف من أشخاص منظمين لتحقيق غرض أو نشاط مشترك"@ar ;
+        rdakit:toolkitLabel "Asutus"@et ,
+                            "Collectivité"@fr ,
+                            "Corporate Body"@en ,
+                            "Corporatie"@nl ,
+                            "Entidad corporativa"@es ,
+                            "Entitat corporativa"@ca ,
+                            "Institution"@sv ,
+                            "Korporasjon"@no ,
+                            "Korporation"@da ,
+                            "Körperschaft"@de ,
+                            "Testület"@hu ,
+                            "Yhteisö"@fi ,
+                            "ente"@it ,
+                            "institūcija"@lv ,
+                            "tập thể"@vi ,
+                            "συλλογικό όργανο"@el ,
+                            "هيئة"@ar ;
+        reg:lexicalAlias :CorporateBody.en ;
+        reg:status <http://metadataregistry.org/uri/RegStatus/1001> ;
+        rdfs:isDefinedBy <http://rdaregistry.info/Elements/c/> ;
+        rdfs:label "Entidad corporativa"@es ,
+                   "Institution"@sv ,
+                   "Körperschaft"@de ,
+                   "asutus"@et ,
+                   "collectivité"@fr ,
+                   "corporate body"@en ,
+                   "corporatie"@nl ,
+                   "ente"@it ,
+                   "entitat corporativa"@ca ,
+                   "institūcija"@lv ,
+                   "korporasjon"@no ,
+                   "korporation"@da ,
+                   "testület"@hu ,
+                   "tập thể"@vi ,
+                   "yhteisö"@fi ,
+                   "συλλογικό όργανο"@el ,
+                   "هيئة"@ar ;
+        skos:definition "A collective agent who is composed of persons who are organized for a common purpose or activity."@en ,
+                        "Agent collectif qui est composé de personnes organisées dans un but commun ou pour une activité commune."@fr ,
+                        "Een collectieve actor die bestaat uit personen die georganiseerd zijn voor een gezamenlijk doel of activiteit."@nl ,
+                        "Egy szervezet vagy személyek és/vagy szervezetek csoportja, amelyet egy adott névvel azonosítanak és amely egységként cselekszik vagy cselekedhet."@hu ,
+                        "Ein gemeinschaftlicher Akteur, der sich aus Personen zusammensetzt, die für einen gemeinsamen Zweck oder eine gemeinsame Tätigkeit organisiert sind."@de ,
+                        "En organisasjon eller gruppe av personer og/eller organisasjoner som har et bestemt navn og som opptrer eller kan opptre som en enhet."@no ,
+                        "Kollektiv agent, som er sammensat af personer, som er organiseret for et fælles formål."@da ,
+                        "Một tổ chức hoặc nhóm cá nhân và/hoặc các tổ chức được nhận dạng bằng tên cụ thể và hoạt động, hoặc có thể hoạt động, như một đơn vị."@vi ,
+                        "Organisatsioon või isikute või organisatsioonide rühm, millel on identifitseeriv nimi ja mis on võimeline tegutsema üksusena."@et ,
+                        "Organització o grup de persones o d’organitzacions que s’identifica amb un nom concret i que actua, o pot actuar, com una unitat."@ca ,
+                        "Organizzazione o gruppo di persone e/o organizzazioni identificato da un particolare nome, che agisce, o può agire, come un'unità."@it ,
+                        "Organizācija vai personu grupa, kas identificējama pēc īpaša nosaukuma un kas darbojas vai var darboties kā patstāvīga vienība. (ISBD)."@lv ,
+                        "Una organización o grupo de personas y/o organizaciones que se identifica mediante un nombre particular y que actúa o puede actuar, como una unidad."@es ,
+                        "Yhteistoimija, joka muodostuu henkilöistä, jotka ovat järjestäytyneet yhteistä päämäärää tai toimintaa varten."@fi ,
+                        "Ένας οργανισμός ή ομάδα προσώπων ή/και οργανισμών, η οποία ταυτίζεται από ένα συγκεκριμένο όνομα, το οποίο δρα ή μπορεί να δρα ως ομάδα."@el ,
+                        "وكيل جماعي يتألف من أشخاص منظمين لتحقيق غرض أو نشاط مشترك"@ar .
+
+
+###  http://rdaregistry.info/Elements/c/C10006
+:C10006 rdf:type owl:Class ;
+        rdfs:subClassOf :C10013 ;
+        rdakit:instructionNumber "5.1.2" ;
+        rdakit:toolkitDefinition "An intellectual or artistic realization of a work in the form of alpha-numeric, musical or choreographic notation, sound, image, object, movement, etc., or any combination of such forms."@en ,
+                                 "Darba intelektuāla vai mākslinieciska īstenošana burtu - ciparu, mūzikas vai horeogrāfijas, skaņu un attēlu, priekšmetu, kustību, utt., pierakstu veidā vai citās šo veidu kombinācijās. (FRBR)"@lv ,
+                                 "Den intellektuelle eller kunstneriske virkeliggørelse af et værk i form af alfanumerisk, musik- eller koreografinotation, en lyd, et billede, en genstand, en bevægelse etc., eller enhver kombination af sådanne former."@da ,
+                                 "Een intellectuele of artistieke realisatie van een werk in de vorm van alfanumerieke, muzikale of choreografische notatie, geluid, beeld, object, beweging etc., of een combinatie van dergelijke vormen."@nl ,
+                                 "Egy mű szellemi vagy művészi megvalósulása alfanumerikus, zenei vagy koreográfiai lejegyzés, hang, kép, tárgy, mozgás stb. formájában, vagy ezen formák bármilyen kombinációjával."@hu ,
+                                 "Eine intellektuelle oder künstlerische Realisierung eines Werks in Form einer alphanumerischen, musikalischen oder choreografischen Notation, in Form von Ton, Bild, Gegenstand, Bewegung und so weiter oder einer Kombination solcher Formen."@de ,
+                                 "En intellektuell eller kunstnerisk realisering av et verk i form av alfanumerisk, musikalsk eller koreografisk notasjon, lyd, bilde, gjenstand, bevegelse etc., eller enhver kombinasjon av slike former."@no ,
+                                 "La realización intelectual o artística de una obra en la forma de notaciones alfanumérica, musical o coreográfica, de sonido, imagen, objeto, movimiento, etc. o de cualquier combinación de tales formas."@es ,
+                                 "Một thể hiện trí tuệ hoặc nghệ thuật của tác phẩm trong hình thái chữ cái-chữ số, ký hiệu âm nhạc hoặc nghệ thuật bố trí, âm thanh, hình ảnh, vật thể, động thái, vv..., hoặc tổ hợp bất kỳ của các hình thái đó."@vi ,
+                                 "Realització intel·lectual o artística d’una obra en la forma de notació alfanumèrica, musical o coreogràfica, de so, d’imatge, d’objecte, de moviment, etc., o de qualsevol combinació d’aquestes formes."@ca ,
+                                 "Realizzazione intellettuale o artistica di un'opera in forma di notazione alfanumerica, musicale o coreografica, suono, immagine, oggetto, movimento, etc. o in una qualsiasi combinazione di queste forme."@it ,
+                                 "Réalisation intellectuelle ou artistique d’une œuvre sous forme de notation alphanumérique, musicale ou chorégraphique, de son, d’image, d’objet, de mouvement, etc. ou de toute combinaison de ces formes."@fr ,
+                                 "Teoksen tiedollinen tai taiteellinen aakkosnumeerinen toteutus, joka voi olla muodoltaan aakkosnumeerinen, musiikkinuotinnos, tanssinotaatio, ääntä, kuva, esine, liikettä tms. tai mikä tahansa tällaisten muotojen yhdistelmä."@fi ,
+                                 "Teose intellektuaalne või kunstiline realisatsioon tähtnumbrilise, muusikalise või koreograafilise notatsioonina, helina, pildina, esemena, liikumisena vms vormis või nende kombinatsioonina."@et ,
+                                 "Ένα πνευματικό περιεχόμενο ή καλλιτεχνική πραγμάτωση/υλοποίηση ενός έργου στη μορφή αλφαβητικής, αλφαριθμητικής, αριθμητικής ή χορογραφικής σημειογραφίας, ήχου, εικόνας, αντικειμένου, κίνησης κ.λπ. ή οποιοσδήποτε συνδυασμός αυτών των μορφών."@el ,
+                                 "تحقق عمل فكري أو فني في شكل تدوين (هجائي - رقمي)، أو موسيقي، أو تعبير راقص، أو صوتي، أو صورة، أو كائن، أو حركة، إلخ. أو أي توليفة من هذه الأشكال."@ar ;
+        rdakit:toolkitLabel "Ekspressio"@fi ,
+                            "Expresión"@es ,
+                            "Expressie"@nl ,
+                            "Expression"@de ,
+                            "Expression"@en ,
+                            "Expression"@fr ,
+                            "Expressió"@ca ,
+                            "Kifejezési Forma"@hu ,
+                            "Udtryk"@da ,
+                            "Uttryck"@sv ,
+                            "Uttrykk"@no ,
+                            "Väljendus"@et ,
+                            "biểu hiện"@vi ,
+                            "espressione"@it ,
+                            "izteiksme"@lv ,
+                            "έκφραση"@el ,
+                            "تعبيرة"@ar ;
+        reg:lexicalAlias :Expression.en ;
+        reg:status <http://metadataregistry.org/uri/RegStatus/1001> ;
+        rdfs:isDefinedBy <http://rdaregistry.info/Elements/c/> ;
+        rdfs:label "Expresión"@es ,
+                   "Expression"@de ,
+                   "Uttryck"@sv ,
+                   "biểu hiện"@vi ,
+                   "ekspressio"@fi ,
+                   "espressione"@it ,
+                   "expressie"@nl ,
+                   "expression"@en ,
+                   "expression"@fr ,
+                   "expressió"@ca ,
+                   "izteiksme"@lv ,
+                   "kifejezési forma"@hu ,
+                   "udtryk"@da ,
+                   "uttrykk"@no ,
+                   "väljendus"@et ,
+                   "έκφραση"@el ,
+                   "تعبيرة"@ar ;
+        skos:definition "An intellectual or artistic realization of a work in the form of alpha-numeric, musical or choreographic notation, sound, image, object, movement, etc., or any combination of such forms."@en ,
+                        "Darba intelektuāla vai mākslinieciska īstenošana burtu - ciparu, mūzikas vai horeogrāfijas, skaņu un attēlu, priekšmetu, kustību, utt., pierakstu veidā vai citās šo veidu kombinācijās. (FRBR)."@lv ,
+                        "Den intellektuelle eller kunstneriske virkeliggørelse af et værk i form af alfanumerisk, musik- eller koreografinotation, en lyd, et billede, en genstand, en bevægelse etc., eller enhver kombination af sådanne former."@da ,
+                        "Een intellectuele of artistieke realisatie van een werk in de vorm van alfanumerieke, muzikale of choreografische notatie, geluid, beeld, object, beweging etc., of een combinatie van dergelijke vormen."@nl ,
+                        "Egy mű szellemi vagy művészi megvalósulása alfanumerikus, zenei vagy koreográfiai lejegyzés, hang, kép, tárgy, mozgás stb. formájában, vagy ezen formák bármilyen kombinációjával."@hu ,
+                        "Eine intellektuelle oder künstlerische Realisierung eines Werks in Form einer alphanumerischen, musikalischen oder choreografischen Notation, in Form von Ton, Bild, Gegenstand, Bewegung und so weiter oder einer Kombination solcher Formen."@de ,
+                        "En intellektuell eller kunstnerisk realisering av et verk i form av alfanumerisk, musikalsk eller koreografisk notasjon, lyd, bilde, gjenstand, bevegelse etc., eller enhver kombinasjon av slike former."@no ,
+                        "La realización intelectual o artística de una obra en la forma de notaciones alfanumérica, musical o coreográfica, de sonido, imagen, objeto, movimiento, etc. o de cualquier combinación de tales formas."@es ,
+                        "Một thể hiện trí tuệ hoặc nghệ thuật của tác phẩm trong hình thái chữ cái-chữ số, ký hiệu âm nhạc hoặc nghệ thuật bố trí, âm thanh, hình ảnh, vật thể, động thái, vv..., hoặc tổ hợp bất kỳ của các hình thái đó."@vi ,
+                        "Realització intel·lectual o artística d’una obra en la forma de notació alfanumèrica, musical o coreogràfica, de so, d’imatge, d’objecte, de moviment, etc., o de qualsevol combinació d’aquestes formes."@ca ,
+                        "Realizzazione intellettuale o artistica di un'opera in forma di notazione alfanumerica, musicale o coreografica, suono, immagine, oggetto, movimento, etc. o in una qualsiasi combinazione di queste forme."@it ,
+                        "Réalisation intellectuelle ou artistique d’une œuvre sous forme de notation alphanumérique, musicale ou chorégraphique, de son, d’image, d’objet, de mouvement, etc. ou de toute combinaison de ces formes."@fr ,
+                        "Teoksen tiedollinen tai taiteellinen aakkosnumeerinen toteutus, joka voi olla muodoltaan aakkosnumeerinen, musiikkinuotinnos, tanssinotaatio, ääntä, kuva, esine, liikettä tms. tai mikä tahansa tällaisten muotojen yhdistelmä."@fi ,
+                        "Teose intellektuaalne või kunstiline realisatsioon tähtnumbrilise, muusikalise või koreograafilise notatsioonina, helina, pildina, esemena, liikumisena vms vormis või nende kombinatsioonina."@et ,
+                        "Ένα πνευματικό περιεχόμενο ή μια καλλιτεχνική πραγμάτωση/υλοποίηση ενός έργου στη μορφή αλφαβητικής, αλφαριθμητικής, αριθμητικής ή χορογραφικής σημειογραφίας, ήχου, εικόνας, αντικειμένου, κίνησης κ.λπ. ή οποιοσδήποτε συνδυασμός αυτών των μορφών."@el ,
+                        "تحقق عمل فكري أو فني في شكل تدوين (هجائي - رقمي)، أو موسيقي، أو تعبير راقص، أو صوتي، أو صورة، أو كائن، أو حركة، إلخ. أو أي توليفة من هذه الأشكال."@ar .
+
+
+###  http://rdaregistry.info/Elements/c/C10007
+:C10007 rdf:type owl:Class ;
+        rdfs:subClassOf :C10013 ;
+        rdakit:instructionNumber "1.1.5" ;
+        rdakit:toolkitDefinition "A physical embodiment of an expression of a work."@en ,
+                                 "Darba izteiksmes fiziskais iemiesojums.(FRBR)"@lv ,
+                                 "Een fysieke belichaming van een expressie van een werk."@nl ,
+                                 "Egy mű kifejezési formájának fizikai megtestesülése."@hu ,
+                                 "Eine physische Verkörperung einer Expression eines Werks."@de ,
+                                 "En konkret utforming av et uttrykk av et verk."@no ,
+                                 "Fysisk realisering af et udtryk."@da ,
+                                 "La materialización física de una expresión de una obra."@es ,
+                                 "Materialització física d’una expressió d’una obra."@ca ,
+                                 "Materializzazione fisica di un'espressione di un'opera."@it ,
+                                 "Matérialisation d’une expression d’une œuvre."@fr ,
+                                 "Một thể hiện vật lý của một biểu hiện của tác phẩm."@vi ,
+                                 "Teoksen ekspression fyysinen ilmentymä."@fi ,
+                                 "Teose väljenduse materiaalne teostus."@et ,
+                                 "Μια φυσική ενσωμάτωση/υλοποίηση της έκφρασης ενός έργου."@el ,
+                                 "تجسيد مادي لتعبيرة عن عمل."@ar ;
+        rdakit:toolkitLabel "Kehastus"@et ,
+                            "Manifestaatio"@fi ,
+                            "Manifestació"@ca ,
+                            "Manifestación"@es ,
+                            "Manifestasjon"@no ,
+                            "Manifestatie"@nl ,
+                            "Manifestation"@da ,
+                            "Manifestation"@de ,
+                            "Manifestation"@en ,
+                            "Manifestation"@fr ,
+                            "Manifestation"@sv ,
+                            "Megjelenési Forma"@hu ,
+                            "biểu thị"@vi ,
+                            "manifestazione"@it ,
+                            "manifestācija"@lv ,
+                            "εκδήλωση"@el ,
+                            "تجسيدة"@ar ;
+        reg:lexicalAlias :Manifestation.en ;
+        reg:status <http://metadataregistry.org/uri/RegStatus/1001> ;
+        rdfs:isDefinedBy <http://rdaregistry.info/Elements/c/> ;
+        rdfs:label "Manifestación"@es ,
+                   "Manifestation"@de ,
+                   "Manifestation"@sv ,
+                   "biểu thị"@vi ,
+                   "kehastus"@et ,
+                   "manifestaatio"@fi ,
+                   "manifestació"@ca ,
+                   "manifestasjon"@no ,
+                   "manifestatie"@nl ,
+                   "manifestation"@da ,
+                   "manifestation"@en ,
+                   "manifestation"@fr ,
+                   "manifestazione"@it ,
+                   "manifestācija"@lv ,
+                   "megjelenési forma"@hu ,
+                   "εκδήλωση"@el ,
+                   "تجسيدة"@ar ;
+        skos:definition "A physical embodiment of an expression of a work."@en ,
+                        "Darba izteiksmes fiziskais iemiesojums.(FRBR)."@lv ,
+                        "Een fysieke belichaming van een expressie van een werk."@nl ,
+                        "Egy mű kifejezési formájának fizikai megtestesülése."@hu ,
+                        "Eine physische Verkörperung einer Expression eines Werks."@de ,
+                        "En konkret utforming av et uttrykk av et verk."@no ,
+                        "Fysisk realisering af et udtryk."@da ,
+                        "La materialización física de una expresión de una obra."@es ,
+                        "Materialització física d’una expressió d’una obra."@ca ,
+                        "Materializzazione fisica di un'espressione di un'opera."@it ,
+                        "Matérialisation d’une expression d’une œuvre."@fr ,
+                        "Một thể hiện vật lý của một biểu hiện của tác phẩm."@vi ,
+                        "Teoksen ekspression fyysinen ilmentymä."@fi ,
+                        "Teose väljenduse materiaalne teostus."@et ,
+                        "Μια φυσική ενσωμάτωση/υλοποίηση της έκφρασης ενός έργου."@el ,
+                        "تجسيد مادي لتعبيرة عن عمل."@ar .
+
+
+###  http://rdaregistry.info/Elements/c/C10008
+:C10008 rdf:type owl:Class ;
+        rdfs:subClassOf :C10011 ;
+        rdakit:instructionNumber "8.1.2" ;
+        rdakit:toolkitDefinition "A collective agent who is composed of persons who are related by birth, marriage, adoption, civil union, or similar legal status, or who otherwise present themselves as a family."@en ,
+                                 "Agent collectif qui est composé de personnes liées par la naissance, le mariage, l’adoption, l’union civile ou tout autre statut légal de même ordre, ou se présentant elles-mêmes pour toute autre raison comme une famille."@fr ,
+                                 "Divas vai vairākas personas, kuru radniecību nosaka piedzimšana, laulības, adopcija, civila savienība vai līdzīgs juridisks statuss."@lv ,
+                                 "Dos o más personas relacionadas por nacimiento, matrimonio, adopción, unión civil o un estado legal similar; o quienes se presentan a sí mismos como una familia."@es ,
+                                 "Due o più persone legate da nascita, matrimonio, adozione, unione civile o simile status giuridico, o che si presentano come una famiglia."@it ,
+                                 "Dues o més persones relacionades pel naixement, el matrimoni, l’adopció, la unió civil o qualsevol altre estat legal similar, o que altrament es presenten com una família."@ca ,
+                                 "Een collectieve actor die bestaat uit personen die verwant zijn door geboorte, huwelijk, adoptie, burgerlijk partnerschap of vergelijkbare juridische status, of die zich anderszins presenteren als een familie."@nl ,
+                                 "Ein gemeinschaftlicher Akteur, der sich aus Personen zusammensetzt, die aufgrund von Geburt, Eheschließung, Adoption, eingetragene Lebenspartnerschaft oder einen ähnlichen Rechtsstatus miteinander in Beziehung stehen oder sich in anderer Form als Familie präsentieren."@de ,
+                                 "Hai hoặc nhiều cá nhân liên quan theo dòng dõi, hôn nhân, nghĩa dưỡng, kết hợp dân sự, hoặc địa vị pháp lý tương tự, hoặc những người mà chính họ thể hiện theo cách khác như một gia đình."@vi ,
+                                 "Isikud, kes on omavahel seotud sünni, abielu, lapsendamise, kooselu või muu õigusliku aluse põhjal või esitlevad ennast muul viisil perekonnana."@et ,
+                                 "Kollektiv agent, som er sammensat af personer, der er beslægtede via fødsel, ægteskab, adoption, registreret partnerskab eller lignende juridisk status, eller som på anden vis præsenterer sig selv som en familie."@da ,
+                                 "Két vagy több személy, akik kapcsolatban állnak születés, házasság, örökbefogadás, élettársi kapcsolat vagy hasonló jogi státusz révén, vagy egyéb módon családként jelennek meg."@hu ,
+                                 "To eller flere personer som er beslektet ved fødsel, ekteskap, adopsjon, partnerskap, samboerskap eller annen juridisk status, eller som på annen måte presenterer seg som en familie."@no ,
+                                 "Yhteistoimija, joka muodostuu henkilöistä, jotka ovat suhteessa toisiinsa syntymän, avioliiton, adoption, rekisteröidyn parisuhteen tai vastaavan oikeudellisen aseman kautta tai jotka muuten esiintyvät perheenä."@fi ,
+                                 "Δύο ή περισσότερα πρόσωπα με σχέσεις όπως γέννησης, γάμου, υιοθεσίας, πολιτικής ένωσης ή παρόμοιου νομικού καθεστώτος ή άλλης περίπτωσης στην οποία εμφανίζονται ως οικογένεια."@el ,
+                                 "وكيل جماعي يتألف من أشخاص يربطهم ميلاد أو زواج أو تبني أو زواج مدني أو أي وضع قانوني آخر، أو يقدمون أنفسهم كعائلة."@ar ;
+        rdakit:toolkitLabel "Család"@hu ,
+                            "Familia"@es ,
+                            "Familie"@da ,
+                            "Familie"@de ,
+                            "Familie"@nl ,
+                            "Familie"@no ,
+                            "Famille"@fr ,
+                            "Family"@en ,
+                            "Família"@ca ,
+                            "Perekond"@et ,
+                            "Suku"@fi ,
+                            "dzimta/ģimene"@lv ,
+                            "famiglia"@it ,
+                            "gia đình"@vi ,
+                            "οικογένεια"@el ,
+                            "عائلة"@ar ;
+        reg:lexicalAlias :Family.en ;
+        reg:status <http://metadataregistry.org/uri/RegStatus/1001> ;
+        rdfs:isDefinedBy <http://rdaregistry.info/Elements/c/> ;
+        rdfs:label "Familia"@es ,
+                   "Familie"@de ,
+                   "család"@hu ,
+                   "dzimta/ģimene"@lv ,
+                   "famiglia"@it ,
+                   "familie"@da ,
+                   "familie"@nl ,
+                   "familie"@no ,
+                   "famille"@fr ,
+                   "family"@en ,
+                   "família"@ca ,
+                   "gia đình"@vi ,
+                   "perekond"@et ,
+                   "suku"@fi ,
+                   "οικογένεια"@el ,
+                   "عائلة"@ar ;
+        skos:definition "A collective agent who is composed of persons who are related by birth, marriage, adoption, civil union, or similar legal status, or who otherwise present themselves as a family."@en ,
+                        "Agent collectif qui est composé de personnes liées par la naissance, le mariage, l’adoption, l’union civile ou tout autre statut légal de même ordre, ou se présentant elles-mêmes pour toute autre raison comme une famille."@fr ,
+                        "Divas vai vairākas personas, kuru radniecību nosaka piedzimšana, laulības, adopcija, civila savienība vai līdzīgs juridisks statuss."@lv ,
+                        "Dos o más personas relacionadas por nacimiento, matrimonio, adopción, unión civil o un estado legal similar; o quienes se presentan a sí mismos como una familia."@es ,
+                        "Due o più persone legate da nascita, matrimonio, adozione, unione civile o simile status giuridico, o che si presentano come una famiglia."@it ,
+                        "Dues o més persones relacionades pel naixement, el matrimoni, l’adopció, la unió civil o qualsevol altre estat legal similar, o que altrament es presenten com una família."@ca ,
+                        "Een collectieve actor die bestaat uit personen die verwant zijn door geboorte, huwelijk, adoptie, burgerlijk partnerschap of vergelijkbare juridische status, of die zich anderszins presenteren als een familie."@nl ,
+                        "Ein gemeinschaftlicher Akteur, der sich aus Personen zusammensetzt, die aufgrund von Geburt, Eheschließung, Adoption, eingetragene Lebenspartnerschaft oder einen ähnlichen Rechtsstatus miteinander in Beziehung stehen oder sich in anderer Form als Familie präsentieren."@de ,
+                        "Hai hoặc nhiều cá nhân liên quan theo dòng dõi, hôn nhân, nghĩa dưỡng, kết hợp dân sự, hoặc địa vị pháp lý tương tự, hoặc những người mà chính họ thể hiện theo cách khác như một gia đình."@vi ,
+                        "Isikud, kes on omavahel seotud sünni, abielu, lapsendamise, kooselu või muu õigusliku aluse põhjal või esitlevad ennast muul viisil perekonnana."@et ,
+                        "Kollektiv agent, som er sammensat af personer, der er beslægtede via fødsel, ægteskab, adoption, registreret partnerskab eller lignende juridisk status, eller som på anden vis præsenterer sig selv som en familie."@da ,
+                        "Két vagy több személy, akik kapcsolatban állnak születés, házasság, örökbefogadás, élettársi kapcsolat vagy hasonló jogi státusz révén, vagy egyéb módon családként jelennek meg."@hu ,
+                        "To eller flere personer som er beslektet ved fødsel, ekteskap, adopsjon, partnerskap, samboerskap eller annen juridisk status, eller som på annen måte presenterer seg som en familie."@no ,
+                        "Yhteistoimija, joka muodostuu henkilöistä, jotka ovat suhteessa toisiinsa syntymän, avioliiton, adoption, rekisteröidyn parisuhteen tai vastaavan oikeudellisen aseman kautta tai jotka muuten esiintyvät perheenä."@fi ,
+                        "Δύο ή περισσότερα πρόσωπα με σχέσεις όπως γέννησης, γάμου, υιοθεσίας, πολιτικής ένωσης ή παρόμοιου νομικού καθεστώτος ή άλλης περίπτωσης στην οποία εμφανίζονται ως οικογένεια."@el ,
+                        "وكيل جماعي يتألف من أشخاص يربطهم ميلاد أو زواج أو تبني أو زواج مدني أو أي وضع قانوني آخر، أو يقدمون أنفسهم كعائلة."@ar .
+
+
+###  http://rdaregistry.info/Elements/c/C10009
+:C10009 rdf:type owl:Class ;
+        rdfs:subClassOf :C10013 ;
+        rdakit:toolkitDefinition "A given extent of space."@en ,
+                                 "A tér egy adott kiterjedése."@hu ,
+                                 "Een bepaalde mate van ruimte."@nl ,
+                                 "Eine definierte Ausdehnung eines Raums."@de ,
+                                 "Et bestemt omfang i rom."@no ,
+                                 "Extensió d’espai determinada."@ca ,
+                                 "Givet omfang af rum."@da ,
+                                 "Một quy mô được nêu ra của không gian."@vi ,
+                                 "Noteikta telpa."@lv ,
+                                 "Portion d’espace déterminée."@fr ,
+                                 "Teatud kindel ruumiulatus."@et ,
+                                 "Tilan tietty laajuus."@fi ,
+                                 "Ubicazione identificata da un nome."@it ,
+                                 "Μια δεδομένη χωρική έκταση."@el ,
+                                 "حيز مكاني معين."@ar ;
+        rdakit:toolkitLabel "Geografikum"@de ,
+                            "Hely"@hu ,
+                            "Koht"@et ,
+                            "Lieu"@fr ,
+                            "Lloc"@ca ,
+                            "Paikka"@fi ,
+                            "Plaats"@nl ,
+                            "Place"@en ,
+                            "Sted"@da ,
+                            "Sted"@no ,
+                            "luogo"@it ,
+                            "vieta"@lv ,
+                            "địa điểm"@vi ,
+                            "τόπος"@el ,
+                            "مكان"@ar ;
+        reg:lexicalAlias :Place.en ;
+        reg:status <http://metadataregistry.org/uri/RegStatus/1001> ;
+        rdfs:isDefinedBy <http://rdaregistry.info/Elements/c/> ;
+        rdfs:label "Geografikum"@de ,
+                   "hely"@hu ,
+                   "koht"@et ,
+                   "lieu"@fr ,
+                   "lloc"@ca ,
+                   "luogo"@it ,
+                   "paikka"@fi ,
+                   "plaats"@nl ,
+                   "place"@en ,
+                   "sted"@da ,
+                   "sted"@no ,
+                   "vieta"@lv ,
+                   "địa điểm"@vi ,
+                   "τόπος"@el ,
+                   "مكان"@ar ;
+        skos:definition "A given extent of space."@en ,
+                        "A tér egy adott kiterjedése."@hu ,
+                        "Een bepaalde mate van ruimte."@nl ,
+                        "Eine definierte Ausdehnung eines Raums."@de ,
+                        "Et bestemt omfang i rom."@no ,
+                        "Extensió d’espai determinada."@ca ,
+                        "Givet omfang af rum."@da ,
+                        "Một quy mô được nêu ra của không gian."@vi ,
+                        "Noteikta telpa."@lv ,
+                        "Portion d’espace déterminée."@fr ,
+                        "Teatud kindel ruumiulatus."@et ,
+                        "Tilan tietty laajuus."@fi ,
+                        "Ubicazione identificata da un nome."@it ,
+                        "Μια δεδομένη χωρική έκταση."@el ,
+                        "حيز مكاني معين."@ar .
+
+
+###  http://rdaregistry.info/Elements/c/C10010
+:C10010 rdf:type owl:Class ;
+        rdfs:subClassOf :C10013 ;
+        rdakit:toolkitDefinition "A finite period of time."@en ,
+                                 "Ajaline ulatus, millel on algus, lõpp ja kestus."@et ,
+                                 "Ajan rajallinen jakso."@fi ,
+                                 "Begrænset tidsrum"@da ,
+                                 "Een eindige periode van tijd."@nl ,
+                                 "Eine definierte Zeitangabe."@de ,
+                                 "Estensione temporale che a un'inizio, una fine e una durata"@it ,
+                                 "Et omfang av tid med en begynnelse, varighet og slutt."@no ,
+                                 "Extensió temporal que té un principi, un final i una durada."@ca ,
+                                 "Időbeli kiterjedés, aminek van kezdete, vége és hossza."@hu ,
+                                 "Laika apjoms, kuram ir sākums, beigas un ilgums."@lv ,
+                                 "Một quy mô thời gian có bắt đầu, kết thúc và khoảng thời gian."@vi ,
+                                 "Période de temps déterminée."@fr ,
+                                 "Μια χρονική έκταση με αρχή, τέλος και διάρκεια."@el ,
+                                 "فترة زمنية محددة"@ar ;
+        rdakit:toolkitLabel "Ajanjakso"@fi ,
+                            "Ajavahemik"@et ,
+                            "Időtartam"@hu ,
+                            "Interval de temps"@ca ,
+                            "Laps de temps"@fr ,
+                            "Tidsperiode"@da ,
+                            "Tidsrom"@no ,
+                            "Tijdspanne"@nl ,
+                            "Timespan"@en ,
+                            "Zeitraum"@de ,
+                            "arco di tempo"@it ,
+                            "khoảng thời gian"@vi ,
+                            "laikposms"@lv ,
+                            "χρονικό διάστημα"@el ,
+                            "فترة زمنية"@ar ;
+        reg:lexicalAlias :Timespan.en ;
+        reg:status <http://metadataregistry.org/uri/RegStatus/1001> ;
+        rdfs:isDefinedBy <http://rdaregistry.info/Elements/c/> ;
+        rdfs:label "Zeitraum"@de ,
+                   "ajanjakso"@fi ,
+                   "ajavahemik"@et ,
+                   "arco di tempo"@it ,
+                   "időtartam"@hu ,
+                   "interval de temps"@ca ,
+                   "khoảng thời gian"@vi ,
+                   "laikposms"@lv ,
+                   "laps de temps"@fr ,
+                   "tidsperiode"@da ,
+                   "tidsrom"@no ,
+                   "tijdspanne"@nl ,
+                   "timespan"@en ,
+                   "χρονικό διάστημα"@el ,
+                   "فترة زمنية"@ar ;
+        skos:altLabel "ajanjakso"@fi ,
+                      "tidsforløb"@da ,
+                      "time-span"@en ,
+                      "فترة زمنية"@ar ;
+        skos:definition "A finite period of time."@en ,
+                        "Ajaline ulatus, millel on algus, lõpp ja kestus."@et ,
+                        "Ajan rajallinen jakso."@fi ,
+                        "Begrænset tidsrum"@da ,
+                        "Een eindige periode van tijd."@nl ,
+                        "Eine definierte Zeitangabe."@de ,
+                        "Estensione temporale che a un'inizio, una fine e una durata"@it ,
+                        "Et omfang av tid med en begynnelse, varighet og slutt."@no ,
+                        "Extensió temporal que té un principi, un final i una durada."@ca ,
+                        "Időbeli kiterjedés, aminek van kezdete, vége és hossza."@hu ,
+                        "Laika apjoms, kuram ir sākums, beigas un ilgums."@lv ,
+                        "Một quy mô thời gian có bắt đầu, kết thúc và khoảng thời gian."@vi ,
+                        "Période de temps déterminée."@fr ,
+                        "Μια χρονική έκταση με αρχή, τέλος και διάρκεια."@el ,
+                        "فترة زمنية محددة"@ar .
+
+
+###  http://rdaregistry.info/Elements/c/C10011
+:C10011 rdf:type owl:Class ;
+        rdfs:subClassOf :C10002 ;
+        rdakit:toolkitDefinition "Agent qui est un groupement ou une association de deux ou plusieurs personnes portant un nom particulier et disposant de la faculté d’agir collectivement."@fr ,
+                                 "Agent, som er en forsamling eller organisation af to eller felere personer med et bestemt namn, der kan agere som en enhed."@da ,
+                                 "An agent who is a gathering or organization of two or more persons that bears a particular name and that is capable of acting as a unit."@en ,
+                                 "Een actor die is een bijeenkomst of organisatie van twee of meer personen dat een specifieke naam draagt en dat in staat is om op te treden als een eenheid."@nl ,
+                                 "Ein Akteur, bei dem es sich um eine Zusammenkunft oder eine Organisation von zwei oder mehreren Personen handelt, die der einen bestimmten Namen trägt und imstande ist, als Einheit zu handeln."@de ,
+                                 "En samling av eller organisasjon av personer som har et eget navn og som er i stand til å opptre som en enhet."@no ,
+                                 "Gruppo o organizzazione di persone contraddistinto da un nome specifico e in grado di agire come un'unità "@it ,
+                                 "Isikute rühm või organisatsioon, millel on kindel nimi ja mis on võimeline tegutsema üksusena."@et ,
+                                 "Một tập hợp hoặc tổ chức của các cá nhân có tên riêng và có thể hoạt động như là một đơn vị."@vi ,
+                                 "Personu kopums vai organizācija, kas izmanto īpašu nosaukumu un darbojas kā vienība."@lv ,
+                                 "Reunió o organització de persones que porten un nom concret i capaç d’actuar com una unitat."@ca ,
+                                 "Személyek csoportosulása vagy szervezete, amely saját névvel rendelkezik és egy egységként képes cselekedni"@hu ,
+                                 "Toimija, joka on useamman kuin yhden henkilön kokoontuminen tai organisaatio, jolla on tietty nimi ja joka on kykenevä toimimaan yksikkönä."@fi ,
+                                 "Μια συνένωση ή οργανισμός φυσικών προσώπων που φέρουν ένα συγκεκριμένο όνομα και δύνανται να δρουν ως ομάδα."@el ,
+                                 "وكيل عبارة عن تجمع أو تنظيم من شخصين أو أكثر يحملون اسما محددا ويمكنهم التعامل كوحدة ."@ar ;
+        rdakit:toolkitLabel "Agent collectif"@fr ,
+                            "Agent col·lectiu"@ca ,
+                            "Collectieve actor"@nl ,
+                            "Collective Agent"@en ,
+                            "Gemeinschaftlicher Akteur"@de ,
+                            "Kollektiiv"@et ,
+                            "Kollektiv Agent"@da ,
+                            "Kollektiv agent"@no ,
+                            "Kollektív Ágens"@hu ,
+                            "Yhteistoimija"@fi ,
+                            "grupa"@lv ,
+                            "tác nhân tập thể"@vi ,
+                            "συλλογικός φορέας"@el ,
+                            "وكيل جماعي"@ar ;
+        reg:lexicalAlias :CollectiveAgent.en ;
+        reg:status <http://metadataregistry.org/uri/RegStatus/1001> ;
+        rdfs:isDefinedBy <http://rdaregistry.info/Elements/c/> ;
+        rdfs:label "Gemeinschaftlicher Akteur"@de ,
+                   "agent collectif"@fr ,
+                   "agent col·lectiu"@ca ,
+                   "agente collettivo"@it ,
+                   "collectieve actor"@nl ,
+                   "collective agent"@en ,
+                   "grupa"@lv ,
+                   "kollektiiv"@et ,
+                   "kollektiv agent"@da ,
+                   "kollektiv agent"@no ,
+                   "kollektív ágens"@hu ,
+                   "tác nhân tập thể"@vi ,
+                   "yhteistoimija"@fi ,
+                   "συλλογικός φορέας"@el ,
+                   "وكيل جماعي"@ar ;
+        skos:definition "Agent qui est un groupement ou une association de deux ou plusieurs personnes portant un nom particulier et disposant de la faculté d’agir collectivement."@fr ,
+                        "Agent, som er en forsamling eller organisation af to eller felere personer med et bestemt namn, der kan agere som en enhed."@da ,
+                        "An agent who is a gathering or organization of two or more persons that bears a particular name and that is capable of acting as a unit."@en ,
+                        "Een actor die is een bijeenkomst of organisatie van twee of meer personen dat een specifieke naam draagt en dat in staat is om op te treden als een eenheid."@nl ,
+                        "Ein Akteur, bei dem es sich um eine Zusammenkunft oder eine Organisation von zwei oder mehreren Personen handelt, die der einen bestimmten Namen trägt und imstande ist, als Einheit zu handeln."@de ,
+                        "En samling av eller organisasjon av personer som har et eget navn og som er i stand til å opptre som en enhet."@no ,
+                        "Gruppo o organizzazione di persone contraddistinto da un nome specifico e in grado di agire come un'unità "@it ,
+                        "Isikute rühm või organisatsioon, millel on kindel nimi ja mis on võimeline tegutsema üksusena."@et ,
+                        "Một tập hợp hoặc tổ chức của các cá nhân có tên riêng và có thể hoạt động như là một đơn vị."@vi ,
+                        "Personu kopums vai organizācija, kas izmanto īpašu nosaukumu un darbojas kā vienība."@lv ,
+                        "Reunió o organització de persones que porten un nom concret i capaç d’actuar com una unitat."@ca ,
+                        "Személyek csoportosulása vagy szervezete, amely saját névvel rendelkezik és egy egységként képes cselekedni."@hu ,
+                        "Toimija, joka on useamman kuin yhden henkilön kokoontuminen tai organisaatio, jolla on tietty nimi ja joka on kykenevä toimimaan yksikkönä."@fi ,
+                        "Μια συνένωση ή οργανισμός φυσικών προσώπων που φέρουν ένα συγκεκριμένο όνομα και δύνανται να δρουν ως ομάδα."@el ,
+                        "وكيل عبارة عن تجمع أو تنظيم من شخصين أو أكثر يحملون اسما محددا ويمكنهم التعامل كوحدة ."@ar ;
+        skos:scopeNote "A collective agent includes a corporate body and a family."@en ,
+                       "Agente collettivo comprende ente e famiglia"@it ,
+                       "Darunter fallen Körperschaften und Familien."@de ,
+                       "Een collectieve actor omvat een corporatie en een familie."@nl ,
+                       "Egy kollektív ágens magába foglal egy testületet és egy családot."@hu ,
+                       "En kollektiv agent inkluderer korporasjon og familie."@no ,
+                       "Grupa ietver institūciju un dzimtu/ģimeni."@lv ,
+                       "Kollektiivid on asutus ja perekond."@et ,
+                       "Kollektiv agent omfatter en korporation og en familie"@da ,
+                       "Un agent collectif comprend une collectivité et une famille."@fr ,
+                       "Un agent col·lectiu inclou una entitat corporativa i una família."@ca ,
+                       "Yhteistoimija kattaa yhteisön ja suvun."@fi ,
+                       "Ένας συλλογικός φορέας περιλαμβάνει ένα συλλογικό όργανο και μια οικογένεια."@el ,
+                       "وكيل جماعي يشمل هيئة وعائلة."@ar .
+
+
+###  http://rdaregistry.info/Elements/c/C10012
+:C10012 rdf:type owl:Class ;
+        rdfs:subClassOf :C10013 ;
+        rdakit:toolkitDefinition "A label for any RDA entity except a nomen."@en ,
+                                 "Apzīmējums, kas attiecas uz RDA entīti."@lv ,
+                                 "Betegnelse for enhver RDA-entitet, undtaget et nomen."@da ,
+                                 "Designació que es refereix a una entitat RDA."@ca ,
+                                 "Designazione che si riferisce a un'entità RDA"@it ,
+                                 "Een aanduiding voor enige RDA-entiteit behalve een nomen."@nl ,
+                                 "Egy megnevezés, amely egy RDA-entitásra utal."@hu ,
+                                 "Ein Label für eine beliebige RDA-Entität. Nomen selbst sind davon ausgenommen."@de ,
+                                 "En betegnelse som henviser til en RDA-entitet."@no ,
+                                 "Một định danh đề cập tới một thực thể RDA."@vi ,
+                                 "Nimike mille tahansa RDA-entiteetille nomenia lukuun ottamatta"@fi ,
+                                 "Tähistus, mis osutab RDA olemile."@et ,
+                                 "Étiquette pour toute entité RDA à l’exception d’un nomen."@fr ,
+                                 "Ένας προσδιορισμός που αναφέρεται σε μια οντότητα RDA."@el ,
+                                 "وسم لأي كيان \"وام\" باستثناء التسمية."@ar ;
+        rdakit:toolkitLabel "Designazione che si riferisce a un'entità RDA"@it ,
+                            "Nomen"@ca ,
+                            "Nomen"@da ,
+                            "Nomen"@de ,
+                            "Nomen"@en ,
+                            "Nomen"@et ,
+                            "Nomen"@fi ,
+                            "Nomen"@fr ,
+                            "Nomen"@hu ,
+                            "Nomen"@nl ,
+                            "Nomen"@no ,
+                            "danh pháp"@vi ,
+                            "nomens"@lv ,
+                            "όνομα"@el ,
+                            "تسمية"@ar ;
+        reg:lexicalAlias :Nomen.en ;
+        reg:status <http://metadataregistry.org/uri/RegStatus/1001> ;
+        rdfs:isDefinedBy <http://rdaregistry.info/Elements/c/> ;
+        rdfs:label "Nomen"@de ,
+                   "danh pháp"@vi ,
+                   "nomen"@ca ,
+                   "nomen"@da ,
+                   "nomen"@en ,
+                   "nomen"@et ,
+                   "nomen"@fi ,
+                   "nomen"@fr ,
+                   "nomen"@hu ,
+                   "nomen"@it ,
+                   "nomen"@nl ,
+                   "nomen"@no ,
+                   "nomens"@lv ,
+                   "όνομα"@el ,
+                   "تسمية"@ar ;
+        skos:definition "A label for any RDA entity except a nomen."@en ,
+                        "Apzīmējums, kas attiecas uz RDA entīti."@lv ,
+                        "Betegnelse for enhver RDA-entitet, undtaget et nomen."@da ,
+                        "Designació que es refereix a una entitat RDA."@ca ,
+                        "Designazione che si riferisce a un'entità RDA"@it ,
+                        "Een aanduiding voor enige RDA-entiteit behalve een nomen."@nl ,
+                        "Egy megnevezés, amely egy RDA-entitásra utal."@hu ,
+                        "Ein Label für eine beliebige RDA-Entität. Nomen selbst sind davon ausgenommen."@de ,
+                        "En betegnelse som henviser til en RDA-entitet."@no ,
+                        "Một định danh đề cập tới một thực thể RDA."@vi ,
+                        "Nimike mille tahansa RDA-entiteetille nomenia lukuun ottamatta"@fi ,
+                        "Tähistus, mis osutab RDA olemile."@et ,
+                        "Étiquette pour toute entité RDA à l’exception d’un nomen."@fr ,
+                        "Ένας προσδιορισμός που αναφέρεται σε μια οντότητα RDA."@el ,
+                        "وسم لأي كيان \"وام\" باستثناء التسمية."@ar ;
+        skos:scopeNote "A nomen includes a name, title, access point, or identifier."@en ,
+                       "Apzīmējums ietver vārdu, nosaukumu, piekļuves punktu, identifikatoru un priekšmetu klasifikācijas kodus."@lv ,
+                       "Betegnelse omfatter et navn, en titel, en søgeindgang, eller en identifikator."@da ,
+                       "Darunter fallen Namen, Titel, Sucheinstiege oder Identifikatoren."@de ,
+                       "Een aanduiding omvat een naam, titel, ingang of identificatie."@nl ,
+                       "Egy megnevezés magába foglal egy nevet, címet, hozzáférési pontot, azonosítót, valamint osztályozási jelzeteket és tárgyszavakat."@hu ,
+                       "En betegnelse inkluderer navn, tittel, søkeinngang, identifikator og emneklassifiseringskoder og -termer."@no ,
+                       "Nimike kattaa nimen, nimekkeen, hakutiedon ja tunnisteen."@fi ,
+                       "Tähistused on nimi, pealkiri, otsielement, identifikaator ning liigiindeksid ja märksõnad."@et ,
+                       "Un nomen comprend un nom, un titre, un point d’accès ou un identifiant."@fr ,
+                       "Una designació inclou un nom, un títol, un punt d’accés, un identificador i els encapçalaments i els codis de la classificació de matèria."@ca ,
+                       "Una designazione comprende un nome, un titolo, un punto d'accesso, un identificatore e codici di classificazioni e intestazioni per soggetto"@it ,
+                       "Ένας προσδιορισμός περιλαμβάνει ένα όνομα, έναν τίτλο, ένα σημείο πρόσβασης, ένα αναγνωριστικό και κώδικες θεματικής ταξινόμησης και επικεφαλίδες."@el ,
+                       "أداة تعريف قد تكون اسما، أو لقبا، أو نقطة وصول، أو معرِّف."@ar .
+
+
+###  http://rdaregistry.info/Elements/c/C10013
+:C10013 rdf:type owl:Class ;
+        rdakit:toolkitDefinition "A tárgyalási univerzum kulcsfogalmi objektumainak elvont osztálya, amely az RDA-metaadathasználók érdeklődésének középpontjában áll a forráskereső rendszerek használata során."@hu ,
+                                 "Abstrakt klasse af begrebsmæssige nøglekomponenter af interesse for brugere af RDA-metadata i et system til ressourcesøgning."@da ,
+                                 "An abstract class of key conceptual objects in the universe of human discourse that are a focus of interest to users of RDA metadata in a system for resource discovery."@en ,
+                                 "Classe abstracta dels objectes conceptuals clau en l’univers del discurs humà que és un centre d’interès per als usuaris de les metadades RDA en un sistema per a la descoberta de recursos."@ca ,
+                                 "Classe abstraite d’objets conceptuels fondamentaux dans l’univers du discours humain qui constituent un centre d’intérêt pour les utilisateurs de métadonnées RDA dans un système de découverte de ressources."@fr ,
+                                 "Classe astratta di oggetti concettuali chiave nel'universo del discorso umano che è focus di interesse per gli utenti di metadati RDA in un sistema per la scoperta delle risorse"@it ,
+                                 "Een abstracte klasse van de belangrijkste conceptuele objecten in de wereld van het menselijk vertoog dat van belang is voor gebruikers van RDA-metadata in een systeem voor het ontdekken van resources."@nl ,
+                                 "Eine abstrakte Klasse wichtiger konzeptioneller Entitäten in der Gesamtheit des menschlichen Diskursuniversums, die für Benutzende von RDA-Metadaten in einem System zum Auffinden von Ressourcen von Interesse ist."@de ,
+                                 "En abstrakt klasse med konseptuelle nøkkelobjekter innenfor menneskelig diskurs som er i fokus for brukere av RDA-metadata i sluttbrukertjenester."@no ,
+                                 "Galveno konceptuālo objektu vispārēja klase, kas interesē RDA metadatu lietotājus bibliotēku informācijas sistēmās."@lv ,
+                                 "Ihmisdiskurssin keskeisten käsitteellisten objektien abstrakti luokka, joka on RDA:n metatietojen käyttäjien kiinnostuksen kohde hakujärjestelmässä."@fi ,
+                                 "Inimühiskonna diskursuse olulisimate mõisteliste objektide abstraktne klass, mis on ressursside leidmise süsteemis RDA metaandmete kasutajate huvikeskmes."@et ,
+                                 "Một lớp trừu tượng của các đối tượng khái niệm chủ yếu của nhân loại được người dùng siêu dữ liệu RDA tập trung chú ý trong các hệ thống thông tin thư viện."@vi ,
+                                 "Μια αφηρημένη τάξη σημαντικών εννοιολογικών αντικειμένων στο σύμπαν του ανθρώπινου λόγου, τα οποία αποτελούν εστία ενδιαφέροντος για τους χρήστες των RDA μεταδεδομένων στα πληροφοριακά συστήματα των βιβλιοθηκών."@el ,
+                                 "فئة مجردة من كائنات مفاهيمية رئيسية في عالم الخطاب البشري، هي محور اهتمام مستخدمي ميتاداتا \"وام\"في نظام لاكتشاف المصادر."@ar ;
+        rdakit:toolkitLabel "Entitat RDA"@ca ,
+                            "Entité RDA"@fr ,
+                            "RDA Entity"@en ,
+                            "RDA Olem"@et ,
+                            "RDA entīte"@lv ,
+                            "RDA οντότητα"@el ,
+                            "RDA-Entität"@de ,
+                            "RDA-entiteetti"@fi ,
+                            "RDA-entiteit"@nl ,
+                            "RDA-entitet"@da ,
+                            "RDA-entitet"@no ,
+                            "RDAEntitás"@hu ,
+                            "entità RDA"@it ,
+                            "thực thể RDA"@vi ,
+                            "كيان \"وام\""@ar ;
+        reg:lexicalAlias :RDAEntity.en ;
+        reg:status <http://metadataregistry.org/uri/RegStatus/1001> ;
+        rdfs:isDefinedBy <http://rdaregistry.info/Elements/c/> ;
+        rdfs:label "RDA entity"@en ,
+                   "RDA entitás"@hu ,
+                   "RDA entīte"@lv ,
+                   "RDA olem"@et ,
+                   "RDA οντότητα"@el ,
+                   "RDA-Entität"@de ,
+                   "RDA-entiteetti"@fi ,
+                   "RDA-entiteit"@nl ,
+                   "RDA-entitet"@da ,
+                   "RDA-entitet"@no ,
+                   "entitat RDA"@ca ,
+                   "entità RDA"@it ,
+                   "entité RDA"@fr ,
+                   "thực thể RDA"@vi ,
+                   "كيان \"وام\""@ar ;
+        skos:definition "A tárgyalási univerzum kulcsfogalmi objektumainak elvont osztálya, amely az RDA-metaadathasználók érdeklődésének középpontjában áll a forráskereső rendszerek használata során."@hu ,
+                        "Abstrakt klasse af begrebsmæssige nøglekomponenter af interesse for brugere af RDA-metadata i et system til ressourcesøgning."@da ,
+                        "An abstract class of key conceptual objects in the universe of human discourse that are a focus of interest to users of RDA metadata in a system for resource discovery."@en ,
+                        "Classe abstracta dels objectes conceptuals clau en l’univers del discurs humà que és un centre d’interès per als usuaris de les metadades RDA en un sistema per a la descoberta de recursos."@ca ,
+                        "Classe abstraite d’objets conceptuels fondamentaux dans l’univers du discours humain qui constituent un centre d’intérêt pour les utilisateurs de métadonnées RDA dans un système de découverte de ressources."@fr ,
+                        "Classe astratta di oggetti concettuali chiave nel'universo del discorso umano che è focus di interesse per gli utenti di metadati RDA in un sistema per la scoperta delle risorse"@it ,
+                        "Een abstracte klasse van de belangrijkste conceptuele objecten in de wereld van het menselijk vertoog dat van belang is voor gebruikers van RDA-metadata in een systeem voor het ontdekken van resources."@nl ,
+                        "Eine abstrakte Klasse wichtiger konzeptioneller Entitäten in der Gesamtheit des menschlichen Diskursuniversums, die für Benutzende von RDA-Metadaten in einem System zum Auffinden von Ressourcen von Interesse ist."@de ,
+                        "En abstrakt klasse med konseptuelle nøkkelobjekter innenfor menneskelig diskurs som er i fokus for brukere av RDA-metadata i sluttbrukertjenester."@no ,
+                        "Galveno konceptuālo objektu vispārēja klase, kas interesē RDA metadatu lietotājus bibliotēku informācijas sistēmās."@lv ,
+                        "Ihmisdiskurssin keskeisten käsitteellisten objektien abstrakti luokka, joka on RDA:n metatietojen käyttäjien kiinnostuksen kohde hakujärjestelmässä."@fi ,
+                        "Inimühiskonna diskursuse olulisimate mõisteliste objektide abstraktne klass, mis on ressursside leidmise süsteemis RDA metaandmete kasutajate huvikeskmes."@et ,
+                        "Một lớp trừu tượng của các đối tượng khái niệm chủ yếu của nhân loại được người dùng siêu dữ liệu RDA tập trung chú ý trong các hệ thống thông tin thư viện."@vi ,
+                        "Μια αφηρημένη τάξη σημαντικών εννοιολογικών αντικειμένων στο σύμπαν του ανθρώπινου λόγου, τα οποία αποτελούν εστία ενδιαφέροντος για τους χρήστες των RDA μεταδεδομένων στα πληροφοριακά συστήματα των βιβλιοθηκών."@el ,
+                        "فئة مجردة من كائنات مفاهيمية رئيسية في عالم الخطاب البشري، هي محور اهتمام مستخدمي ميتاداتا \"وام\" في نظام لاكتشاف المصادر."@ar ;
+        skos:scopeNote "An RDA entity includes an agent, collective agent, corporate body, expression, family, item, manifestation, nomen, person, place, timespan, and work."@en ,
+                       "Darunter fallen Akteure, Exemplare, Expressionen, Familien, gemeinschaftliche Akteure, Geografika, Körperschaften, Manifestationen, Nomen, Personen, Werke und Zeiträume."@de ,
+                       "Een RDA-entiteit omvat een actor, collectieve actor, corporatie, expressie, familie, item, manifestatie, nomen, persoon, plaats, tijdspanne en werk."@nl ,
+                       "Egy RDA entitás magába foglal egy ágenst, egy kollektív ágenst, testületet, kifejezési formát, családot, példányt, megjelenési formát, noment, személyt, helyet, időtartamot és művet."@hu ,
+                       "En RDA-entitet inkluderer agent, fellesagent, korporasjon, uttrykk, familie, eksemplar, manifestasjon, nomen, person, sted, tidsrom og verk."@no ,
+                       "RDA entīte ietver aģentu, grupu, institūciju, izteiksmi, dzimtu/ģimeni, vienību, manifestāciju, nomenu, personu, vietu, laikposmu un darbu."@lv ,
+                       "RDA olemid on tegija, kollektiiv, asutus, väljendus, perekond, eksemplar, kehastus, nomen, isik, koht, ajavahemik ja teos."@et ,
+                       "RDA-entiteetti kattaa toimijan, yhteistoimijan, yhteisön, ekspression, suvun, kappaleen, manifestaation, nomenin, henkilön, paikan, ajanjakson ja teoksen."@fi ,
+                       "RDA-entitet omfatter en agent, kollektiv agent, korporation, et udtryk, en familie, et eksemplar, en manifestation, et nomen, en person, et sted, en tidsperiode og et værk."@da ,
+                       "Un'entità RDA comprende arco di tempo, agente, agente collettivo, ente, espressione, famiglia, item, luogo, manifestazione, nomen, opera e persona."@it ,
+                       "Una entitat RDA inclou un agent, un agent col·lectiu, una entitat corporativa, una expressió, una família, un ítem, una manifestació, un nomen, una persona, un lloc, un interval de temps i una obra."@ca ,
+                       "Une entité RDA comprend un agent, un agent collectif, une collectivité, une expression, une famille, un item, un laps de temps, un lieu, une manifestation, un nomen, une œuvre et une personne."@fr ,
+                       "Μια οντότητα RDA περιλαμβάνει έναν φορέα, έναν συλλογικό φορέα, μια έκφραση, μια οικογένεια, ένα αντίτυπο, μια εκδήλωση, ένα όνομα, ένα φυσικό πρόσωπο, έναν τόπο, ένα χρονικό διάστημα και ένα έργο."@el ,
+                       "كيان \"وام\" يشمل وكيلا، ووكيلا جماعيا، وهيئة، وتعبيرة، وعائلة، ومفردة، وتجسيدة، وتسمية، وشخص، ومكان، وفترة زمنية، وعمل."@ar .
+
+
+###  http://www.w3.org/2004/02/skos/core#Concept
+skos:Concept rdf:type owl:Class .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  http://metadataregistry.org/uri/RegStatus/1001
+<http://metadataregistry.org/uri/RegStatus/1001> rdf:type owl:NamedIndividual ,
+                                                          skos:Concept ;
+                                                 skos:prefLabel "Published"@en .
+
+
+###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi
