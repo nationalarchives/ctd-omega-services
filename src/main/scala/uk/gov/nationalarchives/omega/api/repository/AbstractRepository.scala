@@ -22,8 +22,8 @@
 package uk.gov.nationalarchives.omega.api.repository
 
 import org.apache.jena.ext.xerces.util.URI
-import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentConceptEntity, AgentDescriptionEntity, LegalStatusEntity }
+import uk.gov.nationalarchives.omega.api.messages.request.{GetRecordFull, ListAgentSummary}
+import uk.gov.nationalarchives.omega.api.repository.model.{AgentConceptEntity, AgentDescriptionEntity, LegalStatusEntity}
 
 import scala.util.Try
 
@@ -60,5 +60,12 @@ trait AbstractRepository {
     listAgentSummary: ListAgentSummary,
     agentConceptUri: URI
   ): Try[List[AgentDescriptionEntity]]
+
+  /**
+    * Retrieve the full record for the URI supplied in the given request
+    * @param getRecordFull the full record request
+    * @return a Success with RecordFullEntity or an error
+    */
+  def getRecordFullEntity(getRecordFull: GetRecordFull): Try[RecordFullEntity]
 
 }
