@@ -3,11 +3,11 @@ PREFIX cat: <http://cat.nationalarchives.gov.uk/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX edm: <http://www.europeana.eu/schemas/edm/>
 
-SELECT ?descriptionId ?abstract ?previousSibling ?versionTimestamp ?previousDescription
-WHERE { ?descriptionId dct:type cat:record-description ;
-                       prov:specializationOf ?conceptId ;
-                       dct:abstract ?abstract ;
-                       prov:generatedAtTime ?versionTimestamp .
-        OPTIONAL { ?descriptionId edm:isNextInSequence ?previousSibling . }
-        OPTIONAL { ?descriptionId prov:wasRevisionOf ?previousDescription . }
+SELECT ?recordDescriptionUri ?abstract ?previousSiblingUri ?versionTimestamp ?previousDescriptionUri
+WHERE { ?recordDescriptionUri dct:type cat:record-description ;
+                              prov:specializationOf ?recordConceptUri ;
+                              dct:abstract ?abstract ;
+                              prov:generatedAtTime ?versionTimestamp .
+        OPTIONAL { ?recordDescriptionUri edm:isNextInSequence ?previousSiblingUri . }
+        OPTIONAL { ?recordDescriptionUri prov:wasRevisionOf ?previousDescriptionUri . }
       }

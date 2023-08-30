@@ -21,7 +21,7 @@
 
 package uk.gov.nationalarchives.omega.api.messages
 
-import io.circe.Encoder
+import io.circe.{ Encoder, Json }
 import io.circe.syntax.EncoderOps
 import io.circe.generic.auto._
 
@@ -32,7 +32,11 @@ case class TemporalInterval(dateFrom: String, dateTo: String) extends Temporal
 
 object GenericTemporalDerivation {
   implicit val encodeTemporal: Encoder[Temporal] = Encoder.instance {
-    case instant @ TemporalInstant(_)      => instant.asJson
-    case interval @ TemporalInterval(_, _) => interval.asJson
+    case instant @ TemporalInstant(_) => instant.asJson
+    case TemporalInterval(dateFrom, dateTo) =>
+      Json.obj(
+        ("date-from", Json.fromString(dateFrom)),
+        ("date-to", Json.fromString(dateTo))
+      )
   }
 }

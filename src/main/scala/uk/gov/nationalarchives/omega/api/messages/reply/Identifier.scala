@@ -22,18 +22,18 @@
 package uk.gov.nationalarchives.omega.api.messages.reply
 
 import io.circe.syntax.EncoderOps
-import io.circe.{Encoder, Json}
+import io.circe.{ Encoder, Json }
 import io.circe.generic.auto._
 
 sealed trait Identifier
 
-case class GeneralIdentifier(id: String) extends Identifier
+case class GeneralIdentifier(identifier: String) extends Identifier
 
-case class LabelledIdentifier(id: String, label: String) extends Identifier
+case class LabelledIdentifier(identifier: String, label: String) extends Identifier
 
 object GenericIdentifierDerivation {
   implicit val encodeIdentifier: Encoder[Identifier] = Encoder.instance {
-    case unlabelled @ GeneralIdentifier(_)      => Json.fromString(unlabelled.id)
+    case unlabelled @ GeneralIdentifier(_)   => Json.fromString(unlabelled.identifier)
     case labelled @ LabelledIdentifier(_, _) => labelled.asJson
   }
 }

@@ -19,27 +19,14 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages.reply
+package uk.gov.nationalarchives.omega.api.business.records
 
-import uk.gov.nationalarchives.omega.api.messages.{ CS13RecordType, DescribedTemporal }
+import uk.gov.nationalarchives.omega.api.business.BusinessServiceError
+import uk.gov.nationalarchives.omega.api.common.ErrorCode
 
-case class RecordDescriptionProperties(
-  assetLegalStatus: Option[Identifier] = None,
-  legacyTnaCs13RecordType: Option[CS13RecordType] = None,
-  designationOfEdition: Option[String] = None,
-  created: Option[DescribedTemporal] = None,
-  covering: Option[DescribedTemporal] = None,
-  archivistsNote: Option[String] = None,
-  sourceOfAcquisition: Option[String] = None,
-  custodialHistory: Option[String] = None,
-  administrativeBiographicalBackground: Option[String] = None,
-  accumulation: Option[DescribedTemporal] = None,
-  appraisal: Option[String] = None,
-  accrualPolicy: Option[String] = None,
-  layout: Option[String] = None,
-  publicationNote: Option[String] = None,
-  referencedBy: Option[Identifier] = None,
-  relatedTo: Option[Identifier] = None,
-  separatedFrom: Option[Identifier] = None,
-  subject: Option[Identifier] = None
-)
+case class GetRecordError(message: String) extends BusinessServiceError {
+
+  override def code: ErrorCode = ErrorCode.PROC002
+
+  override def description: String = "There was an error"
+}

@@ -26,7 +26,7 @@ import org.apache.jena.query.{ Query, QuerySolution }
 import org.phenoscape.sparql.FromQuerySolution
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentConceptEntity, AgentDescriptionEntity, LegalStatusEntity }
+import uk.gov.nationalarchives.omega.api.repository.model._
 
 import java.time.ZonedDateTime
 import scala.util.Try
@@ -37,6 +37,8 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
   private val selectLegalStatusSummarySparqlResource = s"/$sparqlResourceDir/select-legal-status-summaries.rq"
   private val getAgentSummariesSparqlResource = s"/$sparqlResourceDir/get-agent-concepts.rq"
   private val getAgentDescriptionsSparqlResource = s"/$sparqlResourceDir/get-agent-descriptions.rq"
+  private val getRecordConceptSparqlResource = s"/$sparqlResourceDir/get-record-concept.rq"
+  private val getRecordCreatorSparqlResource = s"/$sparqlResourceDir/get-record-creator.rq"
 
   implicit object BooleanFromQuerySolution extends FromQuerySolution[Boolean] {
     def fromQuerySolution(qs: QuerySolution, variablePath: String = ""): Try[Boolean] =
@@ -75,7 +77,37 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
       result <- executeQuery(query, implicitly[FromQuerySolution[AgentDescriptionEntity]])
     } yield result
 
+  override def getRecordConceptEntity(recordConceptId: String): Try[List[RecordConceptEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+                 getRecordConceptSparqlResource,
+                 SparqlParams(strings = Map("identifier" -> recordConceptId)),
+                 extendQuery = false
+               )
+      result <- executeQuery(query, implicitly[FromQuerySolution[RecordConceptEntity]])
+    } yield result
+
+  override def getCreatorEntities(recordConceptUri: String): Try[List[CreatorEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+                 getRecordCreatorSparqlResource,
+                 SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri)),
+                 extendQuery = false
+               )
+      result <- executeQuery(query, implicitly[FromQuerySolution[CreatorEntity]])
+    } yield result
+
   private def executeQuery[A](query: Query, queryDecoder: FromQuerySolution[A]): Try[List[A]] =
     sparqlConnector.execute(query, queryDecoder)
 
+  override def getRecordDescriptionSummaries(recordConceptUri: String): Try[List[RecordDescriptionSummaryEntity]] = ???
+
+  override def getRecordDescriptionProperties(recordConceptUri: String): Try[List[RecordDescriptionPropertiesEntity]] =
+    ???
+
+  override def getAccessRights(recordConceptUri: String): Try[List[AccessRightsEntity]] = ???
+
+  override def getIsPartOf(recordConceptUri: String): Try[List[IsPartOfEntity]] = ???
+
+  override def getSecondaryIdentifiers(recordConceptUri: String): Try[List[SecondaryIdentifierEntity]] = ???
 }

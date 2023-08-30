@@ -2,10 +2,11 @@ PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX cat: <http://cat.nationalarchives.gov.uk/>
 PREFIX odrl: <http://www.w3.org/ns/odrl/2/>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
 
-SELECT ?accessRights
-WHERE { ?descriptionId dct:type cat:record-description ;
-                       dct:accessRights ?accessRightsBNode .
+SELECT ?recordDescriptionUri ?accessRights
+WHERE { ?recordDescriptionUri prov:specializationOf ?recordConceptUri ;
+                              dct:accessRights ?accessRightsBNode .
         ?accessRightsBNode rdf:type dct:RightsStatement ;
                            odrl:hasPolicy ?accessRights .
       }

@@ -24,6 +24,8 @@ package uk.gov.nationalarchives.omega.api.messages
 import enumeratum.EnumEntry.CapitalWords
 import enumeratum.{ CirceEnum, Enum, EnumEntry }
 
+import scala.util.{ Failure, Success, Try }
+
 sealed trait RecordType extends EnumEntry with CapitalWords
 
 object RecordType extends Enum[RecordType] with CirceEnum[RecordType] {
@@ -37,5 +39,11 @@ object RecordType extends Enum[RecordType] with CirceEnum[RecordType] {
   case object BornDigital extends RecordType
 
   case object Hybrid extends RecordType
+
+  def fromUri(uri: String): Try[RecordType] =
+    uri match {
+      case "http://www.nationalarchives.gov.uk/ont.physical-record" => Success(Physical)
+      case unknown => Failure(new IllegalArgumentException(s"Unknown record type: $unknown"))
+    }
 
 }

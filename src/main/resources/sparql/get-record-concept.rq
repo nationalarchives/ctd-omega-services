@@ -2,7 +2,6 @@ PREFIX ver: <http://purl.org/linked-data/version#>
 PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX cat: <http://cat.nationalarchives.gov.uk/>
 
-SELECT ?identifier ?type ?currentDescription
-WHERE { ?identifier dct:type cat:record-concept ;
-                    dct:format ?type ;
-                    ver:currentVersion ?currentDescription }
+SELECT ?type ?currentDescription
+WHERE { ?recordConceptUri dct:format ?type ;
+                          ver:currentVersion ?currentDescription }

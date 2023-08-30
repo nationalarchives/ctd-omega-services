@@ -68,7 +68,8 @@ cat:COAL.2022.N373.P.2
                                      schema:propertyID  <http://www.nationalarchives.gov.uk/ont.iaid> ;
                                      schema:value       "C12085388"
                                    ] ;
-    prov:wasRevisionOf             cat:COAL.2022.N373.P.1 .
+    prov:wasRevisionOf             cat:COAL.2022.N373.P.1 ;
+    rdau:P60365                    "<unittitle type=\"Map Designation\">GSGS 2321</unittitle>"^^rdf:XMLLiteral .
 
 cat:COAL.2022.N373.P.1
     a                              premis:IntellectualEntity ;

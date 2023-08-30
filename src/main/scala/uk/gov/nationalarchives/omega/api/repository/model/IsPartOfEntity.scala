@@ -19,27 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages.reply
+package uk.gov.nationalarchives.omega.api.repository.model
 
-import uk.gov.nationalarchives.omega.api.messages.{ CS13RecordType, DescribedTemporal }
+import org.apache.jena.ext.xerces.util.URI
 
-case class RecordDescriptionProperties(
-  assetLegalStatus: Option[Identifier] = None,
-  legacyTnaCs13RecordType: Option[CS13RecordType] = None,
-  designationOfEdition: Option[String] = None,
-  created: Option[DescribedTemporal] = None,
-  covering: Option[DescribedTemporal] = None,
-  archivistsNote: Option[String] = None,
-  sourceOfAcquisition: Option[String] = None,
-  custodialHistory: Option[String] = None,
-  administrativeBiographicalBackground: Option[String] = None,
-  accumulation: Option[DescribedTemporal] = None,
-  appraisal: Option[String] = None,
-  accrualPolicy: Option[String] = None,
-  layout: Option[String] = None,
-  publicationNote: Option[String] = None,
-  referencedBy: Option[Identifier] = None,
-  relatedTo: Option[Identifier] = None,
-  separatedFrom: Option[Identifier] = None,
-  subject: Option[Identifier] = None
-)
+case class IsPartOfEntity(recordDescriptionUri: URI, isPartOfUri: URI)

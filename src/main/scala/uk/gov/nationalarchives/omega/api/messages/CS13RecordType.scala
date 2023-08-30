@@ -23,6 +23,10 @@ package uk.gov.nationalarchives.omega.api.messages
 
 import enumeratum.EnumEntry.CapitalWords
 import enumeratum.{ CirceEnum, Enum, EnumEntry }
+import org.apache.jena.ext.xerces.util.URI
+import uk.gov.nationalarchives.omega.api.repository.BaseURL
+
+import scala.util.{ Failure, Success, Try }
 
 sealed trait CS13RecordType extends EnumEntry with CapitalWords
 
@@ -33,5 +37,12 @@ object CS13RecordType extends Enum[CS13RecordType] with CirceEnum[CS13RecordType
   case object Piece extends CS13RecordType
 
   case object Item extends CS13RecordType
+
+  def fromUri(cs13RecordTypeUri: URI): Try[CS13RecordType] =
+    cs13RecordTypeUri.toString match {
+      case s"${BaseURL.cat}/piece" => Success(Piece)
+      case s"${BaseURL.cat}/item"  => Success(Item)
+      case unknown                 => Failure(new IllegalArgumentException(s"Unknown CS13 record type: $unknown"))
+    }
 
 }

@@ -2,7 +2,7 @@ PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX cat: <http://cat.nationalarchives.gov.uk/>
 
 SELECT ?identifier ?label
-WHERE { ?conceptId dct:type cat:record-concept ;
+WHERE { ?recordConceptUri dct:type cat:record-concept ;
                    dct:creator ?creator .
         ?creator dct:subject ?identifier .
         OPTIONAL { ?creator dct:description ?label . }

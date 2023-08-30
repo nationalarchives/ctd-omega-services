@@ -4,17 +4,30 @@ PREFIX odrl: <http://www.w3.org/ns/odrl/2/>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX premis: <http://www.loc.gov/premis/rdf/v3/>
 PREFIX rdau: <http://rdaregistry.info/Elements/u/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX time: <http://www.w3.org/2006/time#>
 
-SELECT ?assetLegalStatus ?designationOfEdition ?createdType ?archivistsNote ?sourceOfAcquisition ?custodialHistory
-WHERE { ?descriptionId dct:type cat:record-description ;
-                       premis:rightsStatus ?rightsStatus ;
-                       cat:created/rdf:type ?createdType .
+SELECT ?recordDescriptionUri ?assetLegalStatus ?legalStatusLabel ?legacyType ?designationOfEdition ?createdType ?createdDescription ?createdBeginning ?createdEnd ?createdInstant ?archivistsNote ?sourceOfAcquisition ?custodialHistory
+WHERE { ?recordDescriptionUri prov:specializationOf ?recordConceptUri ;
+                              premis:rightsStatus ?rightsStatus ;
+                              cat:created ?created ;
+                              dct:type ?legacyType .
+        FILTER(?legacyType IN (cat:item, cat:piece))
+        ?created rdf:type ?createdType ;
+                 dct:description ?createdDescription .
+        OPTIONAL { ?created time:hasBeginning ?beginning ;
+                            time:hasEnd ?end .
+                   ?beginning time:inXSDDate ?createdBeginning .
+                   ?end time:inXSDDate ?createdEnd . }
+        OPTIONAL { ?created time:inXSDDate ?createdInstant . }
         ?rightsStatus rdf:type premis:RightsStatus ;
                       premis:basis ?assetLegalStatus .
-        OPTIONAL { ?descriptionId rdau:P60365 ?designationOfEdition . }
-        OPTIONAL { ?descriptionId premis:note ?archivistsNote . }
-        OPTIONAL { ?descriptionId dct:provenance/dct:type cat:immediate-source-of-acquisition ;
-                                  dct:provenance/dct:subject ?sourceOfAcquisition . }
-        OPTIONAL { ?descriptionId dct:provenance/dct:type cat:custodial-history ;
-                                  dct:provenance/dct:description ?custodialHistory . }
+        ?assetLegalStatus skos:prefLabel ?legalStatusLabel .
+        OPTIONAL { ?recordDescriptionUri rdau:P60365 ?designationOfEdition . }
+        OPTIONAL { ?recordDescriptionUri premis:note ?archivistsNote . }
+        OPTIONAL { ?recordDescriptionUri dct:provenance/dct:type cat:immediate-source-of-acquisition ;
+                                         dct:provenance/dct:subject ?sourceOfAcquisition . }
+        OPTIONAL { ?recordDescriptionUri dct:provenance/dct:type cat:custodial-history ;
+                                         dct:provenance/dct:description ?custodialHistory . }
       }

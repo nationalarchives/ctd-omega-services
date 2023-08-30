@@ -22,7 +22,7 @@
 package uk.gov.nationalarchives.omega.api.messages.reply
 
 import io.circe.syntax.EncoderOps
-import io.circe.{Encoder, Json}
+import io.circe.{ Encoder, Json }
 
 case class RecordDescriptionSummary(
   identifier: String,
@@ -31,7 +31,7 @@ case class RecordDescriptionSummary(
   accessRights: List[String],
   isPartOf: List[String],
   versionTimestamp: String,
-  secondaryIdentifier: Option[TypedIdentifier],
+  secondaryIdentifier: Option[List[TypedIdentifier]],
   previousSibling: Option[String],
   previousDescription: Option[String]
 )
@@ -43,11 +43,11 @@ object RecordDescriptionSummary {
           ("identifier", recordDescriptionSummary.identifier.asJson),
           ("secondary-identifier", recordDescriptionSummary.secondaryIdentifier.asJson),
           ("label", recordDescriptionSummary.label.asJson),
-          ("abstract",recordDescriptionSummary.description.asJson),
+          ("abstract", recordDescriptionSummary.description.asJson),
           ("access-rights", recordDescriptionSummary.accessRights.asJson),
-          ("is-part-of",recordDescriptionSummary.isPartOf.asJson),
-          ("previous-sibling",recordDescriptionSummary.previousSibling.asJson),
-          ("version-timestamp",recordDescriptionSummary.versionTimestamp.asJson),
-          ("previous-description",recordDescriptionSummary.previousDescription.asJson)
+          ("is-part-of", recordDescriptionSummary.isPartOf.asJson),
+          ("previous-sibling", recordDescriptionSummary.previousSibling.asJson),
+          ("version-timestamp", recordDescriptionSummary.versionTimestamp.asJson),
+          ("previous-description", recordDescriptionSummary.previousDescription.asJson)
         )
 }
