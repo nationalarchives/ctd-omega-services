@@ -24,7 +24,7 @@ package uk.gov.nationalarchives.omega.api.business.legalstatus
 import org.mockito.MockitoSugar
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import uk.gov.nationalarchives.omega.api.repository.OmegaRepository
+import uk.gov.nationalarchives.omega.api.repository.{ BaseURL, OmegaRepository }
 import uk.gov.nationalarchives.omega.api.messages.request.ListAssetLegalStatusSummary
 import uk.gov.nationalarchives.omega.api.support.TestStubData
 
@@ -46,23 +46,23 @@ class LegalStatusServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar
 
         result mustBe Right(LegalStatusReply(s"""[
   {
-    "identifier" : "http://cat.nationalarchives.gov.uk/public-record",
+    "identifier" : "${BaseURL.cat}/public-record",
     "label" : "Public Record"
   },
   {
-    "identifier" : "http://cat.nationalarchives.gov.uk/non-public-record",
+    "identifier" : "${BaseURL.cat}/non-public-record",
     "label" : "Non-Public Record"
   },
   {
-    "identifier" : "http://cat.nationalarchives.gov.uk/public-record-unless-otherwise-stated",
+    "identifier" : "${BaseURL.cat}/public-record-unless-otherwise-stated",
     "label" : "Public Record (unless otherwise stated)"
   },
   {
-    "identifier" : "http://cat.nationalarchives.gov.uk/welsh-public-record",
+    "identifier" : "${BaseURL.cat}/welsh-public-record",
     "label" : "Welsh Public Record"
   },
   {
-    "identifier" : "http://cat.nationalarchives.gov.uk/non-record-material",
+    "identifier" : "${BaseURL.cat}/non-record-material",
     "label" : "Non-Record Material"
   }
 ]""".stripMargin))
