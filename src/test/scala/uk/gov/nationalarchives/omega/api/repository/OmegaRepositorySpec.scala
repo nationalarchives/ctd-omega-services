@@ -32,6 +32,7 @@ import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.model.{ AgentConceptEntity, AgentDescriptionEntity }
 import uk.gov.nationalarchives.omega.api.support.UnitTest
 
+import java.time.ZonedDateTime
 import scala.util.{ Failure, Success, Try }
 
 class OmegaRepositorySpec extends UnitTest {
@@ -48,7 +49,7 @@ class OmegaRepositorySpec extends UnitTest {
     }
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[LegalStatus](any, any)).thenReturn(
-        Success(List(LegalStatus(new URI("http://cat.nationalarchives.gov.uk/public-record"), "Public Record")))
+        Success(List(LegalStatus(new URI(s"${BaseURL.cat}/public-record"), "Public Record")))
       )
       val result = repository.getLegalStatusEntities
       result.success.get.length mustBe 1
@@ -68,9 +69,9 @@ class OmegaRepositorySpec extends UnitTest {
         Try(
           List(
             AgentConceptEntity(
-              new URI("http://cat.nationalarchives.gov.uk/agent.3LG"),
-              new URI("http://cat.nationalarchives.gov.uk/person-concept"),
-              new URI("http://cat.nationalarchives.gov.uk/agent.3LG.1")
+              new URI(s"${BaseURL.cat}/agent.3LG"),
+              new URI(s"${BaseURL.cat}/person-concept"),
+              new URI(s"${BaseURL.cat}/agent.3LG.1")
             )
           )
         )
@@ -84,14 +85,14 @@ class OmegaRepositorySpec extends UnitTest {
         Try(
           List(
             AgentConceptEntity(
-              new URI("http://cat.nationalarchives.gov.uk/agent.3LG"),
-              new URI("http://cat.nationalarchives.gov.uk/person-concept"),
-              new URI("http://cat.nationalarchives.gov.uk/agent.3LG.1")
+              new URI(s"${BaseURL.cat}/agent.3LG"),
+              new URI(s"${BaseURL.cat}/person-concept"),
+              new URI(s"${BaseURL.cat}/agent.3LG.1")
             ),
             AgentConceptEntity(
-              new URI("http://cat.nationalarchives.gov.uk/agent.S7"),
-              new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
-              new URI("http://cat.nationalarchives.gov.uk/agent.S7.1")
+              new URI(s"${BaseURL.cat}/agent.S7"),
+              new URI(s"${BaseURL.cat}/corporate-body-concept"),
+              new URI(s"${BaseURL.cat}/agent.S7.1")
             )
           )
         )
@@ -104,9 +105,9 @@ class OmegaRepositorySpec extends UnitTest {
         Try(
           List(
             AgentConceptEntity(
-              new URI("http://cat.nationalarchives.gov.uk/agent.S7"),
-              new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
-              new URI("http://cat.nationalarchives.gov.uk/agent.S7.1")
+              new URI(s"${BaseURL.cat}/agent.S7"),
+              new URI(s"${BaseURL.cat}/corporate-body-concept"),
+              new URI(s"${BaseURL.cat}/agent.S7.1")
             )
           )
         )
@@ -121,9 +122,9 @@ class OmegaRepositorySpec extends UnitTest {
       Try(
         List(
           AgentConceptEntity(
-            new URI("http://cat.nationalarchives.gov.uk/agent.3LG"),
-            new URI("http://cat.nationalarchives.gov.uk/person-concept"),
-            new URI("http://cat.nationalarchives.gov.uk/agent.3LG.1")
+            new URI(s"${BaseURL.cat}/agent.3LG"),
+            new URI(s"${BaseURL.cat}/person-concept"),
+            new URI(s"${BaseURL.cat}/agent.3LG.1")
           )
         )
       )
@@ -137,9 +138,9 @@ class OmegaRepositorySpec extends UnitTest {
         Try(
           List(
             AgentDescriptionEntity(
-              new URI("http://cat.nationalarchives.gov.uk/agent.3LG.1"),
+              new URI(s"${BaseURL.cat}/agent.3LG.1"),
               "Edwin Hill",
-              "2023-01-25T14:18:41.668Z",
+              ZonedDateTime.parse("2023-01-25T14:18:41.668Z"),
               Some("1793"),
               Some("1876"),
               depository = Some(false),
@@ -150,7 +151,7 @@ class OmegaRepositorySpec extends UnitTest {
       )
       val result = repository.getAgentDescriptionEntities(
         ListAgentSummary(),
-        new URI("http://cat.nationalarchives.gov.uk/agent.3LG")
+        new URI(s"${BaseURL.cat}/agent.3LG")
       )
       result.success.get.length mustBe 1
     }
@@ -159,18 +160,18 @@ class OmegaRepositorySpec extends UnitTest {
         Try(
           List(
             AgentDescriptionEntity(
-              new URI("http://cat.nationalarchives.gov.uk/agent.3LG.2"),
+              new URI(s"${BaseURL.cat}/agent.3LG.2"),
               "Edmond Hill",
-              "2023-07-27T12:45:00.000Z",
+              ZonedDateTime.parse("2023-07-27T12:45:00.000Z"),
               Some("1793"),
               Some("1876"),
               depository = Some(false),
               None
             ),
             AgentDescriptionEntity(
-              new URI("http://cat.nationalarchives.gov.uk/agent.3LG.1"),
+              new URI(s"${BaseURL.cat}/agent.3LG.1"),
               "Edwin Hill",
-              "2023-01-25T14:18:41.668Z",
+              ZonedDateTime.parse("2023-01-25T14:18:41.668Z"),
               Some("1793"),
               Some("1876"),
               depository = Some(false),
@@ -181,7 +182,7 @@ class OmegaRepositorySpec extends UnitTest {
       )
       val result = repository.getAgentDescriptionEntities(
         ListAgentSummary(),
-        new URI("http://cat.nationalarchives.gov.uk/agent.3LG")
+        new URI(s"${BaseURL.cat}/agent.3LG")
       )
       result.success.get.length mustBe 2
     }

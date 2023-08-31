@@ -10,7 +10,7 @@ import org.scalatest.time.{ Second, Seconds, Span }
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.OmegaRepository
+import uk.gov.nationalarchives.omega.api.repository.{ BaseURL, OmegaRepository }
 
 class OmegaRepositoryISpec
     extends AnyFreeSpec with Matchers with Eventually with IntegrationPatience with BeforeAndAfterAll
@@ -62,41 +62,61 @@ class OmegaRepositoryISpec
       eventually {
         val result = repository.getAgentDescriptionEntities(
           ListAgentSummary(),
-          new URI("http://cat.nationalarchives.gov.uk/agent.HHC")
+          new URI(s"${BaseURL.cat}/agent.HHC")
         )
         result.success.get.length mustBe 1
-        result.success.get.head.identifier mustBe "http://cat.nationalarchives.gov.uk/agent.HHC.2"
+        result.success.get.head.identifier mustBe s"${BaseURL.cat}/agent.HHC.2"
       }
     }
-    "must return a List containing the HHC.2 agent" in {
+    "must return a List containing the latest HHC agent (HH2)" in {
       when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
       eventually {
         val result = repository.getAgentDescriptionEntities(
           ListAgentSummary(versionTimestamp = Some("latest")),
-          new URI("http://cat.nationalarchives.gov.uk/agent.HHC")
+          new URI(s"${BaseURL.cat}/agent.HHC")
         )
         result.success.get.length mustBe 1
-        result.success.get.head.identifier mustBe "http://cat.nationalarchives.gov.uk/agent.HHC.2"
+        result.success.get.head.identifier mustBe s"${BaseURL.cat}/agent.HHC.2"
       }
     }
-    "must return a List with two items" in {
+    "must return a List with both HHC agent descriptions" in {
       when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
       eventually {
         val result = repository.getAgentDescriptionEntities(
           ListAgentSummary(versionTimestamp = Some("all")),
-          new URI("http://cat.nationalarchives.gov.uk/agent.HHC")
+          new URI(s"${BaseURL.cat}/agent.HHC")
         )
         result.success.get.length mustBe 2
       }
     }
-    "must return a List containing the HHC.1 agent" in {
+    "must return a List containing with all HHC agents created from a date onwards (0)" in {
       when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
       eventually {
         val result = repository.getAgentDescriptionEntities(
-          ListAgentSummary(versionTimestamp = Some("2023-01-25T14:14:47.534Z")),
-          new URI("http://cat.nationalarchives.gov.uk/agent.HHC")
+          ListAgentSummary(versionTimestamp = Some("2023-08-01T00:00:00.000Z")),
+          new URI(s"${BaseURL.cat}/agent.HHC")
         )
-        result.success.get.head.identifier mustBe "http://cat.nationalarchives.gov.uk/agent.HHC.1"
+        result.success.get mustEqual List.empty
+      }
+    }
+    "must return a List containing with all HHC agents created from a date onwards (1)" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getAgentDescriptionEntities(
+          ListAgentSummary(versionTimestamp = Some("2023-07-01T00:00:00.000Z")),
+          new URI(s"${BaseURL.cat}/agent.HHC")
+        )
+        result.success.get.head.identifier mustBe s"${BaseURL.cat}/agent.HHC.2"
+      }
+    }
+    "must return a List containing with all HHC agents created from a date onwards (2)" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getAgentDescriptionEntities(
+          ListAgentSummary(versionTimestamp = Some("2023-01-01T00:00:00.000Z")),
+          new URI(s"${BaseURL.cat}/agent.HHC")
+        )
+        result.success.get.length mustBe 2
       }
     }
   }

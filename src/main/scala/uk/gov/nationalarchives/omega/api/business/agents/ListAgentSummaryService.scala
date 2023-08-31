@@ -34,9 +34,7 @@ import uk.gov.nationalarchives.omega.api.messages.{ StubData, ValidatedLocalMess
 import uk.gov.nationalarchives.omega.api.repository.AbstractRepository
 import uk.gov.nationalarchives.omega.api.repository.model.AgentConceptEntity
 
-import java.text.SimpleDateFormat
-import java.util.Date
-import javax.xml.crypto.dsig.TransformException
+import java.time.ZonedDateTime
 import scala.util.{ Failure, Success, Try }
 
 class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRepository)
@@ -81,18 +79,16 @@ class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRe
       Validated.valid(ListAgentSummary())
     }
 
-  private def validateDate(dateStr: String): Option[Date] = {
-
-    val dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX")
+  private def validateDate(dateStr: String): Option[ZonedDateTime] = {
     val trimmedDate = dateStr.trim
     if (trimmedDate.isEmpty) None
     else
-      Try(dateFormatter.parse(trimmedDate)).toOption
+      Try(ZonedDateTime.parse(trimmedDate)).toOption
   }
 
   private def getAgentSummaries(listAgentSummary: ListAgentSummary): Try[List[AgentSummary]] =
     for {
-      agentEntities  <- repository.getAgentSummaryEntities(listAgentSummary.copy(versionTimestamp = None))
+      agentEntities  <- repository.getAgentSummaryEntities(listAgentSummary)
       agentSummaries <- convertAgentSummaryEntities(agentEntities, listAgentSummary)
     } yield agentSummaries
 

@@ -1,4 +1,4 @@
-val CatsEffectVersion = "3.4.8"
+val CatsEffectVersion = "3.5.1"
 val Log4CatsVersion = "2.5.0"
 val PureConfigVersion = "0.17.2"
 val Jms4SVersion = "0.5.0-TNA-OMG-0.1.0"
@@ -66,7 +66,7 @@ lazy val root = Project("ctd-omega-services", file("."))
       "com.github.pureconfig"                         %% "pureconfig-core"            % PureConfigVersion,
       "com.github.pureconfig"                         %% "pureconfig-generic"         % PureConfigVersion,
       "com.github.pureconfig"                         %% "pureconfig-generic-base"    % PureConfigVersion,
-      "com.fasterxml.uuid"                             % "java-uuid-generator"        % "4.1.0",
+      "com.fasterxml.uuid"                             % "java-uuid-generator"        % "4.2.0",
       "com.beachape"                                  %% "enumeratum"                 % EnumeratumVersion,
       "com.beachape"                                  %% "enumeratum-circe"           % EnumeratumVersion,
       "org.typelevel"                                 %% "log4cats-core"              % Log4CatsVersion,
@@ -74,11 +74,12 @@ lazy val root = Project("ctd-omega-services", file("."))
       "com.chuusai"                                   %% "shapeless"                  % "2.3.10",
       "org.apache.commons"                             % "commons-lang3"              % "3.12.0",
       "io.circe"                                      %% "circe-core"                 % CirceVersion,
-      "io.circe"                                      %% "circe-generic"              % CirceVersion,
       "io.circe"                                      %% "circe-parser"               % CirceVersion,
       "org.phenoscape"                                %% "sparql-utils"               % "1.3.1",
       "org.apache.jena"                                % "jena-core"                  % JenaVersion,
       "org.apache.jena"                                % "jena-arq"                   % JenaVersion,
+      "com.propensive"                                %% "magnolia"                   % "0.17.0",
+      "com.propensive"                                %% "mercator"                   % "0.2.1",
       "ch.qos.logback"         % "logback-classic"               % "1.3.5"   % Runtime, // Java 8 compatible
       "net.logstash.logback"   % "logstash-logback-encoder"      % "7.3"     % Runtime,
       "org.scalatest"         %% "scalatest"                     % "3.2.15"  % "it,test",

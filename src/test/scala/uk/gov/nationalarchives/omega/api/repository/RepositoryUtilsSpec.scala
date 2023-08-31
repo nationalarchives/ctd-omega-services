@@ -40,7 +40,8 @@ class RepositoryUtilsSpec extends UnitTest {
             PREFIX cat: <http://cat.nationalarchives.gov.uk/>
             PREFIX time: <http://www.w3.org/2006/time#>
             PREFIX prov: <http://www.w3.org/ns/prov#>
-            PREFIX foaf: <http://xmlns.com/foaf/0.1/>"""
+            PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+            PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>"""
 
   val expectedSparqlWithValues: Query =
     (sparqlPrefix + sparql"""
@@ -92,6 +93,27 @@ class RepositoryUtilsSpec extends UnitTest {
           ?currentVersion dct:type                  cat:authority-file .
           VALUES (?agentType) {(<http://cat.nationalarchives.gov.uk/person-concept>) (<http://cat.nationalarchives.gov.uk/corporate-body-concept>)}
 
+        }""").toQuery
+
+  val expectedSparqlWithFilter: Query =
+    (sparqlPrefix +
+      sparql"""
+        SELECT DISTINCT ?identifier ?agentType ?currentVersion
+        WHERE {
+          ?identifier     dct:type                  ?agentType ;
+                          ver:currentVersion        ?currentVersion .
+          ?currentVersion prov:generatedAtTime      ?versionTimestamp .
+          FILTER(?versionTimestamp >= xsd:dateTime("2023-07-01T17:30:00.000Z"))
+        }""").toQuery
+
+  val expectedSparqlWithoutFilter: Query =
+    (sparqlPrefix +
+      sparql"""
+        SELECT DISTINCT ?identifier ?agentType ?currentVersion
+        WHERE {
+          ?identifier     dct:type                  ?agentType ;
+                          ver:currentVersion        ?currentVersion .
+          ?currentVersion prov:generatedAtTime      ?versionTimestamp .
         }""").toQuery
 
   "prepareParameterizedQuery must" - {
@@ -158,7 +180,22 @@ class RepositoryUtilsSpec extends UnitTest {
       )
       val result = utils.prepareParameterizedQuery(queryResource, queryParams, extendQuery = false)
       result.get mustEqual expectedSparqlWithPropertiesAndValues
-
+    }
+    "add a filter param in" in {
+      val utils = new RepositoryUtils {}
+      val queryResource = "/sparql/filter.rq"
+      val queryParams = SparqlParams(filters =
+        Map("filterParam" -> "FILTER(?versionTimestamp >= xsd:dateTime(\"2023-07-01T17:30:00.000Z\"))")
+      )
+      val result = utils.prepareParameterizedQuery(queryResource, queryParams, extendQuery = false)
+      result.get mustEqual expectedSparqlWithFilter
+    }
+    "remove a filter param in" in {
+      val utils = new RepositoryUtils {}
+      val queryResource = "/sparql/filter.rq"
+      val queryParams = SparqlParams(filters = Map("filterParam" -> ""))
+      val result = utils.prepareParameterizedQuery(queryResource, queryParams, extendQuery = false)
+      result.get mustEqual expectedSparqlWithoutFilter
     }
   }
 

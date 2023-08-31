@@ -21,10 +21,10 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 import org.apache.jena.ext.xerces.util.URI
-import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.model.{ AgentConceptEntity, AgentDescriptionEntity, LegalStatusEntity }
 
+import java.time.ZonedDateTime
 import scala.util.Try
 
 class TestRepository extends AbstractRepository {
@@ -35,9 +35,9 @@ class TestRepository extends AbstractRepository {
       Try(
         List(
           AgentConceptEntity(
-            new URI("http://cat.nationalarchives.gov.uk/agent.S7"),
-            new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
-            new URI("http://cat.nationalarchives.gov.uk/agent.S7.1")
+            new URI(s"${BaseURL.cat}/agent.S7"),
+            new URI(s"${BaseURL.cat}/corporate-body-concept"),
+            new URI(s"${BaseURL.cat}/agent.S7.1")
           )
         )
       )
@@ -45,29 +45,29 @@ class TestRepository extends AbstractRepository {
       Try(
         List(
           AgentConceptEntity(
-            new URI("http://cat.nationalarchives.gov.uk/agent.48N"),
-            new URI("http://cat.nationalarchives.gov.uk/person-concept"),
-            new URI("http://cat.nationalarchives.gov.uk/agent.48N.1")
+            new URI(s"${BaseURL.cat}/agent.48N"),
+            new URI(s"${BaseURL.cat}/person-concept"),
+            new URI(s"${BaseURL.cat}/agent.48N.1")
           ),
           AgentConceptEntity(
-            new URI("http://cat.nationalarchives.gov.uk/agent.46F"),
-            new URI("http://cat.nationalarchives.gov.uk/person-concept"),
-            new URI("http://cat.nationalarchives.gov.uk/agent.46F.1")
+            new URI(s"${BaseURL.cat}/agent.46F"),
+            new URI(s"${BaseURL.cat}/person-concept"),
+            new URI(s"${BaseURL.cat}/agent.46F.1")
           ),
           AgentConceptEntity(
-            new URI("http://cat.nationalarchives.gov.uk/agent.92W"),
-            new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
-            new URI("http://cat.nationalarchives.gov.uk/agent.92W.1")
+            new URI(s"${BaseURL.cat}/agent.92W"),
+            new URI(s"${BaseURL.cat}/corporate-body-concept"),
+            new URI(s"${BaseURL.cat}/agent.92W.1")
           ),
           AgentConceptEntity(
-            new URI("http://cat.nationalarchives.gov.uk/agent.8R6"),
-            new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
-            new URI("http://cat.nationalarchives.gov.uk/agent.8R6.1")
+            new URI(s"${BaseURL.cat}/agent.8R6"),
+            new URI(s"${BaseURL.cat}/corporate-body-concept"),
+            new URI(s"${BaseURL.cat}/agent.8R6.1")
           ),
           AgentConceptEntity(
-            new URI("http://cat.nationalarchives.gov.uk/agent.S7"),
-            new URI("http://cat.nationalarchives.gov.uk/corporate-body-concept"),
-            new URI("http://cat.nationalarchives.gov.uk/agent.S7.1")
+            new URI(s"${BaseURL.cat}/agent.S7"),
+            new URI(s"${BaseURL.cat}/corporate-body-concept"),
+            new URI(s"${BaseURL.cat}/agent.S7.1")
           )
         )
       )
@@ -78,13 +78,13 @@ class TestRepository extends AbstractRepository {
     agentConceptUri: URI
   ): Try[List[AgentDescriptionEntity]] =
     agentConceptUri.toString match {
-      case "http://cat.nationalarchives.gov.uk/agent.48N" =>
+      case s"${BaseURL.cat}/agent.48N" =>
         Try(
           List(
             AgentDescriptionEntity(
-              new URI("http://cat.nationalarchives.gov.uk/agent.48N.1"),
+              new URI(s"${BaseURL.cat}/agent.48N.1"),
               "Baden-Powell",
-              "2022-06-22T02:00:00-0500",
+              ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
               Some("1889"),
               Some("1977"),
               Some(false),
@@ -92,13 +92,13 @@ class TestRepository extends AbstractRepository {
             )
           )
         )
-      case "http://cat.nationalarchives.gov.uk/agent.46F" =>
+      case s"${BaseURL.cat}/agent.46F" =>
         Try(
           List(
             AgentDescriptionEntity(
-              new URI("http://cat.nationalarchives.gov.uk/agent.46F.1"),
+              new URI(s"${BaseURL.cat}/agent.46F.1"),
               "Fawkes, Guy",
-              "2022-06-22T02:00:00-0500",
+              ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
               Some("1570"),
               Some("1606"),
               Some(false),
@@ -106,13 +106,13 @@ class TestRepository extends AbstractRepository {
             )
           )
         )
-      case "http://cat.nationalarchives.gov.uk/agent.92W" =>
+      case s"${BaseURL.cat}/agent.92W" =>
         Try(
           List(
             AgentDescriptionEntity(
-              new URI("http://cat.nationalarchives.gov.uk/agent.92W.1"),
+              new URI(s"${BaseURL.cat}/agent.92W.1"),
               "Joint Milk Quality Committee",
-              "2022-06-22T02:00:00-0500",
+              ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
               Some("1948"),
               Some("1948"),
               Some(false),
@@ -120,13 +120,13 @@ class TestRepository extends AbstractRepository {
             )
           )
         )
-      case "http://cat.nationalarchives.gov.uk/agent.8R6" =>
+      case s"${BaseURL.cat}/agent.8R6" =>
         Try(
           List(
             AgentDescriptionEntity(
-              new URI("http://cat.nationalarchives.gov.uk/agent.8R6.1"),
+              new URI(s"${BaseURL.cat}/agent.8R6.1"),
               "Queen Anne's Bounty",
-              "2022-06-22T02:00:00-0500",
+              ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
               None,
               None,
               Some(false),
@@ -134,13 +134,13 @@ class TestRepository extends AbstractRepository {
             )
           )
         )
-      case "http://cat.nationalarchives.gov.uk/agent.S7" =>
+      case s"${BaseURL.cat}/agent.S7" =>
         Try(
           List(
             AgentDescriptionEntity(
-              new URI("http://cat.nationalarchives.gov.uk/agent.S7.1"),
+              new URI(s"${BaseURL.cat}/agent.S7.1"),
               "The National Archives, Kew",
-              "2022-06-22T02:00:00-0500",
+              ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
               Some("2003"),
               None,
               Some(true),

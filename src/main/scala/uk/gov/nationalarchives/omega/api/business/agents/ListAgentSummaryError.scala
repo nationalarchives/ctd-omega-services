@@ -28,5 +28,5 @@ case class ListAgentSummaryError(message: String) extends BusinessServiceError {
 
   override def code: ErrorCode = ErrorCode.PROC002
 
-  override def description: String = "There was an error"
+  override def description: String = message
 }

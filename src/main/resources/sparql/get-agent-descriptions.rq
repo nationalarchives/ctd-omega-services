@@ -10,13 +10,15 @@ PREFIX rdaa: <http://rdaregistry.info/Elements/a/>
 PREFIX time: <http://www.w3.org/2006/time#>
 PREFIX todo: <http://TODO/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 SELECT DISTINCT ?descriptionId ?label ?dateFrom ?dateTo ?depository ?versionTimestamp ?previousDescription
 
 WHERE {
     ?descriptionId prov:specializationOf ?conceptIdParam ;
-                   prov:generatedAtTime ?generatedAtParam .
-  	OPTIONAL {
+  	               prov:generatedAtTime  ?versionTimestamp .
+    ?filterParam
+    OPTIONAL {
     	{
 	    	?descriptionId rdaa:P50032 ?label .
 	    }
@@ -47,8 +49,6 @@ WHERE {
   	OPTIONAL {
     	?descriptionId todo:is-place-of-deposit ?depository.
   	}
-
-  	?descriptionId prov:generatedAtTime ?versionTimestamp .
   	OPTIONAL {
   		?descriptionId prov:wasRevisionOf ?previousDescription .
   	}

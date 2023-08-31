@@ -25,7 +25,7 @@ import org.apache.jena.rdf.model.{ Resource, ResourceFactory }
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.model.AgentTypeMapper
 
-import java.text.SimpleDateFormat
+import java.time.ZonedDateTime
 import java.util.GregorianCalendar
 import javax.xml.datatype.{ DatatypeFactory, XMLGregorianCalendar }
 import scala.util.Try
@@ -35,11 +35,11 @@ case class SparqlParams(
   uris: Map[String, String] = Map.empty,
   dateTimes: Map[String, XMLGregorianCalendar] = Map.empty,
   values: Map[String, List[Resource]] = Map.empty,
+  filters: Map[String, String] = Map.empty,
   queryExtension: Option[String] = None
 )
 object SparqlParams extends AgentTypeMapper {
 
-  val iso8601DateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
   def from(listAgentSummary: ListAgentSummary): Try[SparqlParams] =
     for {
       valuesMap      <- Try(getValuesMap(listAgentSummary))
@@ -47,7 +47,8 @@ object SparqlParams extends AgentTypeMapper {
       booleanMap     <- Try(getBooleanMap(listAgentSummary))
       dateTimeMap    <- getDateTimeMap(listAgentSummary)
       queryExtension <- Try(getQueryExtension(listAgentSummary))
-    } yield SparqlParams(booleanMap, uriMap, dateTimeMap, valuesMap, queryExtension)
+      filterMap      <- Try(getFilterMap(listAgentSummary))
+    } yield SparqlParams(booleanMap, uriMap, dateTimeMap, valuesMap, filterMap, queryExtension)
 
   private def getValuesMap(listAgentSummary: ListAgentSummary): Map[String, List[Resource]] = {
     val agentTypeUris = listAgentSummary.agentTypes.getOrElse(getAllAgentTypes).map(getUriFromAgentType)
@@ -57,8 +58,8 @@ object SparqlParams extends AgentTypeMapper {
 
   private def getQueryExtension(listAgentSummary: ListAgentSummary): Option[String] =
     listAgentSummary.versionTimestamp match {
-      case Some("latest") | None => Some("ORDER BY DESC(?generatedAtParam) LIMIT 1")
-      case Some("all")           => Some("ORDER BY DESC(?generatedAtParam)")
+      case Some("latest") | None => Some("ORDER BY DESC(?versionTimestamp) LIMIT 1")
+      case Some("all")           => Some("ORDER BY DESC(?versionTimestamp)")
       case _                     => None
     }
 
@@ -85,11 +86,16 @@ object SparqlParams extends AgentTypeMapper {
     listAgentSummary.versionTimestamp match {
       case Some("all") | Some("latest") | None => Map.empty
       case Some(dateTimeValue) =>
-        val date = iso8601DateTimeFormat.parse(dateTimeValue)
-        val calendar = new GregorianCalendar()
-        calendar.setTime(date)
+        val date = ZonedDateTime.parse(dateTimeValue)
+        val calendar = GregorianCalendar.from(date)
         Map("generatedAtParam" -> DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar))
     }
   }
+
+  private def getFilterMap(listAgentSummary: ListAgentSummary): Map[String, String] =
+    listAgentSummary.versionTimestamp match {
+      case Some("all") | Some("latest") | None => Map("filterParam" -> "")
+      case Some(dateTimeValue) => Map("filterParam" -> s"FILTER(?versionTimestamp >= xsd:dateTime(\"$dateTimeValue\"))")
+    }
 
 }

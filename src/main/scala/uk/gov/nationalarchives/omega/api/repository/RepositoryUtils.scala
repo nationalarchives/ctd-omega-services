@@ -97,72 +97,78 @@ trait RepositoryUtils extends AgentTypeMapper {
       resource.getLines().mkString("\n")
     }
 
-  private def parameterizeQuery(queryText_0: String, params: SparqlParams): Try[ParameterizedSparqlString] =
-    for {
-      queryText_1 <- Try(setBooleanParams(queryText_0, params.booleans))
-      queryText_2 <- Try(setResourceParams(queryText_1, params.uris))
-      queryText_3 <- Try(setValueParams(queryText_2, params.values))
-      queryText_4 <- Try(setXSDDateTimeParams(queryText_3, params.dateTimes))
-    } yield new ParameterizedSparqlString(queryText_4)
+  private def parameterizeQuery(queryText: String, params: SparqlParams): Try[ParameterizedSparqlString] = {
+    val parameterize: ParameterizedSparqlString => ParameterizedSparqlString = Seq(
+      setBooleanParams(_, params.booleans),
+      setResourceParams(_, params.uris),
+      setValueParams(_, params.values),
+      setXSDDateTimeParams(_, params.dateTimes)
+    ).reduceLeft(_.andThen(_))
 
-  private def setBooleanParams(queryText: String, booleans: Map[String, Boolean]): String = {
-
-    @tailrec
-    def setParams(bools: Map[String, Boolean], query: String): String =
-      bools match {
-        case m: Map[String, Boolean] if m.isEmpty => query
-        case param =>
-          val pss = new ParameterizedSparqlString(query)
-          pss.setLiteral(param.head._1, param.head._2)
-          setParams(bools.tail, pss.toString)
-      }
-
-    setParams(booleans, queryText)
+    val filteredQueryText = setFilterParams(queryText, params.filters)
+    Try(parameterize(new ParameterizedSparqlString(filteredQueryText)))
   }
 
-  private def setXSDDateTimeParams(queryText: String, dateTimes: Map[String, XMLGregorianCalendar]): String = {
-
-    @tailrec
-    def setParams(dates: Map[String, XMLGregorianCalendar], query: String): String =
-      dates match {
-        case m: Map[String, XMLGregorianCalendar] if m.isEmpty => query
-        case param =>
-          val pss = new ParameterizedSparqlString(query)
-          pss.setLiteral(param.head._1, param.head._2.toXMLFormat, new XSDDateTimeType("dateTime"))
-          setParams(dates.tail, pss.toString)
-      }
-
-    setParams(dateTimes, queryText)
+  private def setParams[T](
+    query: ParameterizedSparqlString,
+    params: Map[String, T],
+    set: (ParameterizedSparqlString, T) => String => Unit
+  ): ParameterizedSparqlString = {
+    params.foreach(param => set(query, param._2)(param._1))
+    query
   }
 
-  private def setResourceParams(queryText: String, resources: Map[String, String]): String = {
+  private def setBooleanParams(
+    query: ParameterizedSparqlString,
+    booleanParams: Map[String, Boolean]
+  ): ParameterizedSparqlString =
+    setParams[Boolean](
+      query,
+      booleanParams,
+      (query, booleanParamValue) => query.setLiteral(_: String, booleanParamValue)
+    )
+
+  private val dateTimeType: XSDDateTimeType = new XSDDateTimeType("dateTime")
+
+  private def setXSDDateTimeParams(
+    query: ParameterizedSparqlString,
+    dateTimeParams: Map[String, XMLGregorianCalendar]
+  ): ParameterizedSparqlString =
+    setParams[XMLGregorianCalendar](
+      query,
+      dateTimeParams,
+      (query, dateTimeParamValue) => query.setLiteral(_: String, dateTimeParamValue.toXMLFormat, dateTimeType)
+    )
+
+  private def setResourceParams(
+    query: ParameterizedSparqlString,
+    resourceParams: Map[String, String]
+  ): ParameterizedSparqlString =
+    setParams[String](query, resourceParams, (query, resourceParamValue) => query.setIri(_: String, resourceParamValue))
+
+  private def setValueParams(
+    query: ParameterizedSparqlString,
+    valueParams: Map[String, List[Resource]]
+  ): ParameterizedSparqlString =
+    setParams[List[Resource]](
+      query,
+      valueParams,
+      (query, valueParamValue) => query.setValues(_: String, valueParamValue.asJava)
+    )
+
+  private def setFilterParams(queryText: String, filterParams: Map[String, String]): String = {
 
     @tailrec
-    def setParams(resMap: Map[String, String], query: String): String =
-      resMap match {
+    def setParams(filterParams: Map[String, String], query: String): String =
+      filterParams match {
         case m: Map[String, String] if m.isEmpty => query
         case param =>
-          val pss = new ParameterizedSparqlString(query)
-          pss.setIri(param.head._1, param.head._2)
-          setParams(resMap.tail, pss.toString)
+          val queryWithFilter = query.replace(s"?${param.head._1}", param.head._2)
+          setParams(filterParams.tail, queryWithFilter)
       }
 
-    setParams(resources, queryText)
-  }
+    setParams(filterParams, queryText)
 
-  private def setValueParams(queryText: String, values: Map[String, List[Resource]]) = {
-
-    @tailrec
-    def setParams(resMap: Map[String, List[Resource]], query: String): String =
-      resMap match {
-        case m: Map[String, List[Resource]] if m.isEmpty => query
-        case param =>
-          val pss = new ParameterizedSparqlString(query)
-          pss.setValues(param.head._1, param.head._2.asJava)
-          setParams(resMap.tail, pss.toString)
-      }
-
-    setParams(values, queryText)
   }
 
 }

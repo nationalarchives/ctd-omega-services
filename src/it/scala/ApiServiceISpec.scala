@@ -17,6 +17,7 @@ import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ INVA002, INVA003, IN
 import uk.gov.nationalarchives.omega.api.common.{ AppLogger, ErrorCode }
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.messages.{ MessageProperties, OutgoingMessageType }
+import uk.gov.nationalarchives.omega.api.repository.BaseURL
 import uk.gov.nationalarchives.omega.api.services.ApiService
 
 import javax.jms.{ Connection, MessageProducer, Session, TextMessage }
@@ -124,23 +125,23 @@ class ApiServiceISpec
         _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
         result <- Resource.liftK(assertReplyMessage(s"""[
   {
-    "identifier" : "http://cat.nationalarchives.gov.uk/public-record",
+    "identifier" : "${BaseURL.cat}/public-record",
     "label" : "Public Record"
   },
   {
-    "identifier" : "http://cat.nationalarchives.gov.uk/non-public-record",
+    "identifier" : "${BaseURL.cat}/non-public-record",
     "label" : "Non-Public Record"
   },
   {
-    "identifier" : "http://cat.nationalarchives.gov.uk/public-record-unless-otherwise-stated",
+    "identifier" : "${BaseURL.cat}/public-record-unless-otherwise-stated",
     "label" : "Public Record (unless otherwise stated)"
   },
   {
-    "identifier" : "http://cat.nationalarchives.gov.uk/welsh-public-record",
+    "identifier" : "${BaseURL.cat}/welsh-public-record",
     "label" : "Welsh Public Record"
   },
   {
-    "identifier" : "http://cat.nationalarchives.gov.uk/non-record-material",
+    "identifier" : "${BaseURL.cat}/non-record-material",
     "label" : "Non-Record Material"
   }
 ]""".stripMargin))

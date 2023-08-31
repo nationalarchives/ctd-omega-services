@@ -28,18 +28,24 @@ import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.model.{ AgentConceptEntity, AgentDescriptionEntity, LegalStatusEntity }
 
+import java.time.ZonedDateTime
 import scala.util.Try
 
 class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends AbstractRepository with RepositoryUtils {
 
   private val sparqlResourceDir = "sparql"
   private val selectLegalStatusSummarySparqlResource = s"/$sparqlResourceDir/select-legal-status-summaries.rq"
-  private val getAgentSummariesSparqlResource = s"/$sparqlResourceDir/get-agent-summaries.rq"
+  private val getAgentSummariesSparqlResource = s"/$sparqlResourceDir/get-agent-concepts.rq"
   private val getAgentDescriptionsSparqlResource = s"/$sparqlResourceDir/get-agent-descriptions.rq"
 
   implicit object BooleanFromQuerySolution extends FromQuerySolution[Boolean] {
     def fromQuerySolution(qs: QuerySolution, variablePath: String = ""): Try[Boolean] =
       getLiteral(qs, variablePath).map(_.getBoolean)
+  }
+
+  implicit object ZoneDateTimeFromQuerySolution extends FromQuerySolution[ZonedDateTime] {
+    def fromQuerySolution(qs: QuerySolution, variablePath: String = ""): Try[ZonedDateTime] =
+      getLiteral(qs, variablePath).map(value => ZonedDateTime.parse(value.getString))
   }
 
   override def getLegalStatusEntities: Try[List[LegalStatusEntity]] =

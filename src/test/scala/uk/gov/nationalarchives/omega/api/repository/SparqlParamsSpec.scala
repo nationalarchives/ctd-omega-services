@@ -28,7 +28,8 @@ import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.model.AgentTypeMapper
 import uk.gov.nationalarchives.omega.api.support.UnitTest
 
-import java.util.GregorianCalendar
+import java.time.ZonedDateTime
+import java.util.{ Date, GregorianCalendar }
 import javax.xml.datatype.{ DatatypeFactory, XMLGregorianCalendar }
 import scala.util.Success
 
@@ -40,7 +41,8 @@ class SparqlParamsSpec extends UnitTest with AgentTypeMapper {
       result mustEqual Success(
         SparqlParams(
           values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
-          queryExtension = Some("ORDER BY DESC(?generatedAtParam) LIMIT 1")
+          filters = Map("filterParam" -> ""),
+          queryExtension = Some("ORDER BY DESC(?versionTimestamp) LIMIT 1")
         )
       )
     }
@@ -49,7 +51,8 @@ class SparqlParamsSpec extends UnitTest with AgentTypeMapper {
       result mustEqual Success(
         SparqlParams(
           values = Map("agentTypeValuesParam" -> getAgentTypeResources(List(CorporateBody, Person))),
-          queryExtension = Some("ORDER BY DESC(?generatedAtParam) LIMIT 1")
+          filters = Map("filterParam" -> ""),
+          queryExtension = Some("ORDER BY DESC(?versionTimestamp) LIMIT 1")
         )
       )
     }
@@ -60,7 +63,8 @@ class SparqlParamsSpec extends UnitTest with AgentTypeMapper {
           booleans = Map("objectParam1" -> true),
           uris = Map("predicateParam1" -> "http://TODO/is-place-of-deposit"),
           values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
-          queryExtension = Some("ORDER BY DESC(?generatedAtParam) LIMIT 1")
+          filters = Map("filterParam" -> ""),
+          queryExtension = Some("ORDER BY DESC(?versionTimestamp) LIMIT 1")
         )
       )
     }
@@ -69,7 +73,8 @@ class SparqlParamsSpec extends UnitTest with AgentTypeMapper {
       result mustEqual Success(
         SparqlParams(
           values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
-          queryExtension = Some("ORDER BY DESC(?generatedAtParam)")
+          filters = Map("filterParam" -> ""),
+          queryExtension = Some("ORDER BY DESC(?versionTimestamp)")
         )
       )
     }
@@ -80,6 +85,7 @@ class SparqlParamsSpec extends UnitTest with AgentTypeMapper {
         SparqlParams(
           dateTimes = Map("generatedAtParam" -> getGregorianDateTime(timestamp)),
           values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
+          filters = Map("filterParam" -> "FILTER(?versionTimestamp >= xsd:dateTime(\"2023-01-25T14:14:49.601Z\"))"),
           queryExtension = None
         )
       )
@@ -90,9 +96,9 @@ class SparqlParamsSpec extends UnitTest with AgentTypeMapper {
     agentTypes.map(agentType => ResourceFactory.createResource(getUriFromAgentType(agentType)))
 
   private def getGregorianDateTime(dateTimeValue: String): XMLGregorianCalendar = {
-    val date = SparqlParams.iso8601DateTimeFormat.parse(dateTimeValue)
+    val date = ZonedDateTime.parse(dateTimeValue)
     val calendar = new GregorianCalendar()
-    calendar.setTime(date)
+    calendar.setTime(Date.from(date.toInstant))
     DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar)
   }
 

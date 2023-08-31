@@ -10,13 +10,16 @@ PREFIX rdaa: <http://rdaregistry.info/Elements/a/>
 PREFIX time: <http://www.w3.org/2006/time#>
 PREFIX todo: <http://TODO/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 SELECT DISTINCT ?conceptId ?agentType ?currentVersionId
 
 WHERE {
-    ?conceptId          dct:type            ?agentType ;
-    			        ver:currentVersion  ?currentVersionId .
-    ?currentVersionId   ?predicateParam1    ?objectParam1 ;
-                        ?predicateParam2    ?objectParam2 .
+    ?conceptId          dct:type                ?agentType ;
+    			        ver:currentVersion      ?currentVersionId .
+    ?currentVersionId   prov:generatedAtTime    ?versionTimestamp ;
+                        ?predicateParam1        ?objectParam1 ;
+                        ?predicateParam2        ?objectParam2 .
+    ?filterParam
   	VALUES (?agentType) {?agentTypeValuesParam}
 }

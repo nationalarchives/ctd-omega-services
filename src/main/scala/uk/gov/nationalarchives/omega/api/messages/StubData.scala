@@ -25,6 +25,8 @@ import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary }
 import uk.gov.nationalarchives.omega.api.repository.model.{ AgentConceptEntity, AgentDescriptionEntity, LegalStatusEntity }
 
+import java.time.ZonedDateTime
+
 class StubDataImpl extends StubData
 
 trait StubData {
@@ -49,7 +51,7 @@ trait StubData {
         AgentDescription(
           "3RX",
           "Abbot, Charles",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1798"),
@@ -65,7 +67,7 @@ trait StubData {
         AgentDescription(
           "48N",
           "Baden-Powell, Lady Olave St Clair",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1889"),
@@ -81,7 +83,7 @@ trait StubData {
         AgentDescription(
           "39K",
           "Cannon, John Francis Michael",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1930"),
@@ -97,7 +99,7 @@ trait StubData {
         AgentDescription(
           "3FH",
           "Dainton, Sir Frederick Sydney",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1914"),
@@ -113,7 +115,7 @@ trait StubData {
         AgentDescription(
           "54J",
           "Edward, ",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1330"),
@@ -129,7 +131,7 @@ trait StubData {
         AgentDescription(
           "2QX",
           "Edward VII",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1841"),
@@ -145,7 +147,7 @@ trait StubData {
         AgentDescription(
           "561",
           "Fanshawe, Baron, of Richmond, ",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           None,
@@ -161,7 +163,7 @@ trait StubData {
         AgentDescription(
           "46F",
           "Fawkes, Guy",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1570"),
@@ -177,7 +179,7 @@ trait StubData {
         AgentDescription(
           "2JN",
           "George, David Lloyd",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1863"),
@@ -193,7 +195,7 @@ trait StubData {
         AgentDescription(
           "34X",
           "Halley, Edmund",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1656"),
@@ -205,7 +207,17 @@ trait StubData {
       AgentType.Person,
       "2TK",
       "current description",
-      List(AgentDescription("2TK", "Halifax, ", "2022-06-22T02:00:00-0500", Some(false), Some(false), None, None))
+      List(
+        AgentDescription(
+          "2TK",
+          "Halifax, ",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
+          Some(false),
+          Some(false),
+          None,
+          None
+        )
+      )
     ),
     AgentSummary(
       AgentType.Person,
@@ -215,7 +227,7 @@ trait StubData {
         AgentDescription(
           "39T",
           "Irvine, Linda Mary",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1928"),
@@ -231,7 +243,7 @@ trait StubData {
         AgentDescription(
           "4",
           "Jack the Ripper, ",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1888"),
@@ -247,7 +259,7 @@ trait StubData {
         AgentDescription(
           "4FF",
           "Keay, Sir Lancelot Herman",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1883"),
@@ -263,7 +275,7 @@ trait StubData {
         AgentDescription(
           "ST",
           "Lawson, Nigel",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1932"),
@@ -279,7 +291,7 @@ trait StubData {
         AgentDescription(
           "51X",
           "Macpherson, Sir William (Alan)",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1926"),
@@ -295,7 +307,7 @@ trait StubData {
         AgentDescription(
           "515",
           "Newcastle, 1st Duke of, ",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           None,
@@ -308,7 +320,15 @@ trait StubData {
       "4VF",
       "current description",
       List(
-        AgentDescription("4VF", "Old Pretender, The", "2022-06-22T02:00:00-0500", Some(false), Some(false), None, None)
+        AgentDescription(
+          "4VF",
+          "Old Pretender, The",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
+          Some(false),
+          Some(false),
+          None,
+          None
+        )
       )
     ),
     AgentSummary(
@@ -319,7 +339,7 @@ trait StubData {
         AgentDescription(
           "4H3",
           "Oliphant, Sir Mark Marcus Laurence Elwin",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1901"),
@@ -335,7 +355,7 @@ trait StubData {
         AgentDescription(
           "46W",
           "Paine, Thomas",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1737"),
@@ -351,7 +371,7 @@ trait StubData {
         AgentDescription(
           "3SH",
           "Reade, Hubert Granville Revell",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1859"),
@@ -363,7 +383,17 @@ trait StubData {
       AgentType.Person,
       "2TF",
       "current description",
-      List(AgentDescription("2TF", "Reading, ", "2022-06-22T02:00:00-0500", Some(false), Some(false), None, None))
+      List(
+        AgentDescription(
+          "2TF",
+          "Reading, ",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
+          Some(false),
+          Some(false),
+          None,
+          None
+        )
+      )
     ),
     AgentSummary(
       AgentType.Person,
@@ -373,7 +403,7 @@ trait StubData {
         AgentDescription(
           "53T",
           "Salisbury, Sir Edward James",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1886"),
@@ -389,7 +419,7 @@ trait StubData {
         AgentDescription(
           "3QL",
           "Tate, Sir Henry",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1819"),
@@ -405,7 +435,7 @@ trait StubData {
         AgentDescription(
           "37K",
           "Uvarov, Sir Boris Petrovitch",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1889"),
@@ -421,7 +451,7 @@ trait StubData {
         AgentDescription(
           "2T1",
           "Vane-Tempest-Stewart, Charles Stewart",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1852"),
@@ -437,7 +467,7 @@ trait StubData {
         AgentDescription(
           "4RW",
           "Victor Amadeus, ",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1666"),
@@ -453,7 +483,7 @@ trait StubData {
         AgentDescription(
           "3GY",
           "Victoria, ",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1819"),
@@ -469,7 +499,7 @@ trait StubData {
         AgentDescription(
           "RR6",
           "100th (Gordon Highlanders) Regiment of Foot",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1794"),
@@ -485,7 +515,7 @@ trait StubData {
         AgentDescription(
           "S34",
           "1st Regiment of Foot or Royal Scots",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1812"),
@@ -501,7 +531,7 @@ trait StubData {
         AgentDescription(
           "87K",
           "Abbotsbury Railway Company",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1877"),
@@ -517,7 +547,7 @@ trait StubData {
         AgentDescription(
           "VWG",
           "Accountant General in the Court of Chancery",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1726"),
@@ -533,7 +563,7 @@ trait StubData {
         AgentDescription(
           "LWY",
           "Admiralty Administrative Whitley Council, General Purposes Committee",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1942"),
@@ -549,7 +579,7 @@ trait StubData {
         AgentDescription(
           "VS6",
           "Advisory Committee on Animal Feedingstuffs",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1999"),
@@ -565,7 +595,7 @@ trait StubData {
         AgentDescription(
           "CC",
           "Bank of England",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1694"),
@@ -581,7 +611,7 @@ trait StubData {
         AgentDescription(
           "N9S",
           "Bank on Tickets of the Million Adventure",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1695"),
@@ -593,7 +623,17 @@ trait StubData {
       AgentType.CorporateBody,
       "JS8",
       "current description",
-      List(AgentDescription("JS8", "BBC", "2022-06-22T02:00:00-0500", Some(false), Some(false), None, None))
+      List(
+        AgentDescription(
+          "JS8",
+          "BBC",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
+          Some(false),
+          Some(false),
+          None,
+          None
+        )
+      )
     ),
     AgentSummary(
       AgentType.CorporateBody,
@@ -603,7 +643,7 @@ trait StubData {
         AgentDescription(
           "8WG",
           "Bee Husbandry Committee",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1959"),
@@ -619,7 +659,7 @@ trait StubData {
         AgentDescription(
           "6VQ",
           "Cabinet",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1919"),
@@ -635,7 +675,7 @@ trait StubData {
         AgentDescription(
           "SV",
           "Cabinet",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1945"),
@@ -651,7 +691,7 @@ trait StubData {
         AgentDescription(
           "5V4",
           "Cabinet, Committee for Control of Official Histories",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1946"),
@@ -667,7 +707,7 @@ trait StubData {
         AgentDescription(
           "GW5",
           "Cattle Emergency Committee",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1934"),
@@ -683,7 +723,7 @@ trait StubData {
         AgentDescription(
           "934",
           "Dairy Crest",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1981"),
@@ -699,7 +739,7 @@ trait StubData {
         AgentDescription(
           "9HC",
           "Dean of the Chapel Royal",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           None,
@@ -715,7 +755,7 @@ trait StubData {
         AgentDescription(
           "WGL",
           "Department for Environment, Food and Rural Affairs, Water Quality Division",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("2002"),
@@ -731,7 +771,7 @@ trait StubData {
         AgentDescription(
           "WJ4",
           "Department for Exiting the European Union",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("2016"),
@@ -747,7 +787,7 @@ trait StubData {
         AgentDescription(
           "9YJ",
           "East Grinstead, Groombridge and Tunbridge Wells Railway Company",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1862"),
@@ -763,7 +803,7 @@ trait StubData {
         AgentDescription(
           "HF4",
           "East India Company",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1600"),
@@ -779,7 +819,7 @@ trait StubData {
         AgentDescription(
           "WN3",
           "Education and Skills Funding Agency",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("2017"),
@@ -795,7 +835,7 @@ trait StubData {
         AgentDescription(
           "WNL",
           "Education and Skills Funding Agency",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("2017"),
@@ -811,7 +851,7 @@ trait StubData {
         AgentDescription(
           "Q1R",
           "Falkland Islands Company",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1899"),
@@ -827,7 +867,7 @@ trait StubData {
         AgentDescription(
           "SQ9",
           "Fish's Corps of Foot",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1782"),
@@ -843,7 +883,7 @@ trait StubData {
         AgentDescription(
           "R6R",
           "Foreign and Commonwealth Office, Consulate, Dusseldorf, West Germany",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1968"),
@@ -859,7 +899,7 @@ trait StubData {
         AgentDescription(
           "HKL",
           "Foreign Office, Consulate, Angora and Konieh, Ottoman Empire",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1895"),
@@ -875,7 +915,7 @@ trait StubData {
         AgentDescription(
           "KSC",
           "Gaming Board for Great Britain",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1968"),
@@ -887,7 +927,17 @@ trait StubData {
       AgentType.CorporateBody,
       "73R",
       "current description",
-      List(AgentDescription("73R", "GCHQ", "2022-06-22T02:00:00-0500", Some(false), Some(false), None, None))
+      List(
+        AgentDescription(
+          "73R",
+          "GCHQ",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
+          Some(false),
+          Some(false),
+          None,
+          None
+        )
+      )
     ),
     AgentSummary(
       AgentType.CorporateBody,
@@ -897,7 +947,7 @@ trait StubData {
         AgentDescription(
           "VR1",
           "Geffrye Museum",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1914"),
@@ -913,7 +963,7 @@ trait StubData {
         AgentDescription(
           "QX5",
           "General Nursing Council for England and Wales, Registration and Enrolment Committee",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1970"),
@@ -929,7 +979,7 @@ trait StubData {
         AgentDescription(
           "C1Y",
           "Halifax High Level and North and South Junction Railway Company",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1884"),
@@ -945,7 +995,7 @@ trait StubData {
         AgentDescription(
           "W2T",
           "Hansard Society",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1944"),
@@ -961,7 +1011,7 @@ trait StubData {
         AgentDescription(
           "F18",
           "Health and Safety Commission, Health and Safety Executive, Employment Medical Advisory Service",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1975"),
@@ -977,7 +1027,7 @@ trait StubData {
         AgentDescription(
           "8JK",
           "Her Majesty's Stationery Office",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1986"),
@@ -993,7 +1043,7 @@ trait StubData {
         AgentDescription(
           "9FV",
           "Ideal Benefit Society",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1912"),
@@ -1009,7 +1059,7 @@ trait StubData {
         AgentDescription(
           "5YX",
           "Imperial War Museum: Churchill Museum and Cabinet War Rooms",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1939"),
@@ -1025,7 +1075,7 @@ trait StubData {
         AgentDescription(
           "W1Q",
           "Independent Expert Group on Mobile Phones",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1999"),
@@ -1041,7 +1091,7 @@ trait StubData {
         AgentDescription(
           "QLY",
           "Independent Expert Group on Mobile Phones",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1999"),
@@ -1057,7 +1107,7 @@ trait StubData {
         AgentDescription(
           "LS5",
           "Jodrell Bank Observatory, Cheshire",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1955"),
@@ -1073,7 +1123,7 @@ trait StubData {
         AgentDescription(
           "92W",
           "Joint Milk Quality Committee",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1948"),
@@ -1089,7 +1139,7 @@ trait StubData {
         AgentDescription(
           "L3W",
           "Justices in Eyre, of Assize, of Gaol Delivery, of Oyer and Terminer, of the Peace, and of Nisi Prius",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           None,
@@ -1105,7 +1155,7 @@ trait StubData {
         AgentDescription(
           "N8X",
           "Justices of the Forest",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1166"),
@@ -1118,7 +1168,15 @@ trait StubData {
       "THY",
       "current description",
       List(
-        AgentDescription("THY", "Kew Gardens Archive", "2022-06-22T02:00:00-0500", Some(false), Some(false), None, None)
+        AgentDescription(
+          "THY",
+          "Kew Gardens Archive",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
+          Some(false),
+          Some(false),
+          None,
+          None
+        )
       )
     ),
     AgentSummary(
@@ -1129,7 +1187,7 @@ trait StubData {
         AgentDescription(
           "SGX",
           "King's Own Dragoons, 1751-1818",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           None,
@@ -1145,7 +1203,7 @@ trait StubData {
         AgentDescription(
           "CCR",
           "Knitting, Lace and Net Industry Training Board",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1966"),
@@ -1161,7 +1219,7 @@ trait StubData {
         AgentDescription(
           "TTT",
           "King's Volunteers Regiment of Foot, 1761-1763",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           None,
@@ -1177,7 +1235,7 @@ trait StubData {
         AgentDescription(
           "VR7",
           "Lady Lever Art Gallery",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1922"),
@@ -1193,7 +1251,7 @@ trait StubData {
         AgentDescription(
           "XQ",
           "Law Society",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1825"),
@@ -1209,7 +1267,7 @@ trait StubData {
         AgentDescription(
           "91W",
           "League of Mercy",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1898"),
@@ -1225,7 +1283,7 @@ trait StubData {
         AgentDescription(
           "VX",
           "Legal Aid Board",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1989"),
@@ -1241,7 +1299,7 @@ trait StubData {
         AgentDescription(
           "TXG",
           "Legal Aid Board, 1988-1989",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           None,
@@ -1257,7 +1315,7 @@ trait StubData {
         AgentDescription(
           "6LL",
           "Machinery of Government Committee",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1917"),
@@ -1273,7 +1331,7 @@ trait StubData {
         AgentDescription(
           "G6N",
           "Magnetic Department",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1839"),
@@ -1289,7 +1347,7 @@ trait StubData {
         AgentDescription(
           "71K",
           "Manpower Distribution Board",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1916"),
@@ -1305,7 +1363,7 @@ trait StubData {
         AgentDescription(
           "KN1",
           "Master of the Rolls Archives Committee",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1925"),
@@ -1321,7 +1379,7 @@ trait StubData {
         AgentDescription(
           "J6X",
           "National Agricultural Advisory Service, Great House Experimental Husbandry Farm",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1951"),
@@ -1337,7 +1395,7 @@ trait StubData {
         AgentDescription(
           "K7N",
           "National Air Traffic Control Services, Director General Projects and Engineering, Directorate of Projects",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1963"),
@@ -1353,7 +1411,7 @@ trait StubData {
         AgentDescription(
           "TSL",
           "National Archives, The",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           None,
@@ -1369,7 +1427,7 @@ trait StubData {
         AgentDescription(
           "LSN",
           "Navy Board, Transport Branch, Prisoner of War Department",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1817"),
@@ -1385,7 +1443,7 @@ trait StubData {
         AgentDescription(
           "W1S",
           "Office for Budget Responsibility",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("2010"),
@@ -1401,7 +1459,7 @@ trait StubData {
         AgentDescription(
           "N4W",
           "Office of Population Censuses and Surveys, Computer Division",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1972"),
@@ -1417,7 +1475,7 @@ trait StubData {
         AgentDescription(
           "QQC",
           "Office of Works, Directorate of Works, Maintenance Surveyors Division, Sanitary Engineers Section",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1928"),
@@ -1433,7 +1491,7 @@ trait StubData {
         AgentDescription(
           "QFY",
           "Office of the President of Social Security Appeal Tribunals, Medical Appeal Tribunals and Vaccine Damage Tribunals",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1984"),
@@ -1449,7 +1507,7 @@ trait StubData {
         AgentDescription(
           "VYJ",
           "Ordnance Survey of Great Britain, Directorate of Data Collection and Management",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("2003"),
@@ -1465,7 +1523,7 @@ trait StubData {
         AgentDescription(
           "8FX",
           "Overseas Development Administration, Information Department",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1970"),
@@ -1481,7 +1539,7 @@ trait StubData {
         AgentDescription(
           "3C",
           "Overseas Finance, International Finance, IF1 International Financial Institutions and Debt Division",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1990"),
@@ -1497,7 +1555,7 @@ trait StubData {
         AgentDescription(
           "988",
           "Oxford University Archives",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1634"),
@@ -1513,7 +1571,7 @@ trait StubData {
         AgentDescription(
           "TWX",
           "Oxford University Press",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1633"),
@@ -1529,7 +1587,7 @@ trait StubData {
         AgentDescription(
           "79L",
           "Palace Court",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1660"),
@@ -1541,7 +1599,17 @@ trait StubData {
       AgentType.CorporateBody,
       "TX6",
       "current description",
-      List(AgentDescription("TX6", "Parker Inquiry", "2022-06-22T02:00:00-0500", Some(false), Some(false), None, None))
+      List(
+        AgentDescription(
+          "TX6",
+          "Parker Inquiry",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
+          Some(false),
+          Some(false),
+          None,
+          None
+        )
+      )
     ),
     AgentSummary(
       AgentType.CorporateBody,
@@ -1551,7 +1619,7 @@ trait StubData {
         AgentDescription(
           "VY4",
           "Paymaster General of the Court of Chancery, Supreme Court Pay Office",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1884"),
@@ -1567,7 +1635,7 @@ trait StubData {
         AgentDescription(
           "VX3",
           "Persona Associates Ltd",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1989"),
@@ -1580,7 +1648,15 @@ trait StubData {
       "V36",
       "current description",
       List(
-        AgentDescription("V36", "Petty Bag Office", "2022-06-22T02:00:00-0500", Some(false), Some(false), None, None)
+        AgentDescription(
+          "V36",
+          "Petty Bag Office",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
+          Some(false),
+          Some(false),
+          None,
+          None
+        )
       )
     ),
     AgentSummary(
@@ -1588,7 +1664,15 @@ trait StubData {
       "8R6",
       "current description",
       List(
-        AgentDescription("8R6", "Queen Anne's Bounty", "2022-06-22T02:00:00-0500", Some(false), Some(false), None, None)
+        AgentDescription(
+          "8R6",
+          "Queen Anne's Bounty",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
+          Some(false),
+          Some(false),
+          None,
+          None
+        )
       )
     ),
     AgentSummary(
@@ -1599,7 +1683,7 @@ trait StubData {
         AgentDescription(
           "SH2",
           "Queen's Own Dragoons, 1788-1818",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           None,
@@ -1615,7 +1699,7 @@ trait StubData {
         AgentDescription(
           "79X",
           "Queens Prison",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1842"),
@@ -1631,7 +1715,7 @@ trait StubData {
         AgentDescription(
           "W91",
           "Queen's Printer for Scotland",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1999"),
@@ -1647,7 +1731,7 @@ trait StubData {
         AgentDescription(
           "F11",
           "Radioactive Substances Advisory Committee",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1948"),
@@ -1663,7 +1747,7 @@ trait StubData {
         AgentDescription(
           "CYY",
           "Railway Executive",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1947"),
@@ -1679,7 +1763,7 @@ trait StubData {
         AgentDescription(
           "CXY",
           "Railway Executive",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1914"),
@@ -1695,7 +1779,7 @@ trait StubData {
         AgentDescription(
           "CY1",
           "Railway Executive",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1939"),
@@ -1711,7 +1795,7 @@ trait StubData {
         AgentDescription(
           "TXH",
           "SaBRE",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("2002"),
@@ -1724,7 +1808,15 @@ trait StubData {
       "739",
       "current description",
       List(
-        AgentDescription("739", "Scaccarium Superius", "2022-06-22T02:00:00-0500", Some(false), Some(false), None, None)
+        AgentDescription(
+          "739",
+          "Scaccarium Superius",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
+          Some(false),
+          Some(false),
+          None,
+          None
+        )
       )
     ),
     AgentSummary(
@@ -1735,7 +1827,7 @@ trait StubData {
         AgentDescription(
           "NWN",
           "School of Anti-Aircraft Artillery",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1942"),
@@ -1751,7 +1843,7 @@ trait StubData {
         AgentDescription(
           "SGS",
           "Scots Greys, 1877-1921",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           None,
@@ -1763,7 +1855,17 @@ trait StubData {
       AgentType.CorporateBody,
       "VXR",
       "current description",
-      List(AgentDescription("VXR", "Takeover Panel", "2022-06-22T02:00:00-0500", Some(false), Some(false), None, None))
+      List(
+        AgentDescription(
+          "VXR",
+          "Takeover Panel",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
+          Some(false),
+          Some(false),
+          None,
+          None
+        )
+      )
     ),
     AgentSummary(
       AgentType.CorporateBody,
@@ -1773,7 +1875,7 @@ trait StubData {
         AgentDescription(
           "QQR",
           "Tate Gallery",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1897"),
@@ -1789,7 +1891,7 @@ trait StubData {
         AgentDescription(
           "63K",
           "Tate Gallery Archive",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1970"),
@@ -1805,7 +1907,7 @@ trait StubData {
         AgentDescription(
           "G91",
           "Thalidomide Y List Inquiry",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1978"),
@@ -1821,7 +1923,7 @@ trait StubData {
         AgentDescription(
           "FKS",
           "The Buying Agency",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1991"),
@@ -1837,7 +1939,7 @@ trait StubData {
         AgentDescription(
           "JLC",
           "The Crown Estate, Other Urban Estates, Foreshore and Seabed Branches",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1973"),
@@ -1853,7 +1955,7 @@ trait StubData {
         AgentDescription(
           "SYL",
           "Uhlans Britanniques de Sainte-Domingue (Charmilly's), 1794-1795",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           None,
@@ -1869,7 +1971,7 @@ trait StubData {
         AgentDescription(
           "TXK",
           "UK Passport Service",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1991"),
@@ -1885,7 +1987,7 @@ trait StubData {
         AgentDescription(
           "V3H",
           "UK Web Archiving Consortium",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           None,
@@ -1901,7 +2003,7 @@ trait StubData {
         AgentDescription(
           "CCX",
           "United Kingdom Atomic Energy Authority, Atomic Weapons Research Establishment, Directors Office",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1954"),
@@ -1917,7 +2019,7 @@ trait StubData {
         AgentDescription(
           "VTY",
           "Valuation Office Agency",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1991"),
@@ -1933,7 +2035,7 @@ trait StubData {
         AgentDescription(
           "9HJ",
           "Venetian Republic",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("727"),
@@ -1949,7 +2051,7 @@ trait StubData {
         AgentDescription(
           "QYF",
           "Victoria and Albert Museum",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1857"),
@@ -1965,7 +2067,7 @@ trait StubData {
         AgentDescription(
           "61H",
           "Victoria & Albert Museum, Archive of Art and Design",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1992"),
@@ -1981,7 +2083,7 @@ trait StubData {
         AgentDescription(
           "W9K",
           "Wales Tourist Board",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1969"),
@@ -1997,7 +2099,7 @@ trait StubData {
         AgentDescription(
           "VRG",
           "Walker Art Gallery",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1873"),
@@ -2013,7 +2115,7 @@ trait StubData {
         AgentDescription(
           "61J",
           "Wallace Collection",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1897"),
@@ -2029,7 +2131,7 @@ trait StubData {
         AgentDescription(
           "HXV",
           "War and Colonial Department, Commissioners for liquidating the Danish and Dutch loans for St Thomas and St John",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1808"),
@@ -2045,7 +2147,7 @@ trait StubData {
         AgentDescription(
           "V2R",
           "Zahid Mubarek Inquiry",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("2004"),
@@ -2061,7 +2163,7 @@ trait StubData {
         AgentDescription(
           "763",
           "Zambia Department, Commonwealth Office",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1967"),
@@ -2077,7 +2179,7 @@ trait StubData {
         AgentDescription(
           "765",
           "Zambia, Malawi and Southern Africa Department",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1968"),
@@ -2093,7 +2195,7 @@ trait StubData {
         AgentDescription(
           "G2Y",
           "Zuckerman Working Party",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           None,
@@ -2109,7 +2211,7 @@ trait StubData {
         AgentDescription(
           "63F",
           "British Museum Central Archive",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("2001"),
@@ -2125,7 +2227,7 @@ trait StubData {
         AgentDescription(
           "614",
           "British Library, Sound Archive",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("1983"),
@@ -2141,7 +2243,7 @@ trait StubData {
         AgentDescription(
           "S2",
           "The National Archives",
-          "2022-06-22T02:00:00-0500",
+          ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
           Some(false),
           Some(false),
           Some("2003"),
@@ -2165,7 +2267,7 @@ trait StubData {
       AgentDescriptionEntity(
         new URI("http://cat.nationalarchives.gov.uk/agent.8R6.1"),
         "Queen Anne's Bounty",
-        "2022-06-22T02:00:00-0500",
+        ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
         None,
         None,
         Some(false),
