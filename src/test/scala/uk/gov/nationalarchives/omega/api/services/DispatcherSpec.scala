@@ -38,7 +38,7 @@ import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.business.legalstatus.LegalStatusService
 import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ INVA001, INVA002, INVA003, INVA005, INVA006, INVA007, INVA008, MISS001, MISS002, MISS003, MISS004, MISS005, MISS006, MISS007 }
 import uk.gov.nationalarchives.omega.api.common.{ ErrorCode, Version1UUID }
-import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, StubDataImpl }
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage
 import uk.gov.nationalarchives.omega.api.repository.OmegaRepository
 
 import java.nio.file.{ FileSystems, Files, StandardOpenOption }
@@ -55,8 +55,8 @@ class DispatcherSpec
   private val testLocalProducer = new TestProducerImpl(testQueue)
   private val echoService = new EchoService()
   private val mockRepository = mock[OmegaRepository]
-  private val legalStatusService = new LegalStatusService(new StubDataImpl, mockRepository)
-  private val listAgentSummaryService = new ListAgentSummaryService(new StubDataImpl, mockRepository)
+  private val legalStatusService = new LegalStatusService(mockRepository)
+  private val listAgentSummaryService = new ListAgentSummaryService(mockRepository)
   private lazy val dispatcher =
     new Dispatcher(testLocalProducer, localMessageStore, echoService, legalStatusService, listAgentSummaryService)
 

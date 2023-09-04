@@ -28,16 +28,16 @@ import io.circe.syntax.EncoderOps
 import uk.gov.nationalarchives.omega.api.business._
 import uk.gov.nationalarchives.omega.api.common.ServiceException
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{ InvalidMessagePayload, MessageValidationError, ValidationResult }
+import uk.gov.nationalarchives.omega.api.messages.ValidatedLocalMessage
 import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary }
 import uk.gov.nationalarchives.omega.api.messages.request.{ ListAgentSummary, RequestMessage }
-import uk.gov.nationalarchives.omega.api.messages.{ StubData, ValidatedLocalMessage }
 import uk.gov.nationalarchives.omega.api.repository.AbstractRepository
 import uk.gov.nationalarchives.omega.api.repository.model.AgentConceptEntity
 
 import java.time.ZonedDateTime
 import scala.util.{ Failure, Success, Try }
 
-class ListAgentSummaryService(val stubData: StubData, val repository: AbstractRepository)
+class ListAgentSummaryService(val repository: AbstractRepository)
     extends BusinessService with BusinessRequestValidation {
 
   override def process(

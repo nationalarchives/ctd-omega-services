@@ -25,15 +25,14 @@ import cats.data.Validated
 import io.circe.syntax.EncoderOps
 import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidation, BusinessService, BusinessServiceError, BusinessServiceReply }
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.ValidationResult
+import uk.gov.nationalarchives.omega.api.messages.ValidatedLocalMessage
 import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
 import uk.gov.nationalarchives.omega.api.messages.request.{ ListAssetLegalStatusSummary, RequestMessage }
-import uk.gov.nationalarchives.omega.api.messages.{ StubData, ValidatedLocalMessage }
 import uk.gov.nationalarchives.omega.api.repository.AbstractRepository
 
 import scala.util.{ Failure, Success, Try }
 
-class LegalStatusService(val stubData: StubData, repository: AbstractRepository)
-    extends BusinessService with BusinessRequestValidation {
+class LegalStatusService(repository: AbstractRepository) extends BusinessService with BusinessRequestValidation {
 
   override def validateRequest(validatedLocalMessage: ValidatedLocalMessage): ValidationResult[RequestMessage] =
     Validated.valid(ListAssetLegalStatusSummary())

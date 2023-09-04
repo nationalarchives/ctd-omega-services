@@ -27,13 +27,12 @@ import uk.gov.nationalarchives.omega.api.messages.AgentType.{ CorporateBody, Per
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.InvalidMessagePayload
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.{ BaseURL, TestRepository }
-import uk.gov.nationalarchives.omega.api.support.{ TestStubData, UnitTest }
+import uk.gov.nationalarchives.omega.api.support.UnitTest
 
 class ListAgentServiceSummarySpec extends UnitTest {
 
-  private val stubData = new TestStubData
   private val testRepository = new TestRepository
-  private val listAgentSummaryService = new ListAgentSummaryService(stubData, testRepository)
+  private val listAgentSummaryService = new ListAgentSummaryService(testRepository)
 
   "The ListAgentSummaryService" - {
     "returns a result on processRequest when given" - {

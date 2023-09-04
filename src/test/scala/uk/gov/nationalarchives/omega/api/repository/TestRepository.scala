@@ -28,7 +28,19 @@ import java.time.ZonedDateTime
 import scala.util.Try
 
 class TestRepository extends AbstractRepository {
-  override def getLegalStatusEntities: Try[List[LegalStatusEntity]] = Try(List())
+  override def getLegalStatusEntities: Try[List[LegalStatusEntity]] =
+    Try(
+      List(
+        LegalStatusEntity(new URI(s"${BaseURL.cat}/public-record"), "Public Record"),
+        LegalStatusEntity(new URI(s"${BaseURL.cat}/non-public-record"), "Non-Public Record"),
+        LegalStatusEntity(
+          new URI(s"${BaseURL.cat}/public-record-unless-otherwise-stated"),
+          "Public Record (unless otherwise stated)"
+        ),
+        LegalStatusEntity(new URI(s"${BaseURL.cat}/welsh-public-record"), "Welsh Public Record"),
+        LegalStatusEntity(new URI(s"${BaseURL.cat}/non-record-material"), "Non-Record Material")
+      )
+    )
 
   override def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): Try[List[AgentConceptEntity]] =
     if (listAgentSummary.depository.getOrElse(false)) {
