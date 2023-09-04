@@ -966,7 +966,7 @@ components:
           description: The period of time or instant during which the record was accumulated
         appraisal:
           type: string
-        accrualPolicy:
+        accrual-policy:
           $ref: '#/components/schemas/GeneralIdentifier'
           description: The URI of the accrual policy of the record
         layout:
