@@ -216,7 +216,16 @@ class TestRepository extends AbstractRepository {
           archivistsNote = Some("[Grid reference: N/A]"),
           sourceOfAcquisition = Some(new URI(s"${BaseURL.cat}/agent.24")),
           custodialHistory = Some("Retained until 2006"),
-          adminBiogBackground = Some("<bioghist><p>The board met periodically until 1935 when it was allowed to lapse.</p></bioghist>")
+          adminBiogBackground =
+            Some("<bioghist><p>The board met periodically until 1935 when it was allowed to lapse.</p></bioghist>"),
+          accumulationType = Some(new URI(s"${BaseURL.time}ProperInterval")),
+          accumulationDescription = Some("1963"),
+          accumulationBeginning = Some("1963-01-01Z"),
+          accumulationEnd = Some("1963-12-31Z"),
+          appraisal = Some("Files selected in accordance with Operational Selection Policy OSP 25"),
+          accrualPolicy = Some(new URI(s"${BaseURL.cat}/policy.Series_is_accruing")),
+          layout = Some("Photographs in an envelope"),
+          publicationNote = Some("Some of the photographs in this series appeared in The Times newspaper.")
         ),
         RecordDescriptionPropertiesEntity(
           recordDescriptionUri = new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
@@ -229,7 +238,16 @@ class TestRepository extends AbstractRepository {
           archivistsNote = Some("[Grid reference: NX 509 582]"),
           sourceOfAcquisition = Some(new URI(s"${BaseURL.cat}/agent.25")),
           custodialHistory = Some("Retained until 2001"),
-          adminBiogBackground = Some("<bioghist><p>The board met periodically until 1936 when it was allowed to lapse.</p></bioghist>")
+          adminBiogBackground =
+            Some("<bioghist><p>The board met periodically until 1936 when it was allowed to lapse.</p></bioghist>"),
+          accumulationType = Some(new URI(s"${BaseURL.time}Instant")),
+          accumulationDescription = Some("1963"),
+          accumulationInstant = Some("1963-01-01Z"),
+          appraisal = Some("Files selected in accordance with Operational Selection Policy OSP 26"),
+          accrualPolicy = Some(new URI(s"${BaseURL.cat}/policy.No_future_accruals_expected")),
+          layout = Some("Photographs in a box"),
+          publicationNote =
+            Some("Some of the photographs in this series appeared in The Manchester Guardian newspaper.")
         )
       )
     )

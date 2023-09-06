@@ -37,5 +37,14 @@ case class RecordDescriptionPropertiesEntity(
   archivistsNote: Option[String] = None,
   sourceOfAcquisition: Option[URI] = None,
   custodialHistory: Option[String] = None,
-  adminBiogBackground: Option[String] = None
+  adminBiogBackground: Option[String] = None,
+  accumulationType: Option[URI] = None,
+  accumulationDescription: Option[String] = None,
+  accumulationBeginning: Option[String] = None,
+  accumulationEnd: Option[String] = None,
+  accumulationInstant: Option[String] = None,
+  appraisal: Option[String] = None,
+  accrualPolicy: Option[URI] = None,
+  layout: Option[String] = None,
+  publicationNote: Option[String] = None
 )

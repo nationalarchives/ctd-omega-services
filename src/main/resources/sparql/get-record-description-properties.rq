@@ -7,21 +7,23 @@ PREFIX rdau: <http://rdaregistry.info/Elements/u/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX time: <http://www.w3.org/2006/time#>
+PREFIX locah: <http://data.archiveshub.ac.uk/def/>
 
 SELECT ?recordDescriptionUri ?assetLegalStatus ?legalStatusLabel ?legacyType ?designationOfEdition ?createdType
         ?createdDescription ?createdBeginning ?createdEnd ?createdInstant ?archivistsNote ?sourceOfAcquisition
-        ?custodialHistory ?adminBiogBackground
+        ?custodialHistory ?adminBiogBackground ?accumulationType ?accumulationDescription ?accumlationBeginning
+        ?accumulationEnd ?accumulationInstant ?appraisal ?accrualPolicy ?layout ?publicationNote
 WHERE { ?recordDescriptionUri prov:specializationOf ?recordConceptUri ;
                               premis:rightsStatus ?rightsStatus ;
                               cat:created ?created ;
-                              dct:type ?legacyType .
+                              dct:type ?legacyType ;
         FILTER(?legacyType IN (cat:item, cat:piece))
         ?created rdf:type ?createdType ;
                  dct:description ?createdDescription .
-        OPTIONAL { ?created time:hasBeginning ?beginning ;
-                            time:hasEnd ?end .
-                   ?beginning time:inXSDDate ?createdBeginning .
-                   ?end time:inXSDDate ?createdEnd . }
+        OPTIONAL { ?created time:hasBeginning ?beginning1 ;
+                            time:hasEnd ?end1 .
+                   ?beginning1 time:inXSDDate ?createdBeginning .
+                   ?end1 time:inXSDDate ?createdEnd . }
         OPTIONAL { ?created time:inXSDDate ?createdInstant . }
         ?rightsStatus rdf:type premis:RightsStatus ;
                       premis:basis ?assetLegalStatus .
@@ -37,4 +39,16 @@ WHERE { ?recordDescriptionUri prov:specializationOf ?recordConceptUri ;
         OPTIONAL { ?recordDescriptionUri dct:provenance ?provenance3 .
                    ?provenance3 dct:type cat:administrative-biographical-backrgound ;
                                 dct:description ?adminBiogBackground . }
+        OPTIONAL { ?recordDescriptionUri dct:dateSubmitted ?accumulation .
+                   ?accumulation rdf:type ?accumulationType ;
+                                 dct:description ?accumulationDescription . }
+        OPTIONAL { ?accumulation time:hasBeginning ?beginning2 ;
+                                 time:hasEnd ?end2 .
+                   ?beginning2 time:inXSDDate ?accumlationBeginning .
+                   ?end2 time:inXSDDate ?accumulationEnd . }
+        OPTIONAL { ?accumulation time:inXSDDate ?accumulationInstant . }
+        OPTIONAL { ?recordDescriptionUri locah:appraisal ?appraisal . }
+        OPTIONAL { ?recordDescriptionUri dct:accrualPolicy ?accrualPolicy . }
+        OPTIONAL { ?recordDescriptionUri rdau:P60784 ?layout . }
+        OPTIONAL { ?recordDescriptionUri rdau:P60128 ?publicationNote . }
       }

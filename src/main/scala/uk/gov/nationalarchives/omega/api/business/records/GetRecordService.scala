@@ -158,7 +158,12 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
       archivistsNote = entity.archivistsNote,
       sourceOfAcquisition = entity.sourceOfAcquisition.flatMap(uri => Some(uri.toString)),
       custodialHistory = entity.custodialHistory,
-      administrativeBiographicalBackground = entity.adminBiogBackground
+      administrativeBiographicalBackground = entity.adminBiogBackground,
+      accumulation = getAccumulation(entity),
+      appraisal = entity.appraisal,
+      accrualPolicy = entity.accrualPolicy.flatMap(uri => Some(uri.toString)),
+      layout = entity.layout,
+      publicationNote = entity.publicationNote
     )
 
   private def getLegalStatus(entity: RecordDescriptionPropertiesEntity): Option[LabelledIdentifier] =
@@ -188,6 +193,25 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
           for {
             description <- entity.createdDescription
             instant     <- entity.createdInstant
+          } yield DescribedTemporal(description, TemporalInstant(instant))
+        case _ => None // TODO (RW) log error here (see PACT-1071)
+      }
+    )
+
+  // TODO (RW) refactor this and getCreated (DRY)
+  private def getAccumulation(entity: RecordDescriptionPropertiesEntity): Option[DescribedTemporal] =
+    entity.accumulationType.flatMap(uri =>
+      uri.toString match {
+        case s"${BaseURL.time}ProperInterval" =>
+          for {
+            description <- entity.accumulationDescription
+            dateFrom    <- entity.accumulationBeginning
+            dateTo      <- entity.accumulationEnd
+          } yield DescribedTemporal(description, TemporalInterval(dateFrom, dateTo))
+        case s"${BaseURL.time}Instant" =>
+          for {
+            description <- entity.accumulationDescription
+            instant     <- entity.accumulationInstant
           } yield DescribedTemporal(description, TemporalInstant(instant))
         case _ => None // TODO (RW) log error here (see PACT-1071)
       }

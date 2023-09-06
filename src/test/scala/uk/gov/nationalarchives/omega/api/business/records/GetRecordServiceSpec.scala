@@ -87,7 +87,18 @@ class GetRecordServiceSpec extends UnitTest {
        |      "archivists-note" : "[Grid reference: N/A]",
        |      "source-of-acquisition" : "${BaseURL.cat}/agent.24",
        |      "custodial-history" : "Retained until 2006",
-       |      "administrative-biographical-background" : "<bioghist><p>The board met periodically until 1935 when it was allowed to lapse.</p></bioghist>"
+       |      "administrative-biographical-background" : "<bioghist><p>The board met periodically until 1935 when it was allowed to lapse.</p></bioghist>",
+       |      "accumulation" : {
+       |        "description" : "1963",
+       |        "temporal" : {
+       |          "date-from" : "1963-01-01Z",
+       |          "date-to" : "1963-12-31Z"
+       |        }
+       |      },
+       |      "appraisal" : "Files selected in accordance with Operational Selection Policy OSP 25",
+       |      "accrual-policy" : "${BaseURL.cat}/policy.Series_is_accruing",
+       |      "layout" : "Photographs in an envelope",
+       |      "publication-note" : "Some of the photographs in this series appeared in The Times newspaper."
        |    },
        |    {
        |      "identifier" : "${BaseURL.cat}/COAL.2022.N373.P.1",
@@ -123,7 +134,17 @@ class GetRecordServiceSpec extends UnitTest {
        |      "archivists-note" : "[Grid reference: NX 509 582]",
        |      "source-of-acquisition" : "${BaseURL.cat}/agent.25",
        |      "custodial-history" : "Retained until 2001",
-       |      "administrative-biographical-background" : "<bioghist><p>The board met periodically until 1936 when it was allowed to lapse.</p></bioghist>"
+       |      "administrative-biographical-background" : "<bioghist><p>The board met periodically until 1936 when it was allowed to lapse.</p></bioghist>",
+       |      "accumulation" : {
+       |        "description" : "1963",
+       |        "temporal" : {
+       |          "instant" : "1963-01-01Z"
+       |        }
+       |      },
+       |      "appraisal" : "Files selected in accordance with Operational Selection Policy OSP 26",
+       |      "accrual-policy" : "${BaseURL.cat}/policy.No_future_accruals_expected",
+       |      "layout" : "Photographs in a box",
+       |      "publication-note" : "Some of the photographs in this series appeared in The Manchester Guardian newspaper."
        |    }
        |  ]
        |}""".stripMargin
