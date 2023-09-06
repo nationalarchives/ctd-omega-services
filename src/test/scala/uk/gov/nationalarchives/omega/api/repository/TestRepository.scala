@@ -212,7 +212,11 @@ class TestRepository extends AbstractRepository {
           createdType = Some(new URI(s"${BaseURL.time}ProperInterval")),
           createdDescription = Some("1963"),
           createdBeginning = Some("1963-01-01Z"),
-          createdEnd = Some("1963-12-31Z")
+          createdEnd = Some("1963-12-31Z"),
+          archivistsNote = Some("[Grid reference: N/A]"),
+          sourceOfAcquisition = Some(new URI(s"${BaseURL.cat}/agent.24")),
+          custodialHistory = Some("Retained until 2006"),
+          adminBiogBackground = Some("<bioghist><p>The board met periodically until 1935 when it was allowed to lapse.</p></bioghist>")
         ),
         RecordDescriptionPropertiesEntity(
           recordDescriptionUri = new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
@@ -221,7 +225,11 @@ class TestRepository extends AbstractRepository {
           legacyType = Some(new URI(s"${BaseURL.cat}/item")),
           createdType = Some(new URI(s"${BaseURL.time}Instant")),
           createdDescription = Some("1963"),
-          createdInstant = Some("1963-01-01Z")
+          createdInstant = Some("1963-01-01Z"),
+          archivistsNote = Some("[Grid reference: NX 509 582]"),
+          sourceOfAcquisition = Some(new URI(s"${BaseURL.cat}/agent.25")),
+          custodialHistory = Some("Retained until 2001"),
+          adminBiogBackground = Some("<bioghist><p>The board met periodically until 1936 when it was allowed to lapse.</p></bioghist>")
         )
       )
     )

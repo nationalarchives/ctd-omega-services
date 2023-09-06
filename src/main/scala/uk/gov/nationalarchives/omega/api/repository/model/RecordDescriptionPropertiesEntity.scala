@@ -35,6 +35,7 @@ case class RecordDescriptionPropertiesEntity(
   createdEnd: Option[String] = None,
   createdInstant: Option[String] = None,
   archivistsNote: Option[String] = None,
-  sourceOfAcquisition: Option[String] = None,
-  custodialHistory: Option[String] = None
+  sourceOfAcquisition: Option[URI] = None,
+  custodialHistory: Option[String] = None,
+  adminBiogBackground: Option[String] = None
 )

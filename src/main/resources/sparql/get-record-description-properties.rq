@@ -8,7 +8,9 @@ PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX time: <http://www.w3.org/2006/time#>
 
-SELECT ?recordDescriptionUri ?assetLegalStatus ?legalStatusLabel ?legacyType ?designationOfEdition ?createdType ?createdDescription ?createdBeginning ?createdEnd ?createdInstant ?archivistsNote ?sourceOfAcquisition ?custodialHistory
+SELECT ?recordDescriptionUri ?assetLegalStatus ?legalStatusLabel ?legacyType ?designationOfEdition ?createdType
+        ?createdDescription ?createdBeginning ?createdEnd ?createdInstant ?archivistsNote ?sourceOfAcquisition
+        ?custodialHistory ?adminBiogBackground
 WHERE { ?recordDescriptionUri prov:specializationOf ?recordConceptUri ;
                               premis:rightsStatus ?rightsStatus ;
                               cat:created ?created ;
@@ -26,8 +28,13 @@ WHERE { ?recordDescriptionUri prov:specializationOf ?recordConceptUri ;
         ?assetLegalStatus skos:prefLabel ?legalStatusLabel .
         OPTIONAL { ?recordDescriptionUri rdau:P60365 ?designationOfEdition . }
         OPTIONAL { ?recordDescriptionUri premis:note ?archivistsNote . }
-        OPTIONAL { ?recordDescriptionUri dct:provenance/dct:type cat:immediate-source-of-acquisition ;
-                                         dct:provenance/dct:subject ?sourceOfAcquisition . }
-        OPTIONAL { ?recordDescriptionUri dct:provenance/dct:type cat:custodial-history ;
-                                         dct:provenance/dct:description ?custodialHistory . }
+        OPTIONAL { ?recordDescriptionUri dct:provenance ?provenance1 .
+                   ?provenance1 dct:type cat:immediate-source-of-acquisition ;
+                                dct:subject ?sourceOfAcquisition . }
+        OPTIONAL { ?recordDescriptionUri dct:provenance ?provenance2 .
+                   ?provenance2 dct:type cat:custodial-history ;
+                                dct:description ?custodialHistory . }
+        OPTIONAL { ?recordDescriptionUri dct:provenance ?provenance3 .
+                   ?provenance3 dct:type cat:administrative-biographical-backrgound ;
+                                dct:description ?adminBiogBackground . }
       }

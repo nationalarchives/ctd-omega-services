@@ -154,7 +154,11 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
       assetLegalStatus = getLegalStatus(entity),
       legacyTnaCs13RecordType = getCS13RecordType(entity),
       designationOfEdition = entity.designationOfEdition,
-      created = getCreated(entity)
+      created = getCreated(entity),
+      archivistsNote = entity.archivistsNote,
+      sourceOfAcquisition = entity.sourceOfAcquisition.flatMap(uri => Some(uri.toString)),
+      custodialHistory = entity.custodialHistory,
+      administrativeBiographicalBackground = entity.adminBiogBackground
     )
 
   private def getLegalStatus(entity: RecordDescriptionPropertiesEntity): Option[LabelledIdentifier] =

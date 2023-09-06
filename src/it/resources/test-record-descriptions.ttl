@@ -48,6 +48,14 @@ cat:COAL.2022.N373.P.2
                                      dct:subject      cat:agent.24 ;
                                      dct:type         cat:immediate-source-of-acquisition
                                    ] ;
+    dct:provenance                 [ a                dct:ProvenanceStatement ;
+                                     dct:description  "Retained until 2001" ;
+                                     dct:type         cat:custodial-history
+                                   ] ;
+    dct:provenance                 [ a                dct:ProvenanceStatement ;
+                                     dct:description  "<bioghist><p>The board met periodically until 1935 when it was allowed to lapse.</p></bioghist>" ;
+                                     dct:type         cat:administrative-biographical-backrgound
+                                   ] ;
     dct:subject                    [ dct:description  "from 1965" ;
                                      dct:subject      cat:agent.24
                                    ] ;
