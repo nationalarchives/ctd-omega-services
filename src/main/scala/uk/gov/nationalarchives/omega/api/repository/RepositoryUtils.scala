@@ -60,7 +60,7 @@ trait RepositoryUtils extends AgentTypeMapper {
   def prepareParameterizedQuery(
     queryResource: String,
     params: SparqlParams,
-    extendQuery: Boolean
+    extendQuery: Boolean = false
   ): Try[Query] =
     for {
       queryText          <- getQueryText(queryResource)

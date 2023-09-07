@@ -22,25 +22,26 @@
 package uk.gov.nationalarchives.omega.api.services
 
 import cats.effect.std.Queue
-import cats.effect.{ IO, Resource }
-import cats.implicits.{ catsSyntaxParallelTraverse_, toFunctorOps }
+import cats.effect.{IO, Resource}
+import cats.implicits.{catsSyntaxParallelTraverse_, toFunctorOps}
 import jms4s.JmsAcknowledgerConsumer.AckAction
 import jms4s.config.QueueName
 import jms4s.jms.JmsMessage
-import jms4s.{ JmsAcknowledgerConsumer, JmsProducer }
+import jms4s.{JmsAcknowledgerConsumer, JmsProducer}
 import uk.gov.nationalarchives.omega.api.business.agents.ListAgentSummaryService
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.business.legalstatus.LegalStatusService
+import uk.gov.nationalarchives.omega.api.business.records.GetRecordService
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
-import uk.gov.nationalarchives.omega.api.connectors.{ JmsConnector, SparqlEndpointConnector }
+import uk.gov.nationalarchives.omega.api.connectors.{JmsConnector, SparqlEndpointConnector}
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.createLocalMessage
-import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, LocalMessageStore }
-import uk.gov.nationalarchives.omega.api.repository.{ AbstractRepository, OmegaRepository }
-import uk.gov.nationalarchives.omega.api.services.ServiceState.{ Started, Starting, Stopped, Stopping }
+import uk.gov.nationalarchives.omega.api.messages.{LocalMessage, LocalMessageStore}
+import uk.gov.nationalarchives.omega.api.repository.{AbstractRepository, OmegaRepository}
+import uk.gov.nationalarchives.omega.api.services.ServiceState.{Started, Starting, Stopped, Stopping}
 
-import java.nio.file.{ Files, Paths }
-import scala.util.{ Failure, Success }
+import java.nio.file.{Files, Paths}
+import scala.util.{Failure, Success}
 
 class ApiService(val config: ServiceConfig) extends Stateful {
 
@@ -149,7 +150,8 @@ class ApiService(val config: ServiceConfig) extends Stateful {
       localMessageStore,
       new EchoService(),
       new LegalStatusService(repository),
-      new ListAgentSummaryService(repository)
+      new ListAgentSummaryService(repository),
+      new GetRecordService(repository)
     )
 
   private def doStop(): IO[Unit] =

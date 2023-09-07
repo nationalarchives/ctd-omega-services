@@ -23,4 +23,4 @@ package uk.gov.nationalarchives.omega.api.repository.model
 
 import org.apache.jena.ext.xerces.util.URI
 
-case class IsPartOfEntity(recordDescriptionUri: URI, isPartOfUri: URI)
+case class IsPartOfEntity(recordDescriptionUri: URI, recordSetConceptUri: URI)

@@ -3,7 +3,7 @@ PREFIX cat: <http://cat.nationalarchives.gov.uk/>
 PREFIX rst: <http://id.loc.gov/vocabulary/preservation/relationshipSubType/>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 
-SELECT ?recordDescriptionUri ?isPartOf
+SELECT ?recordDescriptionUri ?recordSetConceptUri
 WHERE { ?recordDescriptionUri prov:specializationOf ?recordConceptUri ; ;
-                       rst:isp ?isPartOf .
+                       rst:isp ?recordSetConceptUri .
       }

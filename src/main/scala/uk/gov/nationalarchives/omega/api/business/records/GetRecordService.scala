@@ -21,17 +21,46 @@
 
 package uk.gov.nationalarchives.omega.api.business.records
 
+import cats.data.Validated
+import io.circe.parser.decode
 import io.circe.syntax.EncoderOps
-import uk.gov.nationalarchives.omega.api.business.{ BusinessService, BusinessServiceError, BusinessServiceReply }
+import uk.gov.nationalarchives.omega.api.business.{BusinessRequestValidation, BusinessService, BusinessServiceError, BusinessServiceReply}
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{InvalidMessagePayload, MessageValidationError, ValidationResult}
 import uk.gov.nationalarchives.omega.api.messages.reply._
-import uk.gov.nationalarchives.omega.api.messages.request.{ RequestByIdentifier, RequestMessage }
-import uk.gov.nationalarchives.omega.api.messages.{ CS13RecordType, DescribedTemporal, RecordType, TemporalInstant, TemporalInterval }
-import uk.gov.nationalarchives.omega.api.repository.{ AbstractRepository, BaseURL }
+import uk.gov.nationalarchives.omega.api.messages.request.{ RequestByIdentifier, RequestMessage}
+import uk.gov.nationalarchives.omega.api.messages._
 import uk.gov.nationalarchives.omega.api.repository.model._
+import uk.gov.nationalarchives.omega.api.repository.{AbstractRepository, BaseURL}
 
-import scala.util.{ Failure, Success, Try }
+import scala.util.matching.Regex
+import scala.util.{Failure, Success, Try}
 
-class GetRecordService(val repository: AbstractRepository) extends BusinessService {
+class GetRecordService(val repository: AbstractRepository) extends BusinessService with BusinessRequestValidation {
+
+  // TODO we need to validate that the message contains a valid record concept identifier
+  override def validateRequest(validatedLocalMessage: ValidatedLocalMessage): ValidationResult[RequestMessage] = {
+    val recordConceptUriPattern: Regex = (BaseURL.cat + "/[A-Z]{1,4}.[0-9]{3,4}.[0-9A-Z]{4}.(P|D)$").r
+    if (validatedLocalMessage.messageText.nonEmpty) {
+      decode[RequestByIdentifier](validatedLocalMessage.messageText) match {
+        case Right(request) => if(request.identifier.nonEmpty && recordConceptUriPattern.matches(request.identifier)){
+          Validated.valid(request)
+        } else {
+          Validated.invalidNec[MessageValidationError, RequestMessage](
+            InvalidMessagePayload(message = Some("Missing identifier value"))
+          )
+        }
+        case Left(error) =>
+          Validated.invalidNec[MessageValidationError, RequestMessage](
+            InvalidMessagePayload(cause = Some(error))
+          )
+      }
+    } else {
+      Validated.invalidNec[MessageValidationError, RequestMessage](
+        InvalidMessagePayload(message = Some("Missing identifier"))
+      )
+    }
+  }
+
   override def process(request: RequestMessage): Either[BusinessServiceError, BusinessServiceReply] = {
     val record = for {
       getRecordRequest <- Try(request.asInstanceOf[RequestByIdentifier])
@@ -104,7 +133,7 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
     val accessRightsMap = getAccessRightsMap(accessRightsEntities)
     val isPartOfMap: Map[String, List[String]] = isPartOfEntities
       .groupBy(_.recordDescriptionUri)
-      .map(entry => entry._1.toString -> entry._2.map(a => a.isPartOfUri.toString))
+      .map(entry => entry._1.toString -> entry._2.map(a => a.recordSetConceptUri.toString))
     val secondaryIdentifierMap: Map[String, List[TypedIdentifier]] = secondaryIdentifierEntities
       .groupBy(_.recordDescriptionUri)
       .map(entry =>

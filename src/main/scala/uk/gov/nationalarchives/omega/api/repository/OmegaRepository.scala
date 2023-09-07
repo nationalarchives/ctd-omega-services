@@ -39,6 +39,11 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
   private val getAgentDescriptionsSparqlResource = s"/$sparqlResourceDir/get-agent-descriptions.rq"
   private val getRecordConceptSparqlResource = s"/$sparqlResourceDir/get-record-concept.rq"
   private val getRecordCreatorSparqlResource = s"/$sparqlResourceDir/get-record-creator.rq"
+  private val getRecordDescriptionSummarySparqlResource = s"/$sparqlResourceDir/get-record-description-summary.rq"
+  private val getRecordDescriptionPropertiesSparqlResource = s"/$sparqlResourceDir/get-record-description-properties.rq"
+  private val getAccessRightsSparqlResource = s"/$sparqlResourceDir/get-access-rights.rq"
+  private val getIsPartOfSparqlResource = s"/$sparqlResourceDir/get-is-part-of.rq"
+  private val getSecondaryIdentifiersSparqlResource = s"/$sparqlResourceDir/get-secondary-identifiers.rq"
 
   implicit object BooleanFromQuerySolution extends FromQuerySolution[Boolean] {
     def fromQuerySolution(qs: QuerySolution, variablePath: String = ""): Try[Boolean] =
@@ -59,7 +64,7 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
   override def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): Try[List[AgentConceptEntity]] =
     for {
       params <- SparqlParams.from(listAgentSummary)
-      query  <- prepareParameterizedQuery(getAgentSummariesSparqlResource, params, extendQuery = false)
+      query  <- prepareParameterizedQuery(getAgentSummariesSparqlResource, params)
       result <- executeQuery(query, implicitly[FromQuerySolution[AgentConceptEntity]])
     } yield result
 
@@ -71,8 +76,7 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
       params <- SparqlParams.from(listAgentSummary)
       query <- prepareParameterizedQuery(
                  getAgentDescriptionsSparqlResource,
-                 params.copy(uris = params.uris ++ Map("conceptIdParam" -> agentConceptUri.toString)),
-                 extendQuery = true
+                 params.copy(uris = params.uris ++ Map("conceptIdParam" -> agentConceptUri.toString))
                )
       result <- executeQuery(query, implicitly[FromQuerySolution[AgentDescriptionEntity]])
     } yield result
@@ -81,8 +85,7 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
     for {
       query <- prepareParameterizedQuery(
                  getRecordConceptSparqlResource,
-                 SparqlParams(strings = Map("identifier" -> recordConceptId)),
-                 extendQuery = false
+                 SparqlParams(strings = Map("recordConceptId" -> recordConceptId))
                )
       result <- executeQuery(query, implicitly[FromQuerySolution[RecordConceptEntity]])
     } yield result
@@ -91,8 +94,7 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
     for {
       query <- prepareParameterizedQuery(
                  getRecordCreatorSparqlResource,
-                 SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri)),
-                 extendQuery = false
+                 SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri))
                )
       result <- executeQuery(query, implicitly[FromQuerySolution[CreatorEntity]])
     } yield result
@@ -100,14 +102,39 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
   private def executeQuery[A](query: Query, queryDecoder: FromQuerySolution[A]): Try[List[A]] =
     sparqlConnector.execute(query, queryDecoder)
 
-  override def getRecordDescriptionSummaries(recordConceptUri: String): Try[List[RecordDescriptionSummaryEntity]] = ???
+  override def getRecordDescriptionSummaries(recordConceptUri: String): Try[List[RecordDescriptionSummaryEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+        getRecordDescriptionSummarySparqlResource, SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri))
+      )
+      result <- executeQuery(query, implicitly[FromQuerySolution[RecordDescriptionSummaryEntity]])
+    } yield result
 
   override def getRecordDescriptionProperties(recordConceptUri: String): Try[List[RecordDescriptionPropertiesEntity]] =
-    ???
+    for {
+      query <- prepareParameterizedQuery(
+      getRecordDescriptionPropertiesSparqlResource, SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri))
+    )
+    result <- executeQuery(query, implicitly[FromQuerySolution[RecordDescriptionPropertiesEntity]])
+  } yield result
 
-  override def getAccessRights(recordConceptUri: String): Try[List[AccessRightsEntity]] = ???
+  override def getAccessRights(recordConceptUri: String): Try[List[AccessRightsEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+        getAccessRightsSparqlResource, SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri))
+      )
+      result <- executeQuery(query, implicitly[FromQuerySolution[AccessRightsEntity]])
+    } yield result
 
-  override def getIsPartOf(recordConceptUri: String): Try[List[IsPartOfEntity]] = ???
+  override def getIsPartOf(recordConceptUri: String): Try[List[IsPartOfEntity]] =
+    for {
+      query <- prepareParameterizedQuery(getIsPartOfSparqlResource, SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri)))
+      result <- executeQuery(query, implicitly[FromQuerySolution[IsPartOfEntity]])
+    }  yield result
 
-  override def getSecondaryIdentifiers(recordConceptUri: String): Try[List[SecondaryIdentifierEntity]] = ???
+  override def getSecondaryIdentifiers(recordConceptUri: String): Try[List[SecondaryIdentifierEntity]] =
+    for {
+      query <- prepareParameterizedQuery(getSecondaryIdentifiersSparqlResource, SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri)))
+      result <- executeQuery(query, implicitly[FromQuerySolution[SecondaryIdentifierEntity]])
+    } yield result
 }

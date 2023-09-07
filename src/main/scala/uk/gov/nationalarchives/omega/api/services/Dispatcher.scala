@@ -22,7 +22,7 @@
 package uk.gov.nationalarchives.omega.api.services
 
 import cats.data.Validated
-import cats.data.Validated.{ Invalid, Valid }
+import cats.data.Validated.{Invalid, Valid}
 import cats.effect.IO
 import cats.effect.std.Queue
 import cats.effect.unsafe.implicits.global
@@ -30,11 +30,12 @@ import uk.gov.nationalarchives.omega.api.business._
 import uk.gov.nationalarchives.omega.api.business.agents.ListAgentSummaryService
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.business.legalstatus.LegalStatusService
+import uk.gov.nationalarchives.omega.api.business.records.GetRecordService
 import uk.gov.nationalarchives.omega.api.common.AppLogger
-import uk.gov.nationalarchives.omega.api.messages.IncomingMessageType.{ ECHO001, OSLISAGT001, OSLISALS001 }
-import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{ InvalidMessageTypeID, ValidationResult }
-import uk.gov.nationalarchives.omega.api.messages.request.{ EchoRequest, ListAgentSummary, ListAssetLegalStatusSummary, RequestMessage }
-import uk.gov.nationalarchives.omega.api.messages.{ IncomingMessageType, LocalMessage, LocalMessageStore, ValidatedLocalMessage }
+import uk.gov.nationalarchives.omega.api.messages.IncomingMessageType.{ECHO001, OSGEFREC001, OSLISAGT001, OSLISALS001}
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{InvalidMessageTypeID, ValidationResult}
+import uk.gov.nationalarchives.omega.api.messages.request._
+import uk.gov.nationalarchives.omega.api.messages.{IncomingMessageType, LocalMessage, LocalMessageStore, ValidatedLocalMessage}
 
 import scala.util.Try
 
@@ -43,7 +44,8 @@ class Dispatcher(
   localMessageStore: LocalMessageStore,
   echoService: EchoService,
   legalStatusService: LegalStatusService,
-  listAgentSummaryService: ListAgentSummaryService
+  listAgentSummaryService: ListAgentSummaryService,
+  getRecordService: GetRecordService
 ) extends AppLogger {
 
   import cats.syntax.all._
@@ -114,6 +116,7 @@ class Dispatcher(
           case ECHO001     => echoService.validateRequest(validatedLocalMessage)
           case OSLISALS001 => legalStatusService.validateRequest(validatedLocalMessage)
           case OSLISAGT001 => listAgentSummaryService.validateRequest(validatedLocalMessage)
+          case OSGEFREC001 => getRecordService.validateRequest(validatedLocalMessage)
         }
       case _ => Validated.invalidNec(InvalidMessageTypeID())
     }
@@ -123,7 +126,7 @@ class Dispatcher(
       case EchoRequest(_)                 => echoService.process(requestMessage)
       case ListAssetLegalStatusSummary(_) => legalStatusService.process(requestMessage)
       case ListAgentSummary(_, _, _, _)   => listAgentSummaryService.process(requestMessage)
-
+      case RequestByIdentifier(_) => getRecordService.process(requestMessage)
     }
 
   private def sendResultToJmsQueue[U <: BusinessServiceReply, E <: BusinessServiceError](
