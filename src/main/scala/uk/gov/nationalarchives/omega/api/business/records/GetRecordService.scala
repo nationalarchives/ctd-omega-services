@@ -127,9 +127,6 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
     isPartOfEntities: List[IsPartOfEntity],
     secondaryIdentifierEntities: List[SecondaryIdentifierEntity]
   ): List[RecordDescriptionFull] = {
-//    val accessRightsMap: Map[String, List[String]] = accessRightsEntities
-//      .groupBy(_.recordDescriptionUri)
-//      .map(entry => entry._1.toString -> entry._2.map(a => a.accessRights.toString))
     val accessRightsMap = getAccessRightsMap(accessRightsEntities)
     val isPartOfMap: Map[String, List[String]] = isPartOfEntities
       .groupBy(_.recordDescriptionUri)
@@ -139,7 +136,7 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
       .map(entry =>
         entry._1.toString -> entry._2.map(a => TypedIdentifier(a.secondaryIdentifier, a.identifierProperty.toString))
       )
-    val recordList = recordSummaryEntities.map(summary =>
+    recordSummaryEntities.map(summary =>
       RecordDescriptionFull(
         summary = RecordDescriptionSummary(
           identifier = summary.recordDescriptionUri.toString,
@@ -148,14 +145,13 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
           description = summary.scopeAndContent,
           accessRights = accessRightsMap.getOrElse(summary.recordDescriptionUri.toString, List.empty),
           isPartOf = isPartOfMap.getOrElse(summary.recordDescriptionUri.toString, List.empty),
-          previousSibling = summary.previousSiblingUri.flatMap(u => Some(u.toString)),
+          previousSibling = summary.previousSiblingUri.flatMap(uri => Some(uri.toString)),
           versionTimestamp = summary.versionTimestamp,
-          previousDescription = summary.previousDescriptionUri.flatMap(d => Some(d.toString))
+          previousDescription = summary.previousDescriptionUri.flatMap(uri => Some(uri.toString))
         ),
         properties = getRecordPropertiesEntity(recordPropertiesEntities, summary.recordDescriptionUri.toString)
       )
     )
-    recordList
   }
 
   private def getAccessRightsMap(accessRightsEntities: List[AccessRightsEntity]): Map[String, List[String]] = {

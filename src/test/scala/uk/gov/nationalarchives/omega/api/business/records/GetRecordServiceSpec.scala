@@ -145,6 +145,12 @@ class GetRecordServiceSpec extends UnitTest {
        |      "accrual-policy" : "${BaseURL.cat}/policy.No_future_accruals_expected",
        |      "layout" : "Photographs in a box",
        |      "publication-note" : "Some of the photographs in this series appeared in The Manchester Guardian newspaper."
+       |      "referencedBy" : [
+       |        {
+       |          "identifier" : "",
+       |          "label" : ""
+       |        }
+       |      ]
        |    }
        |  ]
        |}""".stripMargin

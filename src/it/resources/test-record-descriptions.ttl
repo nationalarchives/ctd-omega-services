@@ -76,7 +76,29 @@ cat:COAL.2022.N373.P.2
     locah:appraisal                   "Files selected in accordance with Operational Selection Policy OSP 26" ;
     dct:accrualPolicy                 cat:policy.No_future_accruals_expected ;
     rdau:P60784                       "Photographs in an envelope" ;
-    rdau:P60128                       "Some of the photographs in this series appeared in The Times newspaper." .
+    rdau:P60128                       "Some of the photographs in this series appeared in The Times newspaper." ;
+    dct:isReferencedBy                [ dct:title       "Coal Board Minutes 1963" ;
+                                        dct:description "pp.41-42 (meeting of 6th March)" ;
+                                        dct:subject     cat:res.4JJF ] ;
+    dct:isReferencedBy                [ dct:title       "Coal Board Minutes 1963" ;
+                                        dct:description "pp.145-146 (meeting of 12th September)" ;
+                                        dct:subject     cat:res.6ADE ] ;
+    dct:relation                      [ dct:title       "Index of colliery photographs March 1963" ;
+                                        dct:description "See also" ;
+                                        dct:subject     cat:COAL.2022.S144 ;
+                                        dct:type        cat:related-material ] ;
+    dct:relation                      [ dct:title       "Index of colliery photographs September 1963" ;
+                                        dct:description "related material can be found in" ;
+                                        dct:subject     cat:COAL.2022.S144 ;
+                                        dct:type        cat:related-material ] ;
+    dct:relation                      [ dct:title       "NCB records 1963" ;
+                                        dct:description "National Coal Board (NCB) records are in" ;
+                                        dct:subject     cat:CAB.2022.L744 ;
+                                        dct:type        cat:separated-material ] ;
+    dct:relation                      [ dct:title       "Cabinet records 1963" ;
+                                        dct:description "Records of Coal Divisions in successive government departments are in" ;
+                                        dct:subject     cat:CAB.2022.N901 ;
+                                        dct:type        cat:separated-material ] .
 
 cat:COAL.2022.N373.P.1
     a                                 premis:IntellectualEntity ;
