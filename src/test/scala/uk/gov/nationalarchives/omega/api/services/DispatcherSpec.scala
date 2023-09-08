@@ -31,21 +31,22 @@ import org.apache.commons.lang3.SerializationUtils
 import org.mockito.MockitoSugar
 import org.scalatest.freespec.AsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{ Assertion, BeforeAndAfterAll, TryValues }
+import org.scalatest.{Assertion, BeforeAndAfterAll, TryValues}
 import uk.gov.nationalarchives.omega.api.LocalMessageSupport
 import uk.gov.nationalarchives.omega.api.business.agents.ListAgentSummaryService
 import uk.gov.nationalarchives.omega.api.business.echo.EchoService
 import uk.gov.nationalarchives.omega.api.business.legalstatus.LegalStatusService
-import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ INVA001, INVA002, INVA003, INVA005, INVA006, INVA007, INVA008, MISS001, MISS002, MISS003, MISS004, MISS005, MISS006, MISS007 }
-import uk.gov.nationalarchives.omega.api.common.{ ErrorCode, Version1UUID }
+import uk.gov.nationalarchives.omega.api.business.records.GetRecordService
+import uk.gov.nationalarchives.omega.api.common.ErrorCode.{INVA001, INVA002, INVA003, INVA005, INVA006, INVA007, INVA008, MISS001, MISS002, MISS003, MISS004, MISS005, MISS006, MISS007}
+import uk.gov.nationalarchives.omega.api.common.{ErrorCode, Version1UUID}
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage
 import uk.gov.nationalarchives.omega.api.repository.OmegaRepository
 
-import java.nio.file.{ FileSystems, Files, StandardOpenOption }
+import java.nio.file.{FileSystems, Files, StandardOpenOption}
 import java.util.UUID
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 class DispatcherSpec
     extends AsyncFreeSpec with BeforeAndAfterAll with AsyncIOSpec with Matchers with TryValues with LocalMessageSupport
@@ -57,8 +58,9 @@ class DispatcherSpec
   private val mockRepository = mock[OmegaRepository]
   private val legalStatusService = new LegalStatusService(mockRepository)
   private val listAgentSummaryService = new ListAgentSummaryService(mockRepository)
+  private val getRecordService = new GetRecordService(mockRepository)
   private lazy val dispatcher =
-    new Dispatcher(testLocalProducer, localMessageStore, echoService, legalStatusService, listAgentSummaryService)
+    new Dispatcher(testLocalProducer, localMessageStore, echoService, legalStatusService, listAgentSummaryService, getRecordService)
 
   override protected def afterAll(): Unit = {
     super.afterAll()

@@ -98,7 +98,13 @@ class GetRecordServiceSpec extends UnitTest {
        |      "appraisal" : "Files selected in accordance with Operational Selection Policy OSP 25",
        |      "accrual-policy" : "${BaseURL.cat}/policy.Series_is_accruing",
        |      "layout" : "Photographs in an envelope",
-       |      "publication-note" : "Some of the photographs in this series appeared in The Times newspaper."
+       |      "publication-note" : "Some of the photographs in this series appeared in The Times newspaper.",
+       |      "referenced-by" : [
+       |        {
+       |          "identifier" : "${BaseURL.cat}/res.JN31",
+       |          "label" : "Coal Board Minutes 1963"
+       |        }
+       |      ]
        |    },
        |    {
        |      "identifier" : "${BaseURL.cat}/COAL.2022.N373.P.1",
@@ -144,11 +150,11 @@ class GetRecordServiceSpec extends UnitTest {
        |      "appraisal" : "Files selected in accordance with Operational Selection Policy OSP 26",
        |      "accrual-policy" : "${BaseURL.cat}/policy.No_future_accruals_expected",
        |      "layout" : "Photographs in a box",
-       |      "publication-note" : "Some of the photographs in this series appeared in The Manchester Guardian newspaper."
-       |      "referencedBy" : [
+       |      "publication-note" : "Some of the photographs in this series appeared in The Manchester Guardian newspaper.",
+       |      "referenced-by" : [
        |        {
-       |          "identifier" : "",
-       |          "label" : ""
+       |          "identifier" : "${BaseURL.cat}/res.4JJF",
+       |          "label" : "Coal Board Minutes 1962"
        |        }
        |      ]
        |    }

@@ -22,7 +22,7 @@
 package uk.gov.nationalarchives.omega.api.repository
 import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{ AccessRightsEntity, AgentConceptEntity, AgentDescriptionEntity, CreatorEntity, IsPartOfEntity, LegalStatusEntity, RecordConceptEntity, RecordDescriptionPropertiesEntity, RecordDescriptionSummaryEntity, SecondaryIdentifierEntity }
+import uk.gov.nationalarchives.omega.api.repository.model.{AccessRightsEntity, AgentConceptEntity, AgentDescriptionEntity, CreatorEntity, IsPartOfEntity, LabelledIdentifierEntity, LegalStatusEntity, RecordConceptEntity, RecordDescriptionPropertiesEntity, RecordDescriptionSummaryEntity, SecondaryIdentifierEntity}
 
 import java.time.ZonedDateTime
 import scala.util.Try
@@ -300,6 +300,22 @@ class TestRepository extends AbstractRepository {
           new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
           new URI(s"${BaseURL.cat}/classicCatalogueReference"),
           "COAL 80/2052/9"
+        )
+      )
+    )
+
+  override def getIsReferencedBy(recordConceptUri: String): Try[List[LabelledIdentifierEntity]] =
+    Try(
+      List(
+        LabelledIdentifierEntity(
+          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+          "Coal Board Minutes 1963",
+          new URI(s"${BaseURL.cat}/res.JN31")
+        ),
+        LabelledIdentifierEntity(
+          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
+          "Coal Board Minutes 1962",
+          new URI(s"${BaseURL.cat}/res.4JJF")
         )
       )
     )

@@ -57,7 +57,7 @@ object RecordDescriptionFull {
           ("accrual-policy", record.properties.accrualPolicy.asJson),
           ("layout", record.properties.layout.asJson),
           ("publication-note", record.properties.publicationNote.asJson),
-          ("referenced-by", record.properties.referencedBy.asJson),
+          ("referenced-by", record.properties.isReferencedBy.asJson),
           ("related-to", record.properties.relatedTo.asJson),
           ("separated-from", record.properties.separatedFrom.asJson),
           ("subject", record.properties.subject.asJson)

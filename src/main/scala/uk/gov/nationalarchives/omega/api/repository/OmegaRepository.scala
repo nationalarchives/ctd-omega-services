@@ -44,6 +44,7 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
   private val getAccessRightsSparqlResource = s"/$sparqlResourceDir/get-access-rights.rq"
   private val getIsPartOfSparqlResource = s"/$sparqlResourceDir/get-is-part-of.rq"
   private val getSecondaryIdentifiersSparqlResource = s"/$sparqlResourceDir/get-secondary-identifiers.rq"
+  private val getIsReferencedBySparqlResource = s"/$sparqlResourceDir/get-is-referenced-by.rq"
 
   implicit object BooleanFromQuerySolution extends FromQuerySolution[Boolean] {
     def fromQuerySolution(qs: QuerySolution, variablePath: String = ""): Try[Boolean] =
@@ -136,5 +137,11 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
     for {
       query <- prepareParameterizedQuery(getSecondaryIdentifiersSparqlResource, SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri)))
       result <- executeQuery(query, implicitly[FromQuerySolution[SecondaryIdentifierEntity]])
+    } yield result
+
+  override def getIsReferencedBy(recordConceptUri: String): Try[List[LabelledIdentifierEntity]] =
+    for {
+      query <- prepareParameterizedQuery(getIsReferencedBySparqlResource, SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri)))
+      result <- executeQuery(query, implicitly[FromQuerySolution[LabelledIdentifierEntity]])
     } yield result
 }
