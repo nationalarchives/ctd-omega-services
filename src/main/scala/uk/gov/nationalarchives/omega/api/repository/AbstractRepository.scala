@@ -75,6 +75,10 @@ trait AbstractRepository {
 
   def getSecondaryIdentifiers(recordConceptUri: String): Try[List[SecondaryIdentifierEntity]]
 
-  def getIsReferencedBy(recordConceptUri: String): Try[List[LabelledIdentifierEntity]]
+  def getIsReferencedBys(recordConceptUri: String): Try[List[LabelledIdentifierEntity]]
+
+  def getRelatedTos(recordConceptUri: String): Try[List[LabelledIdentifierEntity]]
+
+  def getSeparatedFroms(recordConceptUri: String): Try[List[LabelledIdentifierEntity]]
 
 }

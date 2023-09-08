@@ -104,6 +104,18 @@ class GetRecordServiceSpec extends UnitTest {
        |          "identifier" : "${BaseURL.cat}/res.JN31",
        |          "label" : "Coal Board Minutes 1963"
        |        }
+       |      ],
+       |      "related-to" : [
+       |        {
+       |          "identifier" : "${BaseURL.cat}/COAL.2022.S144",
+       |          "label" : "Index of colliery photographs March 1963"
+       |        }
+       |      ],
+       |      "separated-from" : [
+       |        {
+       |          "identifier" : "${BaseURL.cat}/CAB.2022.L744",
+       |          "label" : "NCB records 1963"
+       |        }
        |      ]
        |    },
        |    {
@@ -155,6 +167,18 @@ class GetRecordServiceSpec extends UnitTest {
        |        {
        |          "identifier" : "${BaseURL.cat}/res.4JJF",
        |          "label" : "Coal Board Minutes 1962"
+       |        }
+       |      ],
+       |      "related-to" : [
+       |        {
+       |          "identifier" : "${BaseURL.cat}/COAL.2022.G221",
+       |          "label" : "Index of colliery photographs September 1963"
+       |        }
+       |      ],
+       |      "separated-from" : [
+       |        {
+       |          "identifier" : "${BaseURL.cat}/CAB.2022.N901",
+       |          "label" : "Cabinet records 1963"
        |        }
        |      ]
        |    }

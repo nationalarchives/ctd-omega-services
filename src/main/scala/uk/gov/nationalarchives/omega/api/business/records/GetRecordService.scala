@@ -24,16 +24,16 @@ package uk.gov.nationalarchives.omega.api.business.records
 import cats.data.Validated
 import io.circe.parser.decode
 import io.circe.syntax.EncoderOps
-import uk.gov.nationalarchives.omega.api.business.{BusinessRequestValidation, BusinessService, BusinessServiceError, BusinessServiceReply}
-import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{InvalidMessagePayload, MessageValidationError, ValidationResult}
+import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidation, BusinessService, BusinessServiceError, BusinessServiceReply }
+import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{ InvalidMessagePayload, MessageValidationError, ValidationResult }
 import uk.gov.nationalarchives.omega.api.messages.reply._
-import uk.gov.nationalarchives.omega.api.messages.request.{ RequestByIdentifier, RequestMessage}
+import uk.gov.nationalarchives.omega.api.messages.request.{ RequestByIdentifier, RequestMessage }
 import uk.gov.nationalarchives.omega.api.messages._
 import uk.gov.nationalarchives.omega.api.repository.model._
-import uk.gov.nationalarchives.omega.api.repository.{AbstractRepository, BaseURL}
+import uk.gov.nationalarchives.omega.api.repository.{ AbstractRepository, BaseURL }
 
 import scala.util.matching.Regex
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
 class GetRecordService(val repository: AbstractRepository) extends BusinessService with BusinessRequestValidation {
 
@@ -42,13 +42,14 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
     val recordConceptUriPattern: Regex = (BaseURL.cat + "/[A-Z]{1,4}.[0-9]{3,4}.[0-9A-Z]{4}.(P|D)$").r
     if (validatedLocalMessage.messageText.nonEmpty) {
       decode[RequestByIdentifier](validatedLocalMessage.messageText) match {
-        case Right(request) => if(request.identifier.nonEmpty && recordConceptUriPattern.matches(request.identifier)){
-          Validated.valid(request)
-        } else {
-          Validated.invalidNec[MessageValidationError, RequestMessage](
-            InvalidMessagePayload(message = Some("Missing identifier value"))
-          )
-        }
+        case Right(request) =>
+          if (request.identifier.nonEmpty && recordConceptUriPattern.matches(request.identifier)) {
+            Validated.valid(request)
+          } else {
+            Validated.invalidNec[MessageValidationError, RequestMessage](
+              InvalidMessagePayload(message = Some("Missing identifier value"))
+            )
+          }
         case Left(error) =>
           Validated.invalidNec[MessageValidationError, RequestMessage](
             InvalidMessagePayload(cause = Some(error))
@@ -83,7 +84,9 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
       accessRights                <- repository.getAccessRights(recordConceptUri)
       isPartOf                    <- repository.getIsPartOf(recordConceptUri)
       secondaryIdentifiers        <- repository.getSecondaryIdentifiers(recordConceptUri)
-      isReferencedBy                <- repository.getIsReferencedBy(recordConceptUri)
+      isReferencedBys              <- repository.getIsReferencedBys(recordConceptUri)
+      relatedTos                  <- repository.getRelatedTos(recordConceptUri)
+      separatedFroms              <- repository.getSeparatedFroms(recordConceptUri)
       recordFull <- convertToRecordFull(
                       recordConceptEntities.head,
                       creatorEntities,
@@ -92,7 +95,9 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
                       accessRights,
                       isPartOf,
                       secondaryIdentifiers,
-        isReferencedBy
+                      isReferencedBys,
+                      relatedTos,
+        separatedFroms
                     )
     } yield recordFull
   }
@@ -105,7 +110,9 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
     accessRightsEntities: List[AccessRightsEntity],
     isPartOfEntities: List[IsPartOfEntity],
     secondaryIdentifierEntities: List[SecondaryIdentifierEntity],
-    isReferencedBy: List[LabelledIdentifierEntity]
+    isReferencedBys: List[LabelledIdentifierEntity],
+    relatedTos: List[LabelledIdentifierEntity],
+    separatedFroms: List[LabelledIdentifierEntity]
   ): Try[RecordFull] =
     for {
       recordType <- RecordType.fromUri(recordConceptEntity.formatUri.toString)
@@ -120,7 +127,9 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
         accessRightsEntities,
         isPartOfEntities,
         secondaryIdentifierEntities,
-        isReferencedBy
+        isReferencedBys,
+        relatedTos,
+        separatedFroms
       )
     ) // TO BE CONTINUED - write a test for this!
 
@@ -130,21 +139,28 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
     accessRightsEntities: List[AccessRightsEntity],
     isPartOfEntities: List[IsPartOfEntity],
     secondaryIdentifierEntities: List[SecondaryIdentifierEntity],
-    isReferencedByEntities: List[LabelledIdentifierEntity]
+    isReferencedByEntities: List[LabelledIdentifierEntity],
+    relatedToEntities: List[LabelledIdentifierEntity],
+    separatedFromEntities: List[LabelledIdentifierEntity]
   ): List[RecordDescriptionFull] = {
     val accessRightsMap = getAccessRightsMap(accessRightsEntities)
     val isPartOfMap: Map[String, List[String]] = isPartOfEntities
-      .groupBy(_.recordDescriptionUri)
-      .map(entry => entry._1.toString -> entry._2.map(a => a.recordSetConceptUri.toString))
+      .groupBy(_.recordDescriptionUri.toString)
+      .map(entry => entry._1 -> entry._2.map(a => a.recordSetConceptUri.toString))
     val secondaryIdentifierMap: Map[String, List[TypedIdentifier]] = secondaryIdentifierEntities
-      .groupBy(_.recordDescriptionUri)
+      .groupBy(_.recordDescriptionUri.toString)
       .map(entry =>
-        entry._1.toString -> entry._2.map(a => TypedIdentifier(a.secondaryIdentifier, a.identifierProperty.toString))
+        entry._1 -> entry._2.map(a => TypedIdentifier(a.secondaryIdentifier, a.identifierProperty.toString))
       )
     val isReferencedByMap: Map[String, List[LabelledIdentifier]] = isReferencedByEntities
-      .groupBy(_.recordDescriptionUri)
-      .map(entry => entry._1.toString -> entry._2.map(a => LabelledIdentifier(a.identifier.toString, a.label)
-      ))
+      .groupBy(_.recordDescriptionUri.toString)
+      .map(entry => entry._1 -> entry._2.map(a => LabelledIdentifier(a.identifier.toString, a.label)))
+    val relatedToMap: Map[String, List[LabelledIdentifier]] = relatedToEntities
+      .groupBy(_.recordDescriptionUri.toString)
+      .map(entry => entry._1 -> entry._2.map(a => LabelledIdentifier(a.identifier.toString, a.label)))
+    val separatedFromMap: Map[String, List[LabelledIdentifier]] = separatedFromEntities
+      .groupBy(_.recordDescriptionUri.toString)
+      .map(entry => entry._1 -> entry._2.map(a => LabelledIdentifier(a.identifier.toString, a.label)))
     recordSummaryEntities.map(summary =>
       RecordDescriptionFull(
         summary = RecordDescriptionSummary(
@@ -158,7 +174,8 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
           versionTimestamp = summary.versionTimestamp,
           previousDescription = summary.previousDescriptionUri.flatMap(uri => Some(uri.toString))
         ),
-        properties = getRecordPropertiesEntity(recordPropertiesEntities, summary.recordDescriptionUri.toString, isReferencedByMap)
+        properties =
+          getRecordPropertiesEntity(recordPropertiesEntities, summary.recordDescriptionUri.toString, isReferencedByMap, relatedToMap, separatedFromMap)
       )
     )
   }
@@ -172,19 +189,26 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
   private def getRecordPropertiesEntity(
     recordProperties: List[RecordDescriptionPropertiesEntity],
     descriptionUri: String, // TODO shouldn't be needed - refactor
-    isReferencedByMap: Map[String, List[LabelledIdentifier]]
+    isReferencedByMap: Map[String, List[LabelledIdentifier]],
+    relatedToMap: Map[String, List[LabelledIdentifier]],
+    separatedFromMap: Map[String, List[LabelledIdentifier]]
   ): RecordDescriptionProperties = {
     val recordPropertiesMap: Map[String, List[RecordDescriptionPropertiesEntity]] =
       recordProperties.groupBy(_.recordDescriptionUri.toString)
     val recordDescriptionProperties: List[RecordDescriptionPropertiesEntity] =
       recordPropertiesMap.getOrElse(descriptionUri, List.empty)
     recordDescriptionProperties.headOption match {
-      case Some(props) => propertiesFromEntity(props, isReferencedByMap)
+      case Some(props) => propertiesFromEntity(props, isReferencedByMap, relatedToMap, separatedFromMap)
       case None        => RecordDescriptionProperties()
     }
   }
 
-  private def propertiesFromEntity(entity: RecordDescriptionPropertiesEntity, isReferencedByMap: Map[String, List[LabelledIdentifier]]): RecordDescriptionProperties =
+  private def propertiesFromEntity(
+    entity: RecordDescriptionPropertiesEntity,
+    isReferencedByMap: Map[String, List[LabelledIdentifier]],
+    relatedToMap: Map[String, List[LabelledIdentifier]],
+    separatedFromMap: Map[String, List[LabelledIdentifier]]
+  ): RecordDescriptionProperties =
     RecordDescriptionProperties(
       assetLegalStatus = getLegalStatus(entity),
       legacyTnaCs13RecordType = getCS13RecordType(entity),
@@ -199,7 +223,9 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
       accrualPolicy = entity.accrualPolicy.flatMap(uri => Some(uri.toString)),
       layout = entity.layout,
       publicationNote = entity.publicationNote,
-      isReferencedBy = isReferencedByMap.get(entity.recordDescriptionUri.toString)
+      isReferencedBy = isReferencedByMap.get(entity.recordDescriptionUri.toString),
+      relatedTo = relatedToMap.get(entity.recordDescriptionUri.toString),
+      separatedFrom = separatedFromMap.get(entity.recordDescriptionUri.toString)
     )
 
   private def getLegalStatus(entity: RecordDescriptionPropertiesEntity): Option[LabelledIdentifier] =

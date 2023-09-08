@@ -7,5 +7,5 @@ WHERE
 { ?recordDescriptionUri prov:specializationOf  ?recordConceptUri ;
                         dct:isReferencedBy ?referencedBy .
   ?referencedBy dct:title ?label ;
-                dct:subject ?identifier .
+                   dct:subject ?identifier .
 }

@@ -89,7 +89,7 @@ cat:COAL.2022.N373.P.2
                                         dct:type        cat:related-material ] ;
     dct:relation                      [ dct:title       "Index of colliery photographs September 1963" ;
                                         dct:description "related material can be found in" ;
-                                        dct:subject     cat:COAL.2022.S144 ;
+                                        dct:subject     cat:COAL.2022.G221 ;
                                         dct:type        cat:related-material ] ;
     dct:relation                      [ dct:title       "NCB records 1963" ;
                                         dct:description "National Coal Board (NCB) records are in" ;

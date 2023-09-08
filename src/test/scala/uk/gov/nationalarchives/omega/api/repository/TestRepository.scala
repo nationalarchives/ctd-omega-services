@@ -86,9 +86,9 @@ class TestRepository extends AbstractRepository {
     }
 
   override def getAgentDescriptionEntities(
-    listAgentSummary: ListAgentSummary,
-    agentConceptUri: URI
-  ): Try[List[AgentDescriptionEntity]] =
+                                            listAgentSummary: ListAgentSummary,
+                                            agentConceptUri: URI
+                                          ): Try[List[AgentDescriptionEntity]] =
     agentConceptUri.toString match {
       case s"${BaseURL.cat}/agent.48N" =>
         Try(
@@ -304,7 +304,7 @@ class TestRepository extends AbstractRepository {
       )
     )
 
-  override def getIsReferencedBy(recordConceptUri: String): Try[List[LabelledIdentifierEntity]] =
+  override def getIsReferencedBys(recordConceptUri: String): Try[List[LabelledIdentifierEntity]] =
     Try(
       List(
         LabelledIdentifierEntity(
@@ -319,4 +319,37 @@ class TestRepository extends AbstractRepository {
         )
       )
     )
+
+  override def getRelatedTos(recordConceptUri: String): Try[List[LabelledIdentifierEntity]] =
+    Try(
+      List(
+        LabelledIdentifierEntity(
+          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+          "Index of colliery photographs March 1963",
+          new URI(s"${BaseURL.cat}/COAL.2022.S144")
+        ),
+        LabelledIdentifierEntity(
+          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
+          "Index of colliery photographs September 1963",
+          new URI(s"${BaseURL.cat}/COAL.2022.G221")
+        )
+      )
+    )
+
+  override def getSeparatedFroms(recordConceptUri: String): Try[List[LabelledIdentifierEntity]] =
+    Try(
+      List(
+        LabelledIdentifierEntity(
+          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+          "NCB records 1963",
+          new URI(s"${BaseURL.cat}/CAB.2022.L744")
+        ),
+        LabelledIdentifierEntity(
+          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
+          "Cabinet records 1963",
+          new URI(s"${BaseURL.cat}/CAB.2022.N901")
+        )
+      )
+    )
+
 }
