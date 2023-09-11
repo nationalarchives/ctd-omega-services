@@ -22,12 +22,18 @@
 package uk.gov.nationalarchives.omega.api.messages.reply
 
 import io.circe.syntax.EncoderOps
-import io.circe.{ Encoder, Json }
+import io.circe.{Encoder, Json}
 import io.circe.generic.auto._
+import org.apache.jena.ext.xerces.util.URI
 
 sealed trait Identifier
 
 case class GeneralIdentifier(identifier: String) extends Identifier
+object GeneralIdentifier {
+
+  def fromUri(uri: URI): GeneralIdentifier = GeneralIdentifier(uri.toString)
+
+}
 
 case class LabelledIdentifier(identifier: String, label: String) extends Identifier
 

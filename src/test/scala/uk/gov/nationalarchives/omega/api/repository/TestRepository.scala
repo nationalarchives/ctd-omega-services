@@ -22,7 +22,7 @@
 package uk.gov.nationalarchives.omega.api.repository
 import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{AccessRightsEntity, AgentConceptEntity, AgentDescriptionEntity, CreatorEntity, IsPartOfEntity, LabelledIdentifierEntity, LegalStatusEntity, RecordConceptEntity, RecordDescriptionPropertiesEntity, RecordDescriptionSummaryEntity, SecondaryIdentifierEntity}
+import uk.gov.nationalarchives.omega.api.repository.model.{AccessRightsEntity, AgentConceptEntity, AgentDescriptionEntity, CreatorEntity, IdentifierEntity, IsPartOfEntity, LabelledIdentifierEntity, LegalStatusEntity, RecordConceptEntity, RecordDescriptionPropertiesEntity, RecordDescriptionSummaryEntity, SecondaryIdentifierEntity}
 
 import java.time.ZonedDateTime
 import scala.util.Try
@@ -352,4 +352,18 @@ class TestRepository extends AbstractRepository {
       )
     )
 
+  override def getUriSubjects(recordConceptUri: String): Try[List[IdentifierEntity]] =
+    Try(
+      List(
+        IdentifierEntity(new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"), new URI(s"${BaseURL.cat}/agent.4N6")),
+        IdentifierEntity(new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"), new URI(s"${BaseURL.cat}/agent.S7")),
+      )
+    )
+
+  override def getLabelledSubjects(recordConceptUri: String): Try[List[LabelledIdentifierEntity]] =
+    Try(
+      List(
+        LabelledIdentifierEntity(new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),"from 1965",new URI(s"${BaseURL.cat}/agent.24"))
+      )
+    )
 }

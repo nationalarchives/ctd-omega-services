@@ -129,6 +129,8 @@ cat:COAL.2022.N373.P.1
                                         dct:type        cat:immediate-source-of-acquisition ] ;
     dct:subject                       [ dct:description "from 1965" ;
                                         dct:subject     cat:agent.24 ] ;
+    dct:subject                       cat:agent.4N6 ;
+    dct:subject                       cat:agent.S7 ;
     dct:type                          cat:item, cat:record-description ;
     edm:isNextInSequence              cat:COAL.2022.N3HQ.P.1 ;
     premis:note                       "[Grid reference: N/A]" ;

@@ -24,22 +24,24 @@ package uk.gov.nationalarchives.omega.api.messages.reply
 import io.circe.syntax._
 import io.circe.{ Encoder, Json }
 import uk.gov.nationalarchives.omega.api.messages.RecordType
+import uk.gov.nationalarchives.omega.api.messages.reply.GenericIdentifierDerivation._
 
 case class RecordFull(
-  identifier: String,
+  identifier: Identifier,
   recordType: RecordType,
   creators: List[String],
-  currentDescription: String,
+  currentDescription: Identifier,
   descriptions: List[RecordDescriptionFull]
 ) extends ReplyMessage
 object RecordFull {
+
   implicit val encodeRecordFull: Encoder[RecordFull] = (recordFull: RecordFull) =>
     Json
       .obj(
-        ("identifier", Json.fromString(recordFull.identifier)),
+        ("identifier", recordFull.identifier.asJson),
         ("type", Json.fromString(recordFull.recordType.entryName)),
         ("creator", recordFull.creators.asJson),
-        ("current-description", Json.fromString(recordFull.currentDescription)),
+        ("current-description", recordFull.currentDescription.asJson),
         ("description", recordFull.descriptions.asJson)
       )
       .deepDropNullValues

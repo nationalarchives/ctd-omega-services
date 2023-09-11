@@ -84,9 +84,11 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
       accessRights                <- repository.getAccessRights(recordConceptUri)
       isPartOf                    <- repository.getIsPartOf(recordConceptUri)
       secondaryIdentifiers        <- repository.getSecondaryIdentifiers(recordConceptUri)
-      isReferencedBys              <- repository.getIsReferencedBys(recordConceptUri)
+      isReferencedBys             <- repository.getIsReferencedBys(recordConceptUri)
       relatedTos                  <- repository.getRelatedTos(recordConceptUri)
       separatedFroms              <- repository.getSeparatedFroms(recordConceptUri)
+      uriSubjects                 <- repository.getUriSubjects(recordConceptUri)
+      labelledSubjects            <- repository.getLabelledSubjects(recordConceptUri)
       recordFull <- convertToRecordFull(
                       recordConceptEntities.head,
                       creatorEntities,
@@ -97,7 +99,9 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
                       secondaryIdentifiers,
                       isReferencedBys,
                       relatedTos,
-        separatedFroms
+                      separatedFroms,
+                      uriSubjects,
+                      labelledSubjects
                     )
     } yield recordFull
   }
@@ -112,15 +116,17 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
     secondaryIdentifierEntities: List[SecondaryIdentifierEntity],
     isReferencedBys: List[LabelledIdentifierEntity],
     relatedTos: List[LabelledIdentifierEntity],
-    separatedFroms: List[LabelledIdentifierEntity]
+    separatedFroms: List[LabelledIdentifierEntity],
+    uriSubjects: List[IdentifierEntity],
+    labelledSubjects: List[LabelledIdentifierEntity]
   ): Try[RecordFull] =
     for {
       recordType <- RecordType.fromUri(recordConceptEntity.formatUri.toString)
     } yield RecordFull(
-      recordConceptEntity.recordConceptUri.toString,
+      GeneralIdentifier.fromUri(recordConceptEntity.recordConceptUri),
       recordType,
       creatorEntities.map(ce => ce.identifier.toString),
-      recordConceptEntity.currentDescriptionUri.toString,
+      GeneralIdentifier.fromUri(recordConceptEntity.currentDescriptionUri),
       getRecordDescriptionFull(
         recordSummaryEntities,
         recordPropertiesEntities,
@@ -129,7 +135,9 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
         secondaryIdentifierEntities,
         isReferencedBys,
         relatedTos,
-        separatedFroms
+        separatedFroms,
+        uriSubjects,
+        labelledSubjects
       )
     ) // TO BE CONTINUED - write a test for this!
 
@@ -141,16 +149,20 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
     secondaryIdentifierEntities: List[SecondaryIdentifierEntity],
     isReferencedByEntities: List[LabelledIdentifierEntity],
     relatedToEntities: List[LabelledIdentifierEntity],
-    separatedFromEntities: List[LabelledIdentifierEntity]
+    separatedFromEntities: List[LabelledIdentifierEntity],
+    uriSubjectEntities: List[IdentifierEntity],
+    labelledSubjectEntities: List[LabelledIdentifierEntity]
   ): List[RecordDescriptionFull] = {
     val accessRightsMap = getAccessRightsMap(accessRightsEntities)
-    val isPartOfMap: Map[String, List[String]] = isPartOfEntities
+    val isPartOfMap: Map[String, List[Identifier]] = isPartOfEntities
       .groupBy(_.recordDescriptionUri.toString)
-      .map(entry => entry._1 -> entry._2.map(a => a.recordSetConceptUri.toString))
+      .map(entry => entry._1 -> entry._2.map(a => GeneralIdentifier.fromUri(a.recordSetConceptUri)))
     val secondaryIdentifierMap: Map[String, List[TypedIdentifier]] = secondaryIdentifierEntities
       .groupBy(_.recordDescriptionUri.toString)
       .map(entry =>
-        entry._1 -> entry._2.map(a => TypedIdentifier(a.secondaryIdentifier, a.identifierProperty.toString))
+        entry._1 -> entry._2.map(a =>
+          TypedIdentifier(GeneralIdentifier(a.secondaryIdentifier), a.identifierProperty.toString)
+        )
       )
     val isReferencedByMap: Map[String, List[LabelledIdentifier]] = isReferencedByEntities
       .groupBy(_.recordDescriptionUri.toString)
@@ -161,29 +173,51 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
     val separatedFromMap: Map[String, List[LabelledIdentifier]] = separatedFromEntities
       .groupBy(_.recordDescriptionUri.toString)
       .map(entry => entry._1 -> entry._2.map(a => LabelledIdentifier(a.identifier.toString, a.label)))
+    val subjectMap = getSubjectMap(uriSubjectEntities, labelledSubjectEntities)
     recordSummaryEntities.map(summary =>
       RecordDescriptionFull(
         summary = RecordDescriptionSummary(
-          identifier = summary.recordDescriptionUri.toString,
+          identifier = GeneralIdentifier.fromUri(summary.recordDescriptionUri),
           secondaryIdentifier = secondaryIdentifierMap.get(summary.recordDescriptionUri.toString),
           label = summary.scopeAndContent,
           description = summary.scopeAndContent,
           accessRights = accessRightsMap.getOrElse(summary.recordDescriptionUri.toString, List.empty),
           isPartOf = isPartOfMap.getOrElse(summary.recordDescriptionUri.toString, List.empty),
-          previousSibling = summary.previousSiblingUri.flatMap(uri => Some(uri.toString)),
+          previousSibling = summary.previousSiblingUri.flatMap(uri => Some(GeneralIdentifier(uri.toString))),
           versionTimestamp = summary.versionTimestamp,
-          previousDescription = summary.previousDescriptionUri.flatMap(uri => Some(uri.toString))
+          previousDescription = summary.previousDescriptionUri.flatMap(uri => Some(GeneralIdentifier(uri.toString)))
         ),
-        properties =
-          getRecordPropertiesEntity(recordPropertiesEntities, summary.recordDescriptionUri.toString, isReferencedByMap, relatedToMap, separatedFromMap)
+        properties = getRecordPropertiesEntity(
+          recordPropertiesEntities,
+          summary.recordDescriptionUri.toString,
+          isReferencedByMap,
+          relatedToMap,
+          separatedFromMap,
+          subjectMap
+        )
       )
     )
   }
 
-  private def getAccessRightsMap(accessRightsEntities: List[AccessRightsEntity]): Map[String, List[String]] = {
+  private def getAccessRightsMap(accessRightsEntities: List[AccessRightsEntity]): Map[String, List[Identifier]] = {
     val groupedMap: Map[String, List[AccessRightsEntity]] =
       accessRightsEntities.groupBy(_.recordDescriptionUri.toString)
-    groupedMap.map(entry => entry._1 -> entry._2.map(a => a.accessRights.toString))
+    groupedMap.map(entry => entry._1 -> entry._2.map(a => GeneralIdentifier(a.accessRights.toString)))
+  }
+
+  private def getSubjectMap(
+    uriSubjectEntities: List[IdentifierEntity],
+    labelledSubjectEntities: List[LabelledIdentifierEntity]
+  ): Map[String, List[Identifier]] = {
+    import cats.implicits._
+    val map1: Map[String, List[Identifier]] = uriSubjectEntities
+      .groupBy(_.recordDescriptionUri.toString)
+      .map(entry => entry._1 -> entry._2.map(a => GeneralIdentifier(a.identifier.toString)))
+    val map2: Map[String, List[Identifier]] = labelledSubjectEntities
+        .groupBy(_.recordDescriptionUri.toString)
+        .map(entry => entry._1 -> entry._2.map(a => LabelledIdentifier(a.identifier.toString, a.label)))
+    val map3 = map1.combine(map2)
+    map3
   }
 
   private def getRecordPropertiesEntity(
@@ -191,14 +225,15 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
     descriptionUri: String, // TODO shouldn't be needed - refactor
     isReferencedByMap: Map[String, List[LabelledIdentifier]],
     relatedToMap: Map[String, List[LabelledIdentifier]],
-    separatedFromMap: Map[String, List[LabelledIdentifier]]
+    separatedFromMap: Map[String, List[LabelledIdentifier]],
+    subjectMap: Map[String, List[Identifier]]
   ): RecordDescriptionProperties = {
     val recordPropertiesMap: Map[String, List[RecordDescriptionPropertiesEntity]] =
       recordProperties.groupBy(_.recordDescriptionUri.toString)
     val recordDescriptionProperties: List[RecordDescriptionPropertiesEntity] =
       recordPropertiesMap.getOrElse(descriptionUri, List.empty)
     recordDescriptionProperties.headOption match {
-      case Some(props) => propertiesFromEntity(props, isReferencedByMap, relatedToMap, separatedFromMap)
+      case Some(props) => propertiesFromEntity(props, isReferencedByMap, relatedToMap, separatedFromMap, subjectMap)
       case None        => RecordDescriptionProperties()
     }
   }
@@ -207,7 +242,8 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
     entity: RecordDescriptionPropertiesEntity,
     isReferencedByMap: Map[String, List[LabelledIdentifier]],
     relatedToMap: Map[String, List[LabelledIdentifier]],
-    separatedFromMap: Map[String, List[LabelledIdentifier]]
+    separatedFromMap: Map[String, List[LabelledIdentifier]],
+    subjectMap: Map[String, List[Identifier]]
   ): RecordDescriptionProperties =
     RecordDescriptionProperties(
       assetLegalStatus = getLegalStatus(entity),
@@ -215,17 +251,18 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
       designationOfEdition = entity.designationOfEdition,
       created = getCreated(entity),
       archivistsNote = entity.archivistsNote,
-      sourceOfAcquisition = entity.sourceOfAcquisition.flatMap(uri => Some(uri.toString)),
+      sourceOfAcquisition = entity.sourceOfAcquisition.flatMap(uri => Some(GeneralIdentifier(uri.toString))),
       custodialHistory = entity.custodialHistory,
       administrativeBiographicalBackground = entity.adminBiogBackground,
       accumulation = getAccumulation(entity),
       appraisal = entity.appraisal,
-      accrualPolicy = entity.accrualPolicy.flatMap(uri => Some(uri.toString)),
+      accrualPolicy = entity.accrualPolicy.flatMap(uri => Some(GeneralIdentifier(uri.toString))),
       layout = entity.layout,
       publicationNote = entity.publicationNote,
       isReferencedBy = isReferencedByMap.get(entity.recordDescriptionUri.toString),
       relatedTo = relatedToMap.get(entity.recordDescriptionUri.toString),
-      separatedFrom = separatedFromMap.get(entity.recordDescriptionUri.toString)
+      separatedFrom = separatedFromMap.get(entity.recordDescriptionUri.toString),
+      subject = subjectMap.get(entity.recordDescriptionUri.toString)
     )
 
   private def getLegalStatus(entity: RecordDescriptionPropertiesEntity): Option[LabelledIdentifier] =

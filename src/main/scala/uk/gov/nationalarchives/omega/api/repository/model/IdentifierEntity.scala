@@ -19,20 +19,9 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages.reply
+package uk.gov.nationalarchives.omega.api.repository.model
 
-import io.circe.{ Encoder, Json }
-import uk.gov.nationalarchives.omega.api.messages.reply.GenericIdentifierDerivation._
-import io.circe.syntax._
+import org.apache.jena.ext.xerces.util.URI
 
-case class TypedIdentifier(identifier: Identifier, identifierType: String)
-object TypedIdentifier {
-  implicit val encodeTypedIdentifier: Encoder[TypedIdentifier] = (typedIdentifier: TypedIdentifier) =>
-    Json
-      .obj(
-        ("identifier", typedIdentifier.identifier.asJson),
-        ("type", Json.fromString(typedIdentifier.identifierType))
-      )
-      .deepDropNullValues
+case class IdentifierEntity(recordDescriptionUri: URI, identifier: URI)
 
-}

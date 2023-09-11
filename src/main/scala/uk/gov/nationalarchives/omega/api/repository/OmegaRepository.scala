@@ -46,6 +46,8 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
   private val getSecondaryIdentifiersSparqlResource = s"/$sparqlResourceDir/get-secondary-identifiers.rq"
   private val getIsReferencedBySparqlResource = s"/$sparqlResourceDir/get-is-referenced-by.rq"
   private val getDctRelationByTypeSparqlResource = s"/$sparqlResourceDir/get-dct-relation-by-type.rq"
+  private val getSubjectUriSparqlResource = s"/$sparqlResourceDir/get-subject-uri.rq"
+  private val getLabelledSubjectUriSparqlResource = s"/$sparqlResourceDir/get-labelled-subject-uri.rq"
 
   implicit object BooleanFromQuerySolution extends FromQuerySolution[Boolean] {
     def fromQuerySolution(qs: QuerySolution, variablePath: String = ""): Try[Boolean] =
@@ -186,6 +188,24 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
             "relationType" -> s"${BaseURL.cat}/separated-material"
           )
         )
+      )
+      result <- executeQuery(query, implicitly[FromQuerySolution[LabelledIdentifierEntity]])
+    } yield result
+
+  override def getUriSubjects(recordConceptUri: String): Try[List[IdentifierEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+        getSubjectUriSparqlResource,
+        SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri))
+      )
+      result <- executeQuery(query, implicitly[FromQuerySolution[IdentifierEntity]])
+    } yield result
+
+  override def getLabelledSubjects(recordConceptUri: String): Try[List[LabelledIdentifierEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+        getLabelledSubjectUriSparqlResource,
+        SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri))
       )
       result <- executeQuery(query, implicitly[FromQuerySolution[LabelledIdentifierEntity]])
     } yield result

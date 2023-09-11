@@ -22,18 +22,19 @@
 package uk.gov.nationalarchives.omega.api.messages.reply
 
 import io.circe.syntax.EncoderOps
-import io.circe.{ Encoder, Json }
+import io.circe.{Encoder, Json}
+import uk.gov.nationalarchives.omega.api.messages.reply.GenericIdentifierDerivation._
 
 case class RecordDescriptionSummary(
-  identifier: String,
+  identifier: Identifier,
   label: String,
   description: String,
-  accessRights: List[String],
-  isPartOf: List[String],
+  accessRights: List[Identifier],
+  isPartOf: List[Identifier],
   versionTimestamp: String,
   secondaryIdentifier: Option[List[TypedIdentifier]],
-  previousSibling: Option[String],
-  previousDescription: Option[String]
+  previousSibling: Option[Identifier],
+  previousDescription: Option[Identifier]
 )
 object RecordDescriptionSummary {
   implicit val encodeRecordDescriptionSummary: Encoder[RecordDescriptionSummary] =

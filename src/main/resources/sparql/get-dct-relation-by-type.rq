@@ -4,7 +4,7 @@ PREFIX prov: <http://www.w3.org/ns/prov#>
 
 SELECT  ?recordDescriptionUri ?label ?identifier
 WHERE
-{ ?recordDescriptionUri prov:specializationOf  cat:COAL.2022.N373.P ;
+{ ?recordDescriptionUri prov:specializationOf ?recordConceptUri ;
                         dct:relation ?relation .
   ?relation dct:type ?relationType ;
             dct:title ?label ;

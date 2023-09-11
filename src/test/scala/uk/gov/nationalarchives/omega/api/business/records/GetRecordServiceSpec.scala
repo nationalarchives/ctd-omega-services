@@ -116,6 +116,14 @@ class GetRecordServiceSpec extends UnitTest {
        |          "identifier" : "${BaseURL.cat}/CAB.2022.L744",
        |          "label" : "NCB records 1963"
        |        }
+       |      ],
+       |      "subject" : [
+       |        "${BaseURL.cat}/agent.4N6",
+       |        "${BaseURL.cat}/agent.S7",
+       |        {
+       |          "identifier" : "${BaseURL.cat}/agent.24",
+       |          "label" : "from 1965"
+       |        }
        |      ]
        |    },
        |    {

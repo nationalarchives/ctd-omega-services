@@ -81,4 +81,8 @@ trait AbstractRepository {
 
   def getSeparatedFroms(recordConceptUri: String): Try[List[LabelledIdentifierEntity]]
 
+  def getUriSubjects(recordConceptUri: String): Try[List[IdentifierEntity]]
+
+  def getLabelledSubjects(recordConceptUri: String): Try[List[LabelledIdentifierEntity]]
+
 }
