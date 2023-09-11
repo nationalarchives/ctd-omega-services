@@ -150,6 +150,24 @@ class ApiServiceISpec
       } yield result
       res.use(assert => IO.pure(assert))
     }
+
+    "returns a full record when a request is sent with the record concept URI" in { f =>
+      val textMessageConfig = generateValidMessageConfig()
+        .copy(messageTypeId = Some("OSGEFREC001"))
+        .copy(contents = s"""{
+                            |    "identifier" : "${BaseURL.cat}/COAL.2022.N36R.P"
+                            |}""".stripMargin)
+      val serviceIO = f.apiService.startSuspended
+      val res = for {
+        consumerFiber   <- f.comsumerRes.start
+        apiServiceFiber <- Resource.liftK(serviceIO.start)
+        _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
+        result          <- Resource.liftK(assertReplyMessage(getExpectedRecordFull))
+        _               <- Resource.eval(apiServiceFiber.cancel)
+        _               <- consumerFiber.cancel
+      } yield result
+      res.use(assert => IO.pure(assert))
+    }
   }
 
   "returns agent summaries message when the given ListAgentSummaryRequest has" - {
@@ -483,6 +501,58 @@ class ApiServiceISpec
       case Left(_)     => ""
     }
   }
+
+  private def getExpectedRecordFull =
+    s"""{
+       |  "identifier" : "${BaseURL.cat}/COAL.2022.N36R.P",
+       |  "type" : "Physical",
+       |  "creator" : [
+       |    "${BaseURL.cat}/agent.24"
+       |  ],
+       |  "current-description" : "${BaseURL.cat}/COAL.2022.N36R.P.1",
+       |  "description" : [
+       |    {
+       |      "identifier" : "${BaseURL.cat}/COAL.2022.N36R.P.1",
+       |      "secondary-identifier" : [
+       |        {
+       |          "identifier" : "COAL 80/2055/22",
+       |          "type" : "${BaseURL.cat}/classicCatalogueReference"
+       |        }
+       |      ],
+       |      "label" : "<scopecontent><p>Coal News. Model II storage unit for photograph negatives (strips of 4). Photograph negatives Nos. T3060-T3102. </p></scopecontent>",
+       |      "abstract" : "<scopecontent><p>Coal News. Model II storage unit for photograph negatives (strips of 4). Photograph negatives Nos. T3060-T3102. </p></scopecontent>",
+       |      "access-rights" : [
+       |        "${BaseURL.cat}/policy.Open_Description",
+       |        "${BaseURL.cat}/policy.Normal_Closure_before_FOI_Act_30_years_from_1964-10-31"
+       |      ],
+       |      "is-part-of" : [
+       |        "${BaseURL.cat}/recordset.COAL.2022.2831"
+       |      ],
+       |      "previous-sibling" : "${BaseURL.cat}/COAL.2022.N361.P.1",
+       |      "version-timestamp" : "2022-12-05T20:37:31.28Z",
+       |      "asset-legal-status" : {
+       |        "identifier" : "${BaseURL.cat}/public-record",
+       |        "label" : "Public Record"
+       |      },
+       |      "legacy-tna-cs13-record-type" : "Item",
+       |      "created" : {
+       |        "description" : "[1964 October]",
+       |        "temporal" : {
+       |          "date-from" : "1964-09-30Z",
+       |          "date-to" : "1964-10-31Z"
+       |        }
+       |      },
+       |      "archivists-note" : "[Grid reference: N/A]",
+       |      "source-of-acquisition" : "${BaseURL.cat}/agent.24",
+       |      "subject" : [
+       |        {
+       |          "identifier" : "${BaseURL.cat}/agent.24",
+       |          "label" : "from 1965"
+       |        }
+       |      ]
+       |    }
+       |  ]
+       |}""".stripMargin
 }
 
 case class TextMessageConfig(

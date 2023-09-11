@@ -19,31 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages
+package uk.gov.nationalarchives.omega.api.business.records
 
-import enumeratum._
+import uk.gov.nationalarchives.omega.api.business.BusinessServiceReply
 
-sealed trait IncomingMessageType extends EnumEntry
-object IncomingMessageType extends Enum[IncomingMessageType] {
-
-  val values: IndexedSeq[IncomingMessageType] = findValues
-
-  case object ECHO001 extends IncomingMessageType {
-    // This happens to follow the regex; otherwise, it's arbitrary.
-    override val entryName = "OSGESZZZ100"
-  }
-
-  case object OSLISALS001 extends IncomingMessageType {
-    override val entryName = "OSLISALS001"
-  }
-
-  case object OSLISAGT001 extends IncomingMessageType {
-    override val entryName = "OSLISAGT001"
-  }
-
-  case object OSGEFREC001 extends IncomingMessageType {
-    override val entryName = "OSGEFREC001"
-  }
-  // add more service identifiers here
-
-}
+case class GetRecordReply(override val content: String) extends BusinessServiceReply

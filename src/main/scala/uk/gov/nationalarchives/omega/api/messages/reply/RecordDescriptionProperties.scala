@@ -19,31 +19,27 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages
+package uk.gov.nationalarchives.omega.api.messages.reply
 
-import enumeratum._
+import uk.gov.nationalarchives.omega.api.messages.{ CS13RecordType, DescribedTemporal }
 
-sealed trait IncomingMessageType extends EnumEntry
-object IncomingMessageType extends Enum[IncomingMessageType] {
-
-  val values: IndexedSeq[IncomingMessageType] = findValues
-
-  case object ECHO001 extends IncomingMessageType {
-    // This happens to follow the regex; otherwise, it's arbitrary.
-    override val entryName = "OSGESZZZ100"
-  }
-
-  case object OSLISALS001 extends IncomingMessageType {
-    override val entryName = "OSLISALS001"
-  }
-
-  case object OSLISAGT001 extends IncomingMessageType {
-    override val entryName = "OSLISAGT001"
-  }
-
-  case object OSGEFREC001 extends IncomingMessageType {
-    override val entryName = "OSGEFREC001"
-  }
-  // add more service identifiers here
-
-}
+case class RecordDescriptionProperties(
+  assetLegalStatus: Option[Identifier] = None,
+  legacyTnaCs13RecordType: Option[CS13RecordType] = None,
+  designationOfEdition: Option[String] = None,
+  created: Option[DescribedTemporal] = None,
+  covering: Option[DescribedTemporal] = None,
+  archivistsNote: Option[String] = None,
+  sourceOfAcquisition: Option[Identifier] = None,
+  custodialHistory: Option[String] = None,
+  administrativeBiographicalBackground: Option[String] = None,
+  accumulation: Option[DescribedTemporal] = None,
+  appraisal: Option[String] = None,
+  accrualPolicy: Option[Identifier] = None,
+  layout: Option[String] = None,
+  publicationNote: Option[String] = None,
+  isReferencedBy: Option[List[Identifier]] = None,
+  relatedTo: Option[List[Identifier]] = None,
+  separatedFrom: Option[List[Identifier]] = None,
+  subject: Option[List[Identifier]] = None
+)

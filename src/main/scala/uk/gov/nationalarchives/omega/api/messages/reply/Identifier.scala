@@ -19,31 +19,27 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages
+package uk.gov.nationalarchives.omega.api.messages.reply
 
-import enumeratum._
+import io.circe.syntax.EncoderOps
+import io.circe.{ Encoder, Json }
+import io.circe.generic.auto._
+import org.apache.jena.ext.xerces.util.URI
 
-sealed trait IncomingMessageType extends EnumEntry
-object IncomingMessageType extends Enum[IncomingMessageType] {
+sealed trait Identifier
 
-  val values: IndexedSeq[IncomingMessageType] = findValues
+case class GeneralIdentifier(identifier: String) extends Identifier
+object GeneralIdentifier {
 
-  case object ECHO001 extends IncomingMessageType {
-    // This happens to follow the regex; otherwise, it's arbitrary.
-    override val entryName = "OSGESZZZ100"
+  def fromUri(uri: URI): GeneralIdentifier = GeneralIdentifier(uri.toString)
+
+}
+
+case class LabelledIdentifier(identifier: String, label: String) extends Identifier
+
+object GenericIdentifierDerivation {
+  implicit val encodeIdentifier: Encoder[Identifier] = Encoder.instance {
+    case unlabelled @ GeneralIdentifier(_)   => Json.fromString(unlabelled.identifier)
+    case labelled @ LabelledIdentifier(_, _) => labelled.asJson
   }
-
-  case object OSLISALS001 extends IncomingMessageType {
-    override val entryName = "OSLISALS001"
-  }
-
-  case object OSLISAGT001 extends IncomingMessageType {
-    override val entryName = "OSLISAGT001"
-  }
-
-  case object OSGEFREC001 extends IncomingMessageType {
-    override val entryName = "OSGEFREC001"
-  }
-  // add more service identifiers here
-
 }

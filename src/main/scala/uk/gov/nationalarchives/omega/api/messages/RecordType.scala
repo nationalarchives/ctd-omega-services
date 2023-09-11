@@ -21,29 +21,30 @@
 
 package uk.gov.nationalarchives.omega.api.messages
 
-import enumeratum._
+import enumeratum.EnumEntry.CapitalWords
+import enumeratum.{ CirceEnum, Enum, EnumEntry }
+import uk.gov.nationalarchives.omega.api.repository.BaseURL
 
-sealed trait IncomingMessageType extends EnumEntry
-object IncomingMessageType extends Enum[IncomingMessageType] {
+import scala.util.{ Failure, Success, Try }
 
-  val values: IndexedSeq[IncomingMessageType] = findValues
+sealed trait RecordType extends EnumEntry with CapitalWords
 
-  case object ECHO001 extends IncomingMessageType {
-    // This happens to follow the regex; otherwise, it's arbitrary.
-    override val entryName = "OSGESZZZ100"
-  }
+object RecordType extends Enum[RecordType] with CirceEnum[RecordType] {
 
-  case object OSLISALS001 extends IncomingMessageType {
-    override val entryName = "OSLISALS001"
-  }
+  val values = findValues
 
-  case object OSLISAGT001 extends IncomingMessageType {
-    override val entryName = "OSLISAGT001"
-  }
+  case object Physical extends RecordType
 
-  case object OSGEFREC001 extends IncomingMessageType {
-    override val entryName = "OSGEFREC001"
-  }
-  // add more service identifiers here
+  case object Digitised extends RecordType
+
+  case object BornDigital extends RecordType
+
+  case object Hybrid extends RecordType
+
+  def fromUri(uri: String): Try[RecordType] =
+    uri match {
+      case s"${BaseURL.tna}/ont.physical-record" => Success(Physical)
+      case unknown => Failure(new IllegalArgumentException(s"Unknown record type: $unknown"))
+    }
 
 }

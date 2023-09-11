@@ -21,29 +21,28 @@
 
 package uk.gov.nationalarchives.omega.api.messages
 
-import enumeratum._
+import enumeratum.EnumEntry.CapitalWords
+import enumeratum.{ CirceEnum, Enum, EnumEntry }
+import org.apache.jena.ext.xerces.util.URI
+import uk.gov.nationalarchives.omega.api.repository.BaseURL
 
-sealed trait IncomingMessageType extends EnumEntry
-object IncomingMessageType extends Enum[IncomingMessageType] {
+import scala.util.{ Failure, Success, Try }
 
-  val values: IndexedSeq[IncomingMessageType] = findValues
+sealed trait CS13RecordType extends EnumEntry with CapitalWords
 
-  case object ECHO001 extends IncomingMessageType {
-    // This happens to follow the regex; otherwise, it's arbitrary.
-    override val entryName = "OSGESZZZ100"
-  }
+object CS13RecordType extends Enum[CS13RecordType] with CirceEnum[CS13RecordType] {
 
-  case object OSLISALS001 extends IncomingMessageType {
-    override val entryName = "OSLISALS001"
-  }
+  val values = findValues
 
-  case object OSLISAGT001 extends IncomingMessageType {
-    override val entryName = "OSLISAGT001"
-  }
+  case object Piece extends CS13RecordType
 
-  case object OSGEFREC001 extends IncomingMessageType {
-    override val entryName = "OSGEFREC001"
-  }
-  // add more service identifiers here
+  case object Item extends CS13RecordType
+
+  def fromUri(cs13RecordTypeUri: URI): Try[CS13RecordType] =
+    cs13RecordTypeUri.toString match {
+      case s"${BaseURL.cat}/piece" => Success(Piece)
+      case s"${BaseURL.cat}/item"  => Success(Item)
+      case unknown                 => Failure(new IllegalArgumentException(s"Unknown CS13 record type: $unknown"))
+    }
 
 }

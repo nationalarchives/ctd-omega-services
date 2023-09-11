@@ -75,6 +75,7 @@ lazy val root = Project("ctd-omega-services", file("."))
       "org.apache.commons"                             % "commons-lang3"              % "3.12.0",
       "io.circe"                                      %% "circe-core"                 % CirceVersion,
       "io.circe"                                      %% "circe-parser"               % CirceVersion,
+      "io.circe"                                      %% "circe-generic"              % CirceVersion,
       "org.phenoscape"                                %% "sparql-utils"               % "1.3.1",
       "org.apache.jena"                                % "jena-core"                  % JenaVersion,
       "org.apache.jena"                                % "jena-arq"                   % JenaVersion,

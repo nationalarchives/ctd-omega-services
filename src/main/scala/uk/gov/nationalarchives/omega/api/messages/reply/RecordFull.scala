@@ -19,31 +19,31 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages
+package uk.gov.nationalarchives.omega.api.messages.reply
 
-import enumeratum._
+import io.circe.syntax._
+import io.circe.{ Encoder, Json }
+import uk.gov.nationalarchives.omega.api.messages.RecordType
+import uk.gov.nationalarchives.omega.api.messages.reply.GenericIdentifierDerivation._
 
-sealed trait IncomingMessageType extends EnumEntry
-object IncomingMessageType extends Enum[IncomingMessageType] {
+case class RecordFull(
+  identifier: Identifier,
+  recordType: RecordType,
+  creators: List[String],
+  currentDescription: Identifier,
+  descriptions: List[RecordDescriptionFull]
+) extends ReplyMessage
+object RecordFull {
 
-  val values: IndexedSeq[IncomingMessageType] = findValues
-
-  case object ECHO001 extends IncomingMessageType {
-    // This happens to follow the regex; otherwise, it's arbitrary.
-    override val entryName = "OSGESZZZ100"
-  }
-
-  case object OSLISALS001 extends IncomingMessageType {
-    override val entryName = "OSLISALS001"
-  }
-
-  case object OSLISAGT001 extends IncomingMessageType {
-    override val entryName = "OSLISAGT001"
-  }
-
-  case object OSGEFREC001 extends IncomingMessageType {
-    override val entryName = "OSGEFREC001"
-  }
-  // add more service identifiers here
+  implicit val encodeRecordFull: Encoder[RecordFull] = (recordFull: RecordFull) =>
+    Json
+      .obj(
+        ("identifier", recordFull.identifier.asJson),
+        ("type", Json.fromString(recordFull.recordType.entryName)),
+        ("creator", recordFull.creators.asJson),
+        ("current-description", recordFull.currentDescription.asJson),
+        ("description", recordFull.descriptions.asJson)
+      )
+      .deepDropNullValues
 
 }

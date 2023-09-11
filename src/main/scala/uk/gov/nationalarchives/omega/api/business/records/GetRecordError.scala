@@ -19,31 +19,14 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages
+package uk.gov.nationalarchives.omega.api.business.records
 
-import enumeratum._
+import uk.gov.nationalarchives.omega.api.business.BusinessServiceError
+import uk.gov.nationalarchives.omega.api.common.ErrorCode
 
-sealed trait IncomingMessageType extends EnumEntry
-object IncomingMessageType extends Enum[IncomingMessageType] {
+case class GetRecordError(message: String) extends BusinessServiceError {
 
-  val values: IndexedSeq[IncomingMessageType] = findValues
+  override def code: ErrorCode = ErrorCode.PROC002
 
-  case object ECHO001 extends IncomingMessageType {
-    // This happens to follow the regex; otherwise, it's arbitrary.
-    override val entryName = "OSGESZZZ100"
-  }
-
-  case object OSLISALS001 extends IncomingMessageType {
-    override val entryName = "OSLISALS001"
-  }
-
-  case object OSLISAGT001 extends IncomingMessageType {
-    override val entryName = "OSLISAGT001"
-  }
-
-  case object OSGEFREC001 extends IncomingMessageType {
-    override val entryName = "OSGEFREC001"
-  }
-  // add more service identifiers here
-
+  override def description: String = "There was an error"
 }

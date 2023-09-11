@@ -21,29 +21,17 @@
 
 package uk.gov.nationalarchives.omega.api.messages
 
-import enumeratum._
+import io.circe.syntax.EncoderOps
+import io.circe.{ Encoder, Json }
+import uk.gov.nationalarchives.omega.api.messages.GenericTemporalDerivation._
 
-sealed trait IncomingMessageType extends EnumEntry
-object IncomingMessageType extends Enum[IncomingMessageType] {
-
-  val values: IndexedSeq[IncomingMessageType] = findValues
-
-  case object ECHO001 extends IncomingMessageType {
-    // This happens to follow the regex; otherwise, it's arbitrary.
-    override val entryName = "OSGESZZZ100"
-  }
-
-  case object OSLISALS001 extends IncomingMessageType {
-    override val entryName = "OSLISALS001"
-  }
-
-  case object OSLISAGT001 extends IncomingMessageType {
-    override val entryName = "OSLISAGT001"
-  }
-
-  case object OSGEFREC001 extends IncomingMessageType {
-    override val entryName = "OSGEFREC001"
-  }
-  // add more service identifiers here
-
+case class DescribedTemporal(description: String, temporal: Temporal)
+object DescribedTemporal {
+  implicit val encodeDescribedTemporal: Encoder[DescribedTemporal] = (describedTemporal: DescribedTemporal) =>
+    Json
+      .obj(
+        ("description", Json.fromString(describedTemporal.description)),
+        ("temporal", describedTemporal.temporal.asJson)
+      )
+      .deepDropNullValues
 }
