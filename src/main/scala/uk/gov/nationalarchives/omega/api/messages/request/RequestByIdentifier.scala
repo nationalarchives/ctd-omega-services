@@ -19,14 +19,15 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.repository
+package uk.gov.nationalarchives.omega.api.messages.request
 
-object BaseURL {
+import io.circe.Decoder
 
-  val cat = "http://cat.nationalarchives.gov.uk"
-  val rdaa = "http://rdaregistry.info/Elements/a"
-  val dct = "http://purl.org/dc/terms"
-  val todo = "http://TODO"
-  val time = "http://www.w3.org/2006/time#"
+case class RequestByIdentifier(identifier: String) extends RequestMessage
+object RequestByIdentifier {
+  implicit val decodeRequestByIdentifier: Decoder[RequestByIdentifier] = json =>
+    for {
+      identifier <- json.get[String]("identifier")
+    } yield RequestByIdentifier(identifier)
 
 }

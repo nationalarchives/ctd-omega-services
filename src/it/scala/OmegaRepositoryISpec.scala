@@ -121,4 +121,197 @@ class OmegaRepositoryISpec
     }
   }
 
+  "Get Record Concept Entity" - {
+    "must return a List with one item" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getRecordConceptEntity("COAL.2022.N373.P")
+        result.success.get.length mustBe 1
+        result.success.get.head.currentDescriptionUri mustEqual new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2")
+      }
+    }
+  }
+
+  "Get Creator Entity" - {
+    "must return a List with one item" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getCreatorEntities(s"${BaseURL.cat}/COAL.2022.N373.P")
+        result.success.get.length mustBe 1
+        result.success.get.head.identifier mustEqual new URI(s"${BaseURL.cat}/agent.24")
+        result.success.get.head.label mustBe "from 1965"
+      }
+    }
+  }
+
+  "Get Record Description Summaries" - {
+    "must return a List with one item" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getRecordDescriptionSummaries(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        result.success.get.length mustBe 1
+      }
+    }
+    "must return a List with two items" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getRecordDescriptionSummaries(s"${BaseURL.cat}/COAL.2022.N373.P")
+        result.success.get.length mustBe 2
+      }
+    }
+  }
+
+  "Get Record Description Properties" - {
+    "must return a List with one item" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getRecordDescriptionProperties(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        result.success.get.length mustBe 1
+      }
+    }
+    "must return a List with two items" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getRecordDescriptionProperties(s"${BaseURL.cat}/COAL.2022.N373.P")
+        result.success.get.length mustBe 2
+      }
+    }
+  }
+
+  "Get Access Rights" - {
+    "must return a List with two items" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getAccessRights(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        result.success.get.length mustBe 2
+      }
+    }
+    "must return a List with four items" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getAccessRights(s"${BaseURL.cat}/COAL.2022.N373.P")
+        result.success.get.length mustBe 4
+      }
+    }
+  }
+
+  "Get Is Part Of" - {
+    "must return a List with one item" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getIsPartOf(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        result.success.get.length mustBe 1
+      }
+    }
+    "must return a List with two items" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getIsPartOf(s"${BaseURL.cat}/COAL.2022.N373.P")
+        result.success.get.length mustBe 2
+      }
+    }
+  }
+
+  "Get Secondary Identifiers" - {
+    "must return a List with one item" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getSecondaryIdentifiers(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        result.success.get.length mustBe 1
+      }
+    }
+    "must return a List with two items" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getSecondaryIdentifiers(s"${BaseURL.cat}/COAL.2022.N373.P")
+        result.success.get.length mustBe 2
+      }
+    }
+  }
+
+  "Get Is Referenced By" - {
+    "must return an empty List" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getIsReferencedBys(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        result.success.get.length mustBe 0
+      }
+    }
+    "must return a List with two items" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getIsReferencedBys(s"${BaseURL.cat}/COAL.2022.N373.P")
+        result.success.get.length mustBe 2
+      }
+    }
+  }
+
+  "Get Related To" - {
+    "must return an empty List" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getRelatedTos(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        result.success.get.length mustBe 0
+      }
+    }
+    "must return a List with two items" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getRelatedTos(s"${BaseURL.cat}/COAL.2022.N373.P")
+        result.success.get.length mustBe 2
+      }
+    }
+  }
+
+  "Get Separated From" - {
+    "must return an empty List" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getSeparatedFroms(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        result.success.get.length mustBe 0
+      }
+    }
+    "must return a List with two items" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getSeparatedFroms(s"${BaseURL.cat}/COAL.2022.N373.P")
+        result.success.get.length mustBe 2
+      }
+    }
+  }
+
+  "Get URI Subjects" - {
+    "must return an empty List" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getUriSubjects(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        result.success.get.length mustBe 0
+      }
+    }
+    "must return a List with two items" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getUriSubjects(s"${BaseURL.cat}/COAL.2022.N373.P")
+        result.success.get.length mustBe 2
+      }
+    }
+  }
+
+  "Get Labelled Subjects" - {
+    "must return a List with one item" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getLabelledSubjects(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        result.success.get.length mustBe 1
+      }
+    }
+    "must return a List with two items" in {
+      when(mockConfig.sparqlEndpoint).thenReturn("http://localhost:8080/rdf4j-server/repositories/PACT")
+      eventually {
+        val result = repository.getLabelledSubjects(s"${BaseURL.cat}/COAL.2022.N373.P")
+        result.success.get.length mustBe 2
+      }
+    }
+  }
+
 }

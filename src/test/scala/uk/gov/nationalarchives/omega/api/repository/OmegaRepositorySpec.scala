@@ -29,7 +29,7 @@ import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.messages.AgentType.{ CorporateBody, Person }
 import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentConceptEntity, AgentDescriptionEntity }
+import uk.gov.nationalarchives.omega.api.repository.model.{ AccessRightsEntity, AgentConceptEntity, AgentDescriptionEntity, CreatorEntity, IdentifierEntity, IsPartOfEntity, LabelledIdentifierEntity, RecordConceptEntity, RecordDescriptionPropertiesEntity, RecordDescriptionSummaryEntity, SecondaryIdentifierEntity }
 import uk.gov.nationalarchives.omega.api.support.UnitTest
 
 import java.time.ZonedDateTime
@@ -187,4 +187,478 @@ class OmegaRepositorySpec extends UnitTest {
       result.success.get.length mustBe 2
     }
   }
+
+  "Get Record Concept Entities" - {
+    "must return a Success with a list of one item" in {
+      when(mockConnector.execute[RecordConceptEntity](any, any)).thenReturn(
+        Try(
+          List(
+            RecordConceptEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P"),
+              new URI("http://www.nationalarchives.gov.uk/ont.physical-record"),
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1")
+            )
+          )
+        )
+      )
+      val result = repository.getRecordConceptEntity(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 1
+
+    }
+    "must return a Success with an empty list if no matching record concept is found" in {
+      when(mockConnector.execute[RecordConceptEntity](any, any)).thenReturn(Try(List.empty))
+      val result = repository.getRecordConceptEntity(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 0
+    }
+  }
+
+  "Get Creator Entities" - {
+    "must return a Success with a list of one item" in {
+      when(mockConnector.execute[CreatorEntity](any, any)).thenReturn(
+        Try(
+          List(
+            CreatorEntity(new URI(s"${BaseURL.cat}/agent.24"), "from 1965")
+          )
+        )
+      )
+      val result = repository.getCreatorEntities(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 1
+    }
+    "must return a Success with a list of two items" in {
+      when(mockConnector.execute[CreatorEntity](any, any)).thenReturn(
+        Try(
+          List(
+            CreatorEntity(new URI(s"${BaseURL.cat}/agent.24"), "from 1965"),
+            CreatorEntity(new URI(s"${BaseURL.cat}/agent.S7"), "from 1968")
+          )
+        )
+      )
+      val result = repository.getCreatorEntities(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 2
+    }
+  }
+
+  "Get Record Description Summaries" - {
+    "must return a Success with a list of one item" in {
+      when(mockConnector.execute[RecordDescriptionSummaryEntity](any, any)).thenReturn(
+        Try(
+          List(
+            RecordDescriptionSummaryEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              "<scopecontent><p>Coal News albums 1963</p></scopecontent>",
+              "2023-08-30T12:10:00.000Z",
+              Some(new URI(s"${BaseURL.cat}/COAL.2022.N3HQ.P.1")),
+              Some(new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"))
+            )
+          )
+        )
+      )
+      val result = repository.getRecordDescriptionSummaries(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 1
+    }
+    "must return a Success with a list of two items" in {
+      when(mockConnector.execute[RecordDescriptionSummaryEntity](any, any)).thenReturn(
+        Try(
+          List(
+            RecordDescriptionSummaryEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              "<scopecontent><p>Coal News albums 1963</scopecontent>",
+              "2023-08-30T12:10:00.000Z",
+              Some(new URI(s"${BaseURL.cat}/COAL.2022.N3HQ.P.1")),
+              Some(new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"))
+            ),
+            RecordDescriptionSummaryEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
+              "<scopecontent><p>Coal News albums 1964</p></scopecontent>",
+              "2023-08-30T12:10:00.000Z",
+              Some(new URI(s"${BaseURL.cat}/COAL.2022.N3HQ.P.1")),
+              Some(new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"))
+            )
+          )
+        )
+      )
+      val result = repository.getRecordDescriptionSummaries(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 2
+    }
+  }
+
+  "Get Record Description Properties" - {
+    "must return a Success with a list of one item" in {
+      when(mockConnector.execute[RecordDescriptionPropertiesEntity](any, any)).thenReturn(
+        Try(
+          List(
+            RecordDescriptionPropertiesEntity(
+              recordDescriptionUri = new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              assetLegalStatus = Some(new URI(s"${BaseURL.cat}/public-record")),
+              legalStatusLabel = Some("Public Record"),
+              legacyType = Some(new URI(s"${BaseURL.cat}/item")),
+              designationOfEdition = Some("<unittitle type=\"Map Designation\">GSGS 2321</unittitle>"),
+              createdType = Some(new URI(s"${BaseURL.time}ProperInterval")),
+              createdDescription = Some("1963"),
+              createdBeginning = Some("1963-01-01Z"),
+              createdEnd = Some("1963-12-31Z"),
+              archivistsNote = Some("[Grid reference: N/A]"),
+              sourceOfAcquisition = Some(new URI(s"${BaseURL.cat}/agent.24")),
+              custodialHistory = Some("Retained until 2006"),
+              adminBiogBackground =
+                Some("<bioghist><p>The board met periodically until 1935 when it was allowed to lapse.</p></bioghist>"),
+              accumulationType = Some(new URI(s"${BaseURL.time}ProperInterval")),
+              accumulationDescription = Some("1963"),
+              accumulationBeginning = Some("1963-01-01Z"),
+              accumulationEnd = Some("1963-12-31Z"),
+              appraisal = Some("Files selected in accordance with Operational Selection Policy OSP 25"),
+              accrualPolicy = Some(new URI(s"${BaseURL.cat}/policy.Series_is_accruing")),
+              layout = Some("Photographs in an envelope"),
+              publicationNote = Some("Some of the photographs in this series appeared in The Times newspaper.")
+            )
+          )
+        )
+      )
+      val result = repository.getRecordDescriptionProperties(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 1
+    }
+    "must return a Success with a list of two items" in {
+      when(mockConnector.execute[RecordDescriptionPropertiesEntity](any, any)).thenReturn(
+        Try(
+          List(
+            RecordDescriptionPropertiesEntity(
+              recordDescriptionUri = new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              assetLegalStatus = Some(new URI(s"${BaseURL.cat}/public-record")),
+              legalStatusLabel = Some("Public Record"),
+              legacyType = Some(new URI(s"${BaseURL.cat}/item")),
+              designationOfEdition = Some("<unittitle type=\"Map Designation\">GSGS 2321</unittitle>"),
+              createdType = Some(new URI(s"${BaseURL.time}ProperInterval")),
+              createdDescription = Some("1963"),
+              createdBeginning = Some("1963-01-01Z"),
+              createdEnd = Some("1963-12-31Z"),
+              archivistsNote = Some("[Grid reference: N/A]"),
+              sourceOfAcquisition = Some(new URI(s"${BaseURL.cat}/agent.24")),
+              custodialHistory = Some("Retained until 2006"),
+              adminBiogBackground =
+                Some("<bioghist><p>The board met periodically until 1935 when it was allowed to lapse.</p></bioghist>"),
+              accumulationType = Some(new URI(s"${BaseURL.time}ProperInterval")),
+              accumulationDescription = Some("1963"),
+              accumulationBeginning = Some("1963-01-01Z"),
+              accumulationEnd = Some("1963-12-31Z"),
+              appraisal = Some("Files selected in accordance with Operational Selection Policy OSP 25"),
+              accrualPolicy = Some(new URI(s"${BaseURL.cat}/policy.Series_is_accruing")),
+              layout = Some("Photographs in an envelope"),
+              publicationNote = Some("Some of the photographs in this series appeared in The Times newspaper.")
+            ),
+            RecordDescriptionPropertiesEntity(
+              recordDescriptionUri = new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
+              assetLegalStatus = Some(new URI(s"${BaseURL.cat}/public-record")),
+              legalStatusLabel = Some("Public Record"),
+              legacyType = Some(new URI(s"${BaseURL.cat}/item")),
+              createdType = Some(new URI(s"${BaseURL.time}Instant")),
+              createdDescription = Some("1963"),
+              createdInstant = Some("1963-01-01Z"),
+              archivistsNote = Some("[Grid reference: NX 509 582]"),
+              sourceOfAcquisition = Some(new URI(s"${BaseURL.cat}/agent.25")),
+              custodialHistory = Some("Retained until 2001"),
+              adminBiogBackground =
+                Some("<bioghist><p>The board met periodically until 1936 when it was allowed to lapse.</p></bioghist>"),
+              accumulationType = Some(new URI(s"${BaseURL.time}Instant")),
+              accumulationDescription = Some("1963"),
+              accumulationInstant = Some("1963-01-01Z"),
+              appraisal = Some("Files selected in accordance with Operational Selection Policy OSP 26"),
+              accrualPolicy = Some(new URI(s"${BaseURL.cat}/policy.No_future_accruals_expected")),
+              layout = Some("Photographs in a box"),
+              publicationNote =
+                Some("Some of the photographs in this series appeared in The Manchester Guardian newspaper.")
+            )
+          )
+        )
+      )
+      val result = repository.getRecordDescriptionProperties(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 2
+    }
+  }
+
+  "Get Access Rights" - {
+    "must return a Success with a list of one item" in {
+      when(mockConnector.execute[AccessRightsEntity](any, any)).thenReturn(
+        Try(
+          List(
+            AccessRightsEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              new URI(s"${BaseURL.cat}/policy.Open_Description")
+            )
+          )
+        )
+      )
+      val result = repository.getAccessRights(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 1
+    }
+    "must return a Success with a list of two items" in {
+      when(mockConnector.execute[AccessRightsEntity](any, any)).thenReturn(
+        Try(
+          List(
+            AccessRightsEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              new URI(s"${BaseURL.cat}/policy.Open_Description")
+            ),
+            AccessRightsEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              new URI(s"${BaseURL.cat}/policy.Normal_Closure_before_FOI_Act_30_years_from_1963-12-31")
+            )
+          )
+        )
+      )
+      val result = repository.getAccessRights(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 2
+    }
+  }
+
+  "Get Is Part Of" - {
+    "must return a Success with a list of one item" in {
+      when(mockConnector.execute[IsPartOfEntity](any, any)).thenReturn(
+        Try(
+          List(
+            IsPartOfEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              new URI(s"${BaseURL.cat}/recordset.COAL.2022.2834")
+            )
+          )
+        )
+      )
+      val result = repository.getIsPartOf(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 1
+    }
+    "must return a Success with a list of two items" in {
+      when(mockConnector.execute[IsPartOfEntity](any, any)).thenReturn(
+        Try(
+          List(
+            IsPartOfEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              new URI(s"${BaseURL.cat}/recordset.COAL.2022.2834")
+            ),
+            IsPartOfEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
+              new URI(s"${BaseURL.cat}/recordset.COAL.2022.2834")
+            )
+          )
+        )
+      )
+      val result = repository.getIsPartOf(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 2
+    }
+  }
+
+  "Get Secondary Identifiers" - {
+    "must return a Success with a list of one item" in {
+      when(mockConnector.execute[SecondaryIdentifierEntity](any, any)).thenReturn(
+        Try(
+          List(
+            SecondaryIdentifierEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              new URI(s"${BaseURL.cat}/classicCatalogueReference"),
+              "COAL 80/2052/9"
+            )
+          )
+        )
+      )
+      val result = repository.getSecondaryIdentifiers(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 1
+    }
+    "must return a Success with a list of two items" in {
+      when(mockConnector.execute[SecondaryIdentifierEntity](any, any)).thenReturn(
+        Try(
+          List(
+            SecondaryIdentifierEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              new URI(s"${BaseURL.cat}/classicCatalogueReference"),
+              "COAL 80/2052/9"
+            ),
+            SecondaryIdentifierEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
+              new URI(s"${BaseURL.cat}/classicCatalogueReference"),
+              "COAL 80/2052/9"
+            )
+          )
+        )
+      )
+      val result = repository.getSecondaryIdentifiers(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 2
+    }
+  }
+
+  "Get Is Referenced By" - {
+    "must return a Success with a list of one item" in {
+      when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
+        Try(
+          List(
+            LabelledIdentifierEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              "Coal Board Minutes 1963",
+              new URI(s"${BaseURL.cat}/res.JN31")
+            )
+          )
+        )
+      )
+      val result = repository.getIsReferencedBys(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 1
+    }
+    "must return a Success with a list of two items" in {
+      when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
+        Try(
+          List(
+            LabelledIdentifierEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              "Coal Board Minutes 1963",
+              new URI(s"${BaseURL.cat}/res.JN31")
+            ),
+            LabelledIdentifierEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
+              "Coal Board Minutes 1962",
+              new URI(s"${BaseURL.cat}/res.4JJF")
+            )
+          )
+        )
+      )
+      val result = repository.getIsReferencedBys(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 2
+    }
+  }
+
+  "Get Related To" - {
+    "must return a Success with a list of one item" in {
+      when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
+        Try(
+          List(
+            LabelledIdentifierEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              "Index of colliery photographs March 1963",
+              new URI(s"${BaseURL.cat}/COAL.2022.S144")
+            )
+          )
+        )
+      )
+      val result = repository.getRelatedTos(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 1
+    }
+    "must return a Success with a list of two items" in {
+      when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
+        Try(
+          List(
+            LabelledIdentifierEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              "Index of colliery photographs March 1963",
+              new URI(s"${BaseURL.cat}/COAL.2022.S144")
+            ),
+            LabelledIdentifierEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
+              "Index of colliery photographs September 1963",
+              new URI(s"${BaseURL.cat}/COAL.2022.G221")
+            )
+          )
+        )
+      )
+      val result = repository.getRelatedTos(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 2
+    }
+  }
+
+  "Get Separated From" - {
+    "must return a Success with a list of one item" in {
+      when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
+        Try(
+          List(
+            LabelledIdentifierEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              "NCB records 1963",
+              new URI(s"${BaseURL.cat}/CAB.2022.L744")
+            )
+          )
+        )
+      )
+      val result = repository.getSeparatedFroms(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 1
+    }
+    "must return a Success with a list of two items" in {
+      when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
+        Try(
+          List(
+            LabelledIdentifierEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              "NCB records 1963",
+              new URI(s"${BaseURL.cat}/CAB.2022.L744")
+            ),
+            LabelledIdentifierEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
+              "Cabinet records 1963",
+              new URI(s"${BaseURL.cat}/CAB.2022.N901")
+            )
+          )
+        )
+      )
+      val result = repository.getSeparatedFroms(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 2
+    }
+  }
+
+  "Get URI Subjects" - {
+    "must return a Success with a list of one item" in {
+      when(mockConnector.execute[IdentifierEntity](any, any)).thenReturn(
+        Try(
+          List(
+            IdentifierEntity(new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"), new URI(s"${BaseURL.cat}/agent.4N6"))
+          )
+        )
+      )
+      val result = repository.getUriSubjects(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 1
+    }
+    "must return a Success with a list of two items" in {
+      when(mockConnector.execute[IdentifierEntity](any, any)).thenReturn(
+        Try(
+          List(
+            IdentifierEntity(new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"), new URI(s"${BaseURL.cat}/agent.4N6")),
+            IdentifierEntity(new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"), new URI(s"${BaseURL.cat}/agent.S7"))
+          )
+        )
+      )
+      val result = repository.getUriSubjects(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 2
+    }
+  }
+
+  "Get Labelled Subjects" - {
+    "must return a Success with a list of one item" in {
+      when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
+        Try(
+          List(
+            LabelledIdentifierEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              "from 1965",
+              new URI(s"${BaseURL.cat}/agent.24")
+            )
+          )
+        )
+      )
+      val result = repository.getLabelledSubjects(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 1
+    }
+    "must return a Success with a list of two items" in {
+      when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
+        Try(
+          List(
+            LabelledIdentifierEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              "from 1965",
+              new URI(s"${BaseURL.cat}/agent.24")
+            ),
+            LabelledIdentifierEntity(
+              new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+              "from 1968",
+              new URI(s"${BaseURL.cat}/agent.S7")
+            )
+          )
+        )
+      )
+      val result = repository.getLabelledSubjects(s"${BaseURL.cat}/COAL.2022.N373.P")
+      result.success.get.length mustBe 2
+    }
+  }
+
 }

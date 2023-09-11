@@ -19,14 +19,32 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.repository
+package uk.gov.nationalarchives.omega.api.repository.model
 
-object BaseURL {
+import org.apache.jena.ext.xerces.util.URI
 
-  val cat = "http://cat.nationalarchives.gov.uk"
-  val rdaa = "http://rdaregistry.info/Elements/a"
-  val dct = "http://purl.org/dc/terms"
-  val todo = "http://TODO"
-  val time = "http://www.w3.org/2006/time#"
-
-}
+case class RecordDescriptionPropertiesEntity(
+  recordDescriptionUri: URI,
+  assetLegalStatus: Option[URI] = None,
+  legalStatusLabel: Option[String] = None,
+  legacyType: Option[URI] = None,
+  designationOfEdition: Option[String] = None,
+  createdType: Option[URI] = None,
+  createdDescription: Option[String] = None,
+  createdBeginning: Option[String] = None,
+  createdEnd: Option[String] = None,
+  createdInstant: Option[String] = None,
+  archivistsNote: Option[String] = None,
+  sourceOfAcquisition: Option[URI] = None,
+  custodialHistory: Option[String] = None,
+  adminBiogBackground: Option[String] = None,
+  accumulationType: Option[URI] = None,
+  accumulationDescription: Option[String] = None,
+  accumulationBeginning: Option[String] = None,
+  accumulationEnd: Option[String] = None,
+  accumulationInstant: Option[String] = None,
+  appraisal: Option[String] = None,
+  accrualPolicy: Option[URI] = None,
+  layout: Option[String] = None,
+  publicationNote: Option[String] = None
+)

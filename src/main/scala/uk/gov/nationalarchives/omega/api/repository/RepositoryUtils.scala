@@ -60,7 +60,7 @@ trait RepositoryUtils extends AgentTypeMapper {
   def prepareParameterizedQuery(
     queryResource: String,
     params: SparqlParams,
-    extendQuery: Boolean
+    extendQuery: Boolean = false
   ): Try[Query] =
     for {
       queryText          <- getQueryText(queryResource)
@@ -102,7 +102,8 @@ trait RepositoryUtils extends AgentTypeMapper {
       setBooleanParams(_, params.booleans),
       setResourceParams(_, params.uris),
       setValueParams(_, params.values),
-      setXSDDateTimeParams(_, params.dateTimes)
+      setXSDDateTimeParams(_, params.dateTimes),
+      setStringParams(_, params.strings)
     ).reduceLeft(_.andThen(_))
 
     val filteredQueryText = setFilterParams(queryText, params.filters)
@@ -126,6 +127,16 @@ trait RepositoryUtils extends AgentTypeMapper {
       query,
       booleanParams,
       (query, booleanParamValue) => query.setLiteral(_: String, booleanParamValue)
+    )
+
+  private def setStringParams(
+    query: ParameterizedSparqlString,
+    stringParams: Map[String, String]
+  ): ParameterizedSparqlString =
+    setParams[String](
+      query,
+      stringParams,
+      (query, stringParamValue) => query.setLiteral(_: String, stringParamValue)
     )
 
   private val dateTimeType: XSDDateTimeType = new XSDDateTimeType("dateTime")

@@ -18,6 +18,10 @@ object BulkLoadData {
     Paths.get(getClass.getClassLoader.getResource("test-person-descriptions.ttl").toURI)
   val legalStatusData: Path =
     Paths.get(getClass.getClassLoader.getResource("test-legal-status.ttl").toURI)
+  val recordConceptData: Path =
+    Paths.get(getClass.getClassLoader.getResource("test-record-concepts.ttl").toURI)
+  val recordDescriptionData: Path =
+    Paths.get(getClass.getClassLoader.getResource("test-record-descriptions.ttl").toURI)
 
   private val deleteRepositoryConfig = Seq(
     "curl",
@@ -94,6 +98,28 @@ object BulkLoadData {
     "http://localhost:8080/rdf4j-server/repositories/PACT/statements"
   )
 
+  private val postRecordConceptData = Seq(
+    "curl",
+    "-X",
+    "POST",
+    "-H",
+    "Content-type: text/turtle",
+    "--data-binary",
+    s"@$recordConceptData",
+    "http://localhost:8080/rdf4j-server/repositories/PACT/statements"
+  )
+
+  private val postRecordDescriptionData = Seq(
+    "curl",
+    "-X",
+    "POST",
+    "-H",
+    "Content-type: text/turtle",
+    "--data-binary",
+    s"@$recordDescriptionData",
+    "http://localhost:8080/rdf4j-server/repositories/PACT/statements"
+  )
+
   def createRepository(): IO[Unit] =
     IO.blocking(deleteRepositoryConfig.!) *>
       IO.blocking(createRepositoryConfig.!) *>
@@ -101,6 +127,8 @@ object BulkLoadData {
       IO.blocking(postCorporateBodyDescriptionData.!) *>
       IO.blocking(postPersonConceptData.!) *>
       IO.blocking(postPersonDescriptionData.!) *>
-      IO.blocking(postLegalStatusData.!) *> IO.unit
+      IO.blocking(postLegalStatusData.!) *>
+      IO.blocking(postRecordConceptData.!) *>
+      IO.blocking(postRecordDescriptionData.!) *> IO.unit
 
 }
