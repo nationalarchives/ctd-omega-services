@@ -1,0 +1,8 @@
+PREFIX cat: <http://cat.nationalarchives.gov.uk/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+
+SELECT ?recordDescriptionUri ?identifierProperty ?secondaryIdentifier
+WHERE { ?recordDescriptionUri prov:specializationOf ?recordConceptUri ;
+                              cat:classicCatalogueReference ?secondaryIdentifier ;
+                              ?identifierProperty ?secondaryIdentifier . }

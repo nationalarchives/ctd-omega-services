@@ -1,0 +1,8 @@
+PREFIX cat: <http://cat.nationalarchives.gov.uk/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX rst: <http://id.loc.gov/vocabulary/preservation/relationshipSubType/>
+
+SELECT ?recordDescriptionUri ?recordSetConceptUri
+WHERE { ?recordDescriptionUri prov:specializationOf ?recordConceptUri ; ;
+                              rst:isp ?recordSetConceptUri .
+      }
