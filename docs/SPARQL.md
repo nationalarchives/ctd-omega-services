@@ -82,4 +82,4 @@ WHERE {
 If the filter parameter is not needed it can be removed simply by setting `filterParam` to be an empty
 string.
 
-More examples of parameterization can be seen in the tests in [RepositoryUtilsSpec](src/test/scala/uk/gov/nationalarchives/omega/api/repository/RepositoryUtilsSpec.scala).
+More examples of parameterization can be seen in the tests in [RepositoryUtilsSpec](../src/test/scala/uk/gov/nationalarchives/omega/api/repository/RepositoryUtilsSpec.scala).
