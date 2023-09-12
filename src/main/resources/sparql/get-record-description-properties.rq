@@ -1,0 +1,56 @@
+PREFIX cat: <http://cat.nationalarchives.gov.uk/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX locah: <http://data.archiveshub.ac.uk/def/>
+PREFIX odrl: <http://www.w3.org/ns/odrl/2/>
+PREFIX premis: <http://www.loc.gov/premis/rdf/v3/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX rdau: <http://rdaregistry.info/Elements/u/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX time: <http://www.w3.org/2006/time#>
+
+SELECT ?recordDescriptionUri ?assetLegalStatus ?legalStatusLabel ?legacyType ?designationOfEdition ?createdType
+        ?createdDescription ?createdBeginning ?createdEnd ?createdInstant ?archivistsNote ?sourceOfAcquisition
+        ?custodialHistory ?adminBiogBackground ?accumulationType ?accumulationDescription ?accumlationBeginning
+        ?accumulationEnd ?accumulationInstant ?appraisal ?accrualPolicy ?layout ?publicationNote
+WHERE { ?recordDescriptionUri prov:specializationOf ?recordConceptUri ;
+                              premis:rightsStatus ?rightsStatus ;
+                              cat:created ?created ;
+                              dct:type ?legacyType ;
+        FILTER(?legacyType IN (cat:item, cat:piece))
+        ?created rdf:type ?createdType ;
+                 dct:description ?createdDescription .
+        OPTIONAL { ?created time:hasBeginning ?beginning1 ;
+                            time:hasEnd ?end1 .
+                   ?beginning1 time:inXSDDate ?createdBeginning .
+                   ?end1 time:inXSDDate ?createdEnd . }
+        OPTIONAL { ?created time:inXSDDate ?createdInstant . }
+        ?rightsStatus rdf:type premis:RightsStatus ;
+                      premis:basis ?assetLegalStatus .
+        ?assetLegalStatus skos:prefLabel ?legalStatusLabel .
+        OPTIONAL { ?recordDescriptionUri rdau:P60365 ?designationOfEdition . }
+        OPTIONAL { ?recordDescriptionUri premis:note ?archivistsNote . }
+        OPTIONAL { ?recordDescriptionUri dct:provenance ?provenance1 .
+                   ?provenance1 dct:type cat:immediate-source-of-acquisition ;
+                                dct:subject ?sourceOfAcquisition . }
+        OPTIONAL { ?recordDescriptionUri dct:provenance ?provenance2 .
+                   ?provenance2 dct:type cat:custodial-history ;
+                                dct:description ?custodialHistory . }
+        OPTIONAL { ?recordDescriptionUri dct:provenance ?provenance3 .
+                   ?provenance3 dct:type cat:administrative-biographical-backrgound ;
+                                dct:description ?adminBiogBackground . }
+        OPTIONAL { ?recordDescriptionUri dct:dateSubmitted ?accumulation .
+                   ?accumulation rdf:type ?accumulationType ;
+                                 dct:description ?accumulationDescription . }
+        OPTIONAL { ?recordDescriptionUri dct:dateSubmitted ?accumulation1 .
+                   ?accumulation1 time:hasBeginning ?beginning2 ;
+                                  time:hasEnd ?end2 .
+                   ?beginning2 time:inXSDDate ?accumlationBeginning .
+                   ?end2 time:inXSDDate ?accumulationEnd . }
+        OPTIONAL { ?recordDescriptionUri dct:dateSubmitted ?accumulation2 .
+                   ?accumulation2 time:inXSDDate ?accumulationInstant . }
+        OPTIONAL { ?recordDescriptionUri locah:appraisal ?appraisal . }
+        OPTIONAL { ?recordDescriptionUri dct:accrualPolicy ?accrualPolicy . }
+        OPTIONAL { ?recordDescriptionUri rdau:P60784 ?layout . }
+        OPTIONAL { ?recordDescriptionUri rdau:P60128 ?publicationNote . }
+      }

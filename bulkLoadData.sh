@@ -6,4 +6,6 @@ curl -v -H "Content-type: text/turtle" --data-binary @src/it/resources/test-corp
 curl -v -H "Content-type: text/turtle" --data-binary @src/it/resources/test-person-concepts.ttl http://localhost:8080/rdf4j-server/repositories/PACT/statements
 curl -v -H "Content-type: text/turtle" --data-binary @src/it/resources/test-person-descriptions.ttl http://localhost:8080/rdf4j-server/repositories/PACT/statements
 curl -v -H "Content-type: text/turtle" --data-binary @src/it/resources/test-legal-status.ttl http://localhost:8080/rdf4j-server/repositories/PACT/statements
+curl -v -H "Content-type: text/turtle" --data-binary @src/it/resources/test-record-concepts.ttl http://localhost:8080/rdf4j-server/repositories/PACT/statements
+curl -v -H "Content-type: text/turtle" --data-binary @src/it/resources/test-record-descriptions.ttl http://localhost:8080/rdf4j-server/repositories/PACT/statements
 curl -v -H "Connection: close" http://localhost:8080/rdf4j-server
