@@ -7,8 +7,9 @@ The SPARQL queries used by PACS are kept in the `src/main/resources/sparql` dire
 
 An architectural decision was made to keep the SPARQL in separate files with the standard `.rq` SPARQL file extension,
 rather than embed the SPARQL into the Scala source code that makes up PACS. This allows the queries to be developed,
-tested and debugged in isolation from the rest of the application. That being said, there is still a requirement to
-inject values into these queries from within the application so that they can be re-used to handle query variations.
+tested and debugged in isolation from the rest of the application. It also means that queries can be developed by 
+a data expert who may know SPARQL but not Scala. That being said, there is still a requirement to inject values into
+these queries from within the application so that they can be re-used to handle query variations.
 
 Within PACS we use the [Apache Jena ARQ API](https://jena.apache.org/documentation/query/index.html) to manage and
 manipulate the RDF data within the data store. This library includes a [ParameterizedSparqlString](https://jena.apache.org/documentation/javadoc/arq/org.apache.jena.arq/org/apache/jena/query/ParameterizedSparqlString.html)
@@ -16,12 +17,12 @@ class which forms the basis of our approach to query parameterization. One nice 
 is that it can be initialised with an existing query and then used to replace variables within the query with
 specific values. For example, the following query, which will select all RDF triples in the RDF store, can be 
 parameterized by replacing `?predicateParam` with `rdf:type`:
-```
+```sparql
 SELECT ?subject ?object
 WHERE { ?subject ?predicateParam ?object . }
 ```
 This will transform the query to create the following query which will only select triples describing the subject types:
-```
+```sparql
 SELECT ?subject ?object 
 WHERE { ?subject rdf:type ?object . }
 ```
@@ -32,7 +33,7 @@ It also supports the parameterization of `VALUES` statements within the SPARQL, 
 
 Within PACS, a request message needs to be converted into SPARQL parameters which are then injected into the SPARQL
 query. The query is then executed and the results are decoded into simple case classes via a typeclass derivation
-mechanism provided by the [sparql-utils](https://github.com/phenoscape/sparql-utils) library. These simple cases
+mechanism provided by the [sparql-utils](https://github.com/phenoscape/sparql-utils) library. These simple case
 classes are then converted into the more complex case classes representing the reply messages. Sometimes it will
 require execution of more than one SPARQL query, in order to gather all the information expected in the reply. This 
 loose coupling between request messages and queries encourages the modularisation and reuse of queries to feed diverse
