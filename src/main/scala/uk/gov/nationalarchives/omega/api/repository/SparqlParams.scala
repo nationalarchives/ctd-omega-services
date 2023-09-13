@@ -83,7 +83,7 @@ object SparqlParams extends AgentTypeMapper {
   }
 
   private def getUriMap(requestByIdentifier: RequestByIdentifier): Map[String, String] =
-    Map("recordConceptUri" -> requestByIdentifier.identifier) // TODO(RW) parameterise key
+    Map("recordConceptUri" -> requestByIdentifier.identifier)
 
   private def getBooleanMap(listAgentSummary: ListAgentSummary): Map[String, Boolean] =
     listAgentSummary.depository match {

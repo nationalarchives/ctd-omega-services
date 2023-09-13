@@ -28,5 +28,6 @@ object BaseURL {
   val dct = "http://purl.org/dc/terms"
   val todo = "http://TODO"
   val time = "http://www.w3.org/2006/time#"
+  val tna = "http://www.nationalarchives.gov.uk"
 
 }

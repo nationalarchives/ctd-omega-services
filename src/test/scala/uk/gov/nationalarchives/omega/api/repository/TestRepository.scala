@@ -168,7 +168,7 @@ class TestRepository extends AbstractRepository {
       List(
         RecordConceptEntity(
           new URI(s"${BaseURL.cat}/COAL.2022.N373.P"),
-          new URI("http://www.nationalarchives.gov.uk/ont.physical-record"),
+          new URI(s"${BaseURL.tna}/ont.physical-record"),
           new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1")
         )
       )

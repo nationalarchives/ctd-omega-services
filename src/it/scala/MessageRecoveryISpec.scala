@@ -158,7 +158,7 @@ class MessageRecoveryISpec
     maxDispatchers = 1,
     maxLocalQueueSize = 1,
     requestQueue = requestQueueName,
-    sparqlEndpoint = "http://localhost:8080/rdf4j-server/repositories/PACT"
+    sparqlEndpoint = BulkLoadData.testRepositoryUrl
   )
 
 }
