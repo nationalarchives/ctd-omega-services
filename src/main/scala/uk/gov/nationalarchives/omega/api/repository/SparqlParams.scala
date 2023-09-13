@@ -22,7 +22,7 @@
 package uk.gov.nationalarchives.omega.api.repository
 
 import org.apache.jena.rdf.model.{ Resource, ResourceFactory }
-import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
+import uk.gov.nationalarchives.omega.api.messages.request.{ ListAgentSummary, RequestByIdentifier }
 import uk.gov.nationalarchives.omega.api.repository.model.AgentTypeMapper
 
 import java.time.ZonedDateTime
@@ -36,7 +36,8 @@ case class SparqlParams(
   dateTimes: Map[String, XMLGregorianCalendar] = Map.empty,
   values: Map[String, List[Resource]] = Map.empty,
   filters: Map[String, String] = Map.empty,
-  queryExtension: Option[String] = None
+  queryExtension: Option[String] = None,
+  strings: Map[String, String] = Map.empty
 )
 object SparqlParams extends AgentTypeMapper {
 
@@ -49,6 +50,11 @@ object SparqlParams extends AgentTypeMapper {
       queryExtension <- Try(getQueryExtension(listAgentSummary))
       filterMap      <- Try(getFilterMap(listAgentSummary))
     } yield SparqlParams(booleanMap, uriMap, dateTimeMap, valuesMap, filterMap, queryExtension)
+
+  def from(getRecord: RequestByIdentifier): Try[SparqlParams] =
+    for {
+      uriMap <- Try(getUriMap(getRecord))
+    } yield SparqlParams(uris = uriMap)
 
   private def getValuesMap(listAgentSummary: ListAgentSummary): Map[String, List[Resource]] = {
     val agentTypeUris = listAgentSummary.agentTypes.getOrElse(getAllAgentTypes).map(getUriFromAgentType)
@@ -75,6 +81,9 @@ object SparqlParams extends AgentTypeMapper {
     }
     map1 ++ map2
   }
+
+  private def getUriMap(requestByIdentifier: RequestByIdentifier): Map[String, String] =
+    Map("recordConceptUri" -> requestByIdentifier.identifier)
 
   private def getBooleanMap(listAgentSummary: ListAgentSummary): Map[String, Boolean] =
     listAgentSummary.depository match {

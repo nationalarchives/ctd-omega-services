@@ -26,7 +26,7 @@ import org.apache.jena.query.{ Query, QuerySolution }
 import org.phenoscape.sparql.FromQuerySolution
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentConceptEntity, AgentDescriptionEntity, LegalStatusEntity }
+import uk.gov.nationalarchives.omega.api.repository.model._
 
 import java.time.ZonedDateTime
 import scala.util.Try
@@ -37,6 +37,17 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
   private val selectLegalStatusSummarySparqlResource = s"/$sparqlResourceDir/select-legal-status-summaries.rq"
   private val getAgentSummariesSparqlResource = s"/$sparqlResourceDir/get-agent-concepts.rq"
   private val getAgentDescriptionsSparqlResource = s"/$sparqlResourceDir/get-agent-descriptions.rq"
+  private val getRecordConceptSparqlResource = s"/$sparqlResourceDir/get-record-concept.rq"
+  private val getRecordCreatorSparqlResource = s"/$sparqlResourceDir/get-record-creator.rq"
+  private val getRecordDescriptionSummarySparqlResource = s"/$sparqlResourceDir/get-record-description-summary.rq"
+  private val getRecordDescriptionPropertiesSparqlResource = s"/$sparqlResourceDir/get-record-description-properties.rq"
+  private val getAccessRightsSparqlResource = s"/$sparqlResourceDir/get-access-rights.rq"
+  private val getIsPartOfSparqlResource = s"/$sparqlResourceDir/get-is-part-of.rq"
+  private val getSecondaryIdentifiersSparqlResource = s"/$sparqlResourceDir/get-secondary-identifiers.rq"
+  private val getIsReferencedBySparqlResource = s"/$sparqlResourceDir/get-is-referenced-by.rq"
+  private val getDctRelationByTypeSparqlResource = s"/$sparqlResourceDir/get-dct-relation-by-type.rq"
+  private val getSubjectUriSparqlResource = s"/$sparqlResourceDir/get-subject-uri.rq"
+  private val getLabelledSubjectUriSparqlResource = s"/$sparqlResourceDir/get-labelled-subject-uri.rq"
 
   implicit object BooleanFromQuerySolution extends FromQuerySolution[Boolean] {
     def fromQuerySolution(qs: QuerySolution, variablePath: String = ""): Try[Boolean] =
@@ -57,7 +68,7 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
   override def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): Try[List[AgentConceptEntity]] =
     for {
       params <- SparqlParams.from(listAgentSummary)
-      query  <- prepareParameterizedQuery(getAgentSummariesSparqlResource, params, extendQuery = false)
+      query  <- prepareParameterizedQuery(getAgentSummariesSparqlResource, params)
       result <- executeQuery(query, implicitly[FromQuerySolution[AgentConceptEntity]])
     } yield result
 
@@ -73,6 +84,128 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
                  extendQuery = true
                )
       result <- executeQuery(query, implicitly[FromQuerySolution[AgentDescriptionEntity]])
+    } yield result
+
+  override def getRecordConceptEntity(recordConceptId: String): Try[List[RecordConceptEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+                 getRecordConceptSparqlResource,
+                 SparqlParams(strings = Map("recordConceptId" -> recordConceptId))
+               )
+      result <- executeQuery(query, implicitly[FromQuerySolution[RecordConceptEntity]])
+    } yield result
+
+  override def getCreatorEntities(recordConceptUri: String): Try[List[CreatorEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+                 getRecordCreatorSparqlResource,
+                 SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri))
+               )
+      result <- executeQuery(query, implicitly[FromQuerySolution[CreatorEntity]])
+    } yield result
+
+  override def getRecordDescriptionSummaries(recordConceptUri: String): Try[List[RecordDescriptionSummaryEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+                 getRecordDescriptionSummarySparqlResource,
+                 SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri))
+               )
+      result <- executeQuery(query, implicitly[FromQuerySolution[RecordDescriptionSummaryEntity]])
+    } yield result
+
+  override def getRecordDescriptionProperties(recordConceptUri: String): Try[List[RecordDescriptionPropertiesEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+                 getRecordDescriptionPropertiesSparqlResource,
+                 SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri))
+               )
+      result <- executeQuery(query, implicitly[FromQuerySolution[RecordDescriptionPropertiesEntity]])
+    } yield result
+
+  override def getAccessRights(recordConceptUri: String): Try[List[AccessRightsEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+                 getAccessRightsSparqlResource,
+                 SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri))
+               )
+      result <- executeQuery(query, implicitly[FromQuerySolution[AccessRightsEntity]])
+    } yield result
+
+  override def getIsPartOf(recordConceptUri: String): Try[List[IsPartOfEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+                 getIsPartOfSparqlResource,
+                 SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri))
+               )
+      result <- executeQuery(query, implicitly[FromQuerySolution[IsPartOfEntity]])
+    } yield result
+
+  override def getSecondaryIdentifiers(recordConceptUri: String): Try[List[SecondaryIdentifierEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+                 getSecondaryIdentifiersSparqlResource,
+                 SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri))
+               )
+      result <- executeQuery(query, implicitly[FromQuerySolution[SecondaryIdentifierEntity]])
+    } yield result
+
+  override def getIsReferencedBys(recordConceptUri: String): Try[List[LabelledIdentifierEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+                 getIsReferencedBySparqlResource,
+                 SparqlParams(uris =
+                   Map(
+                     "recordConceptUri" -> recordConceptUri
+                   )
+                 )
+               )
+      result <- executeQuery(query, implicitly[FromQuerySolution[LabelledIdentifierEntity]])
+    } yield result
+
+  override def getRelatedTos(recordConceptUri: String): Try[List[LabelledIdentifierEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+                 getDctRelationByTypeSparqlResource,
+                 SparqlParams(uris =
+                   Map(
+                     "recordConceptUri" -> recordConceptUri,
+                     "relationType"     -> s"${BaseURL.cat}/related-material"
+                   )
+                 )
+               )
+      result <- executeQuery(query, implicitly[FromQuerySolution[LabelledIdentifierEntity]])
+    } yield result
+
+  override def getSeparatedFroms(recordConceptUri: String): Try[List[LabelledIdentifierEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+                 getDctRelationByTypeSparqlResource,
+                 SparqlParams(uris =
+                   Map(
+                     "recordConceptUri" -> recordConceptUri,
+                     "relationType"     -> s"${BaseURL.cat}/separated-material"
+                   )
+                 )
+               )
+      result <- executeQuery(query, implicitly[FromQuerySolution[LabelledIdentifierEntity]])
+    } yield result
+
+  override def getUriSubjects(recordConceptUri: String): Try[List[IdentifierEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+                 getSubjectUriSparqlResource,
+                 SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri))
+               )
+      result <- executeQuery(query, implicitly[FromQuerySolution[IdentifierEntity]])
+    } yield result
+
+  override def getLabelledSubjects(recordConceptUri: String): Try[List[LabelledIdentifierEntity]] =
+    for {
+      query <- prepareParameterizedQuery(
+                 getLabelledSubjectUriSparqlResource,
+                 SparqlParams(uris = Map("recordConceptUri" -> recordConceptUri))
+               )
+      result <- executeQuery(query, implicitly[FromQuerySolution[LabelledIdentifierEntity]])
     } yield result
 
   private def executeQuery[A](query: Query, queryDecoder: FromQuerySolution[A]): Try[List[A]] =

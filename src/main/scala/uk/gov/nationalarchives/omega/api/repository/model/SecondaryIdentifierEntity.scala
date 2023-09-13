@@ -19,15 +19,8 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.repository
+package uk.gov.nationalarchives.omega.api.repository.model
 
-object BaseURL {
+import org.apache.jena.ext.xerces.util.URI
 
-  val cat = "http://cat.nationalarchives.gov.uk"
-  val rdaa = "http://rdaregistry.info/Elements/a"
-  val dct = "http://purl.org/dc/terms"
-  val todo = "http://TODO"
-  val time = "http://www.w3.org/2006/time#"
-  val tna = "http://www.nationalarchives.gov.uk"
-
-}
+case class SecondaryIdentifierEntity(recordDescriptionUri: URI, identifierProperty: URI, secondaryIdentifier: String)

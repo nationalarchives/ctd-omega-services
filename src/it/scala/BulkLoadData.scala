@@ -7,6 +7,8 @@ import scala.sys.process._
   */
 object BulkLoadData {
 
+  val testRepositoryUrl = "http://localhost:8080/rdf4j-server/repositories/PACT"
+
   val repositoryConfig: Path = Paths.get(getClass.getClassLoader.getResource("repositoryConfig.ttl").toURI)
   val corporateBodyConceptData: Path =
     Paths.get(getClass.getClassLoader.getResource("test-corporate-body-concepts.ttl").toURI)
@@ -18,13 +20,17 @@ object BulkLoadData {
     Paths.get(getClass.getClassLoader.getResource("test-person-descriptions.ttl").toURI)
   val legalStatusData: Path =
     Paths.get(getClass.getClassLoader.getResource("test-legal-status.ttl").toURI)
+  val recordConceptData: Path =
+    Paths.get(getClass.getClassLoader.getResource("test-record-concepts.ttl").toURI)
+  val recordDescriptionData: Path =
+    Paths.get(getClass.getClassLoader.getResource("test-record-descriptions.ttl").toURI)
 
   private val deleteRepositoryConfig = Seq(
     "curl",
     "-v",
     "-X",
     "DELETE",
-    "http://localhost:8080/rdf4j-server/repositories/PACT"
+    testRepositoryUrl
   )
 
   private val createRepositoryConfig = Seq(
@@ -36,7 +42,7 @@ object BulkLoadData {
     "Content-Type: text/turtle",
     "--data-binary",
     s"@$repositoryConfig",
-    "http://localhost:8080/rdf4j-server/repositories/PACT"
+    testRepositoryUrl
   )
 
   private val postCorporateBodyConceptData = Seq(
@@ -47,7 +53,7 @@ object BulkLoadData {
     "Content-type: text/turtle",
     "--data-binary",
     s"@$corporateBodyConceptData",
-    "http://localhost:8080/rdf4j-server/repositories/PACT/statements"
+    s"$testRepositoryUrl/statements"
   )
 
   private val postCorporateBodyDescriptionData = Seq(
@@ -58,7 +64,7 @@ object BulkLoadData {
     "Content-type: text/turtle",
     "--data-binary",
     s"@$corporateBodyDescriptionData",
-    "http://localhost:8080/rdf4j-server/repositories/PACT/statements"
+    s"$testRepositoryUrl/statements"
   )
 
   private val postPersonConceptData = Seq(
@@ -69,7 +75,7 @@ object BulkLoadData {
     "Content-type: text/turtle",
     "--data-binary",
     s"@$personConceptData",
-    "http://localhost:8080/rdf4j-server/repositories/PACT/statements"
+    s"$testRepositoryUrl/statements"
   )
 
   private val postPersonDescriptionData = Seq(
@@ -80,7 +86,7 @@ object BulkLoadData {
     "Content-type: text/turtle",
     "--data-binary",
     s"@$personDescriptionData",
-    "http://localhost:8080/rdf4j-server/repositories/PACT/statements"
+    s"$testRepositoryUrl/statements"
   )
 
   private val postLegalStatusData = Seq(
@@ -91,7 +97,29 @@ object BulkLoadData {
     "Content-type: text/turtle",
     "--data-binary",
     s"@$legalStatusData",
-    "http://localhost:8080/rdf4j-server/repositories/PACT/statements"
+    s"$testRepositoryUrl/statements"
+  )
+
+  private val postRecordConceptData = Seq(
+    "curl",
+    "-X",
+    "POST",
+    "-H",
+    "Content-type: text/turtle",
+    "--data-binary",
+    s"@$recordConceptData",
+    s"$testRepositoryUrl/statements"
+  )
+
+  private val postRecordDescriptionData = Seq(
+    "curl",
+    "-X",
+    "POST",
+    "-H",
+    "Content-type: text/turtle",
+    "--data-binary",
+    s"@$recordDescriptionData",
+    s"$testRepositoryUrl/statements"
   )
 
   def createRepository(): IO[Unit] =
@@ -101,6 +129,8 @@ object BulkLoadData {
       IO.blocking(postCorporateBodyDescriptionData.!) *>
       IO.blocking(postPersonConceptData.!) *>
       IO.blocking(postPersonDescriptionData.!) *>
-      IO.blocking(postLegalStatusData.!) *> IO.unit
+      IO.blocking(postLegalStatusData.!) *>
+      IO.blocking(postRecordConceptData.!) *>
+      IO.blocking(postRecordDescriptionData.!) *> IO.unit
 
 }

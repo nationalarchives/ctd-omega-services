@@ -40,7 +40,7 @@ class ApiServiceISpec
     maxDispatchers = 1,
     maxLocalQueueSize = 1,
     requestQueue = requestQueueName,
-    sparqlEndpoint = "http://localhost:8080/rdf4j-server/repositories/PACT"
+    sparqlEndpoint = BulkLoadData.testRepositoryUrl
   )
 
   private val replyMessageText: Ref[IO, Option[String]] = Ref[IO].of(Option.empty[String]).unsafeRunSync()

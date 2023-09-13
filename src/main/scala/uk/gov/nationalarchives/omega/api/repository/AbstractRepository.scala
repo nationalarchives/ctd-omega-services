@@ -23,7 +23,7 @@ package uk.gov.nationalarchives.omega.api.repository
 
 import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{ AgentConceptEntity, AgentDescriptionEntity, LegalStatusEntity }
+import uk.gov.nationalarchives.omega.api.repository.model._
 
 import scala.util.Try
 
@@ -60,5 +60,101 @@ trait AbstractRepository {
     listAgentSummary: ListAgentSummary,
     agentConceptUri: URI
   ): Try[List[AgentDescriptionEntity]]
+
+  /** Retrieve the record concept for the given record concept URI *
+    * @param recordConceptId
+    *   the record concept URI
+    * @return
+    *   a Success with a a list of RecordConceptEntity objects or an error
+    */
+  def getRecordConceptEntity(recordConceptId: String): Try[List[RecordConceptEntity]]
+
+  /** Retrieve the creator(s) for the given record concept URI
+    * @param recordConceptUri
+    *   the record concept URI
+    * @return
+    *   a Success with a list of CreatorEntity objects or an error
+    */
+  def getCreatorEntities(recordConceptUri: String): Try[List[CreatorEntity]]
+
+  /** Retrieve the record description summary for the given record concept URI
+    * @param recordConceptUri
+    *   the record concept URI
+    * @return
+    *   a Success with a list of RecordDescriptionSummaryEntity objects or an error
+    */
+  def getRecordDescriptionSummaries(recordConceptUri: String): Try[List[RecordDescriptionSummaryEntity]]
+
+  /** Retrieve the record description properties for the given record concept URI
+    * @param recordConceptUri
+    *   the record concept URI
+    * @return
+    *   a Success with a list of RecordDescriptionPropertiesEntity objects or an error
+    */
+  def getRecordDescriptionProperties(recordConceptUri: String): Try[List[RecordDescriptionPropertiesEntity]]
+
+  /** Retrieve the record description access rights URIs for the given record concept URI
+    * @param recordConceptUri
+    *   the record concept URI
+    * @return
+    *   a Success with a list of AccessRightsEntity objects or an error
+    */
+  def getAccessRights(recordConceptUri: String): Try[List[AccessRightsEntity]]
+
+  /** Retrieve the record description record set URIs for the given record concept URI
+    * @param recordConceptUri
+    *   the record concept URI
+    * @return
+    *   a Success with a list of IsPartOfEntity objects or an error
+    */
+  def getIsPartOf(recordConceptUri: String): Try[List[IsPartOfEntity]]
+
+  /** Retrieve the record description secondary identifiers for the given record concept URI
+    * @param recordConceptUri
+    *   the record concept URI
+    * @return
+    *   a Success with a list of SecondaryIdentifierEntity objects or an error
+    */
+  def getSecondaryIdentifiers(recordConceptUri: String): Try[List[SecondaryIdentifierEntity]]
+
+  /** Retrieve the record description 'is referenced by' identifiers for the given record concept URI
+    * @param recordConceptUri
+    *   the record concept URI
+    * @return
+    *   a Success with a list of LabelledIdentifierEntity objects or an error
+    */
+  def getIsReferencedBys(recordConceptUri: String): Try[List[LabelledIdentifierEntity]]
+
+  /** Retrieve the record description 'related to' identifiers for the given record concept URI
+    * @param recordConceptUri
+    *   the record concept URI
+    * @return
+    *   a Success with a list of LabelledIdentifierEntity objects or an error
+    */
+  def getRelatedTos(recordConceptUri: String): Try[List[LabelledIdentifierEntity]]
+
+  /** Retrieve the record description 'separated from' identifiers for the given record concept URI
+    * @param recordConceptUri
+    *   the record concept URI
+    * @return
+    *   a Success with a list of LabelledIdentifierEntity objects or an error
+    */
+  def getSeparatedFroms(recordConceptUri: String): Try[List[LabelledIdentifierEntity]]
+
+  /** Retrieve the record description subject URIs for the given record concept URI
+    * @param recordConceptUri
+    *   the record concept URI
+    * @return
+    *   a Success with a list of IdentifierEntity objects or an error
+    */
+  def getUriSubjects(recordConceptUri: String): Try[List[IdentifierEntity]]
+
+  /** Retrieve the record description subjects with labels for the given record concept URI
+    * @param recordConceptUri
+    *   the record concept URI
+    * @return
+    *   a Success with a list of LabelledIdentifierEntity objects or an error
+    */
+  def getLabelledSubjects(recordConceptUri: String): Try[List[LabelledIdentifierEntity]]
 
 }
