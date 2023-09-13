@@ -16,18 +16,34 @@ manipulate the RDF data within the data store. This library includes a [Paramete
 class which forms the basis of our approach to query parameterization. One nice feature of `ParameterisedSparqlString`
 is that it can be initialised with an existing query and then used to replace variables within the query with
 specific values. For example, the following query, which will select all RDF triples in the RDF store, can be 
-parameterized by replacing `?predicateParam` with `rdf:type`:
+parameterized by replacing `?predicateParam` with `dct:type`:
 ```sparql
+PREFIX dct: <http://purl.org/dc/terms/>
+
 SELECT ?subject ?object
 WHERE { ?subject ?predicateParam ?object . }
 ```
 This will transform the query to create the following query which will only select triples describing the subject types:
 ```sparql
+PREFIX dct: <http://purl.org/dc/terms/>
+
 SELECT ?subject ?object 
-WHERE { ?subject rdf:type ?object . }
+WHERE { ?subject dct:type ?object . }
 ```
+Whereas the original query will return the subject and object of all RDF triples in the database, the second will only
+return those that are joined by a `dct:type` property. This would give results similar to the following (please refer to the
+[Omega Catalogue Data Model](https://github.com/nationalarchives/tna-cat/blob/master/Omega/documents/omega-catalogue-data-model/original/rendered/Omega%20Catalogue%20Data%20Model.pdf)
+for more information about what these results mean):
+
+| Subject | Object |
+|------------------------|------------------------|
+| cat:COAL.2022.N373.P   | cat:record-concept     |
+| cat:COAL.2022.N37S.P   | cat:item               |
+| cat:COAL.2022.N373.P.1 | cat:record-description |
+| cat:COAL.2022.N373.P.1 | cat:item               |
+
 Any part of the SPARQL describing triples can be replaced using the `ParamterizedSparqlString` and all the usual data
-types seen in RDF are supported, e.g. literals such as string, integer and boolean as well as URIs such as `rdf:type`.
+types seen in RDF are supported, e.g. literals such as string, integer and boolean as well as URIs such as `dct:type`.
 It also supports the parameterization of `VALUES` statements within the SPARQL, but it does not support addition of
 `FILTER` statements and so a mechanism was added to allow this which follows the same syntactic style.
 
