@@ -3,9 +3,11 @@ A message-based API for Pan-Archival Catalogue (PAC) services.
 
 The PAC API is implemented using Cats Effect, to provide an asynchronous runtime, and an asynchronous   communications protocol (JMS). The reason for using an asynchronous protocol, rather than a synchronous one, like HTTP, is to ensure strong decoupling between the service and client systems. Strongly decoupled systems are much less likely to experience cascading failures, where the failure of one system causes others to fail, and are much less likely to become overloaded by too many requests.
 
+The Pan-Archival Catalogue itself is held in an RDF graph database and is therefore queried using [SPARQL Query Language for RDF](https://www.w3.org/TR/rdf-sparql-query/). You can read more about how the PAC services use SPARQL [here](docs/SPARQL.md).
+
 ## Cats Effect services
 
-![Cats Effect Services](images/Cats_Effect_Services.png)
+![Cats Effect Services](docs/images/Cats_Effect_Services.png)
 
 ## Services
 ### Echo Service
