@@ -22,7 +22,7 @@
 package uk.gov.nationalarchives.omega.api.repository.model
 
 import org.apache.jena.ext.xerces.util.URI
-import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
+import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatusSummary
 
 case class LegalStatusEntity(identifier: URI, label: String) {
   def as[T](implicit f: LegalStatusEntity => T): T = f(this)
@@ -30,6 +30,7 @@ case class LegalStatusEntity(identifier: URI, label: String) {
 }
 
 object LegalStatusEntity {
-  implicit def legalStatusMapper: LegalStatusEntity => Option[LegalStatus] = (legalStatusEntity: LegalStatusEntity) =>
-    Some(LegalStatus(legalStatusEntity.identifier, legalStatusEntity.label))
+  implicit def legalStatusMapper: LegalStatusEntity => Option[LegalStatusSummary] =
+    (legalStatusEntity: LegalStatusEntity) =>
+      Some(LegalStatusSummary(legalStatusEntity.identifier, legalStatusEntity.label))
 }

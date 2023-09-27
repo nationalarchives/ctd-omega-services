@@ -26,7 +26,8 @@ import cats.data.Validated.{ Invalid, Valid }
 import uk.gov.nationalarchives.omega.api.messages.AgentType.{ CorporateBody, Person }
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.InvalidMessagePayload
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.{ BaseURL, TestRepository }
+import uk.gov.nationalarchives.omega.api.repository.TestRepository
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
 import uk.gov.nationalarchives.omega.api.support.UnitTest
 
 class ListAgentServiceSummarySpec extends UnitTest {
@@ -178,11 +179,11 @@ class ListAgentServiceSummarySpec extends UnitTest {
   private def getExpectedAgentSummaries: String = s"""[
   {
     "type" : "Person",
-    "identifier" : "${BaseURL.cat}/agent.48N",
-    "current-description" : "${BaseURL.cat}/agent.48N.1",
+    "identifier" : "${Cat.NS}agent.48N",
+    "current-description" : "${Cat.NS}agent.48N.1",
     "description" : [
       {
-        "identifier" : "${BaseURL.cat}/agent.48N.1",
+        "identifier" : "${Cat.NS}agent.48N.1",
         "label" : "Baden-Powell",
         "depository" : false,
         "version-timestamp" : "2022-06-22T02:00:00-05:00",
@@ -193,11 +194,11 @@ class ListAgentServiceSummarySpec extends UnitTest {
   },
   {
     "type" : "Person",
-    "identifier" : "${BaseURL.cat}/agent.46F",
-    "current-description" : "${BaseURL.cat}/agent.46F.1",
+    "identifier" : "${Cat.NS}agent.46F",
+    "current-description" : "${Cat.NS}agent.46F.1",
     "description" : [
       {
-        "identifier" : "${BaseURL.cat}/agent.46F.1",
+        "identifier" : "${Cat.NS}agent.46F.1",
         "label" : "Fawkes, Guy",
         "depository" : false,
         "version-timestamp" : "2022-06-22T02:00:00-05:00",
@@ -208,11 +209,11 @@ class ListAgentServiceSummarySpec extends UnitTest {
   },
   {
     "type" : "Corporate Body",
-    "identifier" : "${BaseURL.cat}/agent.92W",
-    "current-description" : "${BaseURL.cat}/agent.92W.1",
+    "identifier" : "${Cat.NS}agent.92W",
+    "current-description" : "${Cat.NS}agent.92W.1",
     "description" : [
       {
-        "identifier" : "${BaseURL.cat}/agent.92W.1",
+        "identifier" : "${Cat.NS}agent.92W.1",
         "label" : "Joint Milk Quality Committee",
         "depository" : false,
         "version-timestamp" : "2022-06-22T02:00:00-05:00",
@@ -223,11 +224,11 @@ class ListAgentServiceSummarySpec extends UnitTest {
   },
   {
     "type" : "Corporate Body",
-    "identifier" : "${BaseURL.cat}/agent.8R6",
-    "current-description" : "${BaseURL.cat}/agent.8R6.1",
+    "identifier" : "${Cat.NS}agent.8R6",
+    "current-description" : "${Cat.NS}agent.8R6.1",
     "description" : [
       {
-        "identifier" : "${BaseURL.cat}/agent.8R6.1",
+        "identifier" : "${Cat.NS}agent.8R6.1",
         "label" : "Queen Anne's Bounty",
         "depository" : false,
         "version-timestamp" : "2022-06-22T02:00:00-05:00"
@@ -236,11 +237,11 @@ class ListAgentServiceSummarySpec extends UnitTest {
   },
   {
     "type" : "Corporate Body",
-    "identifier" : "${BaseURL.cat}/agent.S7",
-    "current-description" : "${BaseURL.cat}/agent.S7.1",
+    "identifier" : "${Cat.NS}agent.S7",
+    "current-description" : "${Cat.NS}agent.S7.1",
     "description" : [
       {
-        "identifier" : "${BaseURL.cat}/agent.S7.1",
+        "identifier" : "${Cat.NS}agent.S7.1",
         "label" : "The National Archives, Kew",
         "depository" : true,
         "version-timestamp" : "2022-06-22T02:00:00-05:00",
@@ -253,11 +254,11 @@ class ListAgentServiceSummarySpec extends UnitTest {
   private def getExpectedPlaceOfDepositSummaries: String = s"""[
   {
     "type" : "Corporate Body",
-    "identifier" : "${BaseURL.cat}/agent.S7",
-    "current-description" : "${BaseURL.cat}/agent.S7.1",
+    "identifier" : "${Cat.NS}agent.S7",
+    "current-description" : "${Cat.NS}agent.S7.1",
     "description" : [
       {
-        "identifier" : "${BaseURL.cat}/agent.S7.1",
+        "identifier" : "${Cat.NS}agent.S7.1",
         "label" : "The National Archives, Kew",
         "depository" : true,
         "version-timestamp" : "2022-06-22T02:00:00-05:00",

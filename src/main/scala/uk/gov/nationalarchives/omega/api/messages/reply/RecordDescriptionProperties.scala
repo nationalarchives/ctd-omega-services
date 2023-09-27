@@ -23,6 +23,7 @@ package uk.gov.nationalarchives.omega.api.messages.reply
 
 import uk.gov.nationalarchives.omega.api.messages.{ CS13RecordType, DescribedTemporal }
 
+/** Represents a RecordDescriptionProperties as defined by the API schema */
 case class RecordDescriptionProperties(
   assetLegalStatus: Option[Identifier] = None,
   legacyTnaCs13RecordType: Option[CS13RecordType] = None,

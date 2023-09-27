@@ -24,7 +24,7 @@ package uk.gov.nationalarchives.omega.api.messages
 import enumeratum.EnumEntry.CapitalWords
 import enumeratum.{ CirceEnum, Enum, EnumEntry }
 import org.apache.jena.ext.xerces.util.URI
-import uk.gov.nationalarchives.omega.api.repository.BaseURL
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
 
 import scala.util.{ Failure, Success, Try }
 
@@ -40,9 +40,9 @@ object CS13RecordType extends Enum[CS13RecordType] with CirceEnum[CS13RecordType
 
   def fromUri(cs13RecordTypeUri: URI): Try[CS13RecordType] =
     cs13RecordTypeUri.toString match {
-      case s"${BaseURL.cat}/piece" => Success(Piece)
-      case s"${BaseURL.cat}/item"  => Success(Item)
-      case unknown                 => Failure(new IllegalArgumentException(s"Unknown CS13 record type: $unknown"))
+      case Cat.piece => Success(Piece)
+      case Cat.item  => Success(Item)
+      case unknown   => Failure(new IllegalArgumentException(s"Unknown CS13 record type: $unknown"))
     }
 
 }

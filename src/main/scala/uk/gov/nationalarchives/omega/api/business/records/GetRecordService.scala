@@ -27,11 +27,13 @@ import io.circe.syntax.EncoderOps
 import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidation, BusinessService, BusinessServiceError, BusinessServiceReply }
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{ InvalidMessagePayload, MessageValidationError, ValidationResult }
+import uk.gov.nationalarchives.omega.api.messages._
 import uk.gov.nationalarchives.omega.api.messages.reply._
 import uk.gov.nationalarchives.omega.api.messages.request.{ RequestByIdentifier, RequestMessage }
-import uk.gov.nationalarchives.omega.api.messages._
 import uk.gov.nationalarchives.omega.api.repository.model._
-import uk.gov.nationalarchives.omega.api.repository.{ AbstractRepository, BaseURL }
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.Time.{ Instant, ProperInterval }
+import uk.gov.nationalarchives.omega.api.repository.AbstractRepository
 
 import scala.language.implicitConversions
 import scala.util.matching.Regex
@@ -42,7 +44,7 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
   implicit def uriToString(uri: URI): String = uri.toString
 
   override def validateRequest(validatedLocalMessage: ValidatedLocalMessage): ValidationResult[RequestMessage] = {
-    val recordConceptUriPattern: Regex = (BaseURL.cat + "/[A-Z]{1,4}.[0-9]{3,4}.[0-9A-Z]{4}.(P|D)$").r
+    val recordConceptUriPattern: Regex = (Cat.NS + "[A-Z]{1,4}.[0-9]{3,4}.[0-9A-Z]{4}.(P|D)$").r
     if (validatedLocalMessage.messageText.nonEmpty) {
       decode[RequestByIdentifier](validatedLocalMessage.messageText) match {
         case Right(request) =>
@@ -201,41 +203,42 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
 
   private def getSecondaryIdentifiersMap(
     secondaryIdentifierEntities: List[SecondaryIdentifierEntity]
-  ): Map[String, List[TypedIdentifier]] =
+  ): Map[String, List[GeneralTypedIdentifier]] =
     secondaryIdentifierEntities
       .groupBy(_.recordDescriptionUri.toString)
       .map(entry =>
-        entry._1 -> entry._2.map(a => TypedIdentifier(GeneralIdentifier(a.secondaryIdentifier), a.identifierProperty))
+        entry._1 -> entry._2.map(a =>
+          GeneralTypedIdentifier(GeneralIdentifier(a.secondaryIdentifier), a.identifierProperty)
+        )
       )
 
   private def getLabelledIdentifierMap(
     labelledIdentifierEntities: List[LabelledIdentifierEntity]
-  ): Map[String, List[LabelledIdentifier]] =
+  ): Map[String, List[GeneralLabelledIdentifier]] =
     labelledIdentifierEntities
       .groupBy(_.recordDescriptionUri.toString)
-      .map(entry => entry._1 -> entry._2.map(a => LabelledIdentifier(a.identifier.toString, a.label)))
+      .map(entry => entry._1 -> entry._2.map(a => GeneralLabelledIdentifier(a.identifier.toString, a.label)))
 
   private def getSubjectMap(
     uriSubjectEntities: List[IdentifierEntity],
     labelledSubjectEntities: List[LabelledIdentifierEntity]
   ): Map[String, List[Identifier]] = {
     import cats.implicits._
-    val map1: Map[String, List[Identifier]] = uriSubjectEntities
+    val uriSubjectMap: Map[String, List[Identifier]] = uriSubjectEntities
       .groupBy(_.recordDescriptionUri.toString)
       .map(entry => entry._1 -> entry._2.map(a => GeneralIdentifier(a.identifier.toString)))
-    val map2: Map[String, List[Identifier]] = labelledSubjectEntities
+    val labelledSubjectMap: Map[String, List[Identifier]] = labelledSubjectEntities
       .groupBy(_.recordDescriptionUri.toString)
-      .map(entry => entry._1 -> entry._2.map(a => LabelledIdentifier(a.identifier.toString, a.label)))
-    val map3 = map1.combine(map2)
-    map3
+      .map(entry => entry._1 -> entry._2.map(a => GeneralLabelledIdentifier(a.identifier.toString, a.label)))
+    uriSubjectMap.combine(labelledSubjectMap)
   }
 
   private def getRecordPropertiesEntity(
     recordProperties: List[RecordDescriptionPropertiesEntity],
     descriptionUri: String,
-    isReferencedByMap: Map[String, List[LabelledIdentifier]],
-    relatedToMap: Map[String, List[LabelledIdentifier]],
-    separatedFromMap: Map[String, List[LabelledIdentifier]],
+    isReferencedByMap: Map[String, List[GeneralLabelledIdentifier]],
+    relatedToMap: Map[String, List[GeneralLabelledIdentifier]],
+    separatedFromMap: Map[String, List[GeneralLabelledIdentifier]],
     subjectMap: Map[String, List[Identifier]]
   ): RecordDescriptionProperties = {
     val recordPropertiesMap: Map[String, List[RecordDescriptionPropertiesEntity]] =
@@ -250,9 +253,9 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
 
   private def propertiesFromEntity(
     entity: RecordDescriptionPropertiesEntity,
-    isReferencedByMap: Map[String, List[LabelledIdentifier]],
-    relatedToMap: Map[String, List[LabelledIdentifier]],
-    separatedFromMap: Map[String, List[LabelledIdentifier]],
+    isReferencedByMap: Map[String, List[GeneralLabelledIdentifier]],
+    relatedToMap: Map[String, List[GeneralLabelledIdentifier]],
+    separatedFromMap: Map[String, List[GeneralLabelledIdentifier]],
     subjectMap: Map[String, List[Identifier]]
   ): RecordDescriptionProperties =
     RecordDescriptionProperties(
@@ -275,11 +278,11 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
       subject = subjectMap.get(entity.recordDescriptionUri)
     )
 
-  private def getLegalStatus(entity: RecordDescriptionPropertiesEntity): Option[LabelledIdentifier] =
+  private def getLegalStatus(entity: RecordDescriptionPropertiesEntity): Option[GeneralLabelledIdentifier] =
     for {
       legalStatusUri   <- entity.assetLegalStatus
       legalStatusLabel <- entity.legalStatusLabel
-    } yield LabelledIdentifier(legalStatusUri, legalStatusLabel)
+    } yield GeneralLabelledIdentifier(legalStatusUri, legalStatusLabel)
 
   private def getCS13RecordType(entity: RecordDescriptionPropertiesEntity): Option[CS13RecordType] =
     entity.legacyType.flatMap { uri =>
@@ -292,13 +295,13 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
   private def getCreated(entity: RecordDescriptionPropertiesEntity): Option[DescribedTemporal] =
     entity.createdType.flatMap(uri =>
       uri.toString match {
-        case s"${BaseURL.time}ProperInterval" =>
+        case ProperInterval =>
           for {
             description <- entity.createdDescription
             dateFrom    <- entity.createdBeginning
             dateTo      <- entity.createdEnd
           } yield DescribedTemporal(description, TemporalInterval(dateFrom, dateTo))
-        case s"${BaseURL.time}Instant" =>
+        case Instant =>
           for {
             description <- entity.createdDescription
             instant     <- entity.createdInstant
@@ -310,13 +313,13 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
   private def getAccumulation(entity: RecordDescriptionPropertiesEntity): Option[DescribedTemporal] =
     entity.accumulationType.flatMap(uri =>
       uri.toString match {
-        case s"${BaseURL.time}ProperInterval" =>
+        case ProperInterval =>
           for {
             description <- entity.accumulationDescription
             dateFrom    <- entity.accumulationBeginning
             dateTo      <- entity.accumulationEnd
           } yield DescribedTemporal(description, TemporalInterval(dateFrom, dateTo))
-        case s"${BaseURL.time}Instant" =>
+        case Instant =>
           for {
             description <- entity.accumulationDescription
             instant     <- entity.accumulationInstant

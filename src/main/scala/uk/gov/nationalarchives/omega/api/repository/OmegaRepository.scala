@@ -27,6 +27,7 @@ import org.phenoscape.sparql.FromQuerySolution
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.model._
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
 
 import java.time.ZonedDateTime
 import scala.util.Try
@@ -169,7 +170,7 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
                  SparqlParams(uris =
                    Map(
                      "recordConceptUri" -> recordConceptUri,
-                     "relationType"     -> s"${BaseURL.cat}/related-material"
+                     "relationType"     -> Cat.relatedMaterial
                    )
                  )
                )
@@ -183,7 +184,7 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
                  SparqlParams(uris =
                    Map(
                      "recordConceptUri" -> recordConceptUri,
-                     "relationType"     -> s"${BaseURL.cat}/separated-material"
+                     "relationType"     -> Cat.separatedMaterial
                    )
                  )
                )

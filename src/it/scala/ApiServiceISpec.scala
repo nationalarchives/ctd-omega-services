@@ -17,7 +17,7 @@ import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ INVA002, INVA003, IN
 import uk.gov.nationalarchives.omega.api.common.{ AppLogger, ErrorCode }
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.messages.{ MessageProperties, OutgoingMessageType }
-import uk.gov.nationalarchives.omega.api.repository.BaseURL
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
 import uk.gov.nationalarchives.omega.api.services.ApiService
 
 import javax.jms.{ Connection, MessageProducer, Session, TextMessage }
@@ -125,23 +125,23 @@ class ApiServiceISpec
         _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
         result <- Resource.liftK(assertReplyMessage(s"""[
   {
-    "identifier" : "${BaseURL.cat}/public-record",
+    "identifier" : "${Cat.publicRecord}",
     "label" : "Public Record"
   },
   {
-    "identifier" : "${BaseURL.cat}/non-public-record",
+    "identifier" : "${Cat.nonPublicRecord}",
     "label" : "Non-Public Record"
   },
   {
-    "identifier" : "${BaseURL.cat}/public-record-unless-otherwise-stated",
+    "identifier" : "${Cat.publicRecordUnlessOtherwiseStated}",
     "label" : "Public Record (unless otherwise stated)"
   },
   {
-    "identifier" : "${BaseURL.cat}/welsh-public-record",
+    "identifier" : "${Cat.welshPublicRecord}",
     "label" : "Welsh Public Record"
   },
   {
-    "identifier" : "${BaseURL.cat}/non-record-material",
+    "identifier" : "${Cat.nonRecordMaterial}",
     "label" : "Non-Record Material"
   }
 ]""".stripMargin))
@@ -155,7 +155,7 @@ class ApiServiceISpec
       val textMessageConfig = generateValidMessageConfig()
         .copy(messageTypeId = Some("OSGEFREC001"))
         .copy(contents = s"""{
-                            |    "identifier" : "${BaseURL.cat}/COAL.2022.N36R.P"
+                            |    "identifier" : "${Cat.NS}COAL.2022.N36R.P"
                             |}""".stripMargin)
       val serviceIO = f.apiService.startSuspended
       val res = for {
@@ -504,34 +504,34 @@ class ApiServiceISpec
 
   private def getExpectedRecordFull =
     s"""{
-       |  "identifier" : "${BaseURL.cat}/COAL.2022.N36R.P",
+       |  "identifier" : "${Cat.NS}COAL.2022.N36R.P",
        |  "type" : "Physical",
        |  "creator" : [
-       |    "${BaseURL.cat}/agent.24"
+       |    "${Cat.NS}agent.24"
        |  ],
-       |  "current-description" : "${BaseURL.cat}/COAL.2022.N36R.P.1",
+       |  "current-description" : "${Cat.NS}COAL.2022.N36R.P.1",
        |  "description" : [
        |    {
-       |      "identifier" : "${BaseURL.cat}/COAL.2022.N36R.P.1",
+       |      "identifier" : "${Cat.NS}COAL.2022.N36R.P.1",
        |      "secondary-identifier" : [
        |        {
        |          "identifier" : "COAL 80/2055/22",
-       |          "type" : "${BaseURL.cat}/classicCatalogueReference"
+       |          "type" : "${Cat.NS}classicCatalogueReference"
        |        }
        |      ],
        |      "label" : "<scopecontent><p>Coal News. Model II storage unit for photograph negatives (strips of 4). Photograph negatives Nos. T3060-T3102. </p></scopecontent>",
        |      "abstract" : "<scopecontent><p>Coal News. Model II storage unit for photograph negatives (strips of 4). Photograph negatives Nos. T3060-T3102. </p></scopecontent>",
        |      "access-rights" : [
-       |        "${BaseURL.cat}/policy.Open_Description",
-       |        "${BaseURL.cat}/policy.Normal_Closure_before_FOI_Act_30_years_from_1964-10-31"
+       |        "${Cat.NS}policy.Open_Description",
+       |        "${Cat.NS}policy.Normal_Closure_before_FOI_Act_30_years_from_1964-10-31"
        |      ],
        |      "is-part-of" : [
-       |        "${BaseURL.cat}/recordset.COAL.2022.2831"
+       |        "${Cat.NS}recordset.COAL.2022.2831"
        |      ],
-       |      "previous-sibling" : "${BaseURL.cat}/COAL.2022.N361.P.1",
+       |      "previous-sibling" : "${Cat.NS}COAL.2022.N361.P.1",
        |      "version-timestamp" : "2022-12-05T20:37:31.28Z",
        |      "asset-legal-status" : {
-       |        "identifier" : "${BaseURL.cat}/public-record",
+       |        "identifier" : "${Cat.NS}public-record",
        |        "label" : "Public Record"
        |      },
        |      "legacy-tna-cs13-record-type" : "Item",
@@ -543,10 +543,10 @@ class ApiServiceISpec
        |        }
        |      },
        |      "archivists-note" : "[Grid reference: N/A]",
-       |      "source-of-acquisition" : "${BaseURL.cat}/agent.24",
+       |      "source-of-acquisition" : "${Cat.NS}agent.24",
        |      "subject" : [
        |        {
-       |          "identifier" : "${BaseURL.cat}/agent.24",
+       |          "identifier" : "${Cat.NS}agent.24",
        |          "label" : "from 1965"
        |        }
        |      ]

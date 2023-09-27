@@ -25,6 +25,7 @@ import io.circe.syntax.EncoderOps
 import io.circe.{ Encoder, Json }
 import uk.gov.nationalarchives.omega.api.messages.reply.GenericIdentifierDerivation._
 
+/** Represents a RecordDescriptionSummary as defined by the API schema */
 case class RecordDescriptionSummary(
   identifier: Identifier,
   label: String,
@@ -32,7 +33,7 @@ case class RecordDescriptionSummary(
   accessRights: List[Identifier],
   isPartOf: List[Identifier],
   versionTimestamp: String,
-  secondaryIdentifier: Option[List[TypedIdentifier]],
+  secondaryIdentifier: Option[List[GeneralTypedIdentifier]],
   previousSibling: Option[Identifier],
   previousDescription: Option[Identifier]
 )

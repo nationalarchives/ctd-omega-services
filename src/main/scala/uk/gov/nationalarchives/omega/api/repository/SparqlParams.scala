@@ -22,8 +22,10 @@
 package uk.gov.nationalarchives.omega.api.repository
 
 import org.apache.jena.rdf.model.{ Resource, ResourceFactory }
+import org.apache.jena.vocabulary.DCTerms
 import uk.gov.nationalarchives.omega.api.messages.request.{ ListAgentSummary, RequestByIdentifier }
 import uk.gov.nationalarchives.omega.api.repository.model.AgentTypeMapper
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.{ Cat, TODO }
 
 import java.time.ZonedDateTime
 import java.util.GregorianCalendar
@@ -71,12 +73,12 @@ object SparqlParams extends AgentTypeMapper {
 
   private def getUriMap(listAgentSummary: ListAgentSummary): Map[String, String] = {
     val map1 = listAgentSummary.depository match {
-      case Some(true) => Map("predicateParam1" -> s"${BaseURL.todo}/is-place-of-deposit")
+      case Some(true) => Map("predicateParam1" -> TODO.isPlaceOfDeposit)
       case _          => Map.empty[String, String]
     }
     val map2 = listAgentSummary.authorityFile match {
       case Some(true) =>
-        Map("predicateParam2" -> s"${BaseURL.dct}/type", "objectParam2" -> s"${BaseURL.cat}/authority-file")
+        Map("predicateParam2" -> DCTerms.`type`.getURI, "objectParam2" -> Cat.authorityFile)
       case _ => Map.empty[String, String]
     }
     map1 ++ map2

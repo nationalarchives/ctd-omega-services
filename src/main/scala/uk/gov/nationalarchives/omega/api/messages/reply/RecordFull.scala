@@ -26,6 +26,7 @@ import io.circe.{ Encoder, Json }
 import uk.gov.nationalarchives.omega.api.messages.RecordType
 import uk.gov.nationalarchives.omega.api.messages.reply.GenericIdentifierDerivation._
 
+/** Represents a RecordFull as defined by the API schema */
 case class RecordFull(
   identifier: Identifier,
   recordType: RecordType,

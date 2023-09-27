@@ -24,7 +24,7 @@ package uk.gov.nationalarchives.omega.api.repository.model
 import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.messages.AgentType
 import uk.gov.nationalarchives.omega.api.messages.AgentType._
-import uk.gov.nationalarchives.omega.api.repository.BaseURL
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
 
 import scala.util.{ Failure, Success, Try }
 
@@ -32,23 +32,23 @@ trait AgentTypeMapper {
 
   def getAgentTypeFromUri(agentTypeUri: URI): Try[AgentType] =
     agentTypeUri.toString match {
-      case s"${BaseURL.cat}/person-concept"           => Success(Person)
-      case s"${BaseURL.cat}/family-concept"           => Success(Family)
-      case s"${BaseURL.cat}/corporate-body-concept"   => Success(CorporateBody)
-      case s"${BaseURL.cat}/collective-agent-concept" => Success(CollectiveAgent)
-      case s"${BaseURL.cat}/hardware-agent-concept"   => Success(HardwareAgent)
-      case s"${BaseURL.cat}/software-agent-concept"   => Success(SoftwareAgent)
+      case s"${Cat.NS}person-concept"           => Success(Person)
+      case s"${Cat.NS}family-concept"           => Success(Family)
+      case s"${Cat.NS}corporate-body-concept"   => Success(CorporateBody)
+      case s"${Cat.NS}collective-agent-concept" => Success(CollectiveAgent)
+      case s"${Cat.NS}hardware-agent-concept"   => Success(HardwareAgent)
+      case s"${Cat.NS}software-agent-concept"   => Success(SoftwareAgent)
       case unknown => Failure(new IllegalArgumentException(s"Unknown agent type: $unknown"))
     }
 
   def getUriFromAgentType(agentType: AgentType): String =
     agentType match {
-      case Person          => s"${BaseURL.cat}/person-concept"
-      case Family          => s"${BaseURL.cat}/family-concept"
-      case CorporateBody   => s"${BaseURL.cat}/corporate-body-concept"
-      case CollectiveAgent => s"${BaseURL.cat}/collective-agent-concept"
-      case HardwareAgent   => s"${BaseURL.cat}/hardware-agent-concept"
-      case SoftwareAgent   => s"${BaseURL.cat}/software-agent-concept"
+      case Person          => Cat.personConcept
+      case Family          => Cat.familyConcept
+      case CorporateBody   => Cat.corporateBodyConcept
+      case CollectiveAgent => Cat.collectiveAgentConcept
+      case HardwareAgent   => Cat.hardwareAgentConcept
+      case SoftwareAgent   => Cat.softwareAgentConcept
     }
 
   def getAllAgentTypes: List[AgentType] =

@@ -26,7 +26,7 @@ import uk.gov.nationalarchives.omega.api.common.ErrorCode
 
 case class GetRecordError(message: String) extends BusinessServiceError {
 
-  override def code: ErrorCode = ErrorCode.PROC002
+  override def code: ErrorCode = ErrorCode.PROC004
 
   override def description: String = "There was an error"
 }

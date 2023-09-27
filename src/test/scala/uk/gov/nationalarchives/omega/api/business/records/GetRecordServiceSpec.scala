@@ -22,9 +22,9 @@
 package uk.gov.nationalarchives.omega.api.business.records
 
 import cats.data.Validated.{ Invalid, Valid }
-import uk.gov.nationalarchives.omega.api.messages.ValidatedLocalMessage
 import uk.gov.nationalarchives.omega.api.messages.request.RequestByIdentifier
-import uk.gov.nationalarchives.omega.api.repository.{ BaseURL, TestRepository }
+import uk.gov.nationalarchives.omega.api.repository.TestRepository
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
 import uk.gov.nationalarchives.omega.api.support.UnitTest
 
 class GetRecordServiceSpec extends UnitTest {
@@ -35,7 +35,7 @@ class GetRecordServiceSpec extends UnitTest {
   "The GetRecordFullService" - {
     "process function returns" - {
       "a full record when given a valid concept URI" in {
-        val recordRequest = RequestByIdentifier(s"${BaseURL.cat}/COAL.2022.N373.P")
+        val recordRequest = RequestByIdentifier(s"${Cat.NS}COAL.2022.N373.P")
         val result = getRecordService.process(recordRequest)
         result mustBe
           Right(GetRecordReply(getExpectedRecord))
@@ -44,10 +44,10 @@ class GetRecordServiceSpec extends UnitTest {
     "validateRequest function returns" - {
       "a valid result when the concept URI is valid" in {
         val message = getValidatedLocalMessage(s"""{
-                                                  |    "identifier" : "${BaseURL.cat}/COAL.2022.N373.P"
+                                                  |    "identifier" : "${Cat.NS}COAL.2022.N373.P"
                                                   |}""".stripMargin)
         val result = getRecordService.validateRequest(message)
-        result mustBe Valid(RequestByIdentifier(s"${BaseURL.cat}/COAL.2022.N373.P"))
+        result mustBe Valid(RequestByIdentifier(s"${Cat.NS}COAL.2022.N373.P"))
       }
       "an invalid result when the concept URI is not valid" in {
         val message = getValidatedLocalMessage(s"""{
@@ -61,35 +61,35 @@ class GetRecordServiceSpec extends UnitTest {
 
   private def getExpectedRecord: String =
     s"""{
-       |  "identifier" : "${BaseURL.cat}/COAL.2022.N373.P",
+       |  "identifier" : "${Cat.NS}COAL.2022.N373.P",
        |  "type" : "Physical",
        |  "creator" : [
-       |    "${BaseURL.cat}/agent.24"
+       |    "${Cat.NS}agent.24"
        |  ],
-       |  "current-description" : "${BaseURL.cat}/COAL.2022.N373.P.1",
+       |  "current-description" : "${Cat.NS}COAL.2022.N373.P.1",
        |  "description" : [
        |    {
-       |      "identifier" : "${BaseURL.cat}/COAL.2022.N373.P.2",
+       |      "identifier" : "${Cat.NS}COAL.2022.N373.P.2",
        |      "secondary-identifier" : [
        |        {
        |          "identifier" : "COAL 80/2052/9",
-       |          "type" : "${BaseURL.cat}/classicCatalogueReference"
+       |          "type" : "${Cat.NS}classicCatalogueReference"
        |        }
        |      ],
        |      "label" : "<scopecontent><p>Coal News albums 1963. Collection of contact prints of photographs taken by Deryk Wills. Photographs depicting: Banwen, Glamorgan. Banwen Miners Hunt. </p></scopecontent>",
        |      "abstract" : "<scopecontent><p>Coal News albums 1963. Collection of contact prints of photographs taken by Deryk Wills. Photographs depicting: Banwen, Glamorgan. Banwen Miners Hunt. </p></scopecontent>",
        |      "access-rights" : [
-       |        "${BaseURL.cat}/policy.Open_Description",
-       |        "${BaseURL.cat}/policy.Normal_Closure_before_FOI_Act_30_years_from_1963-12-31"
+       |        "${Cat.NS}policy.Open_Description",
+       |        "${Cat.NS}policy.Normal_Closure_before_FOI_Act_30_years_from_1963-12-31"
        |      ],
        |      "is-part-of" : [
-       |        "${BaseURL.cat}/recordset.COAL.2022.2834"
+       |        "${Cat.NS}recordset.COAL.2022.2834"
        |      ],
-       |      "previous-sibling" : "${BaseURL.cat}/COAL.2022.N3HQ.P.1",
+       |      "previous-sibling" : "${Cat.NS}COAL.2022.N3HQ.P.1",
        |      "version-timestamp" : "2023-08-30T12:10:00.000Z",
-       |      "previous-description" : "${BaseURL.cat}/COAL.2022.N373.P.1",
+       |      "previous-description" : "${Cat.NS}COAL.2022.N373.P.1",
        |      "asset-legal-status" : {
-       |        "identifier" : "${BaseURL.cat}/public-record",
+       |        "identifier" : "${Cat.NS}public-record",
        |        "label" : "Public Record"
        |      },
        |      "legacy-tna-cs13-record-type" : "Item",
@@ -102,7 +102,7 @@ class GetRecordServiceSpec extends UnitTest {
        |        }
        |      },
        |      "archivists-note" : "[Grid reference: N/A]",
-       |      "source-of-acquisition" : "${BaseURL.cat}/agent.24",
+       |      "source-of-acquisition" : "${Cat.NS}agent.24",
        |      "custodial-history" : "Retained until 2006",
        |      "administrative-biographical-background" : "<bioghist><p>The board met periodically until 1935 when it was allowed to lapse.</p></bioghist>",
        |      "accumulation" : {
@@ -113,58 +113,58 @@ class GetRecordServiceSpec extends UnitTest {
        |        }
        |      },
        |      "appraisal" : "Files selected in accordance with Operational Selection Policy OSP 25",
-       |      "accrual-policy" : "${BaseURL.cat}/policy.Series_is_accruing",
+       |      "accrual-policy" : "${Cat.NS}policy.Series_is_accruing",
        |      "layout" : "Photographs in an envelope",
        |      "publication-note" : "Some of the photographs in this series appeared in The Times newspaper.",
        |      "referenced-by" : [
        |        {
-       |          "identifier" : "${BaseURL.cat}/res.JN31",
+       |          "identifier" : "${Cat.NS}res.JN31",
        |          "label" : "Coal Board Minutes 1963"
        |        }
        |      ],
        |      "related-to" : [
        |        {
-       |          "identifier" : "${BaseURL.cat}/COAL.2022.S144",
+       |          "identifier" : "${Cat.NS}COAL.2022.S144",
        |          "label" : "Index of colliery photographs March 1963"
        |        }
        |      ],
        |      "separated-from" : [
        |        {
-       |          "identifier" : "${BaseURL.cat}/CAB.2022.L744",
+       |          "identifier" : "${Cat.NS}CAB.2022.L744",
        |          "label" : "NCB records 1963"
        |        }
        |      ],
        |      "subject" : [
-       |        "${BaseURL.cat}/agent.4N6",
-       |        "${BaseURL.cat}/agent.S7",
+       |        "${Cat.NS}agent.4N6",
+       |        "${Cat.NS}agent.S7",
        |        {
-       |          "identifier" : "${BaseURL.cat}/agent.24",
+       |          "identifier" : "${Cat.NS}agent.24",
        |          "label" : "from 1965"
        |        }
        |      ]
        |    },
        |    {
-       |      "identifier" : "${BaseURL.cat}/COAL.2022.N373.P.1",
+       |      "identifier" : "${Cat.NS}COAL.2022.N373.P.1",
        |      "secondary-identifier" : [
        |        {
        |          "identifier" : "COAL 80/2052/9",
-       |          "type" : "${BaseURL.cat}/classicCatalogueReference"
+       |          "type" : "${Cat.NS}classicCatalogueReference"
        |        }
        |      ],
        |      "label" : "<scopecontent><p>Coal News albums 1963. Collection of contact prints of photographs taken by Derick Wills. Photographs depicting: Banwen, Glamorgan. Banwen Miners Hunt. </p></scopecontent>",
        |      "abstract" : "<scopecontent><p>Coal News albums 1963. Collection of contact prints of photographs taken by Derick Wills. Photographs depicting: Banwen, Glamorgan. Banwen Miners Hunt. </p></scopecontent>",
        |      "access-rights" : [
-       |        "${BaseURL.cat}/policy.Open_Description",
-       |        "${BaseURL.cat}/policy.Normal_Closure_before_FOI_Act_30_years_from_1963-12-31"
+       |        "${Cat.NS}policy.Open_Description",
+       |        "${Cat.NS}policy.Normal_Closure_before_FOI_Act_30_years_from_1963-12-31"
        |      ],
        |      "is-part-of" : [
-       |        "${BaseURL.cat}/recordset.COAL.2022.2834"
+       |        "${Cat.NS}recordset.COAL.2022.2834"
        |      ],
-       |      "previous-sibling" : "${BaseURL.cat}/COAL.2022.N3HQ.P.1",
+       |      "previous-sibling" : "${Cat.NS}COAL.2022.N3HQ.P.1",
        |      "version-timestamp" : "2023-08-30T12:10:00.000Z",
-       |      "previous-description" : "${BaseURL.cat}/COAL.2022.N373.P.1",
+       |      "previous-description" : "${Cat.NS}COAL.2022.N373.P.1",
        |      "asset-legal-status" : {
-       |        "identifier" : "${BaseURL.cat}/public-record",
+       |        "identifier" : "${Cat.NS}public-record",
        |        "label" : "Public Record"
        |      },
        |      "legacy-tna-cs13-record-type" : "Item",
@@ -175,7 +175,7 @@ class GetRecordServiceSpec extends UnitTest {
        |        }
        |      },
        |      "archivists-note" : "[Grid reference: NX 509 582]",
-       |      "source-of-acquisition" : "${BaseURL.cat}/agent.25",
+       |      "source-of-acquisition" : "${Cat.NS}agent.25",
        |      "custodial-history" : "Retained until 2001",
        |      "administrative-biographical-background" : "<bioghist><p>The board met periodically until 1936 when it was allowed to lapse.</p></bioghist>",
        |      "accumulation" : {
@@ -185,24 +185,24 @@ class GetRecordServiceSpec extends UnitTest {
        |        }
        |      },
        |      "appraisal" : "Files selected in accordance with Operational Selection Policy OSP 26",
-       |      "accrual-policy" : "${BaseURL.cat}/policy.No_future_accruals_expected",
+       |      "accrual-policy" : "${Cat.NS}policy.No_future_accruals_expected",
        |      "layout" : "Photographs in a box",
        |      "publication-note" : "Some of the photographs in this series appeared in The Manchester Guardian newspaper.",
        |      "referenced-by" : [
        |        {
-       |          "identifier" : "${BaseURL.cat}/res.4JJF",
+       |          "identifier" : "${Cat.NS}res.4JJF",
        |          "label" : "Coal Board Minutes 1962"
        |        }
        |      ],
        |      "related-to" : [
        |        {
-       |          "identifier" : "${BaseURL.cat}/COAL.2022.G221",
+       |          "identifier" : "${Cat.NS}COAL.2022.G221",
        |          "label" : "Index of colliery photographs September 1963"
        |        }
        |      ],
        |      "separated-from" : [
        |        {
-       |          "identifier" : "${BaseURL.cat}/CAB.2022.N901",
+       |          "identifier" : "${Cat.NS}CAB.2022.N901",
        |          "label" : "Cabinet records 1963"
        |        }
        |      ]

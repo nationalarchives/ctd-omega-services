@@ -23,7 +23,7 @@ package uk.gov.nationalarchives.omega.api.messages
 
 import enumeratum.EnumEntry.CapitalWords
 import enumeratum.{ CirceEnum, Enum, EnumEntry }
-import uk.gov.nationalarchives.omega.api.repository.BaseURL
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.TNA
 
 import scala.util.{ Failure, Success, Try }
 
@@ -43,8 +43,8 @@ object RecordType extends Enum[RecordType] with CirceEnum[RecordType] {
 
   def fromUri(uri: String): Try[RecordType] =
     uri match {
-      case s"${BaseURL.tna}/ont.physical-record" => Success(Physical)
-      case unknown => Failure(new IllegalArgumentException(s"Unknown record type: $unknown"))
+      case TNA.ontPhysicalRecord => Success(Physical)
+      case unknown               => Failure(new IllegalArgumentException(s"Unknown record type: $unknown"))
     }
 
 }

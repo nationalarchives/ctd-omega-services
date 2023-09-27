@@ -28,6 +28,7 @@ import org.apache.jena.ext.xerces.util.URI
 
 sealed trait Identifier
 
+/** Represents a GeneralIdentifier as defined by the AsyncAPI schema */
 case class GeneralIdentifier(identifier: String) extends Identifier
 object GeneralIdentifier {
 
@@ -35,11 +36,12 @@ object GeneralIdentifier {
 
 }
 
-case class LabelledIdentifier(identifier: String, label: String) extends Identifier
+/** Represents a GeneralLabelledIdentifier as defined by the AsyncAPI schema */
+case class GeneralLabelledIdentifier(identifier: String, label: String) extends Identifier
 
 object GenericIdentifierDerivation {
   implicit val encodeIdentifier: Encoder[Identifier] = Encoder.instance {
-    case unlabelled @ GeneralIdentifier(_)   => Json.fromString(unlabelled.identifier)
-    case labelled @ LabelledIdentifier(_, _) => labelled.asJson
+    case unlabelled @ GeneralIdentifier(_)          => Json.fromString(unlabelled.identifier)
+    case labelled @ GeneralLabelledIdentifier(_, _) => labelled.asJson
   }
 }

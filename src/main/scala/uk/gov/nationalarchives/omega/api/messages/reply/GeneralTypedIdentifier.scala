@@ -25,9 +25,10 @@ import io.circe.{ Encoder, Json }
 import uk.gov.nationalarchives.omega.api.messages.reply.GenericIdentifierDerivation._
 import io.circe.syntax._
 
-case class TypedIdentifier(identifier: Identifier, identifierType: String)
-object TypedIdentifier {
-  implicit val encodeTypedIdentifier: Encoder[TypedIdentifier] = (typedIdentifier: TypedIdentifier) =>
+/** Represents a GeneralTypedIdentifier as defined by the API schema */
+case class GeneralTypedIdentifier(identifier: Identifier, identifierType: String)
+object GeneralTypedIdentifier {
+  implicit val encodeTypedIdentifier: Encoder[GeneralTypedIdentifier] = (typedIdentifier: GeneralTypedIdentifier) =>
     Json
       .obj(
         ("identifier", typedIdentifier.identifier.asJson),

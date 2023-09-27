@@ -19,16 +19,18 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages.reply
+package uk.gov.nationalarchives.omega.api.repository.vocabulary
 
-import io.circe.{ Encoder, Json }
-import org.apache.jena.ext.xerces.util.URI
+import org.apache.jena.rdf.model.ModelFactory
 
-case class LegalStatus(identifier: URI, label: String) extends ReplyMessage
-object LegalStatus {
-  implicit val encodeLegalStatus: Encoder[LegalStatus] = (legalStatus: LegalStatus) =>
-    Json.obj(
-      ("identifier", Json.fromString(legalStatus.identifier.toString)),
-      ("label", Json.fromString(legalStatus.label))
-    )
+object TNA {
+
+  /** The RDF model that holds the vocabulary terms */
+  private val model = ModelFactory.createDefaultModel
+
+  /** The namespace of the vocabulary as a string */
+  val NS = "http://www.nationalarchives.gov.uk/"
+
+  val ontPhysicalRecord: String = model.createResource(s"${NS}ont.physical-record").getURI
+
 }

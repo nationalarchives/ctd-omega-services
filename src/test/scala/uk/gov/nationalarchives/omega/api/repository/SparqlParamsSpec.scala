@@ -26,6 +26,7 @@ import uk.gov.nationalarchives.omega.api.messages.AgentType
 import uk.gov.nationalarchives.omega.api.messages.AgentType.{ CorporateBody, Person }
 import uk.gov.nationalarchives.omega.api.messages.request.{ ListAgentSummary, RequestByIdentifier }
 import uk.gov.nationalarchives.omega.api.repository.model.AgentTypeMapper
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
 import uk.gov.nationalarchives.omega.api.support.UnitTest
 
 import java.time.ZonedDateTime
@@ -91,9 +92,9 @@ class SparqlParamsSpec extends UnitTest with AgentTypeMapper {
       )
     }
     "a URI map with recordConceptUri when provided in RequestByIdentifier" in {
-      val result = SparqlParams.from(RequestByIdentifier(s"${BaseURL.cat}/COAL.2022.N373.P"))
+      val result = SparqlParams.from(RequestByIdentifier(s"${Cat.NS}COAL.2022.N373.P"))
       result mustEqual Success(
-        SparqlParams(uris = Map("recordConceptUri" -> s"${BaseURL.cat}/COAL.2022.N373.P"))
+        SparqlParams(uris = Map("recordConceptUri" -> s"${Cat.NS}COAL.2022.N373.P"))
       )
     }
   }

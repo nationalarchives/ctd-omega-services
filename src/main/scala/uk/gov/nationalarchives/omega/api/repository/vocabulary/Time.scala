@@ -19,15 +19,20 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.repository
+package uk.gov.nationalarchives.omega.api.repository.vocabulary
 
-object BaseURL {
+import org.apache.jena.rdf.model.{ ModelFactory, Resource }
 
-  val cat = "http://cat.nationalarchives.gov.uk"
-  val rdaa = "http://rdaregistry.info/Elements/a"
-  val dct = "http://purl.org/dc/terms"
-  val todo = "http://TODO"
-  val time = "http://www.w3.org/2006/time#"
-  val tna = "http://www.nationalarchives.gov.uk"
+object Time {
+
+  /** The RDF model that holds the vocabulary terms */
+  private val model = ModelFactory.createDefaultModel
+
+  /** The namespace of the vocabulary as a string */
+  val NS = "http://www.w3.org/2006/time#"
+
+  val ProperInterval: String = model.createResource(s"${NS}ProperInterval").getURI
+
+  val Instant: String = model.createResource(s"${NS}Instant").getURI
 
 }

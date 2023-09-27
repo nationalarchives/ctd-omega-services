@@ -26,7 +26,7 @@ import uk.gov.nationalarchives.omega.api.common.ErrorCode
 
 case class LegalStatusError(message: String) extends BusinessServiceError {
 
-  override val code: ErrorCode = ErrorCode.PROC001
+  override val code: ErrorCode = ErrorCode.PROC002
 
   override def description: String = message
 

@@ -21,4 +21,5 @@
 
 package uk.gov.nationalarchives.omega.api.messages.reply
 
-trait ReplyMessage {}
+/** Represents a reply message from the API services */
+trait ReplyMessage

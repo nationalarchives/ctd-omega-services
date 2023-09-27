@@ -27,6 +27,7 @@ import uk.gov.nationalarchives.omega.api.messages.AgentType
 
 import java.time.ZonedDateTime
 
+/** Represents an AgentSummary as defined by the API services */
 case class AgentSummary(
   agentType: AgentType,
   identifier: String,

@@ -19,18 +19,17 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages.request
+package uk.gov.nationalarchives.omega.api.messages.reply
 
-import io.circe.Decoder
+import io.circe.{ Encoder, Json }
+import org.apache.jena.ext.xerces.util.URI
 
-/** RequestByIdentifier is a generic message which is used to request a resource by identifier - for example, the
-  * GetRecord message in the API schema uses this format
-  */
-case class RequestByIdentifier(identifier: String) extends RequestMessage
-object RequestByIdentifier {
-  implicit val decodeRequestByIdentifier: Decoder[RequestByIdentifier] = json =>
-    for {
-      identifier <- json.get[String]("identifier")
-    } yield RequestByIdentifier(identifier)
-
+/** Represents a LegalStatusSummary as defined by API schema */
+case class LegalStatusSummary(identifier: URI, label: String) extends ReplyMessage
+object LegalStatusSummary {
+  implicit val encodeLegalStatus: Encoder[LegalStatusSummary] = (legalStatusSummary: LegalStatusSummary) =>
+    Json.obj(
+      ("identifier", Json.fromString(legalStatusSummary.identifier.toString)),
+      ("label", Json.fromString(legalStatusSummary.label))
+    )
 }

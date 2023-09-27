@@ -25,7 +25,8 @@ import org.mockito.MockitoSugar
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import uk.gov.nationalarchives.omega.api.messages.request.ListAssetLegalStatusSummary
-import uk.gov.nationalarchives.omega.api.repository.{ BaseURL, TestRepository }
+import uk.gov.nationalarchives.omega.api.repository.TestRepository
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
 
 class LegalStatusServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar {
 
@@ -40,23 +41,23 @@ class LegalStatusServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar
 
         result mustBe Right(LegalStatusReply(s"""[
   {
-    "identifier" : "${BaseURL.cat}/public-record",
+    "identifier" : "${Cat.publicRecord}",
     "label" : "Public Record"
   },
   {
-    "identifier" : "${BaseURL.cat}/non-public-record",
+    "identifier" : "${Cat.nonPublicRecord}",
     "label" : "Non-Public Record"
   },
   {
-    "identifier" : "${BaseURL.cat}/public-record-unless-otherwise-stated",
+    "identifier" : "${Cat.publicRecordUnlessOtherwiseStated}",
     "label" : "Public Record (unless otherwise stated)"
   },
   {
-    "identifier" : "${BaseURL.cat}/welsh-public-record",
+    "identifier" : "${Cat.welshPublicRecord}",
     "label" : "Welsh Public Record"
   },
   {
-    "identifier" : "${BaseURL.cat}/non-record-material",
+    "identifier" : "${Cat.nonRecordMaterial}",
     "label" : "Non-Record Material"
   }
 ]""".stripMargin))
