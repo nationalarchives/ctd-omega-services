@@ -22,24 +22,28 @@
 package uk.gov.nationalarchives.omega.api.business.records
 
 import cats.data.Validated
+import cats.effect.IO
+import cats.implicits._
 import io.circe.parser.decode
 import io.circe.syntax.EncoderOps
 import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidation, BusinessService, BusinessServiceError, BusinessServiceReply }
+import uk.gov.nationalarchives.omega.api.common.{ AppLogger, ServiceException }
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.{ InvalidMessagePayload, MessageValidationError, ValidationResult }
 import uk.gov.nationalarchives.omega.api.messages._
 import uk.gov.nationalarchives.omega.api.messages.reply._
 import uk.gov.nationalarchives.omega.api.messages.request.{ RequestByIdentifier, RequestMessage }
+import uk.gov.nationalarchives.omega.api.repository.AbstractRepository
 import uk.gov.nationalarchives.omega.api.repository.model._
 import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
 import uk.gov.nationalarchives.omega.api.repository.vocabulary.Time.{ Instant, ProperInterval }
-import uk.gov.nationalarchives.omega.api.repository.AbstractRepository
 
 import scala.language.implicitConversions
+import scala.util.Success
 import scala.util.matching.Regex
-import scala.util.{ Failure, Success, Try }
 
-class GetRecordService(val repository: AbstractRepository) extends BusinessService with BusinessRequestValidation {
+class GetRecordService(val repository: AbstractRepository)
+    extends BusinessService with BusinessRequestValidation with AppLogger {
 
   implicit def uriToString(uri: URI): String = uri.toString
 
@@ -67,18 +71,14 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
     }
   }
 
-  override def process(request: RequestMessage): Either[BusinessServiceError, BusinessServiceReply] = {
-    val record = for {
-      getRecordRequest <- Try(request.asInstanceOf[RequestByIdentifier])
-      recordFull       <- getRecord(getRecordRequest)
-    } yield recordFull
-    record match {
-      case Success(rec)       => Right(GetRecordReply(rec.asJson.toString()))
-      case Failure(exception) => Left(GetRecordError(exception.getMessage))
-    }
-  }
+  override def process(request: RequestMessage): IO[Either[BusinessServiceError, BusinessServiceReply]] = {
+    for {
+      getRecordRequest <- IO(request.asInstanceOf[RequestByIdentifier])
+      record           <- getRecord(getRecordRequest)
+    } yield Right(GetRecordReply(record.asJson.toString()))
+  }.handleErrorWith(error => IO(Left(GetRecordError(error.getMessage))))
 
-  private def getRecord(recordRequest: RequestByIdentifier): Try[RecordFull] = {
+  private def getRecord(recordRequest: RequestByIdentifier): IO[RecordFull] = {
     val recordConceptUri = recordRequest.identifier
     val recordConceptId = recordConceptUri.substring(recordConceptUri.lastIndexOf('/') + 1)
     for {
@@ -124,29 +124,30 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
     separatedFroms: List[LabelledIdentifierEntity],
     uriSubjects: List[IdentifierEntity],
     labelledSubjects: List[LabelledIdentifierEntity]
-  ): Try[RecordFull] =
+  ): IO[RecordFull] =
     for {
-      recordType <- RecordType.fromUri(recordConceptEntity.formatUri)
+      recordType <- IO.fromTry(RecordType.fromUri(recordConceptEntity.formatUri))
+      recordDescriptions <- getRecordDescriptionFullList(
+                              recordSummaryEntities,
+                              recordPropertiesEntities,
+                              accessRightsEntities,
+                              isPartOfEntities,
+                              secondaryIdentifierEntities,
+                              isReferencedBys,
+                              relatedTos,
+                              separatedFroms,
+                              uriSubjects,
+                              labelledSubjects
+                            )
     } yield RecordFull(
       GeneralIdentifier.fromUri(recordConceptEntity.recordConceptUri),
       recordType,
       creatorEntities.map(ce => ce.identifier),
       GeneralIdentifier.fromUri(recordConceptEntity.currentDescriptionUri),
-      getRecordDescriptionFull(
-        recordSummaryEntities,
-        recordPropertiesEntities,
-        accessRightsEntities,
-        isPartOfEntities,
-        secondaryIdentifierEntities,
-        isReferencedBys,
-        relatedTos,
-        separatedFroms,
-        uriSubjects,
-        labelledSubjects
-      )
+      recordDescriptions
     )
 
-  private def getRecordDescriptionFull(
+  private def getRecordDescriptionFullList(
     recordSummaryEntities: List[RecordDescriptionSummaryEntity],
     recordPropertiesEntities: List[RecordDescriptionPropertiesEntity],
     accessRightsEntities: List[AccessRightsEntity],
@@ -157,72 +158,114 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
     separatedFromEntities: List[LabelledIdentifierEntity],
     uriSubjectEntities: List[IdentifierEntity],
     labelledSubjectEntities: List[LabelledIdentifierEntity]
-  ): List[RecordDescriptionFull] = {
-    val accessRightsMap = getAccessRightsMap(accessRightsEntities)
-    val isPartOfMap = getIsPartOfMap(isPartOfEntities)
-    val secondaryIdentifierMap = getSecondaryIdentifiersMap(secondaryIdentifierEntities)
-    val isReferencedByMap = getLabelledIdentifierMap(isReferencedByEntities)
-    val relatedToMap = getLabelledIdentifierMap(relatedToEntities)
-    val separatedFromMap = getLabelledIdentifierMap(separatedFromEntities)
-    val subjectMap = getSubjectMap(uriSubjectEntities, labelledSubjectEntities)
-    recordSummaryEntities.map(summary =>
-      RecordDescriptionFull(
-        summary = RecordDescriptionSummary(
-          identifier = GeneralIdentifier.fromUri(summary.recordDescriptionUri),
-          secondaryIdentifier = secondaryIdentifierMap.get(summary.recordDescriptionUri),
-          label = summary.scopeAndContent,
-          description = summary.scopeAndContent,
-          accessRights = accessRightsMap.getOrElse(summary.recordDescriptionUri, List.empty),
-          isPartOf = isPartOfMap.getOrElse(summary.recordDescriptionUri, List.empty),
-          previousSibling = summary.previousSiblingUri.flatMap(uri => Some(GeneralIdentifier(uri))),
-          versionTimestamp = summary.versionTimestamp,
-          previousDescription = summary.previousDescriptionUri.flatMap(uri => Some(GeneralIdentifier(uri)))
-        ),
-        properties = getRecordPropertiesEntity(
+  ): IO[List[RecordDescriptionFull]] = {
+    for {
+      accessRightsMap        <- getAccessRightsMap(accessRightsEntities)
+      isPartOfMap            <- getIsPartOfMap(isPartOfEntities)
+      secondaryIdentifierMap <- getSecondaryIdentifiersMap(secondaryIdentifierEntities)
+      isReferencedByMap      <- getLabelledIdentifierMap(isReferencedByEntities)
+      relatedToMap           <- getLabelledIdentifierMap(relatedToEntities)
+      separatedFromMap       <- getLabelledIdentifierMap(separatedFromEntities)
+      subjectMap             <- getSubjectMap(uriSubjectEntities, labelledSubjectEntities)
+    } yield recordSummaryEntities
+      .map(summary =>
+        getRecordDescriptionFull(
+          summary,
+          secondaryIdentifierMap,
+          accessRightsMap,
+          isPartOfMap,
           recordPropertiesEntities,
-          summary.recordDescriptionUri,
           isReferencedByMap,
           relatedToMap,
           separatedFromMap,
           subjectMap
         )
       )
-    )
-  }
+      .sequence
+  }.flatten
 
-  private def getAccessRightsMap(accessRightsEntities: List[AccessRightsEntity]): Map[String, List[Identifier]] = {
-    val groupedMap: Map[String, List[AccessRightsEntity]] =
-      accessRightsEntities.groupBy(_.recordDescriptionUri)
-    groupedMap.map(entry => entry._1 -> entry._2.map(a => GeneralIdentifier(a.accessRights)))
-  }
+  private def getRecordDescriptionFull(
+    summaryEntity: RecordDescriptionSummaryEntity,
+    secondaryIdentifierMap: Map[String, List[GeneralTypedIdentifier]],
+    accessRightsMap: Map[String, List[Identifier]],
+    isPartOfMap: Map[String, List[Identifier]],
+    recordProperties: List[RecordDescriptionPropertiesEntity],
+    isReferencedByMap: Map[String, List[GeneralLabelledIdentifier]],
+    relatedToMap: Map[String, List[GeneralLabelledIdentifier]],
+    separatedFromMap: Map[String, List[GeneralLabelledIdentifier]],
+    subjectMap: Map[String, List[Identifier]]
+  ): IO[RecordDescriptionFull] =
+    for {
+      summary <- getRecordDescriptionSummary(summaryEntity, secondaryIdentifierMap, accessRightsMap, isPartOfMap)
+      properties <- getRecordPropertiesEntity(
+                      recordProperties,
+                      summaryEntity.recordDescriptionUri,
+                      isReferencedByMap,
+                      relatedToMap,
+                      separatedFromMap,
+                      subjectMap: Map[String, List[Identifier]]
+                    )
+    } yield RecordDescriptionFull(summary, properties)
 
-  private def getIsPartOfMap(isPartOfEntities: List[IsPartOfEntity]): Map[String, List[Identifier]] =
+  private def getRecordDescriptionSummary(
+    summary: RecordDescriptionSummaryEntity,
+    secondaryIdentifierMap: Map[String, List[GeneralTypedIdentifier]],
+    accessRightsMap: Map[String, List[Identifier]],
+    isPartOfMap: Map[String, List[Identifier]]
+  ): IO[RecordDescriptionSummary] =
+    IO {
+      RecordDescriptionSummary(
+        identifier = GeneralIdentifier.fromUri(summary.recordDescriptionUri),
+        secondaryIdentifier = secondaryIdentifierMap.get(summary.recordDescriptionUri),
+        label = summary.scopeAndContent,
+        description = summary.scopeAndContent,
+        accessRights = accessRightsMap.getOrElse(summary.recordDescriptionUri, List.empty),
+        isPartOf = isPartOfMap.getOrElse(summary.recordDescriptionUri, List.empty),
+        previousSibling = summary.previousSiblingUri.flatMap(uri => Some(GeneralIdentifier(uri))),
+        versionTimestamp = summary.versionTimestamp,
+        previousDescription = summary.previousDescriptionUri.flatMap(uri => Some(GeneralIdentifier(uri)))
+      )
+    }
+
+  private def getAccessRightsMap(accessRightsEntities: List[AccessRightsEntity]): IO[Map[String, List[Identifier]]] =
+    IO {
+      val groupedMap: Map[String, List[AccessRightsEntity]] =
+        accessRightsEntities.groupBy(_.recordDescriptionUri)
+      groupedMap.map(entry => entry._1 -> entry._2.map(a => GeneralIdentifier(a.accessRights)))
+    }
+
+  private def getIsPartOfMap(isPartOfEntities: List[IsPartOfEntity]): IO[Map[String, List[Identifier]]] = IO {
     isPartOfEntities
       .groupBy(_.recordDescriptionUri.toString)
       .map(entry => entry._1 -> entry._2.map(a => GeneralIdentifier.fromUri(a.recordSetConceptUri)))
+  }
 
   private def getSecondaryIdentifiersMap(
     secondaryIdentifierEntities: List[SecondaryIdentifierEntity]
-  ): Map[String, List[GeneralTypedIdentifier]] =
-    secondaryIdentifierEntities
-      .groupBy(_.recordDescriptionUri.toString)
-      .map(entry =>
-        entry._1 -> entry._2.map(a =>
-          GeneralTypedIdentifier(GeneralIdentifier(a.secondaryIdentifier), a.identifierProperty)
+  ): IO[Map[String, List[GeneralTypedIdentifier]]] =
+    IO {
+      secondaryIdentifierEntities
+        .groupBy(_.recordDescriptionUri.toString)
+        .map(entry =>
+          entry._1 -> entry._2.map(a =>
+            GeneralTypedIdentifier(GeneralIdentifier(a.secondaryIdentifier), a.identifierProperty)
+          )
         )
-      )
+    }
 
   private def getLabelledIdentifierMap(
     labelledIdentifierEntities: List[LabelledIdentifierEntity]
-  ): Map[String, List[GeneralLabelledIdentifier]] =
-    labelledIdentifierEntities
-      .groupBy(_.recordDescriptionUri.toString)
-      .map(entry => entry._1 -> entry._2.map(a => GeneralLabelledIdentifier(a.identifier.toString, a.label)))
+  ): IO[Map[String, List[GeneralLabelledIdentifier]]] =
+    IO {
+      labelledIdentifierEntities
+        .groupBy(_.recordDescriptionUri.toString)
+        .map { case (k, v) => (k, v.map(a => GeneralLabelledIdentifier(a.identifier.toString, a.label))) }
+    }
 
   private def getSubjectMap(
     uriSubjectEntities: List[IdentifierEntity],
     labelledSubjectEntities: List[LabelledIdentifierEntity]
-  ): Map[String, List[Identifier]] = {
+  ): IO[Map[String, List[Identifier]]] = IO {
     import cats.implicits._
     val uriSubjectMap: Map[String, List[Identifier]] = uriSubjectEntities
       .groupBy(_.recordDescriptionUri.toString)
@@ -240,14 +283,14 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
     relatedToMap: Map[String, List[GeneralLabelledIdentifier]],
     separatedFromMap: Map[String, List[GeneralLabelledIdentifier]],
     subjectMap: Map[String, List[Identifier]]
-  ): RecordDescriptionProperties = {
+  ): IO[RecordDescriptionProperties] = {
     val recordPropertiesMap: Map[String, List[RecordDescriptionPropertiesEntity]] =
       recordProperties.groupBy(_.recordDescriptionUri.toString)
     val recordDescriptionProperties: List[RecordDescriptionPropertiesEntity] =
       recordPropertiesMap.getOrElse(descriptionUri, List.empty)
     recordDescriptionProperties.headOption match {
       case Some(props) => propertiesFromEntity(props, isReferencedByMap, relatedToMap, separatedFromMap, subjectMap)
-      case None        => RecordDescriptionProperties()
+      case None        => IO(RecordDescriptionProperties())
     }
   }
 
@@ -257,17 +300,22 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
     relatedToMap: Map[String, List[GeneralLabelledIdentifier]],
     separatedFromMap: Map[String, List[GeneralLabelledIdentifier]],
     subjectMap: Map[String, List[Identifier]]
-  ): RecordDescriptionProperties =
-    RecordDescriptionProperties(
-      assetLegalStatus = getLegalStatus(entity),
-      legacyTnaCs13RecordType = getCS13RecordType(entity),
+  ): IO[RecordDescriptionProperties] =
+    for {
+      legalStatus       <- getLegalStatus(entity)
+      tnaCs13RecordType <- getCS13RecordType(entity)
+      entityCreated     <- getCreated(entity)
+      accumulationDates <- getAccumulation(entity)
+    } yield RecordDescriptionProperties(
+      assetLegalStatus = legalStatus,
+      legacyTnaCs13RecordType = tnaCs13RecordType,
       designationOfEdition = entity.designationOfEdition,
-      created = getCreated(entity),
+      created = entityCreated,
       archivistsNote = entity.archivistsNote,
       sourceOfAcquisition = entity.sourceOfAcquisition.flatMap(uri => Some(GeneralIdentifier(uri))),
       custodialHistory = entity.custodialHistory,
       administrativeBiographicalBackground = entity.adminBiogBackground,
-      accumulation = getAccumulation(entity),
+      accumulation = accumulationDates,
       appraisal = entity.appraisal,
       accrualPolicy = entity.accrualPolicy.flatMap(uri => Some(GeneralIdentifier(uri))),
       layout = entity.layout,
@@ -278,54 +326,62 @@ class GetRecordService(val repository: AbstractRepository) extends BusinessServi
       subject = subjectMap.get(entity.recordDescriptionUri)
     )
 
-  private def getLegalStatus(entity: RecordDescriptionPropertiesEntity): Option[GeneralLabelledIdentifier] =
-    for {
-      legalStatusUri   <- entity.assetLegalStatus
-      legalStatusLabel <- entity.legalStatusLabel
-    } yield GeneralLabelledIdentifier(legalStatusUri, legalStatusLabel)
+  private def getLegalStatus(entity: RecordDescriptionPropertiesEntity): IO[Option[GeneralLabelledIdentifier]] =
+    IO {
+      for {
+        legalStatusUri   <- entity.assetLegalStatus
+        legalStatusLabel <- entity.legalStatusLabel
+      } yield GeneralLabelledIdentifier(legalStatusUri, legalStatusLabel)
+    }
 
-  private def getCS13RecordType(entity: RecordDescriptionPropertiesEntity): Option[CS13RecordType] =
-    entity.legacyType.flatMap { uri =>
-      CS13RecordType.fromUri(uri) match {
-        case Success(recordType) => Some(recordType)
-        case _                   => None // TODO (RW) log error here (see PACT-1071)
+  private def getCS13RecordType(entity: RecordDescriptionPropertiesEntity): IO[Option[CS13RecordType]] =
+    IO {
+      entity.legacyType.flatMap { uri =>
+        CS13RecordType.fromUri(uri) match {
+          case Success(recordType) => Some(recordType)
+          case _ => throw ServiceException(s"Failed to read CS13 record type from URI: ${uri.toString}")
+        }
       }
     }
 
-  private def getCreated(entity: RecordDescriptionPropertiesEntity): Option[DescribedTemporal] =
-    entity.createdType.flatMap(uri =>
-      uri.toString match {
-        case ProperInterval =>
-          for {
-            description <- entity.createdDescription
-            dateFrom    <- entity.createdBeginning
-            dateTo      <- entity.createdEnd
-          } yield DescribedTemporal(description, TemporalInterval(dateFrom, dateTo))
-        case Instant =>
-          for {
-            description <- entity.createdDescription
-            instant     <- entity.createdInstant
-          } yield DescribedTemporal(description, TemporalInstant(instant))
-        case _ => None // TODO (RW) log error here (see PACT-1071)
-      }
-    )
+  private def getCreated(entity: RecordDescriptionPropertiesEntity): IO[Option[DescribedTemporal]] =
+    IO {
+      entity.createdType.flatMap(uri =>
+        uri.toString match {
+          case ProperInterval =>
+            for {
+              description <- entity.createdDescription
+              dateFrom    <- entity.createdBeginning
+              dateTo      <- entity.createdEnd
+            } yield DescribedTemporal(description, TemporalInterval(dateFrom, dateTo))
+          case Instant =>
+            for {
+              description <- entity.createdDescription
+              instant     <- entity.createdInstant
+            } yield DescribedTemporal(description, TemporalInstant(instant))
+          case _ => throw ServiceException(s"Failed to read temporal entity from URI: ${uri.toString}")
+        }
+      )
+    }
 
-  private def getAccumulation(entity: RecordDescriptionPropertiesEntity): Option[DescribedTemporal] =
-    entity.accumulationType.flatMap(uri =>
-      uri.toString match {
-        case ProperInterval =>
-          for {
-            description <- entity.accumulationDescription
-            dateFrom    <- entity.accumulationBeginning
-            dateTo      <- entity.accumulationEnd
-          } yield DescribedTemporal(description, TemporalInterval(dateFrom, dateTo))
-        case Instant =>
-          for {
-            description <- entity.accumulationDescription
-            instant     <- entity.accumulationInstant
-          } yield DescribedTemporal(description, TemporalInstant(instant))
-        case _ => None // TODO (RW) log error here (see PACT-1071)
-      }
-    )
+  private def getAccumulation(entity: RecordDescriptionPropertiesEntity): IO[Option[DescribedTemporal]] =
+    IO {
+      entity.accumulationType.flatMap(uri =>
+        uri.toString match {
+          case ProperInterval =>
+            for {
+              description <- entity.accumulationDescription
+              dateFrom    <- entity.accumulationBeginning
+              dateTo      <- entity.accumulationEnd
+            } yield DescribedTemporal(description, TemporalInterval(dateFrom, dateTo))
+          case Instant =>
+            for {
+              description <- entity.accumulationDescription
+              instant     <- entity.accumulationInstant
+            } yield DescribedTemporal(description, TemporalInstant(instant))
+          case _ => throw ServiceException(s"Failed to read temporal entity from URI: ${uri.toString}")
+        }
+      )
+    }
 
 }

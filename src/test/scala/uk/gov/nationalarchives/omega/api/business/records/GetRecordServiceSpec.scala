@@ -25,9 +25,9 @@ import cats.data.Validated.{ Invalid, Valid }
 import uk.gov.nationalarchives.omega.api.messages.request.RequestByIdentifier
 import uk.gov.nationalarchives.omega.api.repository.TestRepository
 import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
-import uk.gov.nationalarchives.omega.api.support.UnitTest
+import uk.gov.nationalarchives.omega.api.support.AsyncUnitTest
 
-class GetRecordServiceSpec extends UnitTest {
+class GetRecordServiceSpec extends AsyncUnitTest {
 
   private val testRepository = new TestRepository
   private val getRecordService = new GetRecordService(testRepository)
@@ -37,8 +37,7 @@ class GetRecordServiceSpec extends UnitTest {
       "a full record when given a valid concept URI" in {
         val recordRequest = RequestByIdentifier(s"${Cat.NS}COAL.2022.N373.P")
         val result = getRecordService.process(recordRequest)
-        result mustBe
-          Right(GetRecordReply(getExpectedRecord))
+        result.asserting(_ mustBe Right(GetRecordReply(getExpectedRecord)))
       }
     }
     "validateRequest function returns" - {

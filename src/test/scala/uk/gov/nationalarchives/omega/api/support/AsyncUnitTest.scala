@@ -19,20 +19,31 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.repository.vocabulary
+package uk.gov.nationalarchives.omega.api.support
 
-import org.apache.jena.rdf.model.ModelFactory
+import cats.effect.IO
+import cats.effect.testing.scalatest.AsyncIOSpec
+import jms4s.config.QueueName
+import org.mockito.MockitoSugar
+import org.scalatest.freespec.AsyncFreeSpec
+import org.scalatest.matchers.must.Matchers
+import uk.gov.nationalarchives.omega.api.common.Version1UUID
+import uk.gov.nationalarchives.omega.api.messages.ValidatedLocalMessage
 
-object Time {
+import java.time.LocalDateTime
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
 
-  /** The RDF model that holds the vocabulary terms */
-  private val model = ModelFactory.createDefaultModel
+trait AsyncUnitTest extends AsyncFreeSpec with AsyncIOSpec with Matchers with MockitoSugar {
 
-  /** The namespace of the vocabulary as a string */
-  val NS = "http://www.w3.org/2006/time#"
+  /** Helper method to get a ValidatedLocalMessage instance
+    * @param messageText
+    *   the body of the message
+    * @return
+    */
+  def getValidatedLocalMessage(messageText: String): ValidatedLocalMessage =
+    ValidatedLocalMessage(Version1UUID.generate(), "", messageText, "", "", LocalDateTime.now(), "", "", QueueName(""))
 
-  val ProperInterval: String = model.createResource(s"${NS}ProperInterval").getURI
-
-  val Instant: String = model.createResource(s"${NS}Instant").getURI
-
+  def await[T](io: IO[T]): T =
+    Await.result(io.unsafeToFuture(), 60.second)
 }

@@ -21,17 +21,17 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
+import cats.effect.IO
 import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.model._
 import uk.gov.nationalarchives.omega.api.repository.vocabulary.{ Cat, TNA, Time }
 
 import java.time.ZonedDateTime
-import scala.util.Try
 
 class TestRepository extends AbstractRepository {
-  override def getLegalStatusEntities: Try[List[LegalStatusEntity]] =
-    Try(
+  override def getLegalStatusEntities: IO[List[LegalStatusEntity]] =
+    IO(
       List(
         LegalStatusEntity(new URI(s"${Cat.NS}public-record"), "Public Record"),
         LegalStatusEntity(new URI(s"${Cat.NS}non-public-record"), "Non-Public Record"),
@@ -44,9 +44,9 @@ class TestRepository extends AbstractRepository {
       )
     )
 
-  override def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): Try[List[AgentConceptEntity]] =
+  override def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): IO[List[AgentConceptEntity]] =
     if (listAgentSummary.depository.getOrElse(false)) {
-      Try(
+      IO(
         List(
           AgentConceptEntity(
             new URI(s"${Cat.NS}agent.S7"),
@@ -56,7 +56,7 @@ class TestRepository extends AbstractRepository {
         )
       )
     } else {
-      Try(
+      IO(
         List(
           AgentConceptEntity(
             new URI(s"${Cat.NS}agent.48N"),
@@ -90,10 +90,10 @@ class TestRepository extends AbstractRepository {
   override def getAgentDescriptionEntities(
     listAgentSummary: ListAgentSummary,
     agentConceptUri: URI
-  ): Try[List[AgentDescriptionEntity]] =
+  ): IO[List[AgentDescriptionEntity]] =
     agentConceptUri.toString match {
       case s"${Cat.NS}agent.48N" =>
-        Try(
+        IO(
           List(
             AgentDescriptionEntity(
               new URI(s"${Cat.NS}agent.48N.1"),
@@ -107,7 +107,7 @@ class TestRepository extends AbstractRepository {
           )
         )
       case s"${Cat.NS}agent.46F" =>
-        Try(
+        IO(
           List(
             AgentDescriptionEntity(
               new URI(s"${Cat.NS}agent.46F.1"),
@@ -121,7 +121,7 @@ class TestRepository extends AbstractRepository {
           )
         )
       case s"${Cat.NS}agent.92W" =>
-        Try(
+        IO(
           List(
             AgentDescriptionEntity(
               new URI(s"${Cat.NS}agent.92W.1"),
@@ -135,7 +135,7 @@ class TestRepository extends AbstractRepository {
           )
         )
       case s"${Cat.NS}agent.8R6" =>
-        Try(
+        IO(
           List(
             AgentDescriptionEntity(
               new URI(s"${Cat.NS}agent.8R6.1"),
@@ -149,7 +149,7 @@ class TestRepository extends AbstractRepository {
           )
         )
       case s"${Cat.NS}agent.S7" =>
-        Try(
+        IO(
           List(
             AgentDescriptionEntity(
               new URI(s"${Cat.NS}agent.S7.1"),
@@ -164,8 +164,8 @@ class TestRepository extends AbstractRepository {
         )
     }
 
-  override def getRecordConceptEntity(recordConceptId: String): Try[List[RecordConceptEntity]] =
-    Try(
+  override def getRecordConceptEntity(recordConceptId: String): IO[List[RecordConceptEntity]] =
+    IO(
       List(
         RecordConceptEntity(
           new URI(s"${Cat.NS}COAL.2022.N373.P"),
@@ -175,15 +175,15 @@ class TestRepository extends AbstractRepository {
       )
     )
 
-  override def getCreatorEntities(agentConceptId: String): Try[List[CreatorEntity]] =
-    Try(
+  override def getCreatorEntities(agentConceptId: String): IO[List[CreatorEntity]] =
+    IO(
       List(
         CreatorEntity(new URI(s"${Cat.NS}agent.24"), "from 1965")
       )
     )
 
-  override def getRecordDescriptionSummaries(recordConceptUri: String): Try[List[RecordDescriptionSummaryEntity]] =
-    Try(
+  override def getRecordDescriptionSummaries(recordConceptUri: String): IO[List[RecordDescriptionSummaryEntity]] =
+    IO(
       List(
         RecordDescriptionSummaryEntity(
           new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -202,8 +202,8 @@ class TestRepository extends AbstractRepository {
       )
     )
 
-  override def getRecordDescriptionProperties(recordConceptUri: String): Try[List[RecordDescriptionPropertiesEntity]] =
-    Try(
+  override def getRecordDescriptionProperties(recordConceptUri: String): IO[List[RecordDescriptionPropertiesEntity]] =
+    IO(
       List(
         RecordDescriptionPropertiesEntity(
           recordDescriptionUri = new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -254,8 +254,8 @@ class TestRepository extends AbstractRepository {
       )
     )
 
-  override def getAccessRights(recordConceptUri: String): Try[List[AccessRightsEntity]] =
-    Try(
+  override def getAccessRights(recordConceptUri: String): IO[List[AccessRightsEntity]] =
+    IO(
       List(
         AccessRightsEntity(
           new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -276,8 +276,8 @@ class TestRepository extends AbstractRepository {
       )
     )
 
-  override def getIsPartOf(recordConceptUri: String): Try[List[IsPartOfEntity]] =
-    Try(
+  override def getIsPartOf(recordConceptUri: String): IO[List[IsPartOfEntity]] =
+    IO(
       List(
         IsPartOfEntity(
           new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -290,8 +290,8 @@ class TestRepository extends AbstractRepository {
       )
     )
 
-  override def getSecondaryIdentifiers(recordConceptUri: String): Try[List[SecondaryIdentifierEntity]] =
-    Try(
+  override def getSecondaryIdentifiers(recordConceptUri: String): IO[List[SecondaryIdentifierEntity]] =
+    IO(
       List(
         SecondaryIdentifierEntity(
           new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -306,8 +306,8 @@ class TestRepository extends AbstractRepository {
       )
     )
 
-  override def getIsReferencedBys(recordConceptUri: String): Try[List[LabelledIdentifierEntity]] =
-    Try(
+  override def getIsReferencedBys(recordConceptUri: String): IO[List[LabelledIdentifierEntity]] =
+    IO(
       List(
         LabelledIdentifierEntity(
           new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -322,8 +322,8 @@ class TestRepository extends AbstractRepository {
       )
     )
 
-  override def getRelatedTos(recordConceptUri: String): Try[List[LabelledIdentifierEntity]] =
-    Try(
+  override def getRelatedTos(recordConceptUri: String): IO[List[LabelledIdentifierEntity]] =
+    IO(
       List(
         LabelledIdentifierEntity(
           new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -338,8 +338,8 @@ class TestRepository extends AbstractRepository {
       )
     )
 
-  override def getSeparatedFroms(recordConceptUri: String): Try[List[LabelledIdentifierEntity]] =
-    Try(
+  override def getSeparatedFroms(recordConceptUri: String): IO[List[LabelledIdentifierEntity]] =
+    IO(
       List(
         LabelledIdentifierEntity(
           new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -354,16 +354,16 @@ class TestRepository extends AbstractRepository {
       )
     )
 
-  override def getUriSubjects(recordConceptUri: String): Try[List[IdentifierEntity]] =
-    Try(
+  override def getUriSubjects(recordConceptUri: String): IO[List[IdentifierEntity]] =
+    IO(
       List(
         IdentifierEntity(new URI(s"${Cat.NS}COAL.2022.N373.P.2"), new URI(s"${Cat.NS}agent.4N6")),
         IdentifierEntity(new URI(s"${Cat.NS}COAL.2022.N373.P.2"), new URI(s"${Cat.NS}agent.S7"))
       )
     )
 
-  override def getLabelledSubjects(recordConceptUri: String): Try[List[LabelledIdentifierEntity]] =
-    Try(
+  override def getLabelledSubjects(recordConceptUri: String): IO[List[LabelledIdentifierEntity]] =
+    IO(
       List(
         LabelledIdentifierEntity(
           new URI(s"${Cat.NS}COAL.2022.N373.P.2"),

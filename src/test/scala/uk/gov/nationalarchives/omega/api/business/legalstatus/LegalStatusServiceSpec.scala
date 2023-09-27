@@ -21,14 +21,12 @@
 
 package uk.gov.nationalarchives.omega.api.business.legalstatus
 
-import org.mockito.MockitoSugar
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.must.Matchers
 import uk.gov.nationalarchives.omega.api.messages.request.ListAssetLegalStatusSummary
 import uk.gov.nationalarchives.omega.api.repository.TestRepository
 import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
+import uk.gov.nationalarchives.omega.api.support.AsyncUnitTest
 
-class LegalStatusServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar {
+class LegalStatusServiceSpec extends AsyncUnitTest {
 
   private val testRepository = new TestRepository
   private val legalStatusService = new LegalStatusService(testRepository)
@@ -39,7 +37,7 @@ class LegalStatusServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar
         val legalStatusRequest = ListAssetLegalStatusSummary()
         val result = legalStatusService.process(legalStatusRequest)
 
-        result mustBe Right(LegalStatusReply(s"""[
+        result.asserting(_ mustBe Right(LegalStatusReply(s"""[
   {
     "identifier" : "${Cat.publicRecord}",
     "label" : "Public Record"
@@ -60,7 +58,7 @@ class LegalStatusServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar
     "identifier" : "${Cat.nonRecordMaterial}",
     "label" : "Non-Record Material"
   }
-]""".stripMargin))
+]""".stripMargin)))
       }
     }
     // TODO This test is ignored until the logging and error handling is completed

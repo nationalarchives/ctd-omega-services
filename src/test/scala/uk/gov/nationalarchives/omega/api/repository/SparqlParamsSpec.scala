@@ -27,68 +27,73 @@ import uk.gov.nationalarchives.omega.api.messages.AgentType.{ CorporateBody, Per
 import uk.gov.nationalarchives.omega.api.messages.request.{ ListAgentSummary, RequestByIdentifier }
 import uk.gov.nationalarchives.omega.api.repository.model.AgentTypeMapper
 import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
-import uk.gov.nationalarchives.omega.api.support.UnitTest
+import uk.gov.nationalarchives.omega.api.support.AsyncUnitTest
 
 import java.time.ZonedDateTime
 import java.util.{ Date, GregorianCalendar }
 import javax.xml.datatype.{ DatatypeFactory, XMLGregorianCalendar }
 import scala.util.Success
 
-class SparqlParamsSpec extends UnitTest with AgentTypeMapper {
+class SparqlParamsSpec extends AsyncUnitTest with AgentTypeMapper {
 
   "SparqlParams must contain" - {
     "all agent type values and a query extension when ListAgentSummary is empty" in {
       val result = SparqlParams.from(ListAgentSummary())
-      result mustEqual Success(
-        SparqlParams(
-          values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
-          filters = Map("filterParam" -> ""),
-          queryExtension = Some("ORDER BY DESC(?versionTimestamp) LIMIT 1")
-        )
+      result.asserting(
+        _ mustEqual
+          SparqlParams(
+            values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
+            filters = Map("filterParam" -> ""),
+            queryExtension = Some("ORDER BY DESC(?versionTimestamp) LIMIT 1")
+          )
       )
     }
     "specific agent type values and a query extension when ListAgentSummary specifies agent types" in {
       val result = SparqlParams.from(ListAgentSummary(agentTypes = Some(List(CorporateBody, Person))))
-      result mustEqual Success(
-        SparqlParams(
-          values = Map("agentTypeValuesParam" -> getAgentTypeResources(List(CorporateBody, Person))),
-          filters = Map("filterParam" -> ""),
-          queryExtension = Some("ORDER BY DESC(?versionTimestamp) LIMIT 1")
-        )
+      result.asserting(
+        _ mustEqual
+          SparqlParams(
+            values = Map("agentTypeValuesParam" -> getAgentTypeResources(List(CorporateBody, Person))),
+            filters = Map("filterParam" -> ""),
+            queryExtension = Some("ORDER BY DESC(?versionTimestamp) LIMIT 1")
+          )
       )
     }
     "all agent type values and a boolean when ListAgentSummary specifies depository" in {
       val result = SparqlParams.from(ListAgentSummary(depository = Some(true)))
-      result mustEqual Success(
-        SparqlParams(
-          booleans = Map("objectParam1" -> true),
-          uris = Map("predicateParam1" -> "http://TODO/is-place-of-deposit"),
-          values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
-          filters = Map("filterParam" -> ""),
-          queryExtension = Some("ORDER BY DESC(?versionTimestamp) LIMIT 1")
-        )
+      result.asserting(
+        _ mustEqual
+          SparqlParams(
+            booleans = Map("objectParam1" -> true),
+            uris = Map("predicateParam1" -> "http://TODO/is-place-of-deposit"),
+            values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
+            filters = Map("filterParam" -> ""),
+            queryExtension = Some("ORDER BY DESC(?versionTimestamp) LIMIT 1")
+          )
       )
     }
     "all agent type values and no limit on query extension when ListAgentSummary specifies version timestamp 'all'" in {
       val result = SparqlParams.from(ListAgentSummary(versionTimestamp = Some("all")))
-      result mustEqual Success(
-        SparqlParams(
-          values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
-          filters = Map("filterParam" -> ""),
-          queryExtension = Some("ORDER BY DESC(?versionTimestamp)")
-        )
+      result.asserting(
+        _ mustEqual
+          SparqlParams(
+            values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
+            filters = Map("filterParam" -> ""),
+            queryExtension = Some("ORDER BY DESC(?versionTimestamp)")
+          )
       )
     }
     "all agent type values and no query extension when ListAgentSummary specifies a version timestamp date" in {
       val timestamp = "2023-01-25T14:14:49.601Z"
       val result = SparqlParams.from(ListAgentSummary(versionTimestamp = Some(timestamp)))
-      result mustEqual Success(
-        SparqlParams(
-          dateTimes = Map("generatedAtParam" -> getGregorianDateTime(timestamp)),
-          values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
-          filters = Map("filterParam" -> "FILTER(?versionTimestamp >= xsd:dateTime(\"2023-01-25T14:14:49.601Z\"))"),
-          queryExtension = None
-        )
+      result.asserting(
+        _ mustEqual
+          SparqlParams(
+            dateTimes = Map("generatedAtParam" -> getGregorianDateTime(timestamp)),
+            values = Map("agentTypeValuesParam" -> getAgentTypeResources(getAllAgentTypes)),
+            filters = Map("filterParam" -> "FILTER(?versionTimestamp >= xsd:dateTime(\"2023-01-25T14:14:49.601Z\"))"),
+            queryExtension = None
+          )
       )
     }
     "a URI map with recordConceptUri when provided in RequestByIdentifier" in {

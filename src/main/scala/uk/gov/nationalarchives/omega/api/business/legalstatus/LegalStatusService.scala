@@ -22,6 +22,7 @@
 package uk.gov.nationalarchives.omega.api.business.legalstatus
 
 import cats.data.Validated
+import cats.effect.IO
 import io.circe.syntax.EncoderOps
 import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidation, BusinessService, BusinessServiceError, BusinessServiceReply }
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.ValidationResult
@@ -37,19 +38,15 @@ class LegalStatusService(repository: AbstractRepository) extends BusinessService
   override def validateRequest(validatedLocalMessage: ValidatedLocalMessage): ValidationResult[RequestMessage] =
     Validated.valid(ListAssetLegalStatusSummary())
 
-  override def process(request: RequestMessage): Either[BusinessServiceError, BusinessServiceReply] =
+  override def process(request: RequestMessage): IO[Either[BusinessServiceError, BusinessServiceReply]] =
     Try(request.asInstanceOf[ListAssetLegalStatusSummary]) match {
-      case Success(_) => Right(LegalStatusReply(getLegalStatusSummaries.asJson.toString()))
-      case Failure(e) => Left(LegalStatusError(e.getMessage))
+      case Success(_) => getLegalStatusSummaries.map(summaries => Right(LegalStatusReply(summaries.asJson.toString())))
+      case Failure(e) => IO(Left(LegalStatusError(e.getMessage)))
     }
 
-  private def getLegalStatusSummaries: List[LegalStatusSummary] =
-    repository.getLegalStatusEntities match {
-      case Success(legalStatusEntities) =>
-        legalStatusEntities.flatMap { agentEntity =>
-          agentEntity.as[Option[LegalStatusSummary]]
-        }
-      case _ => List.empty // TODO (RW) log the error
-    }
+  private def getLegalStatusSummaries: IO[List[LegalStatusSummary]] =
+    repository.getLegalStatusEntities.map(legalStatusEntities =>
+      legalStatusEntities.map(legalStatusEntity => legalStatusEntity.as[LegalStatusSummary])
+    )
 
 }

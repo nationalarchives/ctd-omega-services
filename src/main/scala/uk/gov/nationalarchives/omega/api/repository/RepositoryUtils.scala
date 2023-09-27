@@ -21,6 +21,8 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
+import cats.effect.IO
+import cats.implicits.catsSyntaxMonadError
 import org.apache.jena.datatypes.xsd.impl.XSDDateTimeType
 import org.apache.jena.query.{ ParameterizedSparqlString, Query, QueryFactory, Syntax }
 import org.apache.jena.rdf.model.{ Resource, ResourceFactory }
@@ -30,7 +32,7 @@ import javax.xml.datatype.XMLGregorianCalendar
 import scala.annotation.tailrec
 import scala.io.Source
 import scala.jdk.CollectionConverters._
-import scala.util.{ Failure, Try, Using }
+import scala.util.{ Try, Using }
 
 /** Some helper methods for working with an RDF triplestore */
 trait RepositoryUtils extends AgentTypeMapper {
@@ -41,9 +43,9 @@ trait RepositoryUtils extends AgentTypeMapper {
     * @return
     *   a Success with the parsed Query object or an error
     */
-  def prepareQuery(queryResource: String): Try[Query] =
+  def prepareQuery(queryResource: String): IO[Query] =
     for {
-      queryText <- getQueryText(queryResource)
+      queryText <- IO.fromTry(getQueryText(queryResource))
       query     <- getQuery(queryText)
     } yield query
 
@@ -61,12 +63,12 @@ trait RepositoryUtils extends AgentTypeMapper {
     queryResource: String,
     params: SparqlParams,
     extendQuery: Boolean = false
-  ): Try[Query] =
+  ): IO[Query] =
     for {
-      queryText          <- getQueryText(queryResource)
+      queryText          <- IO.fromTry(getQueryText(queryResource))
       extendedQuery      <- setQueryExtension(queryText, params, extendQuery)
       parameterizedQuery <- parameterizeQuery(extendedQuery, params)
-      query              <- Try(parameterizedQuery.asQuery(Syntax.syntaxSPARQL_11))
+      query              <- IO(parameterizedQuery.asQuery(Syntax.syntaxSPARQL_11))
     } yield query
 
   /** Convenience method to create a Jena Resource from a given base URL and local name
@@ -80,16 +82,17 @@ trait RepositoryUtils extends AgentTypeMapper {
   def createResource(baseUrl: String, localName: String): Resource =
     ResourceFactory.createResource(s"$baseUrl/$localName")
 
-  private def setQueryExtension(query: String, sparqlParams: SparqlParams, extendQuery: Boolean): Try[String] =
+  private def setQueryExtension(query: String, sparqlParams: SparqlParams, extendQuery: Boolean): IO[String] = IO {
     if (extendQuery) {
-      Try(query + sparqlParams.queryExtension.getOrElse(""))
+      query + sparqlParams.queryExtension.getOrElse("")
     } else {
-      Try(query)
+      query
     }
+  }
 
-  private def getQuery(queryText: String): Try[Query] =
-    Try(QueryFactory.create(queryText, Syntax.syntaxSPARQL_11)).recoverWith { case _: NullPointerException =>
-      Failure(new IllegalArgumentException(s"Unable to read query from text: $queryText"))
+  private def getQuery(queryText: String): IO[Query] =
+    IO.blocking(QueryFactory.create(queryText, Syntax.syntaxSPARQL_11)).adaptError { case _: NullPointerException =>
+      new IllegalArgumentException(s"Unable to read query from text: $queryText")
     }
 
   private def getQueryText(queryResource: String): Try[String] =
@@ -97,7 +100,7 @@ trait RepositoryUtils extends AgentTypeMapper {
       resource.getLines().mkString("\n")
     }
 
-  private def parameterizeQuery(queryText: String, params: SparqlParams): Try[ParameterizedSparqlString] = {
+  private def parameterizeQuery(queryText: String, params: SparqlParams): IO[ParameterizedSparqlString] = IO {
     val parameterize: ParameterizedSparqlString => ParameterizedSparqlString = Seq(
       setBooleanParams(_, params.booleans),
       setResourceParams(_, params.uris),
@@ -107,7 +110,7 @@ trait RepositoryUtils extends AgentTypeMapper {
     ).reduceLeft(_.andThen(_))
 
     val filteredQueryText = setFilterParams(queryText, params.filters)
-    Try(parameterize(new ParameterizedSparqlString(filteredQueryText)))
+    parameterize(new ParameterizedSparqlString(filteredQueryText))
   }
 
   private def setParams[T](
