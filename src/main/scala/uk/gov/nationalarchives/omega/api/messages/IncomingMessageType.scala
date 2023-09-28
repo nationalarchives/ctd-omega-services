@@ -28,17 +28,25 @@ object IncomingMessageType extends Enum[IncomingMessageType] {
 
   val values: IndexedSeq[IncomingMessageType] = findValues
 
+  /** Echo message type */
   case object ECHO001 extends IncomingMessageType {
     // This happens to follow the regex; otherwise, it's arbitrary.
     override val entryName = "OSGESZZZ100"
   }
 
+  /** List Asset Legal Status Summaries message type */
   case object OSLISALS001 extends IncomingMessageType {
     override val entryName = "OSLISALS001"
   }
 
+  /** List Agent Summaries message type */
   case object OSLISAGT001 extends IncomingMessageType {
     override val entryName = "OSLISAGT001"
+  }
+
+  /** Get Record message type */
+  case object OSGEFREC001 extends IncomingMessageType {
+    override val entryName = "OSGEFREC001"
   }
   // add more service identifiers here
 

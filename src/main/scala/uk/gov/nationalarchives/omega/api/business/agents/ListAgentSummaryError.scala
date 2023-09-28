@@ -26,7 +26,7 @@ import uk.gov.nationalarchives.omega.api.common.ErrorCode
 
 case class ListAgentSummaryError(message: String) extends BusinessServiceError {
 
-  override def code: ErrorCode = ErrorCode.PROC002
+  override def code: ErrorCode = ErrorCode.PROC003
 
   override def description: String = message
 }

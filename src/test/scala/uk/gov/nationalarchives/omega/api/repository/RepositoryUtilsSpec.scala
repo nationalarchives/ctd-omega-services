@@ -22,7 +22,10 @@
 package uk.gov.nationalarchives.omega.api.repository
 
 import org.apache.jena.query.Query
+import org.apache.jena.rdf.model.ResourceFactory
+import org.apache.jena.vocabulary.DCTerms
 import org.phenoscape.sparql.SPARQLInterpolation.SPARQLStringContext
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.{ Cat, TODO }
 import uk.gov.nationalarchives.omega.api.support.UnitTest
 
 class RepositoryUtilsSpec extends UnitTest {
@@ -123,8 +126,8 @@ class RepositoryUtilsSpec extends UnitTest {
       val queryParams = SparqlParams(values =
         Map(
           "agentTypeValuesParam" -> List(
-            utils.createResource(BaseURL.cat, "person-concept"),
-            utils.createResource(BaseURL.cat, "corporate-body-concept")
+            ResourceFactory.createResource(Cat.personConcept),
+            ResourceFactory.createResource(Cat.corporateBodyConcept)
           )
         )
       )
@@ -137,7 +140,7 @@ class RepositoryUtilsSpec extends UnitTest {
       val queryParams =
         SparqlParams(
           booleans = Map("objectParam" -> true),
-          uris = Map("predicateParam" -> s"${BaseURL.todo}/is-place-of-deposit")
+          uris = Map("predicateParam" -> TODO.isPlaceOfDeposit)
         )
       val result = utils.prepareParameterizedQuery(queryResource, queryParams, extendQuery = false)
       result.get mustEqual expectedSparqlWithBoolean
@@ -154,11 +157,9 @@ class RepositoryUtilsSpec extends UnitTest {
       val utils = new RepositoryUtils {}
       val queryResource = "/sparql/properties.rq"
       val queryParams =
-        SparqlParams(uris =
-          Map("predicateParam" -> s"${BaseURL.dct}/type", "objectParam" -> s"${BaseURL.cat}/authority-file")
-        )
+        SparqlParams(uris = Map("predicateParam" -> DCTerms.`type`.getURI, "objectParam" -> Cat.authorityFile))
       val result = utils.prepareParameterizedQuery(queryResource, queryParams, extendQuery = false)
-      SparqlParams(uris = Map("property" -> s"${BaseURL.dct}/type", "value" -> s"${BaseURL.cat}/authority-file"))
+      SparqlParams(uris = Map("property" -> DCTerms.`type`.getURI, "value" -> Cat.authorityFile))
       result.get mustEqual expectedSparqlWithObject
     }
     "add multiple params and values" in {
@@ -167,14 +168,14 @@ class RepositoryUtilsSpec extends UnitTest {
       val queryParams = SparqlParams(
         booleans = Map("objectParam1" -> true),
         uris = Map(
-          "predicateParam1" -> s"${BaseURL.todo}/is-place-of-deposit",
-          "predicateParam2" -> s"${BaseURL.dct}/type",
-          "objectParam2"    -> s"${BaseURL.cat}/authority-file"
+          "predicateParam1" -> TODO.isPlaceOfDeposit,
+          "predicateParam2" -> DCTerms.`type`.getURI,
+          "objectParam2"    -> Cat.authorityFile
         ),
         values = Map(
           "agentTypeValuesParam" -> List(
-            utils.createResource(BaseURL.cat, "person-concept"),
-            utils.createResource(BaseURL.cat, "corporate-body-concept")
+            ResourceFactory.createResource(Cat.personConcept),
+            ResourceFactory.createResource(Cat.corporateBodyConcept)
           )
         )
       )

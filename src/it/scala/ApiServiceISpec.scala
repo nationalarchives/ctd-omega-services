@@ -17,7 +17,7 @@ import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ INVA002, INVA003, IN
 import uk.gov.nationalarchives.omega.api.common.{ AppLogger, ErrorCode }
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.messages.{ MessageProperties, OutgoingMessageType }
-import uk.gov.nationalarchives.omega.api.repository.BaseURL
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
 import uk.gov.nationalarchives.omega.api.services.ApiService
 
 import javax.jms.{ Connection, MessageProducer, Session, TextMessage }
@@ -125,28 +125,46 @@ class ApiServiceISpec
         _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
         result <- Resource.liftK(assertReplyMessage(s"""[
   {
-    "identifier" : "${BaseURL.cat}/public-record",
+    "identifier" : "${Cat.publicRecord}",
     "label" : "Public Record"
   },
   {
-    "identifier" : "${BaseURL.cat}/non-public-record",
+    "identifier" : "${Cat.nonPublicRecord}",
     "label" : "Non-Public Record"
   },
   {
-    "identifier" : "${BaseURL.cat}/public-record-unless-otherwise-stated",
+    "identifier" : "${Cat.publicRecordUnlessOtherwiseStated}",
     "label" : "Public Record (unless otherwise stated)"
   },
   {
-    "identifier" : "${BaseURL.cat}/welsh-public-record",
+    "identifier" : "${Cat.welshPublicRecord}",
     "label" : "Welsh Public Record"
   },
   {
-    "identifier" : "${BaseURL.cat}/non-record-material",
+    "identifier" : "${Cat.nonRecordMaterial}",
     "label" : "Non-Record Material"
   }
 ]""".stripMargin))
         _ <- Resource.eval(apiServiceFiber.cancel)
         _ <- consumerFiber.cancel
+      } yield result
+      res.use(assert => IO.pure(assert))
+    }
+
+    "returns a full record when a request is sent with the record concept URI" in { f =>
+      val textMessageConfig = generateValidMessageConfig()
+        .copy(messageTypeId = Some("OSGEFREC001"))
+        .copy(contents = s"""{
+                            |    "identifier" : "${Cat.NS}COAL.2022.N36R.P"
+                            |}""".stripMargin)
+      val serviceIO = f.apiService.startSuspended
+      val res = for {
+        consumerFiber   <- f.comsumerRes.start
+        apiServiceFiber <- Resource.liftK(serviceIO.start)
+        _               <- Resource.liftK(sendMessage(f.session, f.producer, textMessageConfig))
+        result          <- Resource.liftK(assertReplyMessage(getExpectedRecordFull))
+        _               <- Resource.eval(apiServiceFiber.cancel)
+        _               <- consumerFiber.cancel
       } yield result
       res.use(assert => IO.pure(assert))
     }
@@ -483,6 +501,58 @@ class ApiServiceISpec
       case Left(_)     => ""
     }
   }
+
+  private def getExpectedRecordFull =
+    s"""{
+       |  "identifier" : "${Cat.NS}COAL.2022.N36R.P",
+       |  "type" : "Physical",
+       |  "creator" : [
+       |    "${Cat.NS}agent.24"
+       |  ],
+       |  "current-description" : "${Cat.NS}COAL.2022.N36R.P.1",
+       |  "description" : [
+       |    {
+       |      "identifier" : "${Cat.NS}COAL.2022.N36R.P.1",
+       |      "secondary-identifier" : [
+       |        {
+       |          "identifier" : "COAL 80/2055/22",
+       |          "type" : "${Cat.NS}classicCatalogueReference"
+       |        }
+       |      ],
+       |      "label" : "<scopecontent><p>Coal News. Model II storage unit for photograph negatives (strips of 4). Photograph negatives Nos. T3060-T3102. </p></scopecontent>",
+       |      "abstract" : "<scopecontent><p>Coal News. Model II storage unit for photograph negatives (strips of 4). Photograph negatives Nos. T3060-T3102. </p></scopecontent>",
+       |      "access-rights" : [
+       |        "${Cat.NS}policy.Open_Description",
+       |        "${Cat.NS}policy.Normal_Closure_before_FOI_Act_30_years_from_1964-10-31"
+       |      ],
+       |      "is-part-of" : [
+       |        "${Cat.NS}recordset.COAL.2022.2831"
+       |      ],
+       |      "previous-sibling" : "${Cat.NS}COAL.2022.N361.P.1",
+       |      "version-timestamp" : "2022-12-05T20:37:31.28Z",
+       |      "asset-legal-status" : {
+       |        "identifier" : "${Cat.NS}public-record",
+       |        "label" : "Public Record"
+       |      },
+       |      "legacy-tna-cs13-record-type" : "Item",
+       |      "created" : {
+       |        "description" : "[1964 October]",
+       |        "temporal" : {
+       |          "date-from" : "1964-09-30Z",
+       |          "date-to" : "1964-10-31Z"
+       |        }
+       |      },
+       |      "archivists-note" : "[Grid reference: N/A]",
+       |      "source-of-acquisition" : "${Cat.NS}agent.24",
+       |      "subject" : [
+       |        {
+       |          "identifier" : "${Cat.NS}agent.24",
+       |          "label" : "from 1965"
+       |        }
+       |      ]
+       |    }
+       |  ]
+       |}""".stripMargin
 }
 
 case class TextMessageConfig(

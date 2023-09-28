@@ -19,18 +19,28 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages.request
+package uk.gov.nationalarchives.omega.api.messages.reply
 
-import io.circe.Decoder
+import uk.gov.nationalarchives.omega.api.messages.{ CS13RecordType, DescribedTemporal }
 
-/** RequestByIdentifier is a generic message which is used to request a resource by identifier - for example, the
-  * GetRecord message in the API schema uses this format
-  */
-case class RequestByIdentifier(identifier: String) extends RequestMessage
-object RequestByIdentifier {
-  implicit val decodeRequestByIdentifier: Decoder[RequestByIdentifier] = json =>
-    for {
-      identifier <- json.get[String]("identifier")
-    } yield RequestByIdentifier(identifier)
-
-}
+/** Represents a RecordDescriptionProperties as defined by the API schema */
+case class RecordDescriptionProperties(
+  assetLegalStatus: Option[Identifier] = None,
+  legacyTnaCs13RecordType: Option[CS13RecordType] = None,
+  designationOfEdition: Option[String] = None,
+  created: Option[DescribedTemporal] = None,
+  covering: Option[DescribedTemporal] = None,
+  archivistsNote: Option[String] = None,
+  sourceOfAcquisition: Option[Identifier] = None,
+  custodialHistory: Option[String] = None,
+  administrativeBiographicalBackground: Option[String] = None,
+  accumulation: Option[DescribedTemporal] = None,
+  appraisal: Option[String] = None,
+  accrualPolicy: Option[Identifier] = None,
+  layout: Option[String] = None,
+  publicationNote: Option[String] = None,
+  isReferencedBy: Option[List[Identifier]] = None,
+  relatedTo: Option[List[Identifier]] = None,
+  separatedFrom: Option[List[Identifier]] = None,
+  subject: Option[List[Identifier]] = None
+)

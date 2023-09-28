@@ -24,8 +24,9 @@ package uk.gov.nationalarchives.omega.api.repository
 import org.apache.jena.rdf.model.{ Resource, ResourceFactory }
 import uk.gov.nationalarchives.omega.api.messages.AgentType
 import uk.gov.nationalarchives.omega.api.messages.AgentType.{ CorporateBody, Person }
-import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
+import uk.gov.nationalarchives.omega.api.messages.request.{ ListAgentSummary, RequestByIdentifier }
 import uk.gov.nationalarchives.omega.api.repository.model.AgentTypeMapper
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
 import uk.gov.nationalarchives.omega.api.support.UnitTest
 
 import java.time.ZonedDateTime
@@ -88,6 +89,12 @@ class SparqlParamsSpec extends UnitTest with AgentTypeMapper {
           filters = Map("filterParam" -> "FILTER(?versionTimestamp >= xsd:dateTime(\"2023-01-25T14:14:49.601Z\"))"),
           queryExtension = None
         )
+      )
+    }
+    "a URI map with recordConceptUri when provided in RequestByIdentifier" in {
+      val result = SparqlParams.from(RequestByIdentifier(s"${Cat.NS}COAL.2022.N373.P"))
+      result mustEqual Success(
+        SparqlParams(uris = Map("recordConceptUri" -> s"${Cat.NS}COAL.2022.N373.P"))
       )
     }
   }

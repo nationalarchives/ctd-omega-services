@@ -26,7 +26,7 @@ import io.circe.syntax.EncoderOps
 import uk.gov.nationalarchives.omega.api.business.{ BusinessRequestValidation, BusinessService, BusinessServiceError, BusinessServiceReply }
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.ValidationResult
 import uk.gov.nationalarchives.omega.api.messages.ValidatedLocalMessage
-import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatus
+import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatusSummary
 import uk.gov.nationalarchives.omega.api.messages.request.{ ListAssetLegalStatusSummary, RequestMessage }
 import uk.gov.nationalarchives.omega.api.repository.AbstractRepository
 
@@ -43,11 +43,11 @@ class LegalStatusService(repository: AbstractRepository) extends BusinessService
       case Failure(e) => Left(LegalStatusError(e.getMessage))
     }
 
-  private def getLegalStatusSummaries: List[LegalStatus] =
+  private def getLegalStatusSummaries: List[LegalStatusSummary] =
     repository.getLegalStatusEntities match {
       case Success(legalStatusEntities) =>
         legalStatusEntities.flatMap { agentEntity =>
-          agentEntity.as[Option[LegalStatus]]
+          agentEntity.as[Option[LegalStatusSummary]]
         }
       case _ => List.empty // TODO (RW) log the error
     }

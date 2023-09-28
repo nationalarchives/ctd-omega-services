@@ -27,6 +27,7 @@ import io.circe.{ Decoder, Encoder, Json }
 import uk.gov.nationalarchives.omega.api.messages.AgentType
 import uk.gov.nationalarchives.omega.api.messages.AgentType._
 
+/** Represents a ListAgentSummary message as defined by the API schema */
 case class ListAgentSummary(
   agentTypes: Option[List[AgentType]] = None,
   versionTimestamp: Option[String] = None,

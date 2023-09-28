@@ -19,18 +19,32 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages.request
+package uk.gov.nationalarchives.omega.api.messages.reply
 
-import io.circe.Decoder
+import io.circe.syntax._
+import io.circe.{ Encoder, Json }
+import uk.gov.nationalarchives.omega.api.messages.RecordType
+import uk.gov.nationalarchives.omega.api.messages.reply.GenericIdentifierDerivation._
 
-/** RequestByIdentifier is a generic message which is used to request a resource by identifier - for example, the
-  * GetRecord message in the API schema uses this format
-  */
-case class RequestByIdentifier(identifier: String) extends RequestMessage
-object RequestByIdentifier {
-  implicit val decodeRequestByIdentifier: Decoder[RequestByIdentifier] = json =>
-    for {
-      identifier <- json.get[String]("identifier")
-    } yield RequestByIdentifier(identifier)
+/** Represents a RecordFull as defined by the API schema */
+case class RecordFull(
+  identifier: Identifier,
+  recordType: RecordType,
+  creators: List[String],
+  currentDescription: Identifier,
+  descriptions: List[RecordDescriptionFull]
+) extends ReplyMessage
+object RecordFull {
+
+  implicit val encodeRecordFull: Encoder[RecordFull] = (recordFull: RecordFull) =>
+    Json
+      .obj(
+        ("identifier", recordFull.identifier.asJson),
+        ("type", Json.fromString(recordFull.recordType.entryName)),
+        ("creator", recordFull.creators.asJson),
+        ("current-description", recordFull.currentDescription.asJson),
+        ("description", recordFull.descriptions.asJson)
+      )
+      .deepDropNullValues
 
 }

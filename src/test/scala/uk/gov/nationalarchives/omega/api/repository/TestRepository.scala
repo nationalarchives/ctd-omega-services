@@ -24,6 +24,7 @@ package uk.gov.nationalarchives.omega.api.repository
 import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.model._
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.{ Cat, TNA, Time }
 
 import java.time.ZonedDateTime
 import scala.util.Try
@@ -32,14 +33,14 @@ class TestRepository extends AbstractRepository {
   override def getLegalStatusEntities: Try[List[LegalStatusEntity]] =
     Try(
       List(
-        LegalStatusEntity(new URI(s"${BaseURL.cat}/public-record"), "Public Record"),
-        LegalStatusEntity(new URI(s"${BaseURL.cat}/non-public-record"), "Non-Public Record"),
+        LegalStatusEntity(new URI(s"${Cat.NS}public-record"), "Public Record"),
+        LegalStatusEntity(new URI(s"${Cat.NS}non-public-record"), "Non-Public Record"),
         LegalStatusEntity(
-          new URI(s"${BaseURL.cat}/public-record-unless-otherwise-stated"),
+          new URI(s"${Cat.NS}public-record-unless-otherwise-stated"),
           "Public Record (unless otherwise stated)"
         ),
-        LegalStatusEntity(new URI(s"${BaseURL.cat}/welsh-public-record"), "Welsh Public Record"),
-        LegalStatusEntity(new URI(s"${BaseURL.cat}/non-record-material"), "Non-Record Material")
+        LegalStatusEntity(new URI(s"${Cat.NS}welsh-public-record"), "Welsh Public Record"),
+        LegalStatusEntity(new URI(s"${Cat.NS}non-record-material"), "Non-Record Material")
       )
     )
 
@@ -48,9 +49,9 @@ class TestRepository extends AbstractRepository {
       Try(
         List(
           AgentConceptEntity(
-            new URI(s"${BaseURL.cat}/agent.S7"),
-            new URI(s"${BaseURL.cat}/corporate-body-concept"),
-            new URI(s"${BaseURL.cat}/agent.S7.1")
+            new URI(s"${Cat.NS}agent.S7"),
+            new URI(s"${Cat.NS}corporate-body-concept"),
+            new URI(s"${Cat.NS}agent.S7.1")
           )
         )
       )
@@ -58,29 +59,29 @@ class TestRepository extends AbstractRepository {
       Try(
         List(
           AgentConceptEntity(
-            new URI(s"${BaseURL.cat}/agent.48N"),
-            new URI(s"${BaseURL.cat}/person-concept"),
-            new URI(s"${BaseURL.cat}/agent.48N.1")
+            new URI(s"${Cat.NS}agent.48N"),
+            new URI(s"${Cat.NS}person-concept"),
+            new URI(s"${Cat.NS}agent.48N.1")
           ),
           AgentConceptEntity(
-            new URI(s"${BaseURL.cat}/agent.46F"),
-            new URI(s"${BaseURL.cat}/person-concept"),
-            new URI(s"${BaseURL.cat}/agent.46F.1")
+            new URI(s"${Cat.NS}agent.46F"),
+            new URI(s"${Cat.NS}person-concept"),
+            new URI(s"${Cat.NS}agent.46F.1")
           ),
           AgentConceptEntity(
-            new URI(s"${BaseURL.cat}/agent.92W"),
-            new URI(s"${BaseURL.cat}/corporate-body-concept"),
-            new URI(s"${BaseURL.cat}/agent.92W.1")
+            new URI(s"${Cat.NS}agent.92W"),
+            new URI(s"${Cat.NS}corporate-body-concept"),
+            new URI(s"${Cat.NS}agent.92W.1")
           ),
           AgentConceptEntity(
-            new URI(s"${BaseURL.cat}/agent.8R6"),
-            new URI(s"${BaseURL.cat}/corporate-body-concept"),
-            new URI(s"${BaseURL.cat}/agent.8R6.1")
+            new URI(s"${Cat.NS}agent.8R6"),
+            new URI(s"${Cat.NS}corporate-body-concept"),
+            new URI(s"${Cat.NS}agent.8R6.1")
           ),
           AgentConceptEntity(
-            new URI(s"${BaseURL.cat}/agent.S7"),
-            new URI(s"${BaseURL.cat}/corporate-body-concept"),
-            new URI(s"${BaseURL.cat}/agent.S7.1")
+            new URI(s"${Cat.NS}agent.S7"),
+            new URI(s"${Cat.NS}corporate-body-concept"),
+            new URI(s"${Cat.NS}agent.S7.1")
           )
         )
       )
@@ -91,11 +92,11 @@ class TestRepository extends AbstractRepository {
     agentConceptUri: URI
   ): Try[List[AgentDescriptionEntity]] =
     agentConceptUri.toString match {
-      case s"${BaseURL.cat}/agent.48N" =>
+      case s"${Cat.NS}agent.48N" =>
         Try(
           List(
             AgentDescriptionEntity(
-              new URI(s"${BaseURL.cat}/agent.48N.1"),
+              new URI(s"${Cat.NS}agent.48N.1"),
               "Baden-Powell",
               ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
               Some("1889"),
@@ -105,11 +106,11 @@ class TestRepository extends AbstractRepository {
             )
           )
         )
-      case s"${BaseURL.cat}/agent.46F" =>
+      case s"${Cat.NS}agent.46F" =>
         Try(
           List(
             AgentDescriptionEntity(
-              new URI(s"${BaseURL.cat}/agent.46F.1"),
+              new URI(s"${Cat.NS}agent.46F.1"),
               "Fawkes, Guy",
               ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
               Some("1570"),
@@ -119,11 +120,11 @@ class TestRepository extends AbstractRepository {
             )
           )
         )
-      case s"${BaseURL.cat}/agent.92W" =>
+      case s"${Cat.NS}agent.92W" =>
         Try(
           List(
             AgentDescriptionEntity(
-              new URI(s"${BaseURL.cat}/agent.92W.1"),
+              new URI(s"${Cat.NS}agent.92W.1"),
               "Joint Milk Quality Committee",
               ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
               Some("1948"),
@@ -133,11 +134,11 @@ class TestRepository extends AbstractRepository {
             )
           )
         )
-      case s"${BaseURL.cat}/agent.8R6" =>
+      case s"${Cat.NS}agent.8R6" =>
         Try(
           List(
             AgentDescriptionEntity(
-              new URI(s"${BaseURL.cat}/agent.8R6.1"),
+              new URI(s"${Cat.NS}agent.8R6.1"),
               "Queen Anne's Bounty",
               ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
               None,
@@ -147,11 +148,11 @@ class TestRepository extends AbstractRepository {
             )
           )
         )
-      case s"${BaseURL.cat}/agent.S7" =>
+      case s"${Cat.NS}agent.S7" =>
         Try(
           List(
             AgentDescriptionEntity(
-              new URI(s"${BaseURL.cat}/agent.S7.1"),
+              new URI(s"${Cat.NS}agent.S7.1"),
               "The National Archives, Kew",
               ZonedDateTime.parse("2022-06-22T02:00:00-05:00"),
               Some("2003"),
@@ -167,9 +168,9 @@ class TestRepository extends AbstractRepository {
     Try(
       List(
         RecordConceptEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P"),
-          new URI(s"${BaseURL.tna}/ont.physical-record"),
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1")
+          new URI(s"${Cat.NS}COAL.2022.N373.P"),
+          new URI(TNA.ontPhysicalRecord),
+          new URI(s"${Cat.NS}COAL.2022.N373.P.1")
         )
       )
     )
@@ -177,7 +178,7 @@ class TestRepository extends AbstractRepository {
   override def getCreatorEntities(agentConceptId: String): Try[List[CreatorEntity]] =
     Try(
       List(
-        CreatorEntity(new URI(s"${BaseURL.cat}/agent.24"), "from 1965")
+        CreatorEntity(new URI(s"${Cat.NS}agent.24"), "from 1965")
       )
     )
 
@@ -185,18 +186,18 @@ class TestRepository extends AbstractRepository {
     Try(
       List(
         RecordDescriptionSummaryEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+          new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
           "<scopecontent><p>Coal News albums 1963. Collection of contact prints of photographs taken by Deryk Wills. Photographs depicting: Banwen, Glamorgan. Banwen Miners Hunt. </p></scopecontent>",
           "2023-08-30T12:10:00.000Z",
-          Some(new URI(s"${BaseURL.cat}/COAL.2022.N3HQ.P.1")),
-          Some(new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"))
+          Some(new URI(s"${Cat.NS}COAL.2022.N3HQ.P.1")),
+          Some(new URI(s"${Cat.NS}COAL.2022.N373.P.1"))
         ),
         RecordDescriptionSummaryEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
+          new URI(s"${Cat.NS}COAL.2022.N373.P.1"),
           "<scopecontent><p>Coal News albums 1963. Collection of contact prints of photographs taken by Derick Wills. Photographs depicting: Banwen, Glamorgan. Banwen Miners Hunt. </p></scopecontent>",
           "2023-08-30T12:10:00.000Z",
-          Some(new URI(s"${BaseURL.cat}/COAL.2022.N3HQ.P.1")),
-          Some(new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"))
+          Some(new URI(s"${Cat.NS}COAL.2022.N3HQ.P.1")),
+          Some(new URI(s"${Cat.NS}COAL.2022.N373.P.1"))
         )
       )
     )
@@ -205,47 +206,47 @@ class TestRepository extends AbstractRepository {
     Try(
       List(
         RecordDescriptionPropertiesEntity(
-          recordDescriptionUri = new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
-          assetLegalStatus = Some(new URI(s"${BaseURL.cat}/public-record")),
+          recordDescriptionUri = new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
+          assetLegalStatus = Some(new URI(s"${Cat.NS}public-record")),
           legalStatusLabel = Some("Public Record"),
-          legacyType = Some(new URI(s"${BaseURL.cat}/item")),
+          legacyType = Some(new URI(s"${Cat.NS}item")),
           designationOfEdition = Some("<unittitle type=\"Map Designation\">GSGS 2321</unittitle>"),
-          createdType = Some(new URI(s"${BaseURL.time}ProperInterval")),
+          createdType = Some(new URI(Time.ProperInterval)),
           createdDescription = Some("1963"),
           createdBeginning = Some("1963-01-01Z"),
           createdEnd = Some("1963-12-31Z"),
           archivistsNote = Some("[Grid reference: N/A]"),
-          sourceOfAcquisition = Some(new URI(s"${BaseURL.cat}/agent.24")),
+          sourceOfAcquisition = Some(new URI(s"${Cat.NS}agent.24")),
           custodialHistory = Some("Retained until 2006"),
           adminBiogBackground =
             Some("<bioghist><p>The board met periodically until 1935 when it was allowed to lapse.</p></bioghist>"),
-          accumulationType = Some(new URI(s"${BaseURL.time}ProperInterval")),
+          accumulationType = Some(new URI(Time.ProperInterval)),
           accumulationDescription = Some("1963"),
           accumulationBeginning = Some("1963-01-01Z"),
           accumulationEnd = Some("1963-12-31Z"),
           appraisal = Some("Files selected in accordance with Operational Selection Policy OSP 25"),
-          accrualPolicy = Some(new URI(s"${BaseURL.cat}/policy.Series_is_accruing")),
+          accrualPolicy = Some(new URI(s"${Cat.NS}policy.Series_is_accruing")),
           layout = Some("Photographs in an envelope"),
           publicationNote = Some("Some of the photographs in this series appeared in The Times newspaper.")
         ),
         RecordDescriptionPropertiesEntity(
-          recordDescriptionUri = new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
-          assetLegalStatus = Some(new URI(s"${BaseURL.cat}/public-record")),
+          recordDescriptionUri = new URI(s"${Cat.NS}COAL.2022.N373.P.1"),
+          assetLegalStatus = Some(new URI(s"${Cat.NS}public-record")),
           legalStatusLabel = Some("Public Record"),
-          legacyType = Some(new URI(s"${BaseURL.cat}/item")),
-          createdType = Some(new URI(s"${BaseURL.time}Instant")),
+          legacyType = Some(new URI(s"${Cat.NS}item")),
+          createdType = Some(new URI(Time.Instant)),
           createdDescription = Some("1963"),
           createdInstant = Some("1963-01-01Z"),
           archivistsNote = Some("[Grid reference: NX 509 582]"),
-          sourceOfAcquisition = Some(new URI(s"${BaseURL.cat}/agent.25")),
+          sourceOfAcquisition = Some(new URI(s"${Cat.NS}agent.25")),
           custodialHistory = Some("Retained until 2001"),
           adminBiogBackground =
             Some("<bioghist><p>The board met periodically until 1936 when it was allowed to lapse.</p></bioghist>"),
-          accumulationType = Some(new URI(s"${BaseURL.time}Instant")),
+          accumulationType = Some(new URI(Time.Instant)),
           accumulationDescription = Some("1963"),
           accumulationInstant = Some("1963-01-01Z"),
           appraisal = Some("Files selected in accordance with Operational Selection Policy OSP 26"),
-          accrualPolicy = Some(new URI(s"${BaseURL.cat}/policy.No_future_accruals_expected")),
+          accrualPolicy = Some(new URI(s"${Cat.NS}policy.No_future_accruals_expected")),
           layout = Some("Photographs in a box"),
           publicationNote =
             Some("Some of the photographs in this series appeared in The Manchester Guardian newspaper.")
@@ -257,20 +258,20 @@ class TestRepository extends AbstractRepository {
     Try(
       List(
         AccessRightsEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
-          new URI(s"${BaseURL.cat}/policy.Open_Description")
+          new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
+          new URI(s"${Cat.NS}policy.Open_Description")
         ),
         AccessRightsEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
-          new URI(s"${BaseURL.cat}/policy.Normal_Closure_before_FOI_Act_30_years_from_1963-12-31")
+          new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
+          new URI(s"${Cat.NS}policy.Normal_Closure_before_FOI_Act_30_years_from_1963-12-31")
         ),
         AccessRightsEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
-          new URI(s"${BaseURL.cat}/policy.Open_Description")
+          new URI(s"${Cat.NS}COAL.2022.N373.P.1"),
+          new URI(s"${Cat.NS}policy.Open_Description")
         ),
         AccessRightsEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
-          new URI(s"${BaseURL.cat}/policy.Normal_Closure_before_FOI_Act_30_years_from_1963-12-31")
+          new URI(s"${Cat.NS}COAL.2022.N373.P.1"),
+          new URI(s"${Cat.NS}policy.Normal_Closure_before_FOI_Act_30_years_from_1963-12-31")
         )
       )
     )
@@ -279,12 +280,12 @@ class TestRepository extends AbstractRepository {
     Try(
       List(
         IsPartOfEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
-          new URI(s"${BaseURL.cat}/recordset.COAL.2022.2834")
+          new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
+          new URI(s"${Cat.NS}recordset.COAL.2022.2834")
         ),
         IsPartOfEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
-          new URI(s"${BaseURL.cat}/recordset.COAL.2022.2834")
+          new URI(s"${Cat.NS}COAL.2022.N373.P.1"),
+          new URI(s"${Cat.NS}recordset.COAL.2022.2834")
         )
       )
     )
@@ -293,13 +294,13 @@ class TestRepository extends AbstractRepository {
     Try(
       List(
         SecondaryIdentifierEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
-          new URI(s"${BaseURL.cat}/classicCatalogueReference"),
+          new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
+          new URI(s"${Cat.NS}classicCatalogueReference"),
           "COAL 80/2052/9"
         ),
         SecondaryIdentifierEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
-          new URI(s"${BaseURL.cat}/classicCatalogueReference"),
+          new URI(s"${Cat.NS}COAL.2022.N373.P.1"),
+          new URI(s"${Cat.NS}classicCatalogueReference"),
           "COAL 80/2052/9"
         )
       )
@@ -309,14 +310,14 @@ class TestRepository extends AbstractRepository {
     Try(
       List(
         LabelledIdentifierEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+          new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
           "Coal Board Minutes 1963",
-          new URI(s"${BaseURL.cat}/res.JN31")
+          new URI(s"${Cat.NS}res.JN31")
         ),
         LabelledIdentifierEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
+          new URI(s"${Cat.NS}COAL.2022.N373.P.1"),
           "Coal Board Minutes 1962",
-          new URI(s"${BaseURL.cat}/res.4JJF")
+          new URI(s"${Cat.NS}res.4JJF")
         )
       )
     )
@@ -325,14 +326,14 @@ class TestRepository extends AbstractRepository {
     Try(
       List(
         LabelledIdentifierEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+          new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
           "Index of colliery photographs March 1963",
-          new URI(s"${BaseURL.cat}/COAL.2022.S144")
+          new URI(s"${Cat.NS}COAL.2022.S144")
         ),
         LabelledIdentifierEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
+          new URI(s"${Cat.NS}COAL.2022.N373.P.1"),
           "Index of colliery photographs September 1963",
-          new URI(s"${BaseURL.cat}/COAL.2022.G221")
+          new URI(s"${Cat.NS}COAL.2022.G221")
         )
       )
     )
@@ -341,14 +342,14 @@ class TestRepository extends AbstractRepository {
     Try(
       List(
         LabelledIdentifierEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+          new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
           "NCB records 1963",
-          new URI(s"${BaseURL.cat}/CAB.2022.L744")
+          new URI(s"${Cat.NS}CAB.2022.L744")
         ),
         LabelledIdentifierEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.1"),
+          new URI(s"${Cat.NS}COAL.2022.N373.P.1"),
           "Cabinet records 1963",
-          new URI(s"${BaseURL.cat}/CAB.2022.N901")
+          new URI(s"${Cat.NS}CAB.2022.N901")
         )
       )
     )
@@ -356,8 +357,8 @@ class TestRepository extends AbstractRepository {
   override def getUriSubjects(recordConceptUri: String): Try[List[IdentifierEntity]] =
     Try(
       List(
-        IdentifierEntity(new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"), new URI(s"${BaseURL.cat}/agent.4N6")),
-        IdentifierEntity(new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"), new URI(s"${BaseURL.cat}/agent.S7"))
+        IdentifierEntity(new URI(s"${Cat.NS}COAL.2022.N373.P.2"), new URI(s"${Cat.NS}agent.4N6")),
+        IdentifierEntity(new URI(s"${Cat.NS}COAL.2022.N373.P.2"), new URI(s"${Cat.NS}agent.S7"))
       )
     )
 
@@ -365,9 +366,9 @@ class TestRepository extends AbstractRepository {
     Try(
       List(
         LabelledIdentifierEntity(
-          new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2"),
+          new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
           "from 1965",
-          new URI(s"${BaseURL.cat}/agent.24")
+          new URI(s"${Cat.NS}agent.24")
         )
       )
     )

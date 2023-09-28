@@ -19,18 +19,29 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages.request
+package uk.gov.nationalarchives.omega.api.messages.reply
 
-import io.circe.Decoder
+import io.circe.syntax.EncoderOps
+import io.circe.{ Encoder, Json }
+import io.circe.generic.auto._
+import org.apache.jena.ext.xerces.util.URI
 
-/** RequestByIdentifier is a generic message which is used to request a resource by identifier - for example, the
-  * GetRecord message in the API schema uses this format
-  */
-case class RequestByIdentifier(identifier: String) extends RequestMessage
-object RequestByIdentifier {
-  implicit val decodeRequestByIdentifier: Decoder[RequestByIdentifier] = json =>
-    for {
-      identifier <- json.get[String]("identifier")
-    } yield RequestByIdentifier(identifier)
+sealed trait Identifier
 
+/** Represents a GeneralIdentifier as defined by the AsyncAPI schema */
+case class GeneralIdentifier(identifier: String) extends Identifier
+object GeneralIdentifier {
+
+  def fromUri(uri: URI): GeneralIdentifier = GeneralIdentifier(uri.toString)
+
+}
+
+/** Represents a GeneralLabelledIdentifier as defined by the AsyncAPI schema */
+case class GeneralLabelledIdentifier(identifier: String, label: String) extends Identifier
+
+object GenericIdentifierDerivation {
+  implicit val encodeIdentifier: Encoder[Identifier] = Encoder.instance {
+    case unlabelled @ GeneralIdentifier(_)          => Json.fromString(unlabelled.identifier)
+    case labelled @ GeneralLabelledIdentifier(_, _) => labelled.asJson
+  }
 }

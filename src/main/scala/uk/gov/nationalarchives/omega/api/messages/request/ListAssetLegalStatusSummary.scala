@@ -21,4 +21,5 @@
 
 package uk.gov.nationalarchives.omega.api.messages.request
 
+/** Represents a ListAssetLegalStatusSummary message as defined by the API schema */
 case class ListAssetLegalStatusSummary(text: Option[String] = None) extends RequestMessage

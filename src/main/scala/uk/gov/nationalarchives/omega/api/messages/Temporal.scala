@@ -19,18 +19,24 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages.request
+package uk.gov.nationalarchives.omega.api.messages
 
-import io.circe.Decoder
+import io.circe.{ Encoder, Json }
+import io.circe.syntax.EncoderOps
+import io.circe.generic.auto._
 
-/** RequestByIdentifier is a generic message which is used to request a resource by identifier - for example, the
-  * GetRecord message in the API schema uses this format
-  */
-case class RequestByIdentifier(identifier: String) extends RequestMessage
-object RequestByIdentifier {
-  implicit val decodeRequestByIdentifier: Decoder[RequestByIdentifier] = json =>
-    for {
-      identifier <- json.get[String]("identifier")
-    } yield RequestByIdentifier(identifier)
+sealed trait Temporal
 
+case class TemporalInstant(instant: String) extends Temporal
+case class TemporalInterval(dateFrom: String, dateTo: String) extends Temporal
+
+object GenericTemporalDerivation {
+  implicit val encodeTemporal: Encoder[Temporal] = Encoder.instance {
+    case instant @ TemporalInstant(_) => instant.asJson
+    case TemporalInterval(dateFrom, dateTo) =>
+      Json.obj(
+        ("date-from", Json.fromString(dateFrom)),
+        ("date-to", Json.fromString(dateTo))
+      )
+  }
 }

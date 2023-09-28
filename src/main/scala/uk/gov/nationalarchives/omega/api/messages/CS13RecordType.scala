@@ -19,18 +19,30 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages.request
+package uk.gov.nationalarchives.omega.api.messages
 
-import io.circe.Decoder
+import enumeratum.EnumEntry.CapitalWords
+import enumeratum.{ CirceEnum, Enum, EnumEntry }
+import org.apache.jena.ext.xerces.util.URI
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
 
-/** RequestByIdentifier is a generic message which is used to request a resource by identifier - for example, the
-  * GetRecord message in the API schema uses this format
-  */
-case class RequestByIdentifier(identifier: String) extends RequestMessage
-object RequestByIdentifier {
-  implicit val decodeRequestByIdentifier: Decoder[RequestByIdentifier] = json =>
-    for {
-      identifier <- json.get[String]("identifier")
-    } yield RequestByIdentifier(identifier)
+import scala.util.{ Failure, Success, Try }
+
+sealed trait CS13RecordType extends EnumEntry with CapitalWords
+
+object CS13RecordType extends Enum[CS13RecordType] with CirceEnum[CS13RecordType] {
+
+  val values = findValues
+
+  case object Piece extends CS13RecordType
+
+  case object Item extends CS13RecordType
+
+  def fromUri(cs13RecordTypeUri: URI): Try[CS13RecordType] =
+    cs13RecordTypeUri.toString match {
+      case Cat.piece => Success(Piece)
+      case Cat.item  => Success(Item)
+      case unknown   => Failure(new IllegalArgumentException(s"Unknown CS13 record type: $unknown"))
+    }
 
 }

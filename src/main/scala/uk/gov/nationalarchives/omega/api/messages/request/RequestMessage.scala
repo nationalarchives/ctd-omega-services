@@ -21,4 +21,5 @@
 
 package uk.gov.nationalarchives.omega.api.messages.request
 
-trait RequestMessage {}
+/** Represents a request message to the API services */
+trait RequestMessage

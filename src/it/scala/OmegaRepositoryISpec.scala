@@ -10,7 +10,8 @@ import org.scalatest.time.{ Second, Seconds, Span }
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.{ BaseURL, OmegaRepository }
+import uk.gov.nationalarchives.omega.api.repository.OmegaRepository
+import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
 
 class OmegaRepositoryISpec
     extends AnyFreeSpec with Matchers with Eventually with IntegrationPatience with BeforeAndAfterAll
@@ -62,10 +63,10 @@ class OmegaRepositoryISpec
       eventually {
         val result = repository.getAgentDescriptionEntities(
           ListAgentSummary(),
-          new URI(s"${BaseURL.cat}/agent.HHC")
+          new URI(s"${Cat.NS}agent.HHC")
         )
         result.success.get.length mustBe 1
-        result.success.get.head.identifier mustBe s"${BaseURL.cat}/agent.HHC.2"
+        result.success.get.head.identifier mustBe s"${Cat.NS}agent.HHC.2"
       }
     }
     "must return a List containing the latest HHC agent (HH2)" in {
@@ -73,10 +74,10 @@ class OmegaRepositoryISpec
       eventually {
         val result = repository.getAgentDescriptionEntities(
           ListAgentSummary(versionTimestamp = Some("latest")),
-          new URI(s"${BaseURL.cat}/agent.HHC")
+          new URI(s"${Cat.NS}agent.HHC")
         )
         result.success.get.length mustBe 1
-        result.success.get.head.identifier mustBe s"${BaseURL.cat}/agent.HHC.2"
+        result.success.get.head.identifier mustBe s"${Cat.NS}agent.HHC.2"
       }
     }
     "must return a List with both HHC agent descriptions" in {
@@ -84,7 +85,7 @@ class OmegaRepositoryISpec
       eventually {
         val result = repository.getAgentDescriptionEntities(
           ListAgentSummary(versionTimestamp = Some("all")),
-          new URI(s"${BaseURL.cat}/agent.HHC")
+          new URI(s"${Cat.NS}agent.HHC")
         )
         result.success.get.length mustBe 2
       }
@@ -94,7 +95,7 @@ class OmegaRepositoryISpec
       eventually {
         val result = repository.getAgentDescriptionEntities(
           ListAgentSummary(versionTimestamp = Some("2023-08-01T00:00:00.000Z")),
-          new URI(s"${BaseURL.cat}/agent.HHC")
+          new URI(s"${Cat.NS}agent.HHC")
         )
         result.success.get mustEqual List.empty
       }
@@ -104,9 +105,9 @@ class OmegaRepositoryISpec
       eventually {
         val result = repository.getAgentDescriptionEntities(
           ListAgentSummary(versionTimestamp = Some("2023-07-01T00:00:00.000Z")),
-          new URI(s"${BaseURL.cat}/agent.HHC")
+          new URI(s"${Cat.NS}agent.HHC")
         )
-        result.success.get.head.identifier mustBe s"${BaseURL.cat}/agent.HHC.2"
+        result.success.get.head.identifier mustBe s"${Cat.NS}agent.HHC.2"
       }
     }
     "must return a List containing with all HHC agents created from a date onwards (2)" in {
@@ -114,7 +115,7 @@ class OmegaRepositoryISpec
       eventually {
         val result = repository.getAgentDescriptionEntities(
           ListAgentSummary(versionTimestamp = Some("2023-01-01T00:00:00.000Z")),
-          new URI(s"${BaseURL.cat}/agent.HHC")
+          new URI(s"${Cat.NS}agent.HHC")
         )
         result.success.get.length mustBe 2
       }
@@ -127,7 +128,7 @@ class OmegaRepositoryISpec
       eventually {
         val result = repository.getRecordConceptEntity("COAL.2022.N373.P")
         result.success.get.length mustBe 1
-        result.success.get.head.currentDescriptionUri mustEqual new URI(s"${BaseURL.cat}/COAL.2022.N373.P.2")
+        result.success.get.head.currentDescriptionUri mustEqual new URI(s"${Cat.NS}COAL.2022.N373.P.2")
       }
     }
   }
@@ -136,9 +137,9 @@ class OmegaRepositoryISpec
     "must return a List with one item" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getCreatorEntities(s"${BaseURL.cat}/COAL.2022.N373.P")
+        val result = repository.getCreatorEntities(s"${Cat.NS}COAL.2022.N373.P")
         result.success.get.length mustBe 1
-        result.success.get.head.identifier mustEqual new URI(s"${BaseURL.cat}/agent.24")
+        result.success.get.head.identifier mustEqual new URI(s"${Cat.NS}agent.24")
         result.success.get.head.label mustBe "from 1965"
       }
     }
@@ -148,14 +149,14 @@ class OmegaRepositoryISpec
     "must return a List with one item" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getRecordDescriptionSummaries(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        val result = repository.getRecordDescriptionSummaries(s"${Cat.NS}COAL.2022.N36R.P")
         result.success.get.length mustBe 1
       }
     }
     "must return a List with two items" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getRecordDescriptionSummaries(s"${BaseURL.cat}/COAL.2022.N373.P")
+        val result = repository.getRecordDescriptionSummaries(s"${Cat.NS}COAL.2022.N373.P")
         result.success.get.length mustBe 2
       }
     }
@@ -165,14 +166,14 @@ class OmegaRepositoryISpec
     "must return a List with one item" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getRecordDescriptionProperties(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        val result = repository.getRecordDescriptionProperties(s"${Cat.NS}COAL.2022.N36R.P")
         result.success.get.length mustBe 1
       }
     }
     "must return a List with two items" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getRecordDescriptionProperties(s"${BaseURL.cat}/COAL.2022.N373.P")
+        val result = repository.getRecordDescriptionProperties(s"${Cat.NS}COAL.2022.N373.P")
         result.success.get.length mustBe 2
       }
     }
@@ -182,14 +183,14 @@ class OmegaRepositoryISpec
     "must return a List with two items" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getAccessRights(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        val result = repository.getAccessRights(s"${Cat.NS}COAL.2022.N36R.P")
         result.success.get.length mustBe 2
       }
     }
     "must return a List with four items" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getAccessRights(s"${BaseURL.cat}/COAL.2022.N373.P")
+        val result = repository.getAccessRights(s"${Cat.NS}COAL.2022.N373.P")
         result.success.get.length mustBe 4
       }
     }
@@ -199,14 +200,14 @@ class OmegaRepositoryISpec
     "must return a List with one item" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getIsPartOf(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        val result = repository.getIsPartOf(s"${Cat.NS}COAL.2022.N36R.P")
         result.success.get.length mustBe 1
       }
     }
     "must return a List with two items" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getIsPartOf(s"${BaseURL.cat}/COAL.2022.N373.P")
+        val result = repository.getIsPartOf(s"${Cat.NS}COAL.2022.N373.P")
         result.success.get.length mustBe 2
       }
     }
@@ -216,14 +217,14 @@ class OmegaRepositoryISpec
     "must return a List with one item" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getSecondaryIdentifiers(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        val result = repository.getSecondaryIdentifiers(s"${Cat.NS}COAL.2022.N36R.P")
         result.success.get.length mustBe 1
       }
     }
     "must return a List with two items" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getSecondaryIdentifiers(s"${BaseURL.cat}/COAL.2022.N373.P")
+        val result = repository.getSecondaryIdentifiers(s"${Cat.NS}COAL.2022.N373.P")
         result.success.get.length mustBe 2
       }
     }
@@ -233,14 +234,14 @@ class OmegaRepositoryISpec
     "must return an empty List" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getIsReferencedBys(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        val result = repository.getIsReferencedBys(s"${Cat.NS}COAL.2022.N36R.P")
         result.success.get.length mustBe 0
       }
     }
     "must return a List with two items" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getIsReferencedBys(s"${BaseURL.cat}/COAL.2022.N373.P")
+        val result = repository.getIsReferencedBys(s"${Cat.NS}COAL.2022.N373.P")
         result.success.get.length mustBe 2
       }
     }
@@ -250,14 +251,14 @@ class OmegaRepositoryISpec
     "must return an empty List" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getRelatedTos(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        val result = repository.getRelatedTos(s"${Cat.NS}COAL.2022.N36R.P")
         result.success.get.length mustBe 0
       }
     }
     "must return a List with two items" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getRelatedTos(s"${BaseURL.cat}/COAL.2022.N373.P")
+        val result = repository.getRelatedTos(s"${Cat.NS}COAL.2022.N373.P")
         result.success.get.length mustBe 2
       }
     }
@@ -267,14 +268,14 @@ class OmegaRepositoryISpec
     "must return an empty List" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getSeparatedFroms(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        val result = repository.getSeparatedFroms(s"${Cat.NS}COAL.2022.N36R.P")
         result.success.get.length mustBe 0
       }
     }
     "must return a List with two items" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getSeparatedFroms(s"${BaseURL.cat}/COAL.2022.N373.P")
+        val result = repository.getSeparatedFroms(s"${Cat.NS}COAL.2022.N373.P")
         result.success.get.length mustBe 2
       }
     }
@@ -284,14 +285,14 @@ class OmegaRepositoryISpec
     "must return an empty List" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getUriSubjects(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        val result = repository.getUriSubjects(s"${Cat.NS}COAL.2022.N36R.P")
         result.success.get.length mustBe 0
       }
     }
     "must return a List with two items" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getUriSubjects(s"${BaseURL.cat}/COAL.2022.N373.P")
+        val result = repository.getUriSubjects(s"${Cat.NS}COAL.2022.N373.P")
         result.success.get.length mustBe 2
       }
     }
@@ -301,14 +302,14 @@ class OmegaRepositoryISpec
     "must return a List with one item" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getLabelledSubjects(s"${BaseURL.cat}/COAL.2022.N36R.P")
+        val result = repository.getLabelledSubjects(s"${Cat.NS}COAL.2022.N36R.P")
         result.success.get.length mustBe 1
       }
     }
     "must return a List with two items" in {
       when(mockConfig.sparqlEndpoint).thenReturn(BulkLoadData.testRepositoryUrl)
       eventually {
-        val result = repository.getLabelledSubjects(s"${BaseURL.cat}/COAL.2022.N373.P")
+        val result = repository.getLabelledSubjects(s"${Cat.NS}COAL.2022.N373.P")
         result.success.get.length mustBe 2
       }
     }

@@ -19,16 +19,19 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages.reply
+package uk.gov.nationalarchives.omega.api.messages
 
+import io.circe.syntax.EncoderOps
 import io.circe.{ Encoder, Json }
-import org.apache.jena.ext.xerces.util.URI
+import uk.gov.nationalarchives.omega.api.messages.GenericTemporalDerivation._
 
-case class LegalStatus(identifier: URI, label: String) extends ReplyMessage
-object LegalStatus {
-  implicit val encodeLegalStatus: Encoder[LegalStatus] = (legalStatus: LegalStatus) =>
-    Json.obj(
-      ("identifier", Json.fromString(legalStatus.identifier.toString)),
-      ("label", Json.fromString(legalStatus.label))
-    )
+case class DescribedTemporal(description: String, temporal: Temporal)
+object DescribedTemporal {
+  implicit val encodeDescribedTemporal: Encoder[DescribedTemporal] = (describedTemporal: DescribedTemporal) =>
+    Json
+      .obj(
+        ("description", Json.fromString(describedTemporal.description)),
+        ("temporal", describedTemporal.temporal.asJson)
+      )
+      .deepDropNullValues
 }

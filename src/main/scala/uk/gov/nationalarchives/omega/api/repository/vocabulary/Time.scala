@@ -19,18 +19,20 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package uk.gov.nationalarchives.omega.api.messages.request
+package uk.gov.nationalarchives.omega.api.repository.vocabulary
 
-import io.circe.Decoder
+import org.apache.jena.rdf.model.{ ModelFactory, Resource }
 
-/** RequestByIdentifier is a generic message which is used to request a resource by identifier - for example, the
-  * GetRecord message in the API schema uses this format
-  */
-case class RequestByIdentifier(identifier: String) extends RequestMessage
-object RequestByIdentifier {
-  implicit val decodeRequestByIdentifier: Decoder[RequestByIdentifier] = json =>
-    for {
-      identifier <- json.get[String]("identifier")
-    } yield RequestByIdentifier(identifier)
+object Time {
+
+  /** The RDF model that holds the vocabulary terms */
+  private val model = ModelFactory.createDefaultModel
+
+  /** The namespace of the vocabulary as a string */
+  val NS = "http://www.w3.org/2006/time#"
+
+  val ProperInterval: String = model.createResource(s"${NS}ProperInterval").getURI
+
+  val Instant: String = model.createResource(s"${NS}Instant").getURI
 
 }
