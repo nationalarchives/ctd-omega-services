@@ -27,9 +27,9 @@ import org.scalatest.matchers.{ MatchResult, Matcher }
 import uk.gov.nationalarchives.omega.api.business.{ BusinessServiceError, BusinessServiceReply }
 import uk.gov.nationalarchives.omega.api.messages.LocalMessage.InvalidMessagePayload
 import uk.gov.nationalarchives.omega.api.messages.request.EchoRequest
-import uk.gov.nationalarchives.omega.api.support.UnitTest
+import uk.gov.nationalarchives.omega.api.support.AsyncUnitTest
 
-class EchoServiceSpec extends UnitTest {
+class EchoServiceSpec extends AsyncUnitTest {
 
   val echoService = new EchoService()
 
@@ -88,7 +88,7 @@ class EchoServiceSpec extends UnitTest {
 
               val result = echoService.process(echoRequest)
 
-              result must beAFailure("Explicit error: ERROR: Some details about that error.")
+              result.asserting(_ must beAFailure("Explicit error: ERROR: Some details about that error."))
 
             }
             "lower case" in {
@@ -97,7 +97,7 @@ class EchoServiceSpec extends UnitTest {
 
               val result = echoService.process(echoRequest)
 
-              result must beASuccess("The Echo Service says: error: Some details about that error.")
+              result.asserting(_ must beASuccess("The Echo Service says: error: Some details about that error."))
 
             }
           }
@@ -108,7 +108,7 @@ class EchoServiceSpec extends UnitTest {
 
               val result = echoService.process(echoRequest)
 
-              result must beASuccess("The Echo Service says: ")
+              result.asserting(_ must beASuccess("The Echo Service says: "))
 
             }
             "only consists of whitespace" in {
@@ -117,7 +117,7 @@ class EchoServiceSpec extends UnitTest {
 
               val result = echoService.process(echoRequest)
 
-              result must beASuccess("The Echo Service says:           ")
+              result.asserting(_ must beASuccess("The Echo Service says:           "))
 
             }
             "has several characters" in {
@@ -126,7 +126,7 @@ class EchoServiceSpec extends UnitTest {
 
               val result = echoService.process(echoRequest)
 
-              result must beASuccess("The Echo Service says: Hello, world")
+              result.asserting(_ must beASuccess("The Echo Service says: Hello, world"))
 
             }
           }

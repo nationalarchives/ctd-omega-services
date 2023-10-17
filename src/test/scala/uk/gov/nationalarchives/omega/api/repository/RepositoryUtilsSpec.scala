@@ -26,9 +26,9 @@ import org.apache.jena.rdf.model.ResourceFactory
 import org.apache.jena.vocabulary.DCTerms
 import org.phenoscape.sparql.SPARQLInterpolation.SPARQLStringContext
 import uk.gov.nationalarchives.omega.api.repository.vocabulary.{ Cat, TODO }
-import uk.gov.nationalarchives.omega.api.support.UnitTest
+import uk.gov.nationalarchives.omega.api.support.AsyncUnitTest
 
-class RepositoryUtilsSpec extends UnitTest {
+class RepositoryUtilsSpec extends AsyncUnitTest {
 
   val sparqlPrefix =
     sparql"""
@@ -131,8 +131,8 @@ class RepositoryUtilsSpec extends UnitTest {
           )
         )
       )
-      val result = utils.prepareParameterizedQuery(queryResource, queryParams, extendQuery = false)
-      result.get mustEqual expectedSparqlWithValues
+      val result = utils.prepareParameterizedQuery(queryResource, queryParams)
+      result.asserting(_ mustEqual expectedSparqlWithValues)
     }
     "add a boolean property" in {
       val utils = new RepositoryUtils {}
@@ -142,8 +142,8 @@ class RepositoryUtilsSpec extends UnitTest {
           booleans = Map("objectParam" -> true),
           uris = Map("predicateParam" -> TODO.isPlaceOfDeposit)
         )
-      val result = utils.prepareParameterizedQuery(queryResource, queryParams, extendQuery = false)
-      result.get mustEqual expectedSparqlWithBoolean
+      val result = utils.prepareParameterizedQuery(queryResource, queryParams)
+      result.asserting(_ mustEqual expectedSparqlWithBoolean)
     }
     "add a query extension" in {
       val utils = new RepositoryUtils {}
@@ -151,16 +151,16 @@ class RepositoryUtilsSpec extends UnitTest {
       val queryParams =
         SparqlParams(queryExtension = Some("ORDER BY DESC(?identifier)"))
       val result = utils.prepareParameterizedQuery(queryResource, queryParams, extendQuery = true)
-      result.get mustEqual expectedSparqlWithExtension
+      result.asserting(_ mustEqual expectedSparqlWithExtension)
     }
     "add an object property" in {
       val utils = new RepositoryUtils {}
       val queryResource = "/sparql/properties.rq"
       val queryParams =
         SparqlParams(uris = Map("predicateParam" -> DCTerms.`type`.getURI, "objectParam" -> Cat.authorityFile))
-      val result = utils.prepareParameterizedQuery(queryResource, queryParams, extendQuery = false)
+      val result = utils.prepareParameterizedQuery(queryResource, queryParams)
       SparqlParams(uris = Map("property" -> DCTerms.`type`.getURI, "value" -> Cat.authorityFile))
-      result.get mustEqual expectedSparqlWithObject
+      result.asserting(_ mustEqual expectedSparqlWithObject)
     }
     "add multiple params and values" in {
       val utils = new RepositoryUtils {}
@@ -179,8 +179,8 @@ class RepositoryUtilsSpec extends UnitTest {
           )
         )
       )
-      val result = utils.prepareParameterizedQuery(queryResource, queryParams, extendQuery = false)
-      result.get mustEqual expectedSparqlWithPropertiesAndValues
+      val result = utils.prepareParameterizedQuery(queryResource, queryParams)
+      result.asserting(_ mustEqual expectedSparqlWithPropertiesAndValues)
     }
     "add a filter param in" in {
       val utils = new RepositoryUtils {}
@@ -188,15 +188,15 @@ class RepositoryUtilsSpec extends UnitTest {
       val queryParams = SparqlParams(filters =
         Map("filterParam" -> "FILTER(?versionTimestamp >= xsd:dateTime(\"2023-07-01T17:30:00.000Z\"))")
       )
-      val result = utils.prepareParameterizedQuery(queryResource, queryParams, extendQuery = false)
-      result.get mustEqual expectedSparqlWithFilter
+      val result = utils.prepareParameterizedQuery(queryResource, queryParams)
+      result.asserting(_ mustEqual expectedSparqlWithFilter)
     }
     "remove a filter param in" in {
       val utils = new RepositoryUtils {}
       val queryResource = "/sparql/filter.rq"
       val queryParams = SparqlParams(filters = Map("filterParam" -> ""))
-      val result = utils.prepareParameterizedQuery(queryResource, queryParams, extendQuery = false)
-      result.get mustEqual expectedSparqlWithoutFilter
+      val result = utils.prepareParameterizedQuery(queryResource, queryParams)
+      result.asserting(_ mustEqual expectedSparqlWithoutFilter)
     }
   }
 

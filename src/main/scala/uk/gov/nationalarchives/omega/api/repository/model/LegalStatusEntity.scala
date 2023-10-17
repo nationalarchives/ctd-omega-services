@@ -30,7 +30,6 @@ case class LegalStatusEntity(identifier: URI, label: String) {
 }
 
 object LegalStatusEntity {
-  implicit def legalStatusMapper: LegalStatusEntity => Option[LegalStatusSummary] =
-    (legalStatusEntity: LegalStatusEntity) =>
-      Some(LegalStatusSummary(legalStatusEntity.identifier, legalStatusEntity.label))
+  implicit def legalStatusMapper: LegalStatusEntity => LegalStatusSummary =
+    (legalStatusEntity: LegalStatusEntity) => LegalStatusSummary(legalStatusEntity.identifier, legalStatusEntity.label)
 }

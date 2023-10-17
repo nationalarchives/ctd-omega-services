@@ -21,7 +21,9 @@
 
 package uk.gov.nationalarchives.omega.api.repository.model
 
+import cats.effect.IO
 import org.apache.jena.ext.xerces.util.URI
+import uk.gov.nationalarchives.omega.api.common.AppLogger
 import uk.gov.nationalarchives.omega.api.messages.reply.{ AgentDescription, AgentSummary }
 
 import scala.util.Success
@@ -29,21 +31,23 @@ import scala.util.Success
 case class AgentConceptEntity(conceptId: URI, agentType: URI, currentVersionId: URI) {
   def as[T](implicit f: AgentConceptEntity => T): T = f(this)
 }
-object AgentConceptEntity extends AgentTypeMapper {
+object AgentConceptEntity extends AgentTypeMapper with AppLogger {
 
-  implicit def agentSummaryMapper: AgentConceptEntity => Option[AgentSummary] =
+  implicit def agentSummaryMapper: AgentConceptEntity => IO[Option[AgentSummary]] =
     (agentSummaryEntity: AgentConceptEntity) =>
       getAgentTypeFromUri(agentSummaryEntity.agentType) match {
         case Success(agentType) =>
-          Some(
-            AgentSummary(
-              agentType,
-              agentSummaryEntity.conceptId.toString,
-              agentSummaryEntity.currentVersionId.toString,
-              List.empty[AgentDescription]
+          IO(
+            Some(
+              AgentSummary(
+                agentType,
+                agentSummaryEntity.conceptId.toString,
+                agentSummaryEntity.currentVersionId.toString,
+                List.empty[AgentDescription]
+              )
             )
           )
-        case _ => None // TODO (RW) log error here (see PACT-1071)
+        case _ => logger.error(s"Unknown agent type: ${agentSummaryEntity.agentType.toString}") *> IO.pure(None)
       }
 
 }

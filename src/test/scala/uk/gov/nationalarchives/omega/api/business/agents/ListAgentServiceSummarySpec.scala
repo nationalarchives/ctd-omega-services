@@ -28,9 +28,9 @@ import uk.gov.nationalarchives.omega.api.messages.LocalMessage.InvalidMessagePay
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.TestRepository
 import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
-import uk.gov.nationalarchives.omega.api.support.UnitTest
+import uk.gov.nationalarchives.omega.api.support.AsyncUnitTest
 
-class ListAgentServiceSummarySpec extends UnitTest {
+class ListAgentServiceSummarySpec extends AsyncUnitTest {
 
   private val testRepository = new TestRepository
   private val listAgentSummaryService = new ListAgentSummaryService(testRepository)
@@ -46,8 +46,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
           authorityFile = Some(false)
         )
         val result = listAgentSummaryService.process(listAgentSummaryRequest)
-        result mustBe
-          Right(ListAgentSummaryReply(getExpectedAgentSummaries))
+        result.asserting(_ mustBe Right(ListAgentSummaryReply(getExpectedAgentSummaries)))
       }
 
       "a valid listAgentSummaryRequest for place of deposit" in {
@@ -59,8 +58,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
           authorityFile = Some(false)
         )
         val result = listAgentSummaryService.process(listAgentSummaryRequest)
-        result mustBe
-          Right(ListAgentSummaryReply(getExpectedPlaceOfDepositSummaries))
+        result.asserting(_ mustBe Right(ListAgentSummaryReply(getExpectedPlaceOfDepositSummaries)))
       }
 
       // NOTE (RW): This test is ignored as empty requests are not allowed by SQS although they are allowed by the schema
@@ -70,7 +68,7 @@ class ListAgentServiceSummarySpec extends UnitTest {
         val listAgentSummaryRequest = ListAgentSummary()
         val result = listAgentSummaryService.process(listAgentSummaryRequest)
 
-        result mustBe Right(ListAgentSummaryReply(getExpectedAgentSummaries))
+        result.asserting(_ mustBe Right(ListAgentSummaryReply(getExpectedAgentSummaries)))
       }
 
     }

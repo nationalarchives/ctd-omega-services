@@ -22,6 +22,7 @@
 package uk.gov.nationalarchives.omega.api.business.agents
 
 import cats.data.Validated
+import cats.effect.IO
 import cats.implicits._
 import io.circe.parser.decode
 import io.circe.syntax.EncoderOps
@@ -35,23 +36,22 @@ import uk.gov.nationalarchives.omega.api.repository.AbstractRepository
 import uk.gov.nationalarchives.omega.api.repository.model.AgentConceptEntity
 
 import java.time.ZonedDateTime
-import scala.util.{ Failure, Success, Try }
+import scala.util.Try
 
 class ListAgentSummaryService(val repository: AbstractRepository)
     extends BusinessService with BusinessRequestValidation {
 
   override def process(
     requestMessage: RequestMessage
-  ): Either[BusinessServiceError, BusinessServiceReply] = {
-    val summaries = for {
-      listAgentSummary <- Try(requestMessage.asInstanceOf[ListAgentSummary])
+  ): IO[Either[BusinessServiceError, BusinessServiceReply]] = {
+    for {
+      listAgentSummary <- IO(requestMessage.asInstanceOf[ListAgentSummary])
       agentSummaries   <- getAgentSummaries(listAgentSummary)
     } yield agentSummaries
-    summaries match {
-      case Success(sums)      => Right(ListAgentSummaryReply(sums.asJson.toString()))
-      case Failure(exception) => Left(ListAgentSummaryError(exception.getMessage))
-    }
-  }
+  }.redeem(
+    error => Left(ListAgentSummaryError(error.getMessage)),
+    sums => Right(ListAgentSummaryReply(sums.asJson.toString()))
+  )
 
   override def validateRequest(validatedLocalMessage: ValidatedLocalMessage): ValidationResult[RequestMessage] =
     if (validatedLocalMessage.messageText.nonEmpty) {
@@ -86,7 +86,7 @@ class ListAgentSummaryService(val repository: AbstractRepository)
       Try(ZonedDateTime.parse(trimmedDate)).toOption
   }
 
-  private def getAgentSummaries(listAgentSummary: ListAgentSummary): Try[List[AgentSummary]] =
+  private def getAgentSummaries(listAgentSummary: ListAgentSummary): IO[List[AgentSummary]] =
     for {
       agentEntities  <- repository.getAgentSummaryEntities(listAgentSummary)
       agentSummaries <- convertAgentSummaryEntities(agentEntities, listAgentSummary)
@@ -95,32 +95,40 @@ class ListAgentSummaryService(val repository: AbstractRepository)
   private def combineSummaryAndDescriptions(
     agentSummary: AgentSummary,
     agentDescriptions: List[AgentDescription]
-  ): Try[AgentSummary] =
-    Try(agentSummary.copy(descriptions = agentDescriptions))
+  ): IO[AgentSummary] =
+    IO(agentSummary.copy(descriptions = agentDescriptions))
 
   private def convertAgentSummaryEntities(
     agentSummaryEntities: List[AgentConceptEntity],
     listAgentSummary: ListAgentSummary
-  ): Try[List[AgentSummary]] =
+  ): IO[List[AgentSummary]] =
     agentSummaryEntities.map { agentSummaryEntity =>
-      agentSummaryEntity.as[Option[AgentSummary]] match {
+      getAgentSummary(agentSummaryEntity, listAgentSummary)
+    }.sequence
+
+  private def getAgentSummary(
+    agentSummaryEntity: AgentConceptEntity,
+    listAgentSummary: ListAgentSummary
+  ): IO[AgentSummary] =
+    agentSummaryEntity.as[IO[Option[AgentSummary]]].flatMap { agentSummaryOpt =>
+      agentSummaryOpt match {
         case Some(agentSummary) =>
           for {
             agentDescriptions            <- getAgentDescriptions(agentSummaryEntity, listAgentSummary)
             agentSummaryWithDescriptions <- combineSummaryAndDescriptions(agentSummary, agentDescriptions)
           } yield agentSummaryWithDescriptions
-        case _ => Failure(ServiceException("Failed to transform AgentSummaryEntity to AgentSummary"))
+        case _ => IO.raiseError(ServiceException("Failed to transform AgentSummaryEntity to AgentSummary"))
       }
-    }.sequence
+    }
 
   private def getAgentDescriptions(
     agentSummaryEntity: AgentConceptEntity,
     listAgentSummary: ListAgentSummary
-  ): Try[List[AgentDescription]] =
+  ): IO[List[AgentDescription]] =
     for {
       agentDescriptionEntities <- repository.getAgentDescriptionEntities(listAgentSummary, agentSummaryEntity.conceptId)
       agentDescriptions <-
-        Try(agentDescriptionEntities.map(agentDescriptionEntity => agentDescriptionEntity.as[AgentDescription]))
+        IO(agentDescriptionEntities.map(agentDescriptionEntity => agentDescriptionEntity.as[AgentDescription]))
     } yield agentDescriptions
 
 }

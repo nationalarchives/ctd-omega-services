@@ -100,7 +100,10 @@ class Dispatcher(
   private def decodeAndDispatch(validatedLocalMessage: ValidatedLocalMessage, localMessage: LocalMessage): IO[Unit] =
     decodePayload(validatedLocalMessage) match {
       case Validated.Valid(requestMessage) =>
-        sendResultToJmsQueue(dispatchRequest(requestMessage), validatedLocalMessage)
+        for {
+          serviceResult <- dispatchRequest(requestMessage)
+          out           <- sendResultToJmsQueue(serviceResult, validatedLocalMessage)
+        } yield out
       case Validated.Invalid(errors) =>
         if (errors.contains(InvalidMessageTypeID())) {
           localProducer.sendUnrecognisedMessageTypeError(localMessage)
@@ -121,7 +124,7 @@ class Dispatcher(
       case _ => Validated.invalidNec(InvalidMessageTypeID())
     }
 
-  private def dispatchRequest(requestMessage: RequestMessage): Either[BusinessServiceError, BusinessServiceReply] =
+  private def dispatchRequest(requestMessage: RequestMessage): IO[Either[BusinessServiceError, BusinessServiceReply]] =
     requestMessage match {
       case EchoRequest(_)                 => echoService.process(requestMessage)
       case ListAssetLegalStatusSummary(_) => legalStatusService.process(requestMessage)

@@ -21,6 +21,7 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
+import cats.effect.IO
 import org.apache.jena.rdf.model.{ Resource, ResourceFactory }
 import org.apache.jena.vocabulary.DCTerms
 import uk.gov.nationalarchives.omega.api.messages.request.{ ListAgentSummary, RequestByIdentifier }
@@ -43,14 +44,14 @@ case class SparqlParams(
 )
 object SparqlParams extends AgentTypeMapper {
 
-  def from(listAgentSummary: ListAgentSummary): Try[SparqlParams] =
+  def from(listAgentSummary: ListAgentSummary): IO[SparqlParams] =
     for {
-      valuesMap      <- Try(getValuesMap(listAgentSummary))
-      uriMap         <- Try(getUriMap(listAgentSummary))
-      booleanMap     <- Try(getBooleanMap(listAgentSummary))
+      valuesMap      <- getValuesMap(listAgentSummary)
+      uriMap         <- getUriMap(listAgentSummary)
+      booleanMap     <- getBooleanMap(listAgentSummary)
       dateTimeMap    <- getDateTimeMap(listAgentSummary)
-      queryExtension <- Try(getQueryExtension(listAgentSummary))
-      filterMap      <- Try(getFilterMap(listAgentSummary))
+      queryExtension <- getQueryExtension(listAgentSummary)
+      filterMap      <- getFilterMap(listAgentSummary)
     } yield SparqlParams(booleanMap, uriMap, dateTimeMap, valuesMap, filterMap, queryExtension)
 
   def from(getRecord: RequestByIdentifier): Try[SparqlParams] =
@@ -58,20 +59,21 @@ object SparqlParams extends AgentTypeMapper {
       uriMap <- Try(getUriMap(getRecord))
     } yield SparqlParams(uris = uriMap)
 
-  private def getValuesMap(listAgentSummary: ListAgentSummary): Map[String, List[Resource]] = {
+  private def getValuesMap(listAgentSummary: ListAgentSummary): IO[Map[String, List[Resource]]] = IO {
     val agentTypeUris = listAgentSummary.agentTypes.getOrElse(getAllAgentTypes).map(getUriFromAgentType)
     val agentTypeResources = agentTypeUris.map(ResourceFactory.createResource)
     Map("agentTypeValuesParam" -> agentTypeResources)
   }
 
-  private def getQueryExtension(listAgentSummary: ListAgentSummary): Option[String] =
+  private def getQueryExtension(listAgentSummary: ListAgentSummary): IO[Option[String]] = IO {
     listAgentSummary.versionTimestamp match {
       case Some("latest") | None => Some("ORDER BY DESC(?versionTimestamp) LIMIT 1")
       case Some("all")           => Some("ORDER BY DESC(?versionTimestamp)")
       case _                     => None
     }
+  }
 
-  private def getUriMap(listAgentSummary: ListAgentSummary): Map[String, String] = {
+  private def getUriMap(listAgentSummary: ListAgentSummary): IO[Map[String, String]] = IO {
     val map1 = listAgentSummary.depository match {
       case Some(true) => Map("predicateParam1" -> TODO.isPlaceOfDeposit)
       case _          => Map.empty[String, String]
@@ -87,13 +89,14 @@ object SparqlParams extends AgentTypeMapper {
   private def getUriMap(requestByIdentifier: RequestByIdentifier): Map[String, String] =
     Map("recordConceptUri" -> requestByIdentifier.identifier)
 
-  private def getBooleanMap(listAgentSummary: ListAgentSummary): Map[String, Boolean] =
+  private def getBooleanMap(listAgentSummary: ListAgentSummary): IO[Map[String, Boolean]] = IO {
     listAgentSummary.depository match {
       case Some(true) => Map("objectParam1" -> true)
       case _          => Map.empty
     }
+  }
 
-  private def getDateTimeMap(listAgentSummary: ListAgentSummary): Try[Map[String, XMLGregorianCalendar]] = Try {
+  private def getDateTimeMap(listAgentSummary: ListAgentSummary): IO[Map[String, XMLGregorianCalendar]] = IO {
     listAgentSummary.versionTimestamp match {
       case Some("all") | Some("latest") | None => Map.empty
       case Some(dateTimeValue) =>
@@ -103,10 +106,11 @@ object SparqlParams extends AgentTypeMapper {
     }
   }
 
-  private def getFilterMap(listAgentSummary: ListAgentSummary): Map[String, String] =
+  private def getFilterMap(listAgentSummary: ListAgentSummary): IO[Map[String, String]] = IO {
     listAgentSummary.versionTimestamp match {
       case Some("all") | Some("latest") | None => Map("filterParam" -> "")
       case Some(dateTimeValue) => Map("filterParam" -> s"FILTER(?versionTimestamp >= xsd:dateTime(\"$dateTimeValue\"))")
     }
+  }
 
 }

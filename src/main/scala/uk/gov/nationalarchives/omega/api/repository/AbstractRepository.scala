@@ -21,11 +21,10 @@
 
 package uk.gov.nationalarchives.omega.api.repository
 
+import cats.effect.IO
 import org.apache.jena.ext.xerces.util.URI
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.model._
-
-import scala.util.Try
 
 /** The AbstractRepository defines the method signatures require for interacting with the data repository and is
   * agnostic as to the type of repository being used. Specific implementations will be required for different repository
@@ -38,7 +37,7 @@ trait AbstractRepository {
     * @return
     *   a Success with a list of LegalStatusEntity objects or an error
     */
-  def getLegalStatusEntities: Try[List[LegalStatusEntity]]
+  def getLegalStatusEntities: IO[List[LegalStatusEntity]]
 
   /** Retrieve the agent concepts from the repository based on the given request
     * @param listAgentSummary
@@ -46,7 +45,7 @@ trait AbstractRepository {
     * @return
     *   a Success with a list of AgentConceptEntity objects or an error
     */
-  def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): Try[List[AgentConceptEntity]]
+  def getAgentSummaryEntities(listAgentSummary: ListAgentSummary): IO[List[AgentConceptEntity]]
 
   /** Retrieve the agent descriptions for the given concept URI based on the given request
     * @param listAgentSummary
@@ -59,7 +58,7 @@ trait AbstractRepository {
   def getAgentDescriptionEntities(
     listAgentSummary: ListAgentSummary,
     agentConceptUri: URI
-  ): Try[List[AgentDescriptionEntity]]
+  ): IO[List[AgentDescriptionEntity]]
 
   /** Retrieve the record concept for the given record concept URI *
     * @param recordConceptId
@@ -67,7 +66,7 @@ trait AbstractRepository {
     * @return
     *   a Success with a a list of RecordConceptEntity objects or an error
     */
-  def getRecordConceptEntity(recordConceptId: String): Try[List[RecordConceptEntity]]
+  def getRecordConceptEntity(recordConceptId: String): IO[List[RecordConceptEntity]]
 
   /** Retrieve the creator(s) for the given record concept URI
     * @param recordConceptUri
@@ -75,7 +74,7 @@ trait AbstractRepository {
     * @return
     *   a Success with a list of CreatorEntity objects or an error
     */
-  def getCreatorEntities(recordConceptUri: String): Try[List[CreatorEntity]]
+  def getCreatorEntities(recordConceptUri: String): IO[List[CreatorEntity]]
 
   /** Retrieve the record description summary for the given record concept URI
     * @param recordConceptUri
@@ -83,7 +82,7 @@ trait AbstractRepository {
     * @return
     *   a Success with a list of RecordDescriptionSummaryEntity objects or an error
     */
-  def getRecordDescriptionSummaries(recordConceptUri: String): Try[List[RecordDescriptionSummaryEntity]]
+  def getRecordDescriptionSummaries(recordConceptUri: String): IO[List[RecordDescriptionSummaryEntity]]
 
   /** Retrieve the record description properties for the given record concept URI
     * @param recordConceptUri
@@ -91,7 +90,7 @@ trait AbstractRepository {
     * @return
     *   a Success with a list of RecordDescriptionPropertiesEntity objects or an error
     */
-  def getRecordDescriptionProperties(recordConceptUri: String): Try[List[RecordDescriptionPropertiesEntity]]
+  def getRecordDescriptionProperties(recordConceptUri: String): IO[List[RecordDescriptionPropertiesEntity]]
 
   /** Retrieve the record description access rights URIs for the given record concept URI
     * @param recordConceptUri
@@ -99,7 +98,7 @@ trait AbstractRepository {
     * @return
     *   a Success with a list of AccessRightsEntity objects or an error
     */
-  def getAccessRights(recordConceptUri: String): Try[List[AccessRightsEntity]]
+  def getAccessRights(recordConceptUri: String): IO[List[AccessRightsEntity]]
 
   /** Retrieve the record description record set URIs for the given record concept URI
     * @param recordConceptUri
@@ -107,7 +106,7 @@ trait AbstractRepository {
     * @return
     *   a Success with a list of IsPartOfEntity objects or an error
     */
-  def getIsPartOf(recordConceptUri: String): Try[List[IsPartOfEntity]]
+  def getIsPartOf(recordConceptUri: String): IO[List[IsPartOfEntity]]
 
   /** Retrieve the record description secondary identifiers for the given record concept URI
     * @param recordConceptUri
@@ -115,7 +114,7 @@ trait AbstractRepository {
     * @return
     *   a Success with a list of SecondaryIdentifierEntity objects or an error
     */
-  def getSecondaryIdentifiers(recordConceptUri: String): Try[List[SecondaryIdentifierEntity]]
+  def getSecondaryIdentifiers(recordConceptUri: String): IO[List[SecondaryIdentifierEntity]]
 
   /** Retrieve the record description 'is referenced by' identifiers for the given record concept URI
     * @param recordConceptUri
@@ -123,7 +122,7 @@ trait AbstractRepository {
     * @return
     *   a Success with a list of LabelledIdentifierEntity objects or an error
     */
-  def getIsReferencedBys(recordConceptUri: String): Try[List[LabelledIdentifierEntity]]
+  def getIsReferencedBys(recordConceptUri: String): IO[List[LabelledIdentifierEntity]]
 
   /** Retrieve the record description 'related to' identifiers for the given record concept URI
     * @param recordConceptUri
@@ -131,7 +130,7 @@ trait AbstractRepository {
     * @return
     *   a Success with a list of LabelledIdentifierEntity objects or an error
     */
-  def getRelatedTos(recordConceptUri: String): Try[List[LabelledIdentifierEntity]]
+  def getRelatedTos(recordConceptUri: String): IO[List[LabelledIdentifierEntity]]
 
   /** Retrieve the record description 'separated from' identifiers for the given record concept URI
     * @param recordConceptUri
@@ -139,7 +138,7 @@ trait AbstractRepository {
     * @return
     *   a Success with a list of LabelledIdentifierEntity objects or an error
     */
-  def getSeparatedFroms(recordConceptUri: String): Try[List[LabelledIdentifierEntity]]
+  def getSeparatedFroms(recordConceptUri: String): IO[List[LabelledIdentifierEntity]]
 
   /** Retrieve the record description subject URIs for the given record concept URI
     * @param recordConceptUri
@@ -147,7 +146,7 @@ trait AbstractRepository {
     * @return
     *   a Success with a list of IdentifierEntity objects or an error
     */
-  def getUriSubjects(recordConceptUri: String): Try[List[IdentifierEntity]]
+  def getUriSubjects(recordConceptUri: String): IO[List[IdentifierEntity]]
 
   /** Retrieve the record description subjects with labels for the given record concept URI
     * @param recordConceptUri
@@ -155,6 +154,6 @@ trait AbstractRepository {
     * @return
     *   a Success with a list of LabelledIdentifierEntity objects or an error
     */
-  def getLabelledSubjects(recordConceptUri: String): Try[List[LabelledIdentifierEntity]]
+  def getLabelledSubjects(recordConceptUri: String): IO[List[LabelledIdentifierEntity]]
 
 }

@@ -24,19 +24,18 @@ package uk.gov.nationalarchives.omega.api.repository
 import org.apache.jena.ext.xerces.util.URI
 import org.apache.jena.query.QueryException
 import org.mockito.ArgumentMatchers.any
-import org.scalatest.TryValues._
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.messages.AgentType.{ CorporateBody, Person }
 import uk.gov.nationalarchives.omega.api.messages.reply.LegalStatusSummary
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
-import uk.gov.nationalarchives.omega.api.repository.model.{ AccessRightsEntity, AgentConceptEntity, AgentDescriptionEntity, CreatorEntity, IdentifierEntity, IsPartOfEntity, LabelledIdentifierEntity, RecordConceptEntity, RecordDescriptionPropertiesEntity, RecordDescriptionSummaryEntity, SecondaryIdentifierEntity }
+import uk.gov.nationalarchives.omega.api.repository.model._
 import uk.gov.nationalarchives.omega.api.repository.vocabulary.{ Cat, Time }
-import uk.gov.nationalarchives.omega.api.support.UnitTest
+import uk.gov.nationalarchives.omega.api.support.AsyncUnitTest
 
 import java.time.ZonedDateTime
 import scala.util.{ Failure, Success, Try }
 
-class OmegaRepositorySpec extends UnitTest {
+class OmegaRepositorySpec extends AsyncUnitTest {
 
   private val mockConnector = mock[SparqlEndpointConnector]
   private val repository = new OmegaRepository(mockConnector)
@@ -46,20 +45,20 @@ class OmegaRepositorySpec extends UnitTest {
     "must return a Success with an empty list" in {
       when(mockConnector.execute[LegalStatusSummary](any, any)).thenReturn(Success(List.empty))
       val result = repository.getLegalStatusEntities
-      result.success.get.length mustBe 0
+      result.asserting(_.length mustBe 0)
     }
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[LegalStatusSummary](any, any)).thenReturn(
         Success(List(LegalStatusSummary(new URI(s"${Cat.NS}public-record"), "Public Record")))
       )
       val result = repository.getLegalStatusEntities
-      result.success.get.length mustBe 1
+      result.asserting(_.length mustBe 1)
     }
     "must return a Failure with an exception" in {
       val errorMessage = "There was a problem"
       when(mockConnector.execute[LegalStatusSummary](any, any)).thenReturn(Failure(new QueryException(errorMessage)))
       val result = repository.getLegalStatusEntities
-      result.failure.exception.getMessage must equal(errorMessage)
+      result.assertThrowsWithMessage[QueryException](errorMessage)
     }
   }
 
@@ -78,7 +77,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getAgentSummaryEntities(ListAgentSummary(Some(List(Person))))
-      result.success.get.length mustBe 1
+      result.asserting(_.length mustBe 1)
     }
 
     "must return a Success with a list of two items" in {
@@ -99,7 +98,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getAgentSummaryEntities(ListAgentSummary(Some(List(CorporateBody, Person))))
-      result.success.get.length mustBe 2
+      result.asserting(_.length mustBe 2)
     }
     "must return a Success with a place of deposit" in {
       when(mockConnector.execute[AgentConceptEntity](any, any)).thenReturn(
@@ -115,7 +114,7 @@ class OmegaRepositorySpec extends UnitTest {
       )
       val result =
         repository.getAgentSummaryEntities(ListAgentSummary(Some(List(CorporateBody)), depository = Some(true)))
-      result.success.get.length mustBe 1
+      result.asserting(_.length mustBe 1)
     }
   }
   "must return a Success with a list of one item" in {
@@ -131,7 +130,7 @@ class OmegaRepositorySpec extends UnitTest {
       )
     )
     val result = repository.getAgentSummaryEntities(ListAgentSummary(Some(List(Person))))
-    result.success.get.length mustBe 1
+    result.asserting(_.length mustBe 1)
   }
   "Get Agent Description Entities" - {
     "must return one agent description" in {
@@ -154,7 +153,7 @@ class OmegaRepositorySpec extends UnitTest {
         ListAgentSummary(),
         new URI(s"${Cat.NS}agent.3LG")
       )
-      result.success.get.length mustBe 1
+      result.asserting(_.length mustBe 1)
     }
     "must return two agent descriptions" in {
       when(mockConnector.execute[AgentDescriptionEntity](any, any)).thenReturn(
@@ -185,7 +184,7 @@ class OmegaRepositorySpec extends UnitTest {
         ListAgentSummary(),
         new URI(s"${Cat.NS}agent.3LG")
       )
-      result.success.get.length mustBe 2
+      result.asserting(_.length mustBe 2)
     }
   }
 
@@ -203,13 +202,13 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getRecordConceptEntity(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 1
+      result.asserting(_.length mustBe 1)
 
     }
     "must return a Success with an empty list if no matching record concept is found" in {
       when(mockConnector.execute[RecordConceptEntity](any, any)).thenReturn(Try(List.empty))
       val result = repository.getRecordConceptEntity(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 0
+      result.asserting(_.length mustBe 0)
     }
   }
 
@@ -223,7 +222,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getCreatorEntities(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 1
+      result.asserting(_.length mustBe 1)
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[CreatorEntity](any, any)).thenReturn(
@@ -235,7 +234,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getCreatorEntities(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 2
+      result.asserting(_.length mustBe 2)
     }
   }
 
@@ -255,7 +254,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getRecordDescriptionSummaries(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 1
+      result.asserting(_.length mustBe 1)
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[RecordDescriptionSummaryEntity](any, any)).thenReturn(
@@ -279,7 +278,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getRecordDescriptionSummaries(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 2
+      result.asserting(_.length mustBe 2)
     }
   }
 
@@ -316,7 +315,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getRecordDescriptionProperties(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 1
+      result.asserting(_.length mustBe 1)
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[RecordDescriptionPropertiesEntity](any, any)).thenReturn(
@@ -372,7 +371,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getRecordDescriptionProperties(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 2
+      result.asserting(_.length mustBe 2)
     }
   }
 
@@ -389,7 +388,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getAccessRights(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 1
+      result.asserting(_.length mustBe 1)
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[AccessRightsEntity](any, any)).thenReturn(
@@ -407,7 +406,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getAccessRights(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 2
+      result.asserting(_.length mustBe 2)
     }
   }
 
@@ -424,7 +423,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getIsPartOf(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 1
+      result.asserting(_.length mustBe 1)
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[IsPartOfEntity](any, any)).thenReturn(
@@ -442,7 +441,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getIsPartOf(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 2
+      result.asserting(_.length mustBe 2)
     }
   }
 
@@ -460,7 +459,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getSecondaryIdentifiers(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 1
+      result.asserting(_.length mustBe 1)
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[SecondaryIdentifierEntity](any, any)).thenReturn(
@@ -480,7 +479,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getSecondaryIdentifiers(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 2
+      result.asserting(_.length mustBe 2)
     }
   }
 
@@ -498,7 +497,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getIsReferencedBys(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 1
+      result.asserting(_.length mustBe 1)
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
@@ -518,7 +517,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getIsReferencedBys(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 2
+      result.asserting(_.length mustBe 2)
     }
   }
 
@@ -536,7 +535,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getRelatedTos(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 1
+      result.asserting(_.length mustBe 1)
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
@@ -556,7 +555,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getRelatedTos(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 2
+      result.asserting(_.length mustBe 2)
     }
   }
 
@@ -574,7 +573,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getSeparatedFroms(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 1
+      result.asserting(_.length mustBe 1)
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
@@ -594,7 +593,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getSeparatedFroms(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 2
+      result.asserting(_.length mustBe 2)
     }
   }
 
@@ -608,7 +607,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getUriSubjects(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 1
+      result.asserting(_.length mustBe 1)
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[IdentifierEntity](any, any)).thenReturn(
@@ -620,7 +619,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getUriSubjects(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 2
+      result.asserting(_.length mustBe 2)
     }
   }
 
@@ -638,7 +637,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getLabelledSubjects(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 1
+      result.asserting(_.length mustBe 1)
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
@@ -658,7 +657,7 @@ class OmegaRepositorySpec extends UnitTest {
         )
       )
       val result = repository.getLabelledSubjects(s"${Cat.NS}COAL.2022.N373.P")
-      result.success.get.length mustBe 2
+      result.asserting(_.length mustBe 2)
     }
   }
 
