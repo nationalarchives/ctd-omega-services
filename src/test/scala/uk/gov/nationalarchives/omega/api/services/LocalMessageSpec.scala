@@ -44,7 +44,7 @@ class LocalMessageSpec extends AnyFreeSpec with Matchers with MockitoSugar {
   private val validEpochTimeInMilliseconds = System.currentTimeMillis()
   private val validMessageFormat = "application/json"
   private val validAuthToken = "AbCdEf123456"
-  private val validReplyAddress = "PACE001_reply"
+  private val validReplyAddress = "PACE001_REPLY001"
   private val validServiceId = "OSGESZZZ100"
   lazy private val validLocalMessage =
     LocalMessage(

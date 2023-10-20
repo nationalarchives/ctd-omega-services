@@ -207,7 +207,7 @@ class LocalMessageStoreSpec
     when(mockJmsMessage.getStringProperty(eqTo(MessageProperties.OMGMessageFormat)))
       .thenReturn(Some("application/json"))
     when(mockJmsMessage.getStringProperty(eqTo(MessageProperties.OMGToken))).thenReturn(Some("application"))
-    when(mockJmsMessage.getStringProperty(eqTo(MessageProperties.OMGReplyAddress))).thenReturn(Some("PACE001_reply"))
+    when(mockJmsMessage.getStringProperty(eqTo(MessageProperties.OMGReplyAddress))).thenReturn(Some("PACE001_REPLY001"))
     mockJmsMessage
   }
 

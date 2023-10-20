@@ -404,7 +404,7 @@ class ApiServiceISpec
       applicationId = Some("PACE001"),
       messageFormat = Some("application/json"),
       token = Some("AbCdEf123456"),
-      replyAddress = Some("PACE001_reply")
+      replyAddress = Some("PACE001_REPLY001")
     )
 
   private def asTextMessage(session: Session, messageConfig: TextMessageConfig): TextMessage = {
