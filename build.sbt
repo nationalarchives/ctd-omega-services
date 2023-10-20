@@ -13,7 +13,10 @@ ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation")
 lazy val root = Project("ctd-omega-services", file("."))
   .enablePlugins(AutomateHeaderPlugin)
   .enablePlugins(BuildInfoPlugin)
-  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(JavaServerAppPackaging)
+  .enablePlugins(LinuxPlugin)
+  .enablePlugins(RpmPlugin)
+  .enablePlugins(SystemdPlugin)
   .configs(IntegrationTest)
   .settings(
     Defaults.itSettings,
@@ -31,6 +34,10 @@ lazy val root = Project("ctd-omega-services", file("."))
     organizationName := "The National Archives",
     organizationHomepage := Some(url("https://www.nationalarchives.gov.uk")),
     maintainer := "cataloguingtaxonomyanddata@nationalarchives.gov.uk",
+    packageSummary := "Omega Services API Package",
+    packageDescription := "Services API for Project Omega",
+    rpmVendor := "The National Archives",
+    rpmLicense := Some("MIT License"),
     scmInfo := Some(
       ScmInfo(
         url("https://github.com/nationalarchives/ctd-omega-services"),
@@ -108,6 +115,9 @@ Universal / mappings  ++= Seq(
 Universal / packageZipTarball / universalArchiveOptions := Seq("--exclude", "*.bat") ++ (Universal / packageZipTarball / universalArchiveOptions).value
 bashScriptExtraDefines += """addJava "-Dconfig.file=${app_home}/../etc/settings.conf""""
 batScriptExtraDefines += """call :add_java "-Dconfig.file=%APP_HOME%\..\conf\settings.conf""""
+
+Linux / daemonUser := "ctd-omega-services-api"
+Linux / daemonGroup := "ctd-omega-services-api"
 
 Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oD", "-h", "target/test-reports")
 IntegrationTest / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/it-reports")
