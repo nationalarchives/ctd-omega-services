@@ -21,9 +21,9 @@
 
 package uk.gov.nationalarchives.omega.api.connectors
 
-import cats.effect.{IO, Resource}
-import org.apache.http.impl.client.{CloseableHttpClient, HttpClientBuilder}
-import org.apache.jena.query.{Query, QueryExecutionFactory}
+import cats.effect.{ IO, Resource }
+import org.apache.http.impl.client.{ CloseableHttpClient, HttpClientBuilder }
+import org.apache.jena.query.{ Query, QueryExecutionFactory }
 import org.phenoscape.sparql.FromQuerySolution
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.connectors.httpclient.V4SigningHttpRequestInterceptor
@@ -34,7 +34,9 @@ import scala.util.Try
 
 class SparqlEndpointConnector(config: ServiceConfig) {
 
-  private val maybeV4SigningHttpRequestInterceptor = config.sparqlRemote.authentication.map(authentication => new V4SigningHttpRequestInterceptor(authentication.iam.awsRegion))
+  private val maybeV4SigningHttpRequestInterceptor = config.sparqlRemote.authentication.map(authentication =>
+    new V4SigningHttpRequestInterceptor(authentication.iam.awsRegion)
+  )
 
   /** Executes the provided SPARQL query against the configured endpoint and decodes the result with the provided
     * decoder
@@ -46,9 +48,11 @@ class SparqlEndpointConnector(config: ServiceConfig) {
     *   \- the result type
     * @return
     */
-  def execute[T](query: Query, queryDecoder: FromQuerySolution[T]): IO[List[T]] = {
-    Resource.make(IO.delay {newHttpClient()})(httpClient => IO.blocking { httpClient.close() }).use { httpClient =>
-      Resource.make(IO.delay {QueryExecutionFactory.createServiceRequest(queryUrl, query, httpClient)})(queryEngine => IO.delay {queryEngine.close()}) use { queryEngine =>
+  def execute[T](query: Query, queryDecoder: FromQuerySolution[T]): IO[List[T]] =
+    Resource.make(IO.delay(newHttpClient()))(httpClient => IO.blocking(httpClient.close())).use { httpClient =>
+      Resource.make(IO.delay(QueryExecutionFactory.createServiceRequest(queryUrl, query, httpClient)))(queryEngine =>
+        IO.delay(queryEngine.close())
+      ) use { queryEngine =>
         IO.blocking {
           val resultSet = queryEngine.execSelect()
           val itResults = resultSet.asScala.toList
@@ -58,29 +62,25 @@ class SparqlEndpointConnector(config: ServiceConfig) {
         }
       }
     }
-  }
 
-  private def newHttpClient(): CloseableHttpClient = {
+  private def newHttpClient(): CloseableHttpClient =
     maybeV4SigningHttpRequestInterceptor match {
       case Some(v4SigningHttpRequestInterceptor) =>
         HttpClientBuilder.create().addInterceptorLast(v4SigningHttpRequestInterceptor).build()
       case None =>
         HttpClientBuilder.create().build()
     }
-  }
 
-  private def queryUrl: String = {
+  private def queryUrl: String =
     config.sparqlRemote.queryEndpoint match {
       case Some(queryEndpoint) if isAbsoluteUri(queryEndpoint) =>
         queryEndpoint
       case Some(queryEndpoint) =>
-        s"${config.sparqlRemote.uri}/${queryEndpoint}"
+        s"${config.sparqlRemote.uri}/$queryEndpoint"
       case None =>
         config.sparqlRemote.uri
     }
-  }
 
-  private def isAbsoluteUri(uri: String): Boolean = {
+  private def isAbsoluteUri(uri: String): Boolean =
     Try(new URI(uri).isAbsolute).getOrElse(false)
-  }
 }

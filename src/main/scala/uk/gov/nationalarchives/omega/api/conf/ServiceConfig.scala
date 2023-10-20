@@ -35,7 +35,7 @@ case class SparqlRemote(
   uri: String,
   queryEndpoint: Option[String] = None,
   updateEndpoint: Option[String] = None,
-  authentication: Option[SparqlRemoteAuthentication] = None,
+  authentication: Option[SparqlRemoteAuthentication] = None
 )
 
 case class SparqlRemoteAuthentication(iam: IamAuthentication)

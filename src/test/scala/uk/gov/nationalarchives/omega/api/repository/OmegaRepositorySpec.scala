@@ -57,7 +57,8 @@ class OmegaRepositorySpec extends AsyncUnitTest {
     }
     "must return a Failure with an exception" in {
       val errorMessage = "There was a problem"
-      when(mockConnector.execute[LegalStatusSummary](any, any)).thenReturn(IO.raiseError(new QueryException(errorMessage)))
+      when(mockConnector.execute[LegalStatusSummary](any, any))
+        .thenReturn(IO.raiseError(new QueryException(errorMessage)))
       val result = repository.getLegalStatusEntities
       result.assertThrowsWithMessage[QueryException](errorMessage)
     }
