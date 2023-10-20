@@ -1,4 +1,8 @@
 # Pan-Archival Catalogue Services
+[![Build Status](https://github.com/nationalarchives/ctd-omega-services/actions/workflows/ci.yml/badge.svg)](https://github.com/nationalarchives/ctd-omega-services/actions/workflows/ci.yml)
+[![Scala 2.13+](https://img.shields.io/badge/scala-2.13+-dc322f.svg)](http://scala-lang.org)
+[![License GPL 3](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/license/mit/)
+
 A message-based API for Pan-Archival Catalogue (PAC) services.
 
 The PAC API is implemented using Cats Effect, to provide an asynchronous runtime, and an asynchronous   communications protocol (JMS). The reason for using an asynchronous protocol, rather than a synchronous one, like HTTP, is to ensure strong decoupling between the service and client systems. Strongly decoupled systems are much less likely to experience cascading failures, where the failure of one system causes others to fail, and are much less likely to become overloaded by too many requests.
