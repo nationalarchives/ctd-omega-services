@@ -28,8 +28,11 @@ case class ServiceConfig(
   maxDispatchers: Int,
   maxLocalQueueSize: Int,
   requestQueue: String,
+  jmsBroker: JmsBroker,
   sparqlRemote: SparqlRemote
 )
+
+case class JmsBroker(tls: Boolean, host: String, port: Int)
 
 case class SparqlRemote(
   uri: String,

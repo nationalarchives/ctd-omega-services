@@ -25,7 +25,7 @@ import cats.effect.{ IO, Resource }
 import jms4s.config.QueueName
 import jms4s.{ JmsAcknowledgerConsumer, JmsClient, JmsProducer }
 import jms4s.sqs.simpleQueueService
-import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP }
+import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP, HTTPS }
 import org.typelevel.log4cats.Logger
 import uk.gov.nationalarchives.omega.api.common.AppLogger
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
@@ -49,15 +49,20 @@ class JmsConnector(serviceConfig: ServiceConfig) extends AppLogger {
         )
     } yield jmsProducerAndConsumer
 
-  def createJmsClient()(implicit L: Logger[IO]): Resource[IO, JmsClient[IO]] =
+  def createJmsClient()(implicit L: Logger[IO]): Resource[IO, JmsClient[IO]] = {
+    val protocol = serviceConfig.jmsBroker.tls match {
+      case true => HTTPS
+      case false => HTTP
+    }
     simpleQueueService.makeJmsClient[IO](
       Config(
-        endpoint = simpleQueueService.Endpoint(Some(DirectAddress(HTTP, "localhost", Some(9324))), "elasticmq"),
+        endpoint = simpleQueueService.Endpoint(Some(DirectAddress(protocol, serviceConfig.jmsBroker.host, Some(serviceConfig.jmsBroker.port))), "elasticmq"),
         credentials = Some(Credentials("x", "x")),
         clientId = simpleQueueService.ClientId("ctd-omega-services"),
         None
       )
     )
+  }
 
   def createJmsProducer(client: JmsClient[IO])(concurrencyLevel: Int): Resource[IO, JmsProducer[IO]] =
     client.createProducer(concurrencyLevel)

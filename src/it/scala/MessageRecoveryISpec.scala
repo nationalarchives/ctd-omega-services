@@ -7,7 +7,7 @@ import jms4s.JmsAutoAcknowledgerConsumer.AutoAckAction
 import jms4s.config.QueueName
 import jms4s.jms.JmsMessage
 import jms4s.sqs.simpleQueueService
-import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP }
+import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP, HTTPS }
 import org.apache.commons.lang3.SerializationUtils
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.concurrent.{ Eventually, IntegrationPatience }
@@ -46,9 +46,14 @@ class MessageRecoveryISpec
   private val replyMessageText: Ref[IO, Option[String]] = Ref[IO].of(Option.empty[String]).unsafeRunSync()
   private var tempMsgDir: Option[String] = None
 
+  private val sqsProtocol = sqsTls match {
+    case true => HTTPS
+    case false => HTTP
+  }
+
   private val jmsClient = simpleQueueService.makeJmsClient[IO](
     Config(
-      endpoint = simpleQueueService.Endpoint(Some(DirectAddress(HTTP, sqsHostName, Some(sqsPort))), "elasticmq"),
+      endpoint = simpleQueueService.Endpoint(Some(DirectAddress(sqsProtocol, sqsHost, Some(sqsPort))), "elasticmq"),
       credentials = Some(Credentials("x", "x")),
       clientId = simpleQueueService.ClientId("ctd-omega-services"),
       None
