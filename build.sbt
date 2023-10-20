@@ -29,8 +29,8 @@ lazy val root = Project("ctd-omega-services", file("."))
     startYear := Some(2023),
     description := "Omega API Service",
     organizationName := "The National Archives",
-    organizationHomepage := Some(url("http://nationalarchives.gov.uk")),
-    maintainer := "webmaster@nationalarchives.gov.uk",
+    organizationHomepage := Some(url("https://www.nationalarchives.gov.uk")),
+    maintainer := "cataloguingtaxonomyanddata@nationalarchives.gov.uk",
     scmInfo := Some(
       ScmInfo(
         url("https://github.com/nationalarchives/ctd-omega-services"),
