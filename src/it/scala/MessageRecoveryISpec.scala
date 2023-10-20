@@ -1,3 +1,4 @@
+import TestConstants._
 import cats.effect.kernel.Resource
 import cats.effect.testing.scalatest.AsyncIOSpec
 import cats.effect.{ IO, Ref }
@@ -17,7 +18,6 @@ import org.scalatest.{ Assertion, BeforeAndAfterAll, BeforeAndAfterEach, FutureO
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import uk.gov.nationalarchives.omega.api.common.Version1UUID
-import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.messages.{ LocalMessage, LocalMessageStore }
 import uk.gov.nationalarchives.omega.api.services.ApiService
 
@@ -40,10 +40,6 @@ class MessageRecoveryISpec
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = scaled(Span(60, Seconds)), interval = scaled(Span(5, Millis)))
 
-  private val requestQueueName = "PACS001_request"
-  private val defaultReplyQueueName = "PACE001_reply"
-  private val sqsHostName = "localhost"
-  private val sqsPort = 9324
   private val testMessage = "Testing message recovery!"
 
   private val messageId: Ref[IO, Option[Version1UUID]] = Ref[IO].of(Option.empty[Version1UUID]).unsafeRunSync()
@@ -73,7 +69,7 @@ class MessageRecoveryISpec
     val consumerRes = for {
       client <- jmsClient
       consumer <-
-        client.createAutoAcknowledgerConsumer(QueueName(defaultReplyQueueName), 1, 100.millis)
+        client.createAutoAcknowledgerConsumer(QueueName(replyQueueName), 1, 100.millis)
       _ <- Resource.eval(consumer.handle { (jmsMessage, _) =>
              for {
                _ <- readTextMessage(jmsMessage)
@@ -100,7 +96,7 @@ class MessageRecoveryISpec
     "runs the recovery service and removes the message from the message store" in { f =>
       val messageStoreFolder = Paths.get(tempMsgDir.get)
       val localMessageStore = new LocalMessageStore(messageStoreFolder)
-      val apiService = new ApiService(getServiceConfig(tempMsgDir.get))
+      val apiService = new ApiService(TestServiceConfig(tempMessageDir = tempMsgDir.get))
       val serviceIO = apiService.startSuspended
       val res = for {
         consumerFiber   <- f.consumerRes.start
@@ -150,15 +146,5 @@ class MessageRecoveryISpec
       Some(UUID.randomUUID().toString),
       Some("PACE001_reply")
     )
-
-  private def getServiceConfig(tempMsgDir: String): ServiceConfig = ServiceConfig(
-    tempMessageDir = tempMsgDir,
-    maxConsumers = 1,
-    maxProducers = 1,
-    maxDispatchers = 1,
-    maxLocalQueueSize = 1,
-    requestQueue = requestQueueName,
-    sparqlEndpoint = BulkLoadData.testRepositoryUrl
-  )
 
 }

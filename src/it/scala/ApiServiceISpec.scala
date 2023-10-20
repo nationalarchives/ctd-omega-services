@@ -1,3 +1,4 @@
+import TestConstants._
 import cats.effect.kernel.Resource
 import cats.effect.testing.scalatest.AsyncIOSpec
 import cats.effect.{ IO, Ref }
@@ -15,7 +16,6 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.{ Assertion, BeforeAndAfterAll, BeforeAndAfterEach, FutureOutcome }
 import uk.gov.nationalarchives.omega.api.common.ErrorCode.{ INVA002, INVA003, INVA005, INVA006, MISS002, MISS003, MISS005, MISS006 }
 import uk.gov.nationalarchives.omega.api.common.{ AppLogger, ErrorCode }
-import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 import uk.gov.nationalarchives.omega.api.messages.{ MessageProperties, OutgoingMessageType }
 import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
 import uk.gov.nationalarchives.omega.api.services.ApiService
@@ -27,21 +27,6 @@ import scala.io.Source
 class ApiServiceISpec
     extends FixtureAsyncFreeSpec with AsyncIOSpec with Matchers with Eventually with IntegrationPatience with AppLogger
     with BeforeAndAfterEach with BeforeAndAfterAll {
-
-  private val requestQueueName = "PACS001_request"
-  private val replyQueueName = "PACE001_reply"
-  private val sqsHostName = "localhost"
-  private val sqsPort = 9324
-
-  private val serviceConfig = ServiceConfig(
-    tempMessageDir = "temp",
-    maxConsumers = 1,
-    maxProducers = 1,
-    maxDispatchers = 1,
-    maxLocalQueueSize = 1,
-    requestQueue = requestQueueName,
-    sparqlEndpoint = BulkLoadData.testRepositoryUrl
-  )
 
   private val replyMessageText: Ref[IO, Option[String]] = Ref[IO].of(Option.empty[String]).unsafeRunSync()
   private val replyMessageId: Ref[IO, Option[String]] = Ref[IO].of(Option.empty[String]).unsafeRunSync()
@@ -70,7 +55,7 @@ class ApiServiceISpec
     val sqsTestConnection: Connection = sqsTestConnector.getConnection
     val session: Session = sqsTestConnection.createSession(false, Session.AUTO_ACKNOWLEDGE)
     val producer: MessageProducer = session.createProducer(session.createQueue(requestQueueName))
-    val apiService = new ApiService(serviceConfig)
+    val apiService = new ApiService(TestServiceConfig())
     val consumerRes = for {
       client <- jmsClient
       consumer <-
