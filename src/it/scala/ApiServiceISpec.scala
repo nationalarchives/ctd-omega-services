@@ -1,3 +1,4 @@
+import TestConstants._
 import cats.effect.kernel.Resource
 import cats.effect.testing.scalatest.AsyncIOSpec
 import cats.effect.{ IO, Ref }
@@ -27,11 +28,6 @@ import scala.io.Source
 class ApiServiceISpec
     extends FixtureAsyncFreeSpec with AsyncIOSpec with Matchers with Eventually with IntegrationPatience with AppLogger
     with BeforeAndAfterEach with BeforeAndAfterAll {
-
-  private val requestQueueName = "PACS001_request"
-  private val replyQueueName = "PACE001_reply"
-  private val sqsHostName = "localhost"
-  private val sqsPort = 9324
 
   private val serviceConfig = ServiceConfig(
     tempMessageDir = "temp",

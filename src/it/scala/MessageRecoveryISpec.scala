@@ -1,3 +1,4 @@
+import TestConstants._
 import cats.effect.kernel.Resource
 import cats.effect.testing.scalatest.AsyncIOSpec
 import cats.effect.{ IO, Ref }
@@ -40,10 +41,6 @@ class MessageRecoveryISpec
   implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = scaled(Span(60, Seconds)), interval = scaled(Span(5, Millis)))
 
-  private val requestQueueName = "PACS001_request"
-  private val defaultReplyQueueName = "PACE001_reply"
-  private val sqsHostName = "localhost"
-  private val sqsPort = 9324
   private val testMessage = "Testing message recovery!"
 
   private val messageId: Ref[IO, Option[Version1UUID]] = Ref[IO].of(Option.empty[Version1UUID]).unsafeRunSync()
@@ -73,7 +70,7 @@ class MessageRecoveryISpec
     val consumerRes = for {
       client <- jmsClient
       consumer <-
-        client.createAutoAcknowledgerConsumer(QueueName(defaultReplyQueueName), 1, 100.millis)
+        client.createAutoAcknowledgerConsumer(QueueName(replyQueueName), 1, 100.millis)
       _ <- Resource.eval(consumer.handle { (jmsMessage, _) =>
              for {
                _ <- readTextMessage(jmsMessage)
