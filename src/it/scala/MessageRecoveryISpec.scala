@@ -144,7 +144,7 @@ class MessageRecoveryISpec
       Some(System.currentTimeMillis()),
       Some("application/json"),
       Some(UUID.randomUUID().toString),
-      Some("PACE001_reply")
+      Some("PACE001_REPLY001")
     )
 
 }

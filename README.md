@@ -13,7 +13,7 @@ The Pan-Archival Catalogue itself is held in an RDF graph database and is theref
 ### Echo Service
 * Service Identifier (SID): ECHO001
 * Description: The echo service accepts a text message which it returns to the sender
-* Request Queue: PACS001_request
+* Request Queue: PACS001_REQUEST001
 * Message Format: plain text
 
 ## Pre-requisites for building and running the project
@@ -48,7 +48,7 @@ docker-compose up -d
 ```
 docker ps -a
 ```
-6. Go to http://localhost:9325/ in a web browser and you should see the message queues used by the application and its clients that are configured in `custom.conf`, e.g. `PACS001_request` and `PACE001_reply`
+6. Go to http://localhost:9325/ in a web browser and you should see the message queues used by the application and its clients that are configured in `custom.conf`, e.g. `PACS001_REQUEST001` and `PACE001_REPLY001`
 7. Run the `curl` command to verify the RD4J is configured and running on `localhost:8080` as below :
 ```
 curl -L http://localhost:8080/rdf4j-workbench/
