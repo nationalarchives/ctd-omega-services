@@ -211,6 +211,6 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
     } yield result
 
   private def executeQuery[A](query: Query, queryDecoder: FromQuerySolution[A]): IO[List[A]] =
-    IO.fromTry(sparqlConnector.execute(query, queryDecoder))
+    sparqlConnector.execute(query, queryDecoder)
 
 }

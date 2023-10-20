@@ -28,5 +28,16 @@ case class ServiceConfig(
   maxDispatchers: Int,
   maxLocalQueueSize: Int,
   requestQueue: String,
-  sparqlEndpoint: String
+  sparqlRemote: SparqlRemote
 )
+
+case class SparqlRemote(
+  uri: String,
+  queryEndpoint: Option[String] = None,
+  updateEndpoint: Option[String] = None,
+  authentication: Option[SparqlRemoteAuthentication] = None
+)
+
+case class SparqlRemoteAuthentication(iam: IamAuthentication)
+
+case class IamAuthentication(awsRegion: String)
