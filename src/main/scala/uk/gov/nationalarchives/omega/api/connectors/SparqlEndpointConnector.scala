@@ -25,6 +25,8 @@ import org.apache.jena.query.{ Query, QueryExecutionFactory }
 import org.phenoscape.sparql.FromQuerySolution
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 
+import java.net.URI
+
 import scala.jdk.CollectionConverters._
 import scala.util.{ Try, Using }
 
@@ -40,13 +42,28 @@ class SparqlEndpointConnector(config: ServiceConfig) {
     *   \- the result type
     * @return
     */
-  def execute[T](query: Query, queryDecoder: FromQuerySolution[T]): Try[List[T]] =
-    Using(QueryExecutionFactory.createServiceRequest(config.sparqlEndpoint, query)) { queryEngine =>
+  def execute[T](query: Query, queryDecoder: FromQuerySolution[T]): Try[List[T]] = {
+    Using(QueryExecutionFactory.createServiceRequest(queryUrl, query)) { queryEngine =>
       val resultSet = queryEngine.execSelect()
       val itResults = resultSet.asScala.toList
       itResults.flatMap { querySolution =>
         queryDecoder.fromQuerySolution(querySolution).toOption
       }
     }
+  }
 
+  private def queryUrl: String = {
+    config.sparqlRemote.queryEndpoint match {
+      case Some(queryEndpoint) if isAbsoluteUri(queryEndpoint) =>
+        queryEndpoint
+      case Some(queryEndpoint) =>
+        s"${config.sparqlRemote.uri}/${queryEndpoint}"
+      case None =>
+        config.sparqlRemote.uri
+    }
+  }
+
+  private def isAbsoluteUri(uri: String): Boolean = {
+    Try(new URI(uri).isAbsolute).getOrElse(false)
+  }
 }
