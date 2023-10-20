@@ -22,7 +22,9 @@
 package uk.gov.nationalarchives.omega.api.connectors
 
 import cats.effect.{ IO, Resource }
+import org.apache.http.conn.HttpClientConnectionManager
 import org.apache.http.impl.client.{ CloseableHttpClient, HttpClientBuilder }
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
 import org.apache.jena.query.{ Query, QueryExecutionFactory }
 import org.phenoscape.sparql.FromQuerySolution
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
@@ -33,6 +35,14 @@ import scala.jdk.CollectionConverters._
 import scala.util.Try
 
 class SparqlEndpointConnector(config: ServiceConfig) {
+
+  // TODO(AR) really this should be initialised as `Resource.make(IO.delay{new PoolingHttpClientConnectionManager()})(httpClientPool => IO.blocking{httpClientPool.close()})` at the start of the IOApp, used and the `httpClientPool` passed through the application to `execute` below... for now this will suffice though as its lifetime is the same as the application anyway!
+  private val poolingHttpClientConnectionManager: HttpClientConnectionManager = {
+    val pool = new PoolingHttpClientConnectionManager()
+    pool.setDefaultMaxPerRoute(20)
+    pool.setMaxTotal(200)
+    pool
+  }
 
   private val maybeV4SigningHttpRequestInterceptor = config.sparqlRemote.authentication.map(authentication =>
     new V4SigningHttpRequestInterceptor(authentication.iam.awsRegion)
@@ -63,13 +73,16 @@ class SparqlEndpointConnector(config: ServiceConfig) {
       }
     }
 
-  private def newHttpClient(): CloseableHttpClient =
-    maybeV4SigningHttpRequestInterceptor match {
-      case Some(v4SigningHttpRequestInterceptor) =>
-        HttpClientBuilder.create().addInterceptorLast(v4SigningHttpRequestInterceptor).build()
-      case None =>
-        HttpClientBuilder.create().build()
-    }
+  private def newHttpClient(): CloseableHttpClient = {
+    val httpClientBuilder = HttpClientBuilder
+      .create()
+      .setConnectionManager(poolingHttpClientConnectionManager)
+
+    maybeV4SigningHttpRequestInterceptor
+      .map(httpClientBuilder.addInterceptorLast(_))
+      .getOrElse(httpClientBuilder)
+      .build()
+  }
 
   private def queryUrl: String =
     config.sparqlRemote.queryEndpoint match {
