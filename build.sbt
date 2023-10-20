@@ -99,6 +99,12 @@ lazy val root = Project("ctd-omega-services", file("."))
       compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
     )
   )
+
+Universal / mappings  ++= Seq(
+  file("LICENSE") -> "LICENSE",
+  file("README.md") -> "README.md"
+)
+
 Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oD", "-h", "target/test-reports")
 IntegrationTest / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/it-reports")
 IntegrationTest / fork := true
