@@ -104,6 +104,7 @@ Universal / mappings  ++= Seq(
   file("LICENSE") -> "LICENSE",
   file("README.md") -> "README.md"
 )
+Universal / packageZipTarball / universalArchiveOptions := Seq("--exclude", "*.bat") ++ (Universal / packageZipTarball / universalArchiveOptions).value
 
 Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oD", "-h", "target/test-reports")
 IntegrationTest / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/it-reports")
