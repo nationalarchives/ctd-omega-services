@@ -34,7 +34,6 @@ import uk.gov.nationalarchives.omega.api.repository.vocabulary.{ Cat, Time }
 import uk.gov.nationalarchives.omega.api.support.AsyncUnitTest
 
 import java.time.ZonedDateTime
-import scala.util.{ Failure, Success, Try }
 
 class OmegaRepositorySpec extends AsyncUnitTest {
 
@@ -50,7 +49,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
     }
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[LegalStatusSummary](any, any)).thenReturn(
-        IO.pure(List(LegalStatusSummary(new URI(s"${Cat.NS}public-record"), "Public Record")))
+        IO(List(LegalStatusSummary(new URI(s"${Cat.NS}public-record"), "Public Record")))
       )
       val result = repository.getLegalStatusEntities
       result.asserting(_.length mustBe 1)
@@ -68,7 +67,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
 
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[AgentConceptEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             AgentConceptEntity(
               new URI(s"${Cat.NS}agent.3LG"),
@@ -84,7 +83,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
 
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[AgentConceptEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             AgentConceptEntity(
               new URI(s"${Cat.NS}agent.3LG"),
@@ -104,7 +103,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
     }
     "must return a Success with a place of deposit" in {
       when(mockConnector.execute[AgentConceptEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             AgentConceptEntity(
               new URI(s"${Cat.NS}agent.S7"),
@@ -121,7 +120,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
   }
   "must return a Success with a list of one item" in {
     when(mockConnector.execute[AgentConceptEntity](any, any)).thenReturn(
-      IO.pure(
+      IO(
         List(
           AgentConceptEntity(
             new URI(s"${Cat.NS}agent.3LG"),
@@ -137,7 +136,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
   "Get Agent Description Entities" - {
     "must return one agent description" in {
       when(mockConnector.execute[AgentDescriptionEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             AgentDescriptionEntity(
               new URI(s"${Cat.NS}agent.3LG.1"),
@@ -159,7 +158,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
     }
     "must return two agent descriptions" in {
       when(mockConnector.execute[AgentDescriptionEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             AgentDescriptionEntity(
               new URI(s"${Cat.NS}agent.3LG.2"),
@@ -193,7 +192,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
   "Get Record Concept Entities" - {
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[RecordConceptEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             RecordConceptEntity(
               new URI(s"${Cat.NS}COAL.2022.N373.P"),
@@ -217,7 +216,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
   "Get Creator Entities" - {
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[CreatorEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             CreatorEntity(new URI(s"${Cat.NS}agent.24"), "from 1965")
           )
@@ -228,7 +227,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[CreatorEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             CreatorEntity(new URI(s"${Cat.NS}agent.24"), "from 1965"),
             CreatorEntity(new URI(s"${Cat.NS}agent.S7"), "from 1968")
@@ -243,7 +242,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
   "Get Record Description Summaries" - {
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[RecordDescriptionSummaryEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             RecordDescriptionSummaryEntity(
               new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -260,7 +259,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[RecordDescriptionSummaryEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             RecordDescriptionSummaryEntity(
               new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -287,7 +286,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
   "Get Record Description Properties" - {
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[RecordDescriptionPropertiesEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             RecordDescriptionPropertiesEntity(
               recordDescriptionUri = new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -321,7 +320,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[RecordDescriptionPropertiesEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             RecordDescriptionPropertiesEntity(
               recordDescriptionUri = new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -380,7 +379,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
   "Get Access Rights" - {
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[AccessRightsEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             AccessRightsEntity(
               new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -394,7 +393,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[AccessRightsEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             AccessRightsEntity(
               new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -415,7 +414,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
   "Get Is Part Of" - {
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[IsPartOfEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             IsPartOfEntity(
               new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -429,7 +428,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[IsPartOfEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             IsPartOfEntity(
               new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -450,7 +449,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
   "Get Secondary Identifiers" - {
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[SecondaryIdentifierEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             SecondaryIdentifierEntity(
               new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -465,7 +464,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[SecondaryIdentifierEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             SecondaryIdentifierEntity(
               new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -488,7 +487,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
   "Get Is Referenced By" - {
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             LabelledIdentifierEntity(
               new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -503,7 +502,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             LabelledIdentifierEntity(
               new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -526,7 +525,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
   "Get Related To" - {
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             LabelledIdentifierEntity(
               new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -541,7 +540,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             LabelledIdentifierEntity(
               new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -564,7 +563,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
   "Get Separated From" - {
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             LabelledIdentifierEntity(
               new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -579,7 +578,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             LabelledIdentifierEntity(
               new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -602,7 +601,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
   "Get URI Subjects" - {
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[IdentifierEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             IdentifierEntity(new URI(s"${Cat.NS}COAL.2022.N373.P.2"), new URI(s"${Cat.NS}agent.4N6"))
           )
@@ -613,7 +612,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[IdentifierEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             IdentifierEntity(new URI(s"${Cat.NS}COAL.2022.N373.P.2"), new URI(s"${Cat.NS}agent.4N6")),
             IdentifierEntity(new URI(s"${Cat.NS}COAL.2022.N373.P.2"), new URI(s"${Cat.NS}agent.S7"))
@@ -628,7 +627,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
   "Get Labelled Subjects" - {
     "must return a Success with a list of one item" in {
       when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             LabelledIdentifierEntity(
               new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
@@ -643,7 +642,7 @@ class OmegaRepositorySpec extends AsyncUnitTest {
     }
     "must return a Success with a list of two items" in {
       when(mockConnector.execute[LabelledIdentifierEntity](any, any)).thenReturn(
-        IO.pure(
+        IO(
           List(
             LabelledIdentifierEntity(
               new URI(s"${Cat.NS}COAL.2022.N373.P.2"),
