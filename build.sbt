@@ -109,14 +109,8 @@ lazy val root = Project("ctd-omega-services", file("."))
   )
 
 // Generate the `logback-test.properties` file (later used by `logback-test.xml`)
-Test / resourceGenerators += Def.task {
-  val testTargetPath = (Test / target).value
-  val logBackTestProperties = (Test / resourceManaged).value / "logback-test.properties"
-  val contents =
-    "name=%s\nversion=%s\nlogback.custom.targetPath=%s".format(name.value, version.value, testTargetPath.getPath)
-  IO.write(logBackTestProperties, contents)
-  Seq(logBackTestProperties)
-}.taskValue
+Test / resourceGenerators += createLogbackTestProperties(Test).taskValue
+IntegrationTest / resourceGenerators += createLogbackTestProperties(IntegrationTest).taskValue
 
 Universal / mappings ++= Seq(
   file("LICENSE")                        -> "LICENSE",
@@ -147,3 +141,20 @@ IntegrationTest / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-h", 
 IntegrationTest / fork := true
 
 coverageEnabled := sys.props.getOrElse("coverageEnabled", "true").toBoolean
+
+/** Task to create a `logback-test.properties` file.
+  *
+  * @param configuration
+  *   A build configuration
+  *
+  * @return
+  *   the task
+  */
+def createLogbackTestProperties(configuration: Configuration) = Def.task {
+  val testTargetPath = (configuration / target).value
+  val logBackTestProperties = (configuration / resourceManaged).value / "logback-test.properties"
+  val contents =
+    "name=%s\nversion=%s\nlogback.custom.targetPath=%s".format(name.value, version.value, testTargetPath.getPath)
+  IO.write(logBackTestProperties, contents)
+  Seq(logBackTestProperties)
+}
