@@ -34,7 +34,7 @@ class MessageRecoveryISpec
     extends FixtureAsyncFreeSpec with AsyncIOSpec with Matchers with Eventually with IntegrationPatience
     with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
+  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory.create[IO]
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
   implicit override val patienceConfig: PatienceConfig =

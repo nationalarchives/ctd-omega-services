@@ -26,6 +26,6 @@ import org.typelevel.log4cats.{ LoggerFactory, SelfAwareStructuredLogger }
 import org.typelevel.log4cats.slf4j.Slf4jFactory
 
 trait AppLogger {
-  implicit val logging: LoggerFactory[IO] = Slf4jFactory[IO]
+  implicit val logging: LoggerFactory[IO] = Slf4jFactory.create[IO]
   implicit val logger: SelfAwareStructuredLogger[IO] = logging.getLoggerFromName(this.getClass.getSimpleName)
 }
