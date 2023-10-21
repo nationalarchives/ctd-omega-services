@@ -107,6 +107,16 @@ lazy val root = Project("ctd-omega-services", file("."))
     )
   )
 
+// Generate the `logback-test.properties` file (later used by `logback-test.xml`)
+Test / resourceGenerators += Def.task {
+  val testTargetPath = (Test / target).value
+  val logBackTestProperties = (Test / resourceManaged).value / "logback-test.properties"
+  val contents =
+    "name=%s\nversion=%s\nlogback.custom.targetPath=%s".format(name.value, version.value, testTargetPath.getPath)
+  IO.write(logBackTestProperties, contents)
+  Seq(logBackTestProperties)
+}.taskValue
+
 Universal / mappings ++= Seq(
   file("LICENSE")                        -> "LICENSE",
   file("README.md")                      -> "README.md",
