@@ -51,12 +51,15 @@ class JmsConnector(serviceConfig: ServiceConfig) extends AppLogger {
 
   def createJmsClient()(implicit L: Logger[IO]): Resource[IO, JmsClient[IO]] = {
     val protocol = serviceConfig.jmsBroker.tls match {
-      case true => HTTPS
+      case true  => HTTPS
       case false => HTTP
     }
     simpleQueueService.makeJmsClient[IO](
       Config(
-        endpoint = simpleQueueService.Endpoint(Some(DirectAddress(protocol, serviceConfig.jmsBroker.host, Some(serviceConfig.jmsBroker.port))), "elasticmq"),
+        endpoint = simpleQueueService.Endpoint(
+          Some(DirectAddress(protocol, serviceConfig.jmsBroker.host, Some(serviceConfig.jmsBroker.port))),
+          "elasticmq"
+        ),
         credentials = Some(Credentials("x", "x")),
         clientId = simpleQueueService.ClientId("ctd-omega-services"),
         None

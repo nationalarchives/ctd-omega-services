@@ -107,12 +107,15 @@ lazy val root = Project("ctd-omega-services", file("."))
     )
   )
 
-Universal / mappings  ++= Seq(
-  file("LICENSE") -> "LICENSE",
-  file("README.md") -> "README.md",
+Universal / mappings ++= Seq(
+  file("LICENSE")                        -> "LICENSE",
+  file("README.md")                      -> "README.md",
   file("src/main/package/settings.conf") -> "etc/settings.conf"
 )
-Universal / packageZipTarball / universalArchiveOptions := Seq("--exclude", "*.bat") ++ (Universal / packageZipTarball / universalArchiveOptions).value
+Universal / packageZipTarball / universalArchiveOptions := Seq(
+  "--exclude",
+  "*.bat"
+) ++ (Universal / packageZipTarball / universalArchiveOptions).value
 bashScriptExtraDefines += """addJava "-Dconfig.file=${app_home}/../etc/settings.conf""""
 batScriptExtraDefines += """call :add_java "-Dconfig.file=%APP_HOME%\..\conf\settings.conf""""
 
