@@ -22,7 +22,7 @@
 package uk.gov.nationalarchives.omega.api.conf
 
 case class ServiceConfig(
-  tempMessageDir: String,
+  messageStoreDir: String,
   maxConsumers: Int,
   maxProducers: Int,
   maxDispatchers: Int,

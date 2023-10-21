@@ -25,7 +25,7 @@ import uk.gov.nationalarchives.omega.api.conf.{ JmsBroker, ServiceConfig, Sparql
   */
 object TestServiceConfig {
   def apply(
-    tempMessageDir: String = "temp",
+    messageStoreDir: String = "target/data/message-store",
     maxConsumers: Int = 1,
     maxProducers: Int = 1,
     maxDispatchers: Int = 1,
@@ -35,7 +35,7 @@ object TestServiceConfig {
     sparqlRemote: SparqlRemote = SparqlRemote(TestConstants.testRepositoryUrl)
   ): ServiceConfig =
     ServiceConfig(
-      tempMessageDir,
+      messageStoreDir,
       maxConsumers,
       maxProducers,
       maxDispatchers,

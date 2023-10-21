@@ -101,7 +101,7 @@ class MessageRecoveryISpec
     "runs the recovery service and removes the message from the message store" in { f =>
       val messageStoreFolder = Paths.get(tempMsgDir.get)
       val localMessageStore = new LocalMessageStore(messageStoreFolder)
-      val apiService = new ApiService(TestServiceConfig(tempMessageDir = tempMsgDir.get))
+      val apiService = new ApiService(TestServiceConfig(messageStoreDir = tempMsgDir.get))
       val serviceIO = apiService.startSuspended
       val res = for {
         consumerFiber   <- f.consumerRes.start
