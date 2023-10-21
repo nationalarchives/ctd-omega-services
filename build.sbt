@@ -1,11 +1,11 @@
-val CatsEffectVersion = "3.5.1"
-val Log4CatsVersion = "2.5.0"
-val PureConfigVersion = "0.17.2"
+val CatsEffectVersion = "3.5.2"
+val Log4CatsVersion = "2.6.0"
+val PureConfigVersion = "0.17.4"
 val Jms4SVersion = "0.5.0-TNA-OMG-0.1.0"
-val AwsJavaSdkVersion = "2.18.1"
-val CirceVersion = "0.14.5"
+val CirceVersion = "0.14.6"
 val EnumeratumVersion = "1.7.2"
 val JenaVersion = "3.17.0"
+val AwsSdkVersion = "2.21.4"
 
 ThisBuild / versionScheme := Some("semver-spec")
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation")
@@ -73,13 +73,13 @@ lazy val root = Project("ctd-omega-services", file("."))
       "com.github.pureconfig"                         %% "pureconfig-core"             % PureConfigVersion,
       "com.github.pureconfig"                         %% "pureconfig-generic"          % PureConfigVersion,
       "com.github.pureconfig"                         %% "pureconfig-generic-base"     % PureConfigVersion,
-      "com.fasterxml.uuid"                             % "java-uuid-generator"         % "4.2.0",
+      "com.fasterxml.uuid"                             % "java-uuid-generator"         % "4.3.0",
       "com.beachape"                                  %% "enumeratum"                  % EnumeratumVersion,
       "com.beachape"                                  %% "enumeratum-circe"            % EnumeratumVersion,
       "org.typelevel"                                 %% "log4cats-core"               % Log4CatsVersion,
       "org.typelevel"                                 %% "log4cats-slf4j"              % Log4CatsVersion,
       "com.chuusai"                                   %% "shapeless"                   % "2.3.10",
-      "org.apache.commons"                             % "commons-lang3"               % "3.12.0",
+      "org.apache.commons"                             % "commons-lang3"               % "3.13.0",
       "io.circe"                                      %% "circe-core"                  % CirceVersion,
       "io.circe"                                      %% "circe-parser"                % CirceVersion,
       "io.circe"                                      %% "circe-generic"               % CirceVersion,
@@ -91,16 +91,16 @@ lazy val root = Project("ctd-omega-services", file("."))
       "org.apache.jena"                                % "jena-arq"                    % JenaVersion,
       "com.propensive"                                %% "magnolia"                    % "0.17.0",
       "com.propensive"                                %% "mercator"                    % "0.2.1",
-      "ch.qos.logback"         % "logback-classic"               % "1.3.5"   % Runtime, // Java 8 compatible
-      "net.logstash.logback"   % "logstash-logback-encoder"      % "7.3"     % Runtime,
-      "org.scalatest"         %% "scalatest"                     % "3.2.15"  % "it,test",
-      "org.typelevel"         %% "cats-effect-testing-scalatest" % "1.5.0"   % "it,test",
-      "com.vladsch.flexmark"   % "flexmark-profile-pegdown"      % "0.62.2"  % "it,test", // Java 8 compatible
-      "org.mockito"           %% "mockito-scala-scalatest"       % "1.17.12" % "it,test",
-      "software.amazon.awssdk" % "auth"                          % "2.18.1"  % "it",
-      "software.amazon.awssdk" % "regions"                       % "2.18.1"  % "it",
-      "software.amazon.awssdk" % "sqs"                           % "2.18.1"  % "it",
-      "com.amazonaws"          % "amazon-sqs-java-messaging-lib" % "2.0.2"   % "it",
+      "ch.qos.logback"         % "logback-classic"               % "1.3.11"      % Runtime, // Java 8 compatible
+      "net.logstash.logback"   % "logstash-logback-encoder"      % "7.4"         % Runtime,
+      "org.scalatest"         %% "scalatest"                     % "3.2.17"      % "it,test",
+      "org.typelevel"         %% "cats-effect-testing-scalatest" % "1.5.0"       % "it,test",
+      "com.vladsch.flexmark"   % "flexmark-profile-pegdown"      % "0.62.2"      % "it,test", // Java 8 compatible
+      "org.mockito"           %% "mockito-scala-scalatest"       % "1.17.25"     % "it,test",
+      "software.amazon.awssdk" % "auth"                          % AwsSdkVersion % "it",
+      "software.amazon.awssdk" % "regions"                       % AwsSdkVersion % "it",
+      "software.amazon.awssdk" % "sqs"                           % AwsSdkVersion % "it",
+      "com.amazonaws" % "amazon-sqs-java-messaging-lib" % "2.0.2" % "it", // NOTE(AR) this must be the same version as depended on by `jms4s-simple-queue-service`
 
       // better monadic for compiler plugin as suggested by documentation
       compilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1")
