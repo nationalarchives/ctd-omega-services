@@ -124,11 +124,13 @@ Universal / packageZipTarball / universalArchiveOptions := Seq(
 ) ++ (Universal / packageZipTarball / universalArchiveOptions).value
 bashScriptExtraDefines ++= Seq(
   """addJava "-Dconfig.file=${app_home}/../etc/settings.conf"""",
+  """addJava "-Dmessage-store-base-dir=${app_home}/../"""",
   """addJava "-Dlogback.custom.targetPath=${app_home}/.."""",
   """addJava "-Dlogback.configurationFile=${app_home}/../etc/logback.xml""""
 )
 batScriptExtraDefines ++= Seq(
   """call :add_java "-Dconfig.file=%APP_HOME%\..\conf\settings.conf"""",
+  """call :add_java "-Dmessage-store-base-dir=%APP_HOME%\..\"""",
   """call :add_java "-Dlogback.custom.targetPath=%APP_HOME%\.."""",
   """call :add_java "-Dlogback.configurationFile=%APP_HOME%\..\etc\logback.xml""""
 )

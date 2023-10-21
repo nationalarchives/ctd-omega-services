@@ -25,7 +25,7 @@ import uk.gov.nationalarchives.omega.api.conf.{ JmsBroker, ServiceConfig, Sparql
   */
 object TestServiceConfig {
   def apply(
-    messageStoreDir: String = "target/data/message-store",
+    messageStoreDir: String = "target/spool/message-store",
     maxConsumers: Int = 1,
     maxProducers: Int = 1,
     maxDispatchers: Int = 1,
