@@ -205,65 +205,68 @@ object LocalMessage extends AppLogger {
       )
     }
 
-  sealed class MessageValidationError(val message: Option[String] = None, val cause: Option[Throwable] = None)
+  sealed trait MessageValidationError {
+    def message: Option[String]
+    def cause: Option[Throwable]
+  }
 
   implicit val eqError: Eq[MessageValidationError] = Eq.fromUniversalEquals
 
   final case class MissingJMSMessageID(
     override val message: Option[String] = None,
     override val cause: Option[Throwable] = None
-  ) extends MessageValidationError(message, cause)
+  ) extends MessageValidationError
   final case class InvalidJMSMessageID(
     override val message: Option[String] = None,
     override val cause: Option[Throwable] = None
-  ) extends MessageValidationError(message, cause)
+  ) extends MessageValidationError
   final case class MissingMessageTypeID(
     override val message: Option[String] = None,
     override val cause: Option[Throwable] = None
-  ) extends MessageValidationError(message, cause)
+  ) extends MessageValidationError
   final case class InvalidMessageTypeID(
     override val message: Option[String] = None,
     override val cause: Option[Throwable] = None
-  ) extends MessageValidationError(message, cause)
+  ) extends MessageValidationError
   final case class MissingApplicationID(
     override val message: Option[String] = None,
     override val cause: Option[Throwable] = None
-  ) extends MessageValidationError(message, cause)
+  ) extends MessageValidationError
   final case class InvalidApplicationID(
     override val message: Option[String] = None,
     override val cause: Option[Throwable] = None
-  ) extends MessageValidationError(message, cause)
+  ) extends MessageValidationError
   final case class MissingJMSTimestamp(
     override val message: Option[String] = None,
     override val cause: Option[Throwable] = None
-  ) extends MessageValidationError(message, cause)
+  ) extends MessageValidationError
   final case class MissingMessageFormat(
     override val message: Option[String] = None,
     override val cause: Option[Throwable] = None
-  ) extends MessageValidationError(message, cause)
+  ) extends MessageValidationError
   final case class InvalidMessageFormat(
     override val message: Option[String] = None,
     override val cause: Option[Throwable] = None
-  ) extends MessageValidationError(message, cause)
+  ) extends MessageValidationError
   final case class MissingAuthToken(
     override val message: Option[String] = None,
     override val cause: Option[Throwable] = None
-  ) extends MessageValidationError(message, cause)
+  ) extends MessageValidationError
   final case class InvalidAuthToken(
     override val message: Option[String] = None,
     override val cause: Option[Throwable] = None
-  ) extends MessageValidationError(message, cause)
+  ) extends MessageValidationError
   final case class MissingReplyAddress(
     override val message: Option[String] = None,
     override val cause: Option[Throwable] = None
-  ) extends MessageValidationError(message, cause)
+  ) extends MessageValidationError
   final case class InvalidReplyAddress(
     override val message: Option[String] = None,
     override val cause: Option[Throwable] = None
-  ) extends MessageValidationError(message, cause)
+  ) extends MessageValidationError
   final case class InvalidMessagePayload(
     override val message: Option[String] = None,
     override val cause: Option[Throwable] = None
-  ) extends MessageValidationError(message, cause)
+  ) extends MessageValidationError
 
 }
