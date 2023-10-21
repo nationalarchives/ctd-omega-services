@@ -91,8 +91,9 @@ lazy val root = Project("ctd-omega-services", file("."))
       "org.apache.jena"                                % "jena-arq"                    % JenaVersion,
       "com.propensive"                                %% "magnolia"                    % "0.17.0",
       "com.propensive"                                %% "mercator"                    % "0.2.1",
-      "ch.qos.logback"         % "logback-classic"               % "1.3.11"      % Runtime, // Java 8 compatible
-      "net.logstash.logback"   % "logstash-logback-encoder"      % "7.4"         % Runtime,
+      "ch.qos.logback" % "logback-classic" % "1.3.11" % Runtime, // Java 8 compatible
+      "org.codehaus.janino" % "janino" % "3.1.10" % Runtime, // NOTE(AR) required for conditions in `logback-classic`
+      "net.logstash.logback" % "logstash-logback-encoder" % "7.4" % Runtime, // NOTE(AR) required for JSON log files via `logback-classic`
       "org.scalatest"         %% "scalatest"                     % "3.2.17"      % "it,test",
       "org.typelevel"         %% "cats-effect-testing-scalatest" % "1.5.0"       % "it,test",
       "com.vladsch.flexmark"   % "flexmark-profile-pegdown"      % "0.62.2"      % "it,test", // Java 8 compatible
@@ -120,14 +121,23 @@ Test / resourceGenerators += Def.task {
 Universal / mappings ++= Seq(
   file("LICENSE")                        -> "LICENSE",
   file("README.md")                      -> "README.md",
-  file("src/main/package/settings.conf") -> "etc/settings.conf"
+  file("src/main/package/settings.conf") -> "etc/settings.conf",
+  file("src/main/package/logback.xml")   -> "etc/logback.xml"
 )
 Universal / packageZipTarball / universalArchiveOptions := Seq(
   "--exclude",
   "*.bat"
 ) ++ (Universal / packageZipTarball / universalArchiveOptions).value
-bashScriptExtraDefines += """addJava "-Dconfig.file=${app_home}/../etc/settings.conf""""
-batScriptExtraDefines += """call :add_java "-Dconfig.file=%APP_HOME%\..\conf\settings.conf""""
+bashScriptExtraDefines ++= Seq(
+  """addJava "-Dconfig.file=${app_home}/../etc/settings.conf"""",
+  """addJava "-Dlogback.custom.targetPath=${app_home}/.."""",
+  """addJava "-Dlogback.configurationFile=${app_home}/../etc/logback.xml""""
+)
+batScriptExtraDefines ++= Seq(
+  """call :add_java "-Dconfig.file=%APP_HOME%\..\conf\settings.conf"""",
+  """call :add_java "-Dlogback.custom.targetPath=%APP_HOME%\.."""",
+  """call :add_java "-Dlogback.configurationFile=%APP_HOME%\..\etc\logback.xml""""
+)
 
 Linux / daemonUser := "ctd-omega-services-api"
 Linux / daemonGroup := "ctd-omega-services-api"
