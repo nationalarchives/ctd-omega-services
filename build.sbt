@@ -126,4 +126,4 @@ Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oD", "-h", "tar
 IntegrationTest / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/it-reports")
 IntegrationTest / fork := true
 
-coverageEnabled := true
+coverageEnabled := sys.props.getOrElse("coverageEnabled", "true").toBoolean
