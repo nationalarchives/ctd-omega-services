@@ -1,3 +1,5 @@
+import com.typesafe.sbt.packager.linux.LinuxSymlink
+
 val CatsEffectVersion = "3.5.2"
 val Log4CatsVersion = "2.6.0"
 val PureConfigVersion = "0.17.4"
@@ -137,6 +139,32 @@ batScriptExtraDefines ++= Seq(
 
 Linux / daemonUser := "ctd-omega-services-api"
 Linux / daemonGroup := "ctd-omega-services-api"
+Linux / serviceAutostart := false
+// change the symlink `<install>/logs` to `<install>/log`
+Linux / linuxPackageSymlinks := {
+  val pkg = packageName.value
+  // the `logs` symlink we want to replace
+  val logsLink = defaultLinuxInstallLocation.value + "/" + pkg + "/logs"
+  val currentLinuxPackageSymLinks = linuxPackageSymlinks.value
+  currentLinuxPackageSymLinks.map {
+    case LinuxSymlink(link, destination) if logsLink.equals(link) =>
+      // the `log` symlink we want instead of the `logs` symlink
+      val logLink = defaultLinuxInstallLocation.value + "/" + pkg + "/log"
+      LinuxSymlink(logLink, destination)
+    case linuxSymLink: LinuxSymlink =>
+      // preserve any other symlink
+      linuxSymLink
+  }
+}
+// add the symlink `<install>/spool` to `/var/spool/<pkg>`
+Linux / linuxPackageMappings += packageTemplateMapping(s"/var/spool/${(Linux / packageName).value}")()
+  .withUser((Linux / daemonUser).value)
+  .withGroup((Linux / daemonGroup).value)
+  .withPerms("750")
+Linux / linuxPackageSymlinks += LinuxSymlink(
+  (Linux / defaultLinuxInstallLocation).value + "/" + (Linux / packageName).value + "/spool",
+  "/var/spool/" + (Linux / packageName).value
+)
 
 Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oD", "-h", "target/test-reports")
 IntegrationTest / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/it-reports")
