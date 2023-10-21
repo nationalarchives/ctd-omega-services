@@ -42,3 +42,10 @@ jobs:
         with:
           file_glob: './schema/omega-services.async.api.yaml'
           spectral_ruleset: './schema/validate-omega-services.spectral.yaml'
+      - name: Build Zip Package
+        run: sbt universal:packageBin
+      - name: Build TGZ Package
+        run: sbt universal:packageZipTarball
+      - name: Build RPM package (Linux Only)
+        if: ${{ matrix.jdk }} == 'ubuntu-latest'
+        run: sbt rpm:packageBin
