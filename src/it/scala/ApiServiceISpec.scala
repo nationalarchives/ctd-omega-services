@@ -39,8 +39,8 @@ class ApiServiceISpec
 
   private val jmsClient = simpleQueueService.makeJmsClient[IO](
     Config(
-      endpoint = simpleQueueService.Endpoint(Some(DirectAddress(sqsProtocol, sqsHost, Some(sqsPort))), "elasticmq"),
-      credentials = Some(Credentials("x", "x")),
+      "elasticmq",
+      endpoint = Some(simpleQueueService.Endpoint(Some(DirectAddress(sqsProtocol, sqsHost, Some(sqsPort))), Some(Credentials("x", "x")))),
       clientId = simpleQueueService.ClientId("ctd-omega-services"),
       None
     )

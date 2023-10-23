@@ -19,7 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import uk.gov.nationalarchives.omega.api.conf.{ JmsBroker, ServiceConfig, SparqlRemote }
+import uk.gov.nationalarchives.omega.api.conf.{ AwsCredentialsAuthentication, ServiceConfig, SparqlRemote, SqsJmsBroker, SqsJmsBrokerEndpoint }
 
 /** Simple facade to ease creation of ServiceConfig for test purposes.
   */
@@ -31,7 +31,7 @@ object TestServiceConfig {
     maxDispatchers: Int = 1,
     maxLocalQueueSize: Int = 1,
     requestQueue: String = TestConstants.requestQueueName,
-    jmsBroker: JmsBroker = JmsBroker(TestConstants.sqsTls, TestConstants.sqsHost, TestConstants.sqsPort),
+    jmsBroker: SqsJmsBroker = SqsJmsBroker("elasticmq", Some(SqsJmsBrokerEndpoint(TestConstants.sqsTls, Some(TestConstants.sqsHost), Some(TestConstants.sqsPort), Some(AwsCredentialsAuthentication("x", "x"))))),
     sparqlRemote: SparqlRemote = SparqlRemote(TestConstants.testRepositoryUrl)
   ): ServiceConfig =
     ServiceConfig(

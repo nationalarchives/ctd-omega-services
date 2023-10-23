@@ -3,7 +3,7 @@ import com.typesafe.sbt.packager.linux.LinuxSymlink
 val CatsEffectVersion = "3.5.2"
 val Log4CatsVersion = "2.6.0"
 val PureConfigVersion = "0.17.4"
-val Jms4SVersion = "0.5.0-TNA-OMG-0.1.0"
+val Jms4SVersion = "0.5.0-TNA-OMG-0.2.0"
 val CirceVersion = "0.14.6"
 val EnumeratumVersion = "1.7.2"
 val JenaVersion = "3.17.0"
