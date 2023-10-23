@@ -31,7 +31,17 @@ object TestServiceConfig {
     maxDispatchers: Int = 1,
     maxLocalQueueSize: Int = 1,
     requestQueue: String = TestConstants.requestQueueName,
-    jmsBroker: SqsJmsBroker = SqsJmsBroker("elasticmq", Some(SqsJmsBrokerEndpoint(TestConstants.sqsTls, Some(TestConstants.sqsHost), Some(TestConstants.sqsPort), Some(AwsCredentialsAuthentication("x", "x"))))),
+    jmsBroker: SqsJmsBroker = SqsJmsBroker(
+      "elasticmq",
+      Some(
+        SqsJmsBrokerEndpoint(
+          TestConstants.sqsTls,
+          Some(TestConstants.sqsHost),
+          Some(TestConstants.sqsPort),
+          Some(AwsCredentialsAuthentication("x", "x"))
+        )
+      )
+    ),
     sparqlRemote: SparqlRemote = SparqlRemote(TestConstants.testRepositoryUrl)
   ): ServiceConfig =
     ServiceConfig(

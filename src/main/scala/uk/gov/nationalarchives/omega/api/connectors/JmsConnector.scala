@@ -21,16 +21,16 @@
 
 package uk.gov.nationalarchives.omega.api.connectors
 
-import cats.effect.{IO, Resource}
+import cats.effect.{ IO, Resource }
 import jms4s.config.QueueName
-import jms4s.{JmsAcknowledgerConsumer, JmsClient, JmsProducer}
+import jms4s.{ JmsAcknowledgerConsumer, JmsClient, JmsProducer }
 import jms4s.sqs.simpleQueueService
-import jms4s.sqs.simpleQueueService.{Config, Credentials, DirectAddress, Endpoint, HTTP, HTTPS}
+import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, Endpoint, HTTP, HTTPS }
 import org.typelevel.log4cats.Logger
 import uk.gov.nationalarchives.omega.api.common.AppLogger
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 
-import scala.concurrent.duration.{DurationInt, FiniteDuration}
+import scala.concurrent.duration.{ DurationInt, FiniteDuration }
 
 class JmsConnector(serviceConfig: ServiceConfig) extends AppLogger {
 
@@ -52,11 +52,15 @@ class JmsConnector(serviceConfig: ServiceConfig) extends AppLogger {
   def createJmsClient()(implicit L: Logger[IO]): Resource[IO, JmsClient[IO]] = {
     val maybeEndpoint: Option[Endpoint] = serviceConfig.sqsJmsBroker.endpoint.flatMap { sqsJmsBrokerEndpoint =>
       val protocol = sqsJmsBrokerEndpoint.tls match {
-        case true => HTTPS
+        case true  => HTTPS
         case false => HTTP
       }
-      val maybeDirectAddress: Option[DirectAddress] = sqsJmsBrokerEndpoint.host.map(host => DirectAddress(protocol, host, sqsJmsBrokerEndpoint.port))
-      val maybeCredentials: Option[Credentials] = sqsJmsBrokerEndpoint.authentication.map(awsCredentialsAuthentication => Credentials(awsCredentialsAuthentication.accessKey, awsCredentialsAuthentication.secretKey))
+      val maybeDirectAddress: Option[DirectAddress] =
+        sqsJmsBrokerEndpoint.host.map(host => DirectAddress(protocol, host, sqsJmsBrokerEndpoint.port))
+      val maybeCredentials: Option[Credentials] =
+        sqsJmsBrokerEndpoint.authentication.map(awsCredentialsAuthentication =>
+          Credentials(awsCredentialsAuthentication.accessKey, awsCredentialsAuthentication.secretKey)
+        )
       if (maybeDirectAddress.nonEmpty || maybeCredentials.nonEmpty) {
         Some(Endpoint(maybeDirectAddress, maybeCredentials))
       } else {

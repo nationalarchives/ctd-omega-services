@@ -34,7 +34,12 @@ case class ServiceConfig(
 
 case class SqsJmsBroker(awsRegion: String, endpoint: Option[SqsJmsBrokerEndpoint])
 
-case class SqsJmsBrokerEndpoint(tls: Boolean, host: Option[String], port: Option[Int], authentication: Option[AwsCredentialsAuthentication])
+case class SqsJmsBrokerEndpoint(
+  tls: Boolean,
+  host: Option[String],
+  port: Option[Int],
+  authentication: Option[AwsCredentialsAuthentication]
+)
 
 case class AwsCredentialsAuthentication(accessKey: String, secretKey: String)
 

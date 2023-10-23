@@ -47,14 +47,17 @@ class MessageRecoveryISpec
   private var tempMsgDir: Option[String] = None
 
   private val sqsProtocol = sqsTls match {
-    case true => HTTPS
+    case true  => HTTPS
     case false => HTTP
   }
 
   private val jmsClient = simpleQueueService.makeJmsClient[IO](
     Config(
       "elasticmq",
-      endpoint = Some(simpleQueueService.Endpoint(Some(DirectAddress(sqsProtocol, sqsHost, Some(sqsPort))), Some(Credentials("x", "x")))),
+      endpoint = Some(
+        simpleQueueService
+          .Endpoint(Some(DirectAddress(sqsProtocol, sqsHost, Some(sqsPort))), Some(Credentials("x", "x")))
+      ),
       clientId = simpleQueueService.ClientId("ctd-omega-services"),
       None
     )

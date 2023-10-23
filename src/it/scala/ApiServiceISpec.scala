@@ -33,14 +33,17 @@ class ApiServiceISpec
   private val messageTypeId: Ref[IO, Option[String]] = Ref[IO].of(Option.empty[String]).unsafeRunSync()
 
   val sqsProtocol = sqsTls match {
-    case true => HTTPS
+    case true  => HTTPS
     case false => HTTP
   }
 
   private val jmsClient = simpleQueueService.makeJmsClient[IO](
     Config(
       "elasticmq",
-      endpoint = Some(simpleQueueService.Endpoint(Some(DirectAddress(sqsProtocol, sqsHost, Some(sqsPort))), Some(Credentials("x", "x")))),
+      endpoint = Some(
+        simpleQueueService
+          .Endpoint(Some(DirectAddress(sqsProtocol, sqsHost, Some(sqsPort))), Some(Credentials("x", "x")))
+      ),
       clientId = simpleQueueService.ClientId("ctd-omega-services"),
       None
     )
@@ -57,7 +60,7 @@ class ApiServiceISpec
 
   override def withFixture(test: OneArgAsyncTest): FutureOutcome = {
     val sqsProtocol = sqsTls match {
-      case true => "https"
+      case true  => "https"
       case false => "http"
     }
     val sqsTestConnector = SqsConnector(s"$sqsProtocol://$sqsHost:$sqsPort")
