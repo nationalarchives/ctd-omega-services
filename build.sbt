@@ -131,7 +131,7 @@ bashScriptExtraDefines ++= Seq(
   """addJava "-Dlogback.configurationFile=${app_home}/../etc/logback.xml""""
 )
 batScriptExtraDefines ++= Seq(
-  """call :add_java "-Dconfig.file=%APP_HOME%\..\conf\settings.conf"""",
+  """call :add_java "-Dconfig.file=%APP_HOME%\..\etc\settings.conf"""",
   """call :add_java "-Dmessage-store-base-dir=%APP_HOME%\..\"""",
   """call :add_java "-Dlogback.custom.targetPath=%APP_HOME%\.."""",
   """call :add_java "-Dlogback.configurationFile=%APP_HOME%\..\etc\logback.xml""""
