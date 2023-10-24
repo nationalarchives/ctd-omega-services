@@ -50,9 +50,22 @@ class JmsConnector(serviceConfig: ServiceConfig) extends AppLogger {
     } yield jmsProducerAndConsumer
 
   def createJmsClient()(implicit L: Logger[IO]): Resource[IO, JmsClient[IO]] = {
-    val maybeEndpoint: Option[Endpoint] = serviceConfig.sqsJmsBroker.endpoint.flatMap { sqsJmsBrokerEndpoint =>
+    val maybeEndpointConfig = getEndpointConfigForSqs()
+
+    simpleQueueService.makeJmsClient[IO](
+      Config(
+        serviceConfig.sqsJmsBroker.awsRegion,
+        maybeEndpointConfig,
+        clientId = simpleQueueService.ClientId("ctd-omega-services"),
+        None
+      )
+    )
+  }
+
+  private def getEndpointConfigForSqs() = {
+    serviceConfig.sqsJmsBroker.endpoint.flatMap { sqsJmsBrokerEndpoint =>
       val protocol = sqsJmsBrokerEndpoint.tls match {
-        case true  => HTTPS
+        case true => HTTPS
         case false => HTTP
       }
       val maybeDirectAddress: Option[DirectAddress] =
@@ -67,15 +80,6 @@ class JmsConnector(serviceConfig: ServiceConfig) extends AppLogger {
         None
       }
     }
-
-    simpleQueueService.makeJmsClient[IO](
-      Config(
-        serviceConfig.sqsJmsBroker.awsRegion,
-        maybeEndpoint,
-        clientId = simpleQueueService.ClientId("ctd-omega-services"),
-        None
-      )
-    )
   }
 
   def createJmsProducer(client: JmsClient[IO])(concurrencyLevel: Int): Resource[IO, JmsProducer[IO]] =
