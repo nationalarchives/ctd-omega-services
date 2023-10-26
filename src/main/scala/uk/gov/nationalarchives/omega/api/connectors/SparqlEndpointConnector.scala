@@ -21,13 +21,13 @@
 
 package uk.gov.nationalarchives.omega.api.connectors
 
-import org.apache.jena.query.{ARQ, Query, QueryExecutionFactory}
-import org.apache.jena.sparql.exec.http.{QueryExecutionHTTP, QueryExecutionHTTPBuilder, QuerySendMode}
+import org.apache.jena.query.{ ARQ, Query, QueryExecutionFactory }
+import org.apache.jena.sparql.exec.http.{ QueryExecutionHTTP, QueryExecutionHTTPBuilder, QuerySendMode }
 import org.phenoscape.sparql.FromQuerySolution
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
 
 import scala.jdk.CollectionConverters._
-import scala.util.{Try, Using}
+import scala.util.{ Try, Using }
 
 class SparqlEndpointConnector(config: ServiceConfig) {
 
@@ -42,12 +42,13 @@ class SparqlEndpointConnector(config: ServiceConfig) {
     * @return
     */
   def execute[T](query: Query, queryDecoder: FromQuerySolution[T]): Try[List[T]] =
-    Using(QueryExecutionHTTP.service(config.sparqlEndpoint).query(query).sendMode(QuerySendMode.asPost).build()) { queryExec =>
-      val resultSet = queryExec.execSelect()
-      val itResults = resultSet.asScala.toList
-      itResults.flatMap { querySolution =>
-        queryDecoder.fromQuerySolution(querySolution).toOption
-      }
+    Using(QueryExecutionHTTP.service(config.sparqlEndpoint).query(query).sendMode(QuerySendMode.asPost).build()) {
+      queryExec =>
+        val resultSet = queryExec.execSelect()
+        val itResults = resultSet.asScala.toList
+        itResults.flatMap { querySolution =>
+          queryDecoder.fromQuerySolution(querySolution).toOption
+        }
     }
 
 }
