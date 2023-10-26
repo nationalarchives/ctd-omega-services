@@ -5,7 +5,7 @@ val Jms4SVersion = "0.5.0-TNA-OMG-0.1.0"
 val AwsJavaSdkVersion = "2.18.1"
 val CirceVersion = "0.14.5"
 val EnumeratumVersion = "1.7.2"
-val JenaVersion = "3.17.0"
+val JenaVersion = "4.9.0"
 
 ThisBuild / versionScheme := Some("semver-spec")
 ThisBuild / scalacOptions ++= Seq("-unchecked", "-deprecation")
