@@ -1,7 +1,7 @@
 import TestConstants.testRepositoryUrl
 import cats.effect.IO
 
-import java.nio.file.{Path, Paths}
+import java.nio.file.{ Path, Paths }
 import scala.sys.process._
 
 /** This is used to load corporate body test data to ElasticSearch instance in Docker container
