@@ -25,6 +25,7 @@ import cats.effect.IO
 import org.apache.jena.ext.xerces.util.URI
 import org.apache.jena.query.{ Query, QuerySolution }
 import org.phenoscape.sparql.FromQuerySolution
+import uk.gov.nationalarchives.omega.api.common.AppLogger
 import uk.gov.nationalarchives.omega.api.connectors.SparqlEndpointConnector
 import uk.gov.nationalarchives.omega.api.messages.request.ListAgentSummary
 import uk.gov.nationalarchives.omega.api.repository.model._
@@ -33,7 +34,8 @@ import uk.gov.nationalarchives.omega.api.repository.vocabulary.Cat
 import java.time.ZonedDateTime
 import scala.util.Try
 
-class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends AbstractRepository with RepositoryUtils {
+class OmegaRepository(sparqlConnector: SparqlEndpointConnector)
+    extends AbstractRepository with RepositoryUtils with AppLogger {
 
   private val sparqlResourceDir = "sparql"
   private val selectLegalStatusSummarySparqlResource = s"/$sparqlResourceDir/select-legal-status-summaries.rq"
@@ -211,6 +213,9 @@ class OmegaRepository(sparqlConnector: SparqlEndpointConnector) extends Abstract
     } yield result
 
   private def executeQuery[A](query: Query, queryDecoder: FromQuerySolution[A]): IO[List[A]] =
-    sparqlConnector.execute(query, queryDecoder)
+    for {
+      result <- sparqlConnector.execute(query, queryDecoder)
+      _      <- logger.debug(s"Query result: [${result.toString()}]")
+    } yield result
 
 }

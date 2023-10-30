@@ -19,19 +19,27 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import uk.gov.nationalarchives.omega.api.conf.{ServiceConfig, SparqlRemote}
+import uk.gov.nationalarchives.omega.api.conf.{ ServiceConfig, SparqlRemote }
 
-/**
- * Simple facade to ease creation of ServiceConfig for test purposes.
- */
+/** Simple facade to ease creation of ServiceConfig for test purposes.
+  */
 object TestServiceConfig {
-  def apply(tempMessageDir: String = "temp",
-            maxConsumers: Int = 1,
-            maxProducers: Int = 1,
-            maxDispatchers: Int = 1,
-            maxLocalQueueSize: Int = 1,
-            requestQueue: String = TestConstants.requestQueueName,
-            sparqlRemote: SparqlRemote = SparqlRemote(TestConstants.testRepositoryUrl)): ServiceConfig = {
-    ServiceConfig(tempMessageDir, maxConsumers, maxProducers, maxDispatchers, maxLocalQueueSize, requestQueue, sparqlRemote)
-  }
+  def apply(
+    tempMessageDir: String = "temp",
+    maxConsumers: Int = 1,
+    maxProducers: Int = 1,
+    maxDispatchers: Int = 1,
+    maxLocalQueueSize: Int = 1,
+    requestQueue: String = TestConstants.requestQueueName,
+    sparqlRemote: SparqlRemote = SparqlRemote(TestConstants.testRepositoryUrl)
+  ): ServiceConfig =
+    ServiceConfig(
+      tempMessageDir,
+      maxConsumers,
+      maxProducers,
+      maxDispatchers,
+      maxLocalQueueSize,
+      requestQueue,
+      sparqlRemote
+    )
 }
