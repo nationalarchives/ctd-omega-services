@@ -62,10 +62,10 @@ class JmsConnector(serviceConfig: ServiceConfig) extends AppLogger {
     )
   }
 
-  private def getEndpointConfigForSqs() = {
+  private def getEndpointConfigForSqs() =
     serviceConfig.sqsJmsBroker.endpoint.flatMap { sqsJmsBrokerEndpoint =>
       val protocol = sqsJmsBrokerEndpoint.tls match {
-        case true => HTTPS
+        case true  => HTTPS
         case false => HTTP
       }
       val maybeDirectAddress: Option[DirectAddress] =
@@ -80,7 +80,6 @@ class JmsConnector(serviceConfig: ServiceConfig) extends AppLogger {
         None
       }
     }
-  }
 
   def createJmsProducer(client: JmsClient[IO])(concurrencyLevel: Int): Resource[IO, JmsProducer[IO]] =
     client.createProducer(concurrencyLevel)
