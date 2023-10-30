@@ -125,3 +125,10 @@ Using the ruleset defined in `.spectral.yaml`, run Spectral via the command line
 ```
 spectral lint ./schema/omega-services.async.api.yaml -r ./schema/validate-omega-services.spectral.yaml --verbose
 ```
+
+### Creating a package for Production
+An RPM package may be built by running:
+```
+sbt clean rpm:packageBin -DcoverageEnabled=false
+```
+the RPM file is then available in: `target/rpm/RPMS/`.

@@ -9,7 +9,7 @@ import jms4s.JmsAutoAcknowledgerConsumer.AutoAckAction
 import jms4s.config.QueueName
 import jms4s.jms.JmsMessage
 import jms4s.sqs.simpleQueueService
-import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP }
+import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP, HTTPS }
 import org.scalatest.concurrent.{ Eventually, IntegrationPatience }
 import org.scalatest.freespec.FixtureAsyncFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -32,10 +32,18 @@ class ApiServiceISpec
   private val replyMessageId: Ref[IO, Option[String]] = Ref[IO].of(Option.empty[String]).unsafeRunSync()
   private val messageTypeId: Ref[IO, Option[String]] = Ref[IO].of(Option.empty[String]).unsafeRunSync()
 
+  val sqsProtocol = sqsTls match {
+    case true  => HTTPS
+    case false => HTTP
+  }
+
   private val jmsClient = simpleQueueService.makeJmsClient[IO](
     Config(
-      endpoint = simpleQueueService.Endpoint(Some(DirectAddress(HTTP, sqsHostName, Some(sqsPort))), "elasticmq"),
-      credentials = Some(Credentials("x", "x")),
+      "elasticmq",
+      endpoint = Some(
+        simpleQueueService
+          .Endpoint(Some(DirectAddress(sqsProtocol, sqsHost, Some(sqsPort))), Some(Credentials("x", "x")))
+      ),
       clientId = simpleQueueService.ClientId("ctd-omega-services"),
       None
     )
@@ -51,7 +59,11 @@ class ApiServiceISpec
   override type FixtureParam = ApiServiceFixture
 
   override def withFixture(test: OneArgAsyncTest): FutureOutcome = {
-    val sqsTestConnector = SqsConnector(s"http://$sqsHostName:$sqsPort")
+    val sqsProtocol = sqsTls match {
+      case true  => "https"
+      case false => "http"
+    }
+    val sqsTestConnector = SqsConnector(s"$sqsProtocol://$sqsHost:$sqsPort")
     val sqsTestConnection: Connection = sqsTestConnector.getConnection
     val session: Session = sqsTestConnection.createSession(false, Session.AUTO_ACKNOWLEDGE)
     val producer: MessageProducer = session.createProducer(session.createQueue(requestQueueName))

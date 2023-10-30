@@ -25,7 +25,7 @@ import cats.effect.{ IO, Resource }
 import jms4s.config.QueueName
 import jms4s.{ JmsAcknowledgerConsumer, JmsClient, JmsProducer }
 import jms4s.sqs.simpleQueueService
-import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP }
+import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, Endpoint, HTTP, HTTPS }
 import org.typelevel.log4cats.Logger
 import uk.gov.nationalarchives.omega.api.common.AppLogger
 import uk.gov.nationalarchives.omega.api.conf.ServiceConfig
@@ -49,15 +49,37 @@ class JmsConnector(serviceConfig: ServiceConfig) extends AppLogger {
         )
     } yield jmsProducerAndConsumer
 
-  def createJmsClient()(implicit L: Logger[IO]): Resource[IO, JmsClient[IO]] =
+  def createJmsClient()(implicit L: Logger[IO]): Resource[IO, JmsClient[IO]] = {
+    val maybeEndpointConfig = getEndpointConfigForSqs()
+
     simpleQueueService.makeJmsClient[IO](
       Config(
-        endpoint = simpleQueueService.Endpoint(Some(DirectAddress(HTTP, "localhost", Some(9324))), "elasticmq"),
-        credentials = Some(Credentials("x", "x")),
+        serviceConfig.sqsJmsBroker.awsRegion,
+        maybeEndpointConfig,
         clientId = simpleQueueService.ClientId("ctd-omega-services"),
         None
       )
     )
+  }
+
+  private def getEndpointConfigForSqs() =
+    serviceConfig.sqsJmsBroker.endpoint.flatMap { sqsJmsBrokerEndpoint =>
+      val protocol = sqsJmsBrokerEndpoint.tls match {
+        case true  => HTTPS
+        case false => HTTP
+      }
+      val maybeDirectAddress: Option[DirectAddress] =
+        sqsJmsBrokerEndpoint.host.map(host => DirectAddress(protocol, host, sqsJmsBrokerEndpoint.port))
+      val maybeCredentials: Option[Credentials] =
+        sqsJmsBrokerEndpoint.authentication.map(awsCredentialsAuthentication =>
+          Credentials(awsCredentialsAuthentication.accessKey, awsCredentialsAuthentication.secretKey)
+        )
+      if (maybeDirectAddress.nonEmpty || maybeCredentials.nonEmpty) {
+        Some(Endpoint(maybeDirectAddress, maybeCredentials))
+      } else {
+        None
+      }
+    }
 
   def createJmsProducer(client: JmsClient[IO])(concurrencyLevel: Int): Resource[IO, JmsProducer[IO]] =
     client.createProducer(concurrencyLevel)

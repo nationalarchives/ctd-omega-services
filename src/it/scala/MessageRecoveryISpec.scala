@@ -7,7 +7,7 @@ import jms4s.JmsAutoAcknowledgerConsumer.AutoAckAction
 import jms4s.config.QueueName
 import jms4s.jms.JmsMessage
 import jms4s.sqs.simpleQueueService
-import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP }
+import jms4s.sqs.simpleQueueService.{ Config, Credentials, DirectAddress, HTTP, HTTPS }
 import org.apache.commons.lang3.SerializationUtils
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 import org.scalatest.concurrent.{ Eventually, IntegrationPatience }
@@ -34,7 +34,7 @@ class MessageRecoveryISpec
     extends FixtureAsyncFreeSpec with AsyncIOSpec with Matchers with Eventually with IntegrationPatience
     with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory[IO]
+  implicit val loggerFactory: LoggerFactory[IO] = Slf4jFactory.create[IO]
   implicit val logger: SelfAwareStructuredLogger[IO] = LoggerFactory[IO].getLogger
 
   implicit override val patienceConfig: PatienceConfig =
@@ -46,10 +46,18 @@ class MessageRecoveryISpec
   private val replyMessageText: Ref[IO, Option[String]] = Ref[IO].of(Option.empty[String]).unsafeRunSync()
   private var tempMsgDir: Option[String] = None
 
+  private val sqsProtocol = sqsTls match {
+    case true  => HTTPS
+    case false => HTTP
+  }
+
   private val jmsClient = simpleQueueService.makeJmsClient[IO](
     Config(
-      endpoint = simpleQueueService.Endpoint(Some(DirectAddress(HTTP, sqsHostName, Some(sqsPort))), "elasticmq"),
-      credentials = Some(Credentials("x", "x")),
+      "elasticmq",
+      endpoint = Some(
+        simpleQueueService
+          .Endpoint(Some(DirectAddress(sqsProtocol, sqsHost, Some(sqsPort))), Some(Credentials("x", "x")))
+      ),
       clientId = simpleQueueService.ClientId("ctd-omega-services"),
       None
     )
@@ -96,7 +104,7 @@ class MessageRecoveryISpec
     "runs the recovery service and removes the message from the message store" in { f =>
       val messageStoreFolder = Paths.get(tempMsgDir.get)
       val localMessageStore = new LocalMessageStore(messageStoreFolder)
-      val apiService = new ApiService(TestServiceConfig(tempMessageDir = tempMsgDir.get))
+      val apiService = new ApiService(TestServiceConfig(messageStoreDir = tempMsgDir.get))
       val serviceIO = apiService.startSuspended
       val res = for {
         consumerFiber   <- f.consumerRes.start

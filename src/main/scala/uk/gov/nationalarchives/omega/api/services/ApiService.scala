@@ -112,9 +112,11 @@ class ApiService(val config: ServiceConfig) extends Stateful {
   }.useEval
 
   private def getLocalMessageStore: IO[Either[Throwable, LocalMessageStore]] = IO.blocking {
-    val messageStoreFolder = Paths.get(config.tempMessageDir)
+    val messageStoreFolder = Paths.get(config.messageStoreDir)
     Files.createDirectories(messageStoreFolder)
-    new LocalMessageStore(messageStoreFolder)
+    val localMessageStore = new LocalMessageStore(messageStoreFolder)
+    logger.info(s"Using message store: ${messageStoreFolder.toAbsolutePath.toString}")
+    localMessageStore
   }.attempt
 
   /* This method uses IO.race() to run the message handler and dispatcher in parallel. The common component between the

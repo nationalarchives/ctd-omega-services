@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration info="true">
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- NOTE(AR) place the `log` folder under a custom target path if specified -->
+    <if condition='isDefined("logback.custom.targetPath")'>
+        <then>
+            <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+                <file>${logback.custom.targetPath}/log/ctd-omega-services.log</file>
+                <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                    <customFields>{"application":"ctd-omega-services"}</customFields>
+                </encoder>
+            </appender>
+        </then>
+        <else>
+            <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+                <file>log/ctd-omega-services.log</file>
+                <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                    <customFields>{"application":"ctd-omega-services"}</customFields>
+                </encoder>
+            </appender>
+        </else>
+    </if>
+
+    <root level="info">
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <logger name="uk.gov.nationalarchives.omega.api" level="INFO"/>
+
+</configuration>

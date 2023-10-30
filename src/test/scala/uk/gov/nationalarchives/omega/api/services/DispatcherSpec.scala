@@ -190,7 +190,7 @@ class DispatcherSpec
     "for message recovery then it should run recovery and delete all the local messages" in {
       val testMessage = "Testing message recovery!"
       // create a valid message
-      // write the message to file in the temporary message store
+      // write the message to file in the message store
       writeMessageFile(generateValidLocalMessageForEchoService().copy(messageText = testMessage))
       // read the file from the message store
       val localMessages = localMessageStore.readAllFilesInDirectory().unsafeRunSync()

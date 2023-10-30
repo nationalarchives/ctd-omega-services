@@ -22,14 +22,26 @@
 package uk.gov.nationalarchives.omega.api.conf
 
 case class ServiceConfig(
-  tempMessageDir: String,
+  messageStoreDir: String,
   maxConsumers: Int,
   maxProducers: Int,
   maxDispatchers: Int,
   maxLocalQueueSize: Int,
   requestQueue: String,
+  sqsJmsBroker: SqsJmsBroker,
   sparqlRemote: SparqlRemote
 )
+
+case class SqsJmsBroker(awsRegion: String, endpoint: Option[SqsJmsBrokerEndpoint])
+
+case class SqsJmsBrokerEndpoint(
+  tls: Boolean,
+  host: Option[String],
+  port: Option[Int],
+  authentication: Option[AwsCredentialsAuthentication]
+)
+
+case class AwsCredentialsAuthentication(accessKey: String, secretKey: String)
 
 case class SparqlRemote(
   uri: String,
@@ -38,6 +50,6 @@ case class SparqlRemote(
   authentication: Option[SparqlRemoteAuthentication] = None
 )
 
-case class SparqlRemoteAuthentication(iam: IamAuthentication)
+case class SparqlRemoteAuthentication(iam: IamRegionAuthentication)
 
-case class IamAuthentication(awsRegion: String)
+case class IamRegionAuthentication(awsRegion: String)
